@@ -1,0 +1,69 @@
+# Нууц ба орчны файлууд — ХЭЗЭЭ Ч commit хийхгүй
+stack/.env
+**/*.key
+**/*.pem
+**/*_key
+secrets/
+
+# Сертификатууд (Лаб 2-т үүсгэнэ)
+stack/emqx/certs/*
+!stack/emqx/certs/.gitkeep
+lab02/certs/*
+!lab02/certs/.gitkeep
+
+# Хэмжилтийн гаралт — тайланд хэрэгтэй хэсгийг нь гараар нэмнэ
+measurements/
+*.csv.raw
+
+# Загварын файлууд (том)
+lab06/models/*.eim
+lab06/models/*.tflite
+lab06/data/raw/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# Систем
+.DS_Store
+Thumbs.db
+*.log
+
+# Лаб 2 — итгэмжлэл агуулсан гаралт
+lab02/out/*
+!lab02/out/.gitkeep
+
+# Лаб 3–5 гаралт
+lab03/out/*
+!lab03/out/.gitkeep
+lab04/measurements/*
+!lab04/measurements/.gitkeep
+lab05/out/*
+!lab05/out/.gitkeep
+
+# Лаб 6–8 гаралт
+lab06/data/*
+!lab06/data/.gitkeep
+lab06/models/*
+!lab06/models/.gitkeep
+lab06/out/*
+!lab06/out/.gitkeep
+lab07/out/*
+!lab07/out/.gitkeep
+lab08/out/*
+!lab08/out/.gitkeep
+
+# LaTeX-ийн түр файлууд
+manual/*.aux
+manual/*.log
+manual/*.out
+manual/*.toc
+manual/*.fls
+manual/*.fdb_latexmk
+manual/*.synctex.gz
+manual/chapters/*.aux
+manual/p-*.jpg

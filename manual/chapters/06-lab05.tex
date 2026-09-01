@@ -1,0 +1,616 @@
+% Автоматаар үүсгэсэн — эх файл: lab05/README.md
+\chapter{Лаб 5 — Өгөгдлийн шугам ба эвдрэлийн туршилт}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+\endhead
+\bottomrule
+\endlastfoot
+\textbf{7 хоног} & XI \\
+\textbf{Хугацаа} & 4 цаг \\
+\textbf{Суралцахуйн үр дүн} & ҮД4 (үнэлэх), ҮД6, ҮД7 \\
+\textbf{Үнэлгээ} & Бичгийн тайлан, 10 оноо \\
+\end{longtable}\endgroup
+
+\hypertarget{ux437ux43eux440ux438ux43bux433ux43e}{%
+\section{1. Зорилго}\label{ux437ux43eux440ux438ux43bux433ux43e}}
+
+Бүрэн өгөгдлийн шугам барьж, дараа нь \textbf{зориудаар эвдэж} юу алдагдахыг тоогоор хэмжинэ.
+
+\begin{verbatim}
+   MQTT  →  Node-RED  →  InfluxDB 3  →  Grafana
+              (шүүх,        (хадгалах)     (харах)
+               нэгтгэх)
+\end{verbatim}
+
+Ихэнх сургалтын лаборатори эхний мөрөөр л дуусдаг: "шугам ажиллаж байна ✓". Гэвч бодит систем \textbf{эвдэрдэг}. Тиймээс энэ лабораторийн хоёр дахь хагаст бид брокерыг унтрааж, сүлжээг тасалж, дискийг дүүргэж, \textbf{юу алдагдаж, юу буферлэгдэж, юу автоматаар сэргэхийг} хэмжинэ.
+
+\hypertarget{ux433ux43eux43b-ux431ux4afux442ux44dux44dux433ux434ux44dux445ux4afux4afux43d-ux44dux432ux434ux440ux44dux43bux438ux439ux43d-ux43cux430ux442ux440ux438ux446}{%
+\subsection{Гол бүтээгдэхүүн: эвдрэлийн матриц}\label{ux433ux43eux43b-ux431ux4afux442ux44dux44dux433ux434ux44dux445ux4afux4afux43d-ux44dux432ux434ux440ux44dux43bux438ux439ux43d-ux43cux430ux442ux440ux438ux446}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
+\toprule
+эвдрэл & шинж тэмдэг & өгөгдлийн алдагдал & сэргэх хугацаа \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\end{longtable}\endgroup
+
+Энэ хүснэгт бол таны системийн \textbf{найдвартай байдлын паспорт}. Багийн төслийн тайланд шууд орно.
+
+\hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}{%
+\section{2. Урьдчилсан нөхцөл}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}}
+
+\begin{itemize}
+\tightlist
+\item
+  Лаб 1--4 дууссан
+\item
+  \texttt{pipeline} профайл нэмж асаана:
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack}
+\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core }\AttributeTok{{-}{-}profile}\NormalTok{ pipeline up }\AttributeTok{{-}d}
+\FunctionTok{make}\NormalTok{ health}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  Pi дээр \texttt{sudo} эрх (disk туршилтад \texttt{mount} шаардлагатай)
+\item
+  \texttt{stress-ng} суусан (\texttt{sudo\ apt\ install\ -y\ stress-ng})
+\end{itemize}
+
+\hypertarget{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}{%
+\section{3. Онолын сануулга}\label{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}}
+
+\textbf{QoS нь брокер хүртэл л баталгаа өгнө.} QoS 2-оор илгээсэн мессеж брокерт баттай хүрнэ. Гэхдээ брокероос Node-RED, тэндээс InfluxDB руу явах замд баталгаа \textbf{байхгүй}. Энэ бол Лаб 3-т үзсэн ойлголтын практик үр дагавар: \textbf{төгсгөлөөс төгсгөл хүртэлх баталгаа нь давхарга бүрийн баталгааны үржвэр биш, хамгийн сул холбоосоор тодорхойлогдоно}.
+
+\textbf{Хаана буферлэгдэх вэ?}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Эвдрэл
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хэн буферлэдэг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хязгаар
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Брокер унтарсан & төхөөрөмж өөрөө (хэрэв кодлогдсон бол) & төхөөрөмжийн RAM \\
+Хэрэглэгч унтарсан & брокер (сесс хадгалагдсан бол) & \texttt{max\_\allowbreak{}mqueue\_\allowbreak{}len} \\
+Өгөгдлийн сан унтарсан & Node-RED (dead-letter бичвэл) & диск \\
+Диск дүүрсэн & \textbf{хэн ч үгүй} & --- \\
+\end{longtable}\endgroup
+
+Сүүлийн мөр хамгийн аюултай: диск дүүрэхэд бүх давхарга нэгэн зэрэг унана.
+
+\textbf{Сэргэх хугацаа (MTTR) vs өгөгдлийн алдагдал (RPO).} Хоёр өөр үзүүлэлт. Систем 30 секундын дараа сэргэж болно (сайн MTTR), гэхдээ тэр 30 секундын өгөгдөл бүрэн алдагдсан байж болно (муу RPO).
+
+\hypertarget{ux430ux43bux445ux43cux443ux443ux434}{%
+\section{4. Алхмууд}\label{ux430ux43bux445ux43cux443ux443ux434}}
+
+\hypertarget{ux430ux43bux445ux430ux43c-1-ux4e9ux433ux4e9ux433ux434ux43bux438ux439ux43d-ux441ux430ux43d-ux431ux44dux43bux442ux433ux44dux445-20-ux43cux438ux43d}{%
+\subsection{Алхам 1 --- Өгөгдлийн сан бэлтгэх (20 мин)}\label{ux430ux43bux445ux430ux43c-1-ux4e9ux433ux4e9ux433ux434ux43bux438ux439ux43d-ux441ux430ux43d-ux431ux44dux43bux442ux433ux44dux445-20-ux43cux438ux43d}}
+
+InfluxDB 3-д мэдээллийн сан үүсгэнэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/configure/database\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \AttributeTok{{-}d} \StringTok{\textquotesingle{}\{"db":"cnc302"\}\textquotesingle{}}
+
+\CommentTok{\# шалгах}
+\ExtensionTok{curl} \AttributeTok{{-}s} \StringTok{\textquotesingle{}http://localhost:8181/api/v3/configure/database?format=json\textquotesingle{}} \KeywordTok{|} \ExtensionTok{jq}
+\end{Highlighting}
+\end{Shaded}
+
+Гараар нэг мөр бичиж туршина:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/write\_lp?db=cnc302\&precision=millisecond\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: text/plain\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}data{-}binary} \StringTok{"telemetry,site=test,device=test0 temperature=24.5 }\VariableTok{$(}\FunctionTok{date}\NormalTok{ +\%s\%3N}\VariableTok{)}\StringTok{"}
+
+\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/query\_sql\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}d} \StringTok{\textquotesingle{}\{"db":"cnc302","q":"SELECT * FROM telemetry LIMIT 5","format":"json"\}\textquotesingle{}} \KeywordTok{|} \ExtensionTok{jq}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+InfluxDB 2.7 нөөц хувилбар ашиглаж байгаа бол \texttt{docs/troubleshooting.md}-ийн заавраар. Дараагийн алхмуудад \texttt{-\/-influx2} тугийг нэмнэ.
+\end{quote}
+
+\hypertarget{ux430ux43bux445ux430ux43c-2-node-red-ux448ux443ux433ux430ux43c-ux431ux430ux440ux438ux445-50-ux43cux438ux43d}{%
+\subsection{Алхам 2 --- Node-RED шугам барих (50 мин)}\label{ux430ux43bux445ux430ux43c-2-node-red-ux448ux443ux433ux430ux43c-ux431ux430ux440ux438ux445-50-ux43cux438ux43d}}
+
+\textbf{2.1 Импортлох.} Node-RED (\texttt{:1880}) → цэс (☰) → \textbf{Import} → \texttt{lab05/flows/nodered-pipeline.json} файлын агуулгыг наана.
+
+Урсгалын бүтэц:
+
+\begin{verbatim}
+mqtt in ──▶ задлан шинжлэх ─┬─▶ line protocol (түүхий) ─┐
+                            │                           ├─▶ InfluxDB бичих ─▶ шалгах ─┬─▶ (ok)
+                            └─▶ 60с цонх ─▶ lp (нэгтгэл)┘                              └─▶ dead-letter
+\end{verbatim}
+
+\textbf{2.2 Брокерын тохиргоог шалгана.} \texttt{mqtt-broker} зангилаа дээр давхар товшиж \texttt{emqx:1883} эсэхийг батална (Docker сүлжээн дотор үйлчилгээний нэрээр хандана).
+
+\textbf{2.3 Deploy} дараад өгөгдөл урсгана:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}devices}\NormalTok{ 10 }\AttributeTok{{-}{-}interval}\NormalTok{ 1}
+\end{Highlighting}
+\end{Shaded}
+
+Node-RED-ийн debug самбарт 10 секунд тутам \texttt{write\_ok} тоолуур өсөх ёстой.
+
+\textbf{2.4 Задлан шинжлэх зангилааны гурван үүргийг ойлгоно:}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Үүрэг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Код дотор
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Яагаад
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+UNS схемийн шалгалт & \texttt{if\ (p.length\ !==\ 6)} & буруу нэршилтэй өгөгдөл санд орохоос сэргийлнэ \\
+Өгөгдлийн чанар & \texttt{temperature\ \textless{}\ -60\ \textbackslash{}\textbar{}\textbackslash{}\textbar{}\ \textgreater{}\ 150} & эвдэрсэн мэдрэгчийн утга нэгтгэлийг сүйтгэнэ \\
+Шошго гаргах & \texttt{msg.tags\ =\ \{site,\ area,\ line,\ device\}} & InfluxDB-д индексжүүлэх хэмжээсүүд \\
+\end{longtable}\endgroup
+
+\textbf{2.5 Чанарын шалгуурыг туршина.} Хүрээнээс гарсан утга илгээнэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h} \VariableTok{$H} \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/ulaanbaatar/campus/line01/dev9999/telemetry\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}m} \StringTok{\textquotesingle{}\{"ts":\textquotesingle{}"}\VariableTok{$(}\FunctionTok{date}\NormalTok{ +\%s\%3N}\VariableTok{)}\StringTok{"\textquotesingle{},"temperature":9999,"humidity":50,"vibration\_rms":0.3\}\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+Node-RED-д \texttt{warn} гарч, өгөгдөл сан руу \textbf{орохгүй} байх ёстой. Шалгана:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/query\_sql\textquotesingle{}} \AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}d} \StringTok{\textquotesingle{}\{"db":"cnc302","q":"SELECT count(*) c FROM telemetry WHERE device=\textquotesingle{}"\textquotesingle{}"\textquotesingle{}dev9999\textquotesingle{}"\textquotesingle{}"\textquotesingle{}","format":"json"\}\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{2.6 Хадгалах бодлого.} InfluxDB 3-д:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/configure/database\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}d} \StringTok{\textquotesingle{}\{"db":"cnc302\_30d","retention\_period":"30d"\}\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Хүснэгт 1}-ийг бөглөнө: түүхий өгөгдөл хэдэн хоног, нэгтгэсэн өгөгдөл хэдэн хоног, яагаад?
+
+\hypertarget{ux430ux43bux445ux430ux43c-3-grafana-ux441ux430ux43cux431ux430ux440-25-ux43cux438ux43d}{%
+\subsection{Алхам 3 --- Grafana самбар (25 мин)}\label{ux430ux43bux445ux430ux43c-3-grafana-ux441ux430ux43cux431ux430ux440-25-ux43cux438ux43d}}
+
+Grafana (\texttt{:3000}) → өгөгдлийн эх сурвалж аль хэдийн тохируулагдсан (\texttt{stack/grafana/provisioning}).
+
+Гурван панель үүсгэнэ:
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Панель
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Асуулга
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Температурын цуваа & \texttt{SELECT\ time,\ temperature,\ device\ FROM\ telemetry\ WHERE\ \$\_\allowbreak{}\_\allowbreak{}timeFilter(time)} \\
+Идэвхтэй төхөөрөмж & \texttt{SELECT\ count(DISTINCT\ device)\ FROM\ telemetry\ WHERE\ \$\_\allowbreak{}\_\allowbreak{}timeFilter(time)} \\
+Бичилтийн хурд & \texttt{SELECT\ time,\ count(*)\ FROM\ telemetry\ WHERE\ \$\_\allowbreak{}\_\allowbreak{}timeFilter(time)\ GROUP\ BY\ time} \\
+\end{longtable}\endgroup
+
+\textbf{Дохиолол нэмнэ:} дундаж чичиргээ \textgreater{} 1.5 үед. Alerting → New alert rule.
+
+\hypertarget{ux430ux43bux445ux430ux43c-4-ux44dux432ux434ux440ux44dux43bux438ux439ux43d-ux442ux443ux440ux448ux438ux43bux442-90-ux43cux438ux43d}{%
+\subsection{Алхам 4 --- ЭВДРЭЛИЙН ТУРШИЛТ (90 мин)}\label{ux430ux43bux445ux430ux43c-4-ux44dux432ux434ux440ux44dux43bux438ux439ux43d-ux442ux443ux440ux448ux438ux43bux442-90-ux43cux438ux43d}}
+
+\textbf{Энэ бол лабораторийн гол хэсэг.} Туршилт бүр ижил бүтэцтэй:
+
+\begin{verbatim}
+1. data_integrity.py publish эхлүүлнэ (5 минут)
+2. 60 секундын дараа эвдрэл үүсгэнэ
+3. Тестийг дуустал хүлээнэ
+4. verify-ээр алдагдлыг тоолно
+\end{verbatim}
+
+\hypertarget{ux441ux443ux443ux440ux44c-ux44dux432ux434ux440ux44dux43bux433ux4afux439-ux437ux430ux430ux432ux430ux43b-ux44dux445ux43bux44dux44dux434-ux445ux438ux439ux43dux44d}{%
+\subsubsection{4.1 Суурь (эвдрэлгүй) --- заавал эхлээд хийнэ}\label{ux441ux443ux443ux440ux44c-ux44dux432ux434ux440ux44dux43bux433ux4afux439-ux437ux430ux430ux432ux430ux43b-ux44dux445ux43bux44dux44dux434-ux445ux438ux439ux43dux44d}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# зөөврийн компьютер дээр}
+\ExtensionTok{python}\NormalTok{ lab05/data\_integrity.py publish }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}rate}\NormalTok{ 10 }\AttributeTok{{-}{-}seconds}\NormalTok{ 180 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}qos}\NormalTok{ 1 }\AttributeTok{{-}{-}run{-}id}\NormalTok{ base }\AttributeTok{{-}{-}outdir}\NormalTok{ lab05/out}
+\ExtensionTok{python}\NormalTok{ lab05/data\_integrity.py verify }\AttributeTok{{-}{-}influx}\NormalTok{ http://}\VariableTok{$H}\NormalTok{:8181 }\AttributeTok{{-}{-}run{-}id}\NormalTok{ base }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}outdir}\NormalTok{ lab05/out}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Алдагдал 0\% байх ёстой.} Хэрэв суурь дээр аль хэдийн алдагдаж байвал цааш явах утгагүй --- шугамаа засна.
+
+\hypertarget{ux431ux440ux43eux43aux435ux440-ux443ux43dux442ux430ux440ux441ux430ux43d}{%
+\subsubsection{4.2 Брокер унтарсан}\label{ux431ux440ux43eux43aux435ux440-ux443ux43dux442ux430ux440ux441ux430ux43d}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# терминал 1 (зөөврийн компьютер)}
+\ExtensionTok{python}\NormalTok{ lab05/data\_integrity.py publish }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}rate}\NormalTok{ 10 }\AttributeTok{{-}{-}seconds}\NormalTok{ 300 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}qos}\NormalTok{ 1 }\AttributeTok{{-}{-}run{-}id}\NormalTok{ broker30 }\AttributeTok{{-}{-}outdir}\NormalTok{ lab05/out}
+
+\CommentTok{\# терминал 2 (Pi дээр, 60 секундын дараа)}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh broker 30}
+\end{Highlighting}
+\end{Shaded}
+
+Ажигла: publish терминалд \texttt{⚠\ холболт\ тасарлаа} → \texttt{✓\ дахин\ холбогдлоо}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab05/data\_integrity.py verify }\AttributeTok{{-}{-}influx}\NormalTok{ http://}\VariableTok{$H}\NormalTok{:8181 }\AttributeTok{{-}{-}run{-}id}\NormalTok{ broker30}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux4e9ux433ux4e9ux433ux434ux43bux438ux439ux43d-ux441ux430ux43d-ux443ux43dux442ux430ux440ux441ux430ux43d-ux431ux440ux43eux43aux435ux440-ux430ux436ux438ux43bux43bux430ux436-ux431ux430ux439ux43dux430}{%
+\subsubsection{4.3 Өгөгдлийн сан унтарсан (брокер ажиллаж байна!)}\label{ux4e9ux433ux4e9ux433ux434ux43bux438ux439ux43d-ux441ux430ux43d-ux443ux43dux442ux430ux440ux441ux430ux43d-ux431ux440ux43eux43aux435ux440-ux430ux436ux438ux43bux43bux430ux436-ux431ux430ux439ux43dux430}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab05/data\_integrity.py publish }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}rate}\NormalTok{ 10 }\AttributeTok{{-}{-}seconds}\NormalTok{ 300 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}qos}\NormalTok{ 1 }\AttributeTok{{-}{-}run{-}id}\NormalTok{ influx30 }\AttributeTok{{-}{-}outdir}\NormalTok{ lab05/out}
+\CommentTok{\# Pi дээр:}
+\FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh influx 30}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+\textbf{Энэ хамгийн сонирхолтой тохиолдол.} Төхөөрөмж юу ч анзаарахгүй --- брокер хүлээж авсаар байна. Гэвч Node-RED-ийн бичилт унана. Dead-letter файл ажиллаж байна уу?
+\end{quote}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ exec cnc302{-}nodered wc }\AttributeTok{{-}l}\NormalTok{ /data/deadletter.jsonl}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux441ux4afux43bux436ux44dux44d-ux442ux430ux441ux430ux440ux441ux430ux43d}{%
+\subsubsection{4.4 Сүлжээ тасарсан}\label{ux441ux4afux43bux436ux44dux44d-ux442ux430ux441ux430ux440ux441ux430ux43d}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab05/data\_integrity.py publish }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}rate}\NormalTok{ 10 }\AttributeTok{{-}{-}seconds}\NormalTok{ 300 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}qos}\NormalTok{ 1 }\AttributeTok{{-}{-}run{-}id}\NormalTok{ net30 }\AttributeTok{{-}{-}outdir}\NormalTok{ lab05/out}
+\FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh network 30}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux434ux438ux441ux43a-ux434ux4afux4afux440ux441ux44dux43d-ux430ux44eux443ux43bux433ux4afux439-ux434ux430ux432ux442ux430ux43bux442ux44bux43d-ux444ux430ux439ux43bux430ux430ux440}{%
+\subsubsection{4.5 Диск дүүрсэн (аюулгүй давталтын файлаар)}\label{ux434ux438ux441ux43a-ux434ux4afux4afux440ux441ux44dux43d-ux430ux44eux443ux43bux433ux4afux439-ux434ux430ux432ux442ux430ux43bux442ux44bux43d-ux444ux430ux439ux43bux430ux430ux440}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh disk 60}
+\end{Highlighting}
+\end{Shaded}
+
+Энэ хооронд Docker-ийн логийн хязгаар ажиллаж байгааг шалгана:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ inspect cnc302{-}emqx }\AttributeTok{{-}{-}format} \StringTok{\textquotesingle{}\{\{json .HostConfig.LogConfig\}\}\textquotesingle{}}
+\FunctionTok{sudo}\NormalTok{ du }\AttributeTok{{-}sh}\NormalTok{ /var/lib/docker/containers/}\PreprocessorTok{*}\NormalTok{/}\PreprocessorTok{*}\NormalTok{{-}json.log }\KeywordTok{|} \FunctionTok{sort} \AttributeTok{{-}h} \KeywordTok{|} \FunctionTok{tail} \AttributeTok{{-}3}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{cpu-ux445ux430ux43dux430ux43bux442}{%
+\subsubsection{4.6 CPU ханалт}\label{cpu-ux445ux430ux43dux430ux43bux442}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab05/data\_integrity.py publish }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}rate}\NormalTok{ 50 }\AttributeTok{{-}{-}seconds}\NormalTok{ 180 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}qos}\NormalTok{ 1 }\AttributeTok{{-}{-}run{-}id}\NormalTok{ cpu45 }\AttributeTok{{-}{-}outdir}\NormalTok{ lab05/out}
+\FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh cpu 45}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{qos-ux438ux439ux43d-ux43dux4e9ux43bux4e9ux4e9}{%
+\subsubsection{4.7 QoS-ийн нөлөө}\label{qos-ux438ux439ux43d-ux43dux4e9ux43bux4e9ux4e9}}
+
+Брокерын унтралтыг \textbf{QoS 0-оор} давтана:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab05/data\_integrity.py publish }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}rate}\NormalTok{ 10 }\AttributeTok{{-}{-}seconds}\NormalTok{ 300 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}qos}\NormalTok{ 0 }\AttributeTok{{-}{-}run{-}id}\NormalTok{ broker30q0 }\AttributeTok{{-}{-}outdir}\NormalTok{ lab05/out}
+\FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh broker 30}
+\end{Highlighting}
+\end{Shaded}
+
+QoS 1-тэй харьцуулна. \textbf{Ялгаа гарсан уу? Хэр их?}
+
+\hypertarget{ux430ux43bux445ux430ux43c-5-ux44dux432ux434ux440ux44dux43bux438ux439ux43d-ux43cux430ux442ux440ux438ux446-ux431ux430-ux434ux4afux433ux43dux44dux43bux442-25-ux43cux438ux43d}{%
+\subsection{Алхам 5 --- Эвдрэлийн матриц ба дүгнэлт (25 мин)}\label{ux430ux43bux445ux430ux43c-5-ux44dux432ux434ux440ux44dux43bux438ux439ux43d-ux43cux430ux442ux440ux438ux446-ux431ux430-ux434ux4afux433ux43dux44dux43bux442-25-ux43cux438ux43d}}
+
+\textbf{Хүснэгт 2} (эвдрэлийн матриц)-ыг бөглөнө. Дараа нь бүх зүйлийг сэргээнэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh restore}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ add }\AttributeTok{{-}A} \KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ status        }\CommentTok{\# lab05/out/ орохгүй}
+\FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 5: өгөгдлийн шугам, эвдрэлийн туршилт"}
+\FunctionTok{git}\NormalTok{ tag lab05{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push origin main }\AttributeTok{{-}{-}tags}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux445ux4afux441ux43dux44dux433ux442ux4afux4afux434}{%
+\section{5. Хэмжилтийн хүснэгтүүд}\label{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux445ux4afux441ux43dux44dux433ux442ux4afux4afux434}}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-1-ux4e9ux433ux4e9ux433ux434ux43bux438ux439ux43d-ux431ux43eux434ux43bux43eux433ux43e}{%
+\subsection{Хүснэгт 1 --- Өгөгдлийн бодлого}\label{ux445ux4afux441ux43dux44dux433ux442-1-ux4e9ux433ux4e9ux433ux434ux43bux438ux439ux43d-ux431ux43eux434ux43bux43eux433ux43e}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Өгөгдлийн төрөл
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Нарийвчлал
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хадгалах хугацаа
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Дискний тооцоо
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Үндэслэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Түүхий телеметр & 1 с & & & \\
+1 минутын нэгтгэл & 60 с & & & \\
+Дохиолол & үйл явдал & & & \\
+\end{longtable}\endgroup
+
+Дискний тооцоо: ule{1.5cm}{0.4pt} төхөөрөмж × ule{1.5cm}{0.4pt} мсж/с × ule{1.5cm}{0.4pt} Б/мөр × ule{1.5cm}{0.4pt} хоног = ule{1.5cm}{0.4pt} GiB
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-2-ux44dux432ux434ux440ux44dux43bux438ux439ux43d-ux43cux430ux442ux440ux438ux446-ux433ux43eux43b-ux445ux4afux441ux43dux44dux433ux442}{%
+\subsection{Хүснэгт 2 --- ЭВДРЭЛИЙН МАТРИЦ (ГОЛ ХҮСНЭГТ)}\label{ux445ux4afux441ux43dux44dux433ux442-2-ux44dux432ux434ux440ux44dux43bux438ux439ux43d-ux43cux430ux442ux440ux438ux446-ux433ux43eux43b-ux445ux4afux441ux43dux44dux433ux442}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Эвдрэл
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Үргэлжлэл (с)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шинж тэмдэг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Илгээсэн
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Санд хүрсэн
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Алдагдал \%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хамгийн урт тасалдал (с)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Сэргэх хугацаа (с)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Автоматаар сэргэсэн үү
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+0 & Суурь (эвдрэлгүй) & --- & & & & & & & \\
+1 & Брокер унтарсан (QoS 1) & 30 & & & & & & & \\
+2 & Брокер унтарсан (QoS 0) & 30 & & & & & & & \\
+3 & Өгөгдлийн сан унтарсан & 30 & & & & & & & \\
+4 & Сүлжээ тасарсан & 30 & & & & & & & \\
+5 & Диск дүүрсэн & 60 & & & & & & & \\
+6 & CPU ханасан & 45 & & & & & & & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-3-ux431ux443ux444ux435ux440ux43bux44dux43bux442ux438ux439ux43d-ux448ux438ux43dux436ux438ux43bux433ux44dux44d}{%
+\subsection{Хүснэгт 3 --- Буферлэлтийн шинжилгээ}\label{ux445ux4afux441ux43dux44dux433ux442-3-ux431ux443ux444ux435ux440ux43bux44dux43bux442ux438ux439ux43d-ux448ux438ux43dux436ux438ux43bux433ux44dux44d}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Эвдрэл
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хэн буферлэсэн
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хэдэн мессеж хадгалагдсан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хязгаар нь юу байв
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Брокер унтарсан & & & \\
+Сан унтарсан & & & \\
+Сүлжээ тасарсан & & & \\
+\end{longtable}\endgroup
+
+Dead-letter файлд хэдэн мөр орсон: ule{1.5cm}{0.4pt}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-4-mttr-ux431ux430-rpo}{%
+\subsection{Хүснэгт 4 --- MTTR ба RPO}\label{ux445ux4afux441ux43dux44dux433ux442-4-mttr-ux431ux430-rpo}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Эвдрэл
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+MTTR (сэргэх хугацаа, с)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+RPO (алдагдсан өгөгдлийн хугацаа, с)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Аль нь илүү муу вэ
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Брокер & & & \\
+Сан & & & \\
+Сүлжээ & & & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442}{%
+\section{6. Хяналтын асуулт}\label{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  QoS 1 ба QoS 0-ын хооронд брокер унтарсан үед алдагдал хэр ялгаатай байв? Хүлээсэн үр дүнтэй тань таарсан уу?
+\item
+  Өгөгдлийн сан унтарсан үед \textbf{төхөөрөмж} юу ч анзаарсангүй. Энэ яагаад аюултай вэ? Хэрхэн илрүүлэх вэ?
+\item
+  Хамгийн урт тасалдал ба эвдрэлийн үргэлжлэх хугацаа тэнцүү байсан уу? Хэрэв тасалдал урт бол илүүдэл хугацаа хаанаас гарав?
+\item
+  Dead-letter загвар юу шийдэж, юу шийдэхгүй вэ?
+\item
+  Диск дүүрсэн үед аль үйлчилгээ хамгийн түрүүнд унав? Логийн эргэлт тохируулаагүй байсан бол юу болох байсан бэ?
+\item
+  MTTR ба RPO-гийн аль нь таны багийн төслийн хэрэглээнд илүү чухал вэ? Яагаад?
+\item
+  Төгсгөлөөс төгсгөл хүртэлх баталгааг сайжруулах гурван арга санал болго. Тус бүрийн зардлыг дурд.
+\item
+  Эдгээр туршилтыг \textbf{үйлдвэрлэлийн} системд хэрхэн аюулгүйгээр хийх вэ? (Санамж: chaos engineering, blast radius.)
+\end{enumerate}
+
+\hypertarget{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux448ux430ux430ux440ux434ux43bux430ux433ux430}{%
+\section{7. Тайлангийн шаардлага}\label{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux448ux430ux430ux440ux434ux43bux430ux433ux430}}
+
+\begin{itemize}
+\tightlist
+\item[$\square$]
+  Хүснэгт 1--4 бүрэн (Хүснэгт 2 нь гол үр дүн)
+\item[$\square$]
+  Node-RED урсгалын дэлгэцийн зураг эсвэл экспорт
+\item[$\square$]
+  Grafana самбарын дэлгэцийн зураг (эвдрэлийн үеийн цоорхой харагдах ёстой)
+\item[$\square$]
+  \texttt{lab05/out/*-result.json} файлуудын гол тоонууд
+\item[$\square$]
+  Хяналтын 8 асуултын хариулт
+\item[$\square$]
+  Багийн төслийн найдвартай байдлын шаардлага (MTTR, RPO зорилт)
+\end{itemize}
+
+\hypertarget{ux43eux43dux43eux448ux438ux43bux433ux43eux43e}{%
+\section{8. Оношилгоо}\label{ux43eux43dux43eux448ux438ux43bux433ux43eux43e}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Шинж тэмдэг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шалтгаан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шийдэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Node-RED бичихгүй, 404 & InfluxDB-д \texttt{cnc302} сан үүсээгүй & Алхам 1-ийг давтана \\
+\texttt{write\_errors} тасралтгүй өснө & line protocol буруу & debug зангилаагаар \texttt{msg.payload}-ыг хар \\
+\texttt{verify} 0 мөр олно & буруу \texttt{-\/-db} эсвэл өгөгдөл өөр хэмжилтэд бичигдсэн & \texttt{SELECT\ *\ FROM\ telemetry\ LIMIT\ 5} \\
+Суурь тестэд аль хэдийн алдагдал & Node-RED-ийн шүүлт хэт хатуу, эсвэл шугам гүйцэхгүй & \texttt{write\_errors} тоолуурыг шалга \\
+\texttt{failure\_inject.sh\ network} алдаа & сүлжээний нэр өөр & \texttt{docker\ network\ ls\ \textbackslash{}\textbar{}\ grep\ cnc302} \\
+\texttt{disk} горим \texttt{mount} алдаа & sudo эрхгүй & \texttt{sudo\ -v} эхлээд ажиллуул \\
+Сэргэсний дараа EMQX unhealthy & healthcheck \texttt{start\_period} дуусаагүй & 60 секунд хүлээ \\
+\end{longtable}\endgroup
+
+\hypertarget{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}{%
+\section{9. Үнэлгээний шалгуур (10 оноо)}\label{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+Шалгуур & Оноо \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Шугам бүрэн ажиллаж, чанарын шүүлт баталгаажсан & 2 \\
+Долоон эвдрэлийн туршилт гүйцэтгэгдсэн & 3 \\
+Эвдрэлийн матриц (Хүснэгт 2) бодит тоогоор бөглөгдсөн & 3 \\
+Буферлэлт ба MTTR/RPO-гийн шинжилгээ & 1 \\
+Grafana самбар, дохиолол ажиллаж байна & 1 \\
+\end{longtable}\endgroup
+
+\textbf{Онцгой оноо (+1):} суурь тестээс өөр QoS, өөр хадгалах бодлоготойгоор нэмэлт туршилт хийж, ялгааг тоогоор харуулсан бол.

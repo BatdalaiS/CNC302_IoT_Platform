@@ -1,0 +1,603 @@
+% Автоматаар үүсгэсэн — эх файл: lab02/README.md
+\chapter{Лаб 2 — Төхөөрөмжийн бүрэн амьдралын мөчлөг}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+\endhead
+\bottomrule
+\endlastfoot
+\textbf{7 хоног} & V \\
+\textbf{Хугацаа} & 4 цаг \\
+\textbf{Суралцахуйн үр дүн} & ҮД3 (үнэлэх), ҮД6 (байршуулах) \\
+\textbf{Үнэлгээ} & Бичгийн тайлан, 10 оноо \\
+\end{longtable}\endgroup
+
+\hypertarget{ux437ux43eux440ux438ux43bux433ux43e}{%
+\section{1. Зорилго}\label{ux437ux43eux440ux438ux43bux433ux43e}}
+
+Төхөөрөмжийн амьдралын мөчлөгийн \textbf{дөрвөн үе шатыг бүхэлд нь} хэрэгжүүлж хэмжинэ:
+
+\begin{verbatim}
+  бүртгэл  →  таних тэмдэг  →  ажиллагаа (OTA)  →  ашиглалтаас гаргах
+ provisioning    identity        operation           decommission
+\end{verbatim}
+
+Ихэнх сургалтын материал зөвхөн эхний хоёр үе шатыг үзүүлдэг. Бодит байршуулалтад \textbf{гурав дахь ба дөрөв дэх} үе шат буюу шинэчлэл, эрх цуцлалт л жинхэнэ асуудлыг үүсгэдэг. Энэ лабораторид дөрвүүлээ хийнэ.
+
+\hypertarget{ux43bux430ux431ux44bux43d-ux442ux4e9ux433ux441ux433ux4e9ux43bux434-ux445ux430ux440ux438ux443ux43bux436-ux447ux430ux434ux430ux445-ux451ux441ux442ux43eux439-ux430ux441ux443ux443ux43bux442ux443ux443ux434}{%
+\subsection{Лабын төгсгөлд хариулж чадах ёстой асуултууд}\label{ux43bux430ux431ux44bux43d-ux442ux4e9ux433ux441ux433ux4e9ux43bux434-ux445ux430ux440ux438ux443ux43bux436-ux447ux430ux434ux430ux445-ux451ux441ux442ux43eux439-ux430ux441ux443ux443ux43bux442ux443ux443ux434}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  100 төхөөрөмжийг bulk болон JIT горимоор бүртгэхэд ямар ялгаа гарах вэ --- хугацаа, эрсдэл, ажиллагааны ачаалал талаас?
+\item
+  Токен (access token) ба X.509 сертификатын хооронд ямар аюулгүй байдлын ялгаа байна вэ?
+\item
+  30\% нь амжилтгүй болсон OTA тараалтын дараа таны флот ямар байдалд байх вэ? Хэдэн хувилбар зэрэг оршиж байна вэ?
+\end{enumerate}
+
+\hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}{%
+\section{2. Урьдчилсан нөхцөл}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}}
+
+\begin{itemize}
+\tightlist
+\item
+  Лаб 1 дууссан, \texttt{core} профайл ажиллаж байна (\texttt{make\ ps})
+\item
+  Бие даалт V: provisioning стратегийн уншлага
+\item
+  Зөөврийн компьютер дээр \texttt{.venv} идэвхтэй, \texttt{requests}, \texttt{paho-mqtt} суусан
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Pi дээр}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack }\KeywordTok{\&\&} \ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core up }\AttributeTok{{-}d} \KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ health}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}{%
+\section{3. Онолын сануулга}\label{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}}
+
+\textbf{Bulk vs JIT.} Bulk нь урьдчилан таамаглах боломжтой: үйлдвэрээс гарахад бүх итгэмжлэл бэлэн. Гэхдээ хэзээ ч асаагдахгүй төхөөрөмжийн итгэмжлэл платформ дээр үүрд хэвтэнэ --- халдагчийн гар дор орох боломж. JIT нь ашиглагдахгүй итгэмжлэл үүсгэхгүй, гэхдээ \textbf{бүртгэлийн түлхүүр} (provision key) нэг л ширхэг бөгөөд түүнийг мэдсэн хэн ч төхөөрөмж нэмж чадна.
+
+\textbf{Токен vs сертификат.}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Access token
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+X.509 сертификат
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Юу нь нууц вэ & тэмдэгт мөр өөрөө & зөвхөн хувийн түлхүүр \\
+Сүлжээгээр дамжих уу & тийм (TLS дотор) & үгүй --- зөвхөн гарын үсэг дамжина \\
+Хугацаа дуусах уу & үгүй (гараар цуцална) & тийм, \texttt{notAfter} талбартай \\
+Цуцлах & платформ дээр устгана & CRL/OCSP шаардана \\
+Тохиромжтой & прототип, дотоод сүлжээ & үйлдвэрлэлийн флот \\
+\end{longtable}\endgroup
+
+\textbf{OTA-гийн эрсдэл.} Шинэчлэл бол төхөөрөмжийг \textbf{алсаас эвдэж болох} цорын ганц үйлдэл. Тиймээс: (1) хяналтын нийлбэр заавал шалгана, (2) үе шаттай (canary) тараана, (3) буцаах зам үргэлж байх ёстой, (4) шинэчлэлийн явцад тэжээл тасарсан ч төхөөрөмж сэргэх ёстой (A/B хуваалт).
+
+\hypertarget{ux430ux43bux445ux43cux443ux443ux434}{%
+\section{4. Алхмууд}\label{ux430ux43bux445ux43cux443ux443ux434}}
+
+\hypertarget{ux430ux43bux445ux430ux43c-1-bulk-provisioning-ux431ux430-ux445ux44dux43cux436ux438ux43bux442-35-ux43cux438ux43d}{%
+\subsection{Алхам 1 --- Bulk provisioning ба хэмжилт (35 мин)}\label{ux430ux43bux445ux430ux43c-1-bulk-provisioning-ux431ux430-ux445ux44dux43cux436ux438ux43bux442-35-ux43cux438ux43d}}
+
+\textbf{Зөөврийн компьютер дээрээс} ThingsBoard-ын REST API руу:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{source}\NormalTok{ .venv/bin/activate}
+\CommentTok{\# SSH туннел эсвэл VS Code порт дамжуулалт идэвхтэй байх ёстой}
+\ExtensionTok{python}\NormalTok{ lab02/provision.py }\AttributeTok{{-}{-}url}\NormalTok{ http://localhost:8080 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}mode}\NormalTok{ bulk }\AttributeTok{{-}{-}count}\NormalTok{ 20 }\AttributeTok{{-}{-}prefix}\NormalTok{ bulk }\AttributeTok{{-}{-}csv}\NormalTok{ lab02/out/bulk.csv}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+\texttt{lab02/out/} нь \texttt{.gitignore}-д бүртгэгдсэн. \textbf{Итгэмжлэл агуулсан CSV-г Git-д оруулах нь автоматаар 0 оноо.}
+\end{quote}
+
+ThingsBoard-ын веб дээр \textbf{Entities → Devices} хэсэгт 20 төхөөрөмж харагдана. Аль нэгийг нээж \textbf{Attributes → Server attributes} дотор \texttt{provision\_mode:\ bulk} байгааг шалгана.
+
+\textbf{Хүснэгт 1}-ийн \texttt{bulk} мөрийг бөглөнө (дундаж, медиан, p95, нийт хугацаа).
+
+Одоо 100 төхөөрөмж дээр давтана:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab02/provision.py }\AttributeTok{{-}{-}url}\NormalTok{ http://localhost:8080 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}mode}\NormalTok{ bulk }\AttributeTok{{-}{-}count}\NormalTok{ 100 }\AttributeTok{{-}{-}prefix}\NormalTok{ bulk1 }\AttributeTok{{-}{-}csv}\NormalTok{ lab02/out/bulk100.csv}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Ажигла:} нэг төхөөрөмжид ногдох хугацаа 20-оос 100 болоход өөрчлөгдсөн үү? Хэрэв өссөн бол яагаад? (Санамж: Pi-гийн Postgres, индекс, ThingsBoard-ын кэш.)
+
+\hypertarget{ux430ux43bux445ux430ux43c-2-jit-provisioning-ux431ux430-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442-30-ux43cux438ux43d}{%
+\subsection{Алхам 2 --- JIT provisioning ба харьцуулалт (30 мин)}\label{ux430ux43bux445ux430ux43c-2-jit-provisioning-ux431ux430-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442-30-ux43cux438ux43d}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab02/provision.py }\AttributeTok{{-}{-}url}\NormalTok{ http://localhost:8080 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}mode}\NormalTok{ jit }\AttributeTok{{-}{-}count}\NormalTok{ 20 }\AttributeTok{{-}{-}prefix}\NormalTok{ jit }\AttributeTok{{-}{-}jit{-}delay}\NormalTok{ 0.5 }\AttributeTok{{-}{-}csv}\NormalTok{ lab02/out/jit.csv}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Хүснэгт 1}-ийн \texttt{jit} мөрийг бөглөнө.
+
+\textbf{Хүснэгт 2} (стратегийн харьцуулалт)-ыг \textbf{өөрсдийн үгээр} бөглөнө. Энэ бол хэмжилт биш, \textbf{шийдвэрийн шинжилгээ}. Багийн төслийн хувьд аль стратегийг сонгохоо энд шийднэ.
+
+\hypertarget{ux430ux43bux445ux430ux43c-3-mtls-ux441ux435ux440ux442ux438ux444ux438ux43aux430ux442-ux4afux4afux441ux433ux44dux445-ux431ux430-ux431ux440ux43eux43aux435ux440ux442-ux442ux43eux445ux438ux440ux443ux443ux43bux430ux445-45-ux43cux438ux43d}{%
+\subsection{Алхам 3 --- mTLS: сертификат үүсгэх ба брокерт тохируулах (45 мин)}\label{ux430ux43bux445ux430ux43c-3-mtls-ux441ux435ux440ux442ux438ux444ux438ux43aux430ux442-ux4afux4afux441ux433ux44dux445-ux431ux430-ux431ux440ux43eux43aux435ux440ux442-ux442ux43eux445ux438ux440ux443ux443ux43bux430ux445-45-ux43cux438ux43d}}
+
+\textbf{3.1 CA ба төхөөрөмжийн сертификат үүсгэх.} Pi дээр (эсвэл зөөврийн компьютер дээр --- дараа нь Pi рүү хуулна):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/lab02}
+\VariableTok{SERVER\_CN}\OperatorTok{=}\NormalTok{pi{-}team03.local }\FunctionTok{bash}\NormalTok{ make\_certs.sh init          }\CommentTok{\# ← өөрийн хостын нэрээр}
+\FunctionTok{bash}\NormalTok{ make\_certs.sh device tls0001 tls0002}
+\FunctionTok{bash}\NormalTok{ make\_certs.sh list}
+\end{Highlighting}
+\end{Shaded}
+
+Сертификатын гинжийг шалгана:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{openssl}\NormalTok{ verify }\AttributeTok{{-}CAfile}\NormalTok{ certs/ca.crt certs/tls0001.crt      }\CommentTok{\# → OK}
+\ExtensionTok{openssl}\NormalTok{ x509 }\AttributeTok{{-}in}\NormalTok{ certs/tls0001.crt }\AttributeTok{{-}noout} \AttributeTok{{-}subject} \AttributeTok{{-}dates} \AttributeTok{{-}ext}\NormalTok{ extendedKeyUsage}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{3.2 EMQX-д TLS сонсогч тохируулах.} Сертификатыг брокерын харагдах фолдер руу хуулна:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cp}\NormalTok{ certs/ca.crt certs/server.crt certs/server.key \textasciitilde{}/cnc302/stack/emqx/certs/}
+\FunctionTok{chmod}\NormalTok{ 644 \textasciitilde{}/cnc302/stack/emqx/certs/}\PreprocessorTok{*}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{stack/docker-compose.yml} дотор \texttt{emqx} үйлчилгээний \texttt{environment} хэсэгт нэмнэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\AttributeTok{      }\FunctionTok{EMQX\_LISTENERS\_\_SSL\_\_DEFAULT\_\_ENABLE}\KeywordTok{:}\AttributeTok{ }\StringTok{"true"}
+\AttributeTok{      }\FunctionTok{EMQX\_LISTENERS\_\_SSL\_\_DEFAULT\_\_BIND}\KeywordTok{:}\AttributeTok{ }\StringTok{"0.0.0.0:8883"}
+\AttributeTok{      }\FunctionTok{EMQX\_LISTENERS\_\_SSL\_\_DEFAULT\_\_SSL\_OPTIONS\_\_CACERTFILE}\KeywordTok{:}\AttributeTok{ }\StringTok{"/opt/emqx/etc/certs/ca.crt"}
+\AttributeTok{      }\FunctionTok{EMQX\_LISTENERS\_\_SSL\_\_DEFAULT\_\_SSL\_OPTIONS\_\_CERTFILE}\KeywordTok{:}\AttributeTok{ }\StringTok{"/opt/emqx/etc/certs/server.crt"}
+\AttributeTok{      }\FunctionTok{EMQX\_LISTENERS\_\_SSL\_\_DEFAULT\_\_SSL\_OPTIONS\_\_KEYFILE}\KeywordTok{:}\AttributeTok{ }\StringTok{"/opt/emqx/etc/certs/server.key"}
+\AttributeTok{      }\FunctionTok{EMQX\_LISTENERS\_\_SSL\_\_DEFAULT\_\_SSL\_OPTIONS\_\_VERIFY}\KeywordTok{:}\AttributeTok{ }\StringTok{"verify\_peer"}
+\AttributeTok{      }\FunctionTok{EMQX\_LISTENERS\_\_SSL\_\_DEFAULT\_\_SSL\_OPTIONS\_\_FAIL\_IF\_NO\_PEER\_CERT}\KeywordTok{:}\AttributeTok{ }\StringTok{"true"}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{verify\_peer} + \texttt{fail\_\allowbreak{}if\_\allowbreak{}no\_\allowbreak{}peer\_\allowbreak{}cert} хоёулаа байх нь \textbf{харилцан баталгаажуулалт (mTLS)} --- зөвхөн бидний CA-гаар гарын үсэг зурагдсан төхөөрөмж холбогдоно.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack }\KeywordTok{\&\&} \ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core up }\AttributeTok{{-}d}\NormalTok{ emqx}
+\ExtensionTok{docker}\NormalTok{ compose logs }\AttributeTok{{-}{-}tail}\OperatorTok{=}\NormalTok{50 emqx }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}i}\NormalTok{ ssl}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux430ux43bux445ux430ux43c-4-tls-ux445ux43eux43bux431ux43eux43bux442ux44bux433-ux448ux430ux43bux433ux430ux445-25-ux43cux438ux43d}{%
+\subsection{Алхам 4 --- TLS холболтыг шалгах (25 мин)}\label{ux430ux43bux445ux430ux43c-4-tls-ux445ux43eux43bux431ux43eux43bux442ux44bux433-ux448ux430ux43bux433ux430ux445-25-ux43cux438ux43d}}
+
+\textbf{4.1 Зөв сертификаттай --- амжилттай байх ёстой:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host}\NormalTok{ pi{-}team03.local }\AttributeTok{{-}{-}port}\NormalTok{ 8883 }\AttributeTok{{-}{-}tls} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}ca}\NormalTok{ lab02/certs/ca.crt }\AttributeTok{{-}{-}cert}\NormalTok{ lab02/certs/tls0001.crt }\DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}key}\NormalTok{ lab02/certs/tls0001.key }\AttributeTok{{-}{-}devices}\NormalTok{ 1 }\AttributeTok{{-}{-}count}\NormalTok{ 5 }\AttributeTok{{-}{-}interval}\NormalTok{ 1}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{4.2 Сертификатгүйгээр --- АМЖИЛТГҮЙ байх ёстой:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host}\NormalTok{ pi{-}team03.local }\AttributeTok{{-}{-}port}\NormalTok{ 8883 }\AttributeTok{{-}{-}tls} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}ca}\NormalTok{ lab02/certs/ca.crt }\AttributeTok{{-}{-}devices}\NormalTok{ 1 }\AttributeTok{{-}{-}count}\NormalTok{ 3}
+\end{Highlighting}
+\end{Shaded}
+
+Алдааны мессежийг \textbf{яг байгаагаар нь} тайланд хуулна.
+
+\textbf{4.3 Хуурамч CA-гаар --- АМЖИЛТГҮЙ байх ёстой:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{CERTDIR}\OperatorTok{=}\NormalTok{/tmp/evil }\VariableTok{SERVER\_CN}\OperatorTok{=}\NormalTok{pi{-}team03.local }\FunctionTok{bash}\NormalTok{ lab02/make\_certs.sh device evil0001}
+\ExtensionTok{python}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host}\NormalTok{ pi{-}team03.local }\AttributeTok{{-}{-}port}\NormalTok{ 8883 }\AttributeTok{{-}{-}tls} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}ca}\NormalTok{ lab02/certs/ca.crt }\AttributeTok{{-}{-}cert}\NormalTok{ /tmp/evil/evil0001.crt }\DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}key}\NormalTok{ /tmp/evil/evil0001.key }\AttributeTok{{-}{-}devices}\NormalTok{ 1 }\AttributeTok{{-}{-}count}\NormalTok{ 3}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Хүснэгт 3}-ыг бөглөнө. Гурван тохиолдол бүрд: холбогдсон уу, алдааны мессеж, брокерын лог дахь бичлэг.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Pi дээр брокерын талын логийг харна}
+\ExtensionTok{docker}\NormalTok{ compose logs }\AttributeTok{{-}{-}tail}\OperatorTok{=}\NormalTok{100 emqx }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}iE} \StringTok{\textquotesingle{}ssl|handshake|certificate\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux430ux43bux445ux430ux43c-5-ota-ux431ux430ux433ux446-ux431ux44dux43bux442ux433ux44dux436-ux431ux430ux439ux440ux448ux443ux443ux43bux430ux445-30-ux43cux438ux43d}{%
+\subsection{Алхам 5 --- OTA багц бэлтгэж байршуулах (30 мин)}\label{ux430ux43bux445ux430ux43c-5-ota-ux431ux430ux433ux446-ux431ux44dux43bux442ux433ux44dux436-ux431ux430ux439ux440ux448ux443ux443ux43bux430ux445-30-ux43cux438ux43d}}
+
+\textbf{5.1 "Firmware" үүсгэх.} Бид жинхэнэ хоёртын firmware биш, гэхдээ протоколын хувьд ялгаагүй:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mkdir} \AttributeTok{{-}p}\NormalTok{ lab02/out}
+\FunctionTok{head} \AttributeTok{{-}c}\NormalTok{ 200000 /dev/urandom }\OperatorTok{\textgreater{}}\NormalTok{ lab02/out/agent{-}1.1.0.bin}
+\FunctionTok{sha256sum}\NormalTok{ lab02/out/agent{-}1.1.0.bin}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{5.2 ThingsBoard дээр байршуулах.} Веб → \textbf{Advanced features → OTA updates → +}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+Талбар & Утга \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Title & \texttt{cnc302-agent} \\
+Version & \texttt{1.1.0} \\
+Device profile & \texttt{default} \\
+Package type & Firmware \\
+Checksum algorithm & SHA-256 \\
+File & \texttt{agent-1.1.0.bin} \\
+\end{longtable}\endgroup
+
+Байршуулсны дараа ThingsBoard хяналтын нийлбэрийг өөрөө тооцно --- таны \texttt{sha256sum}-тай \textbf{таарч байгааг шалгана}.
+
+\textbf{5.3 Нэг төхөөрөмж дээр туршина.} \texttt{bulk.csv}-ээс эхний токеныг аваад:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab02/ota\_agent.py }\AttributeTok{{-}{-}host}\NormalTok{ pi{-}team03.local }\AttributeTok{{-}{-}port}\NormalTok{ 1884 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}token} \OperatorTok{\textless{}}\NormalTok{ACCESS\_TOKEN}\OperatorTok{\textgreater{}}\NormalTok{ {-}{-}verbose}
+\end{Highlighting}
+\end{Shaded}
+
+Агент ажиллаж байх зуур ThingsBoard-ын төхөөрөмжийн хуудсан дээр \textbf{Latest telemetry} хэсэгт \texttt{fw\_state} талбар \texttt{DOWNLOADING\ →\ DOWNLOADED\ →\ VERIFIED\ →\ UPDATING\ →\ UPDATED} гэж өөрчлөгдөхийг ажиглана.
+
+\begin{quote}
+Хэрэв төлөв өөрчлөгдөхгүй бол: төхөөрөмжид firmware оноогдоогүй байна. Device → \textbf{Manage firmware} → \texttt{cnc302-agent\ 1.1.0} сонгоно.
+\end{quote}
+
+\hypertarget{ux430ux43bux445ux430ux43c-6-canary-ux442ux430ux440ux430ux430ux43bux442-ux431ux430-ux431ux443ux446ux430ux430ux43bux442-35-ux43cux438ux43d}{%
+\subsection{Алхам 6 --- Canary тараалт ба буцаалт (35 мин)}\label{ux430ux43bux445ux430ux43c-6-canary-ux442ux430ux440ux430ux430ux43bux442-ux431ux430-ux431ux443ux446ux430ux430ux43bux442-35-ux43cux438ux43d}}
+
+Бодит тараалтад бүх флотыг нэг дор шинэчлэхгүй. Эхлээд жижиг хэсгийг ("canary") шинэчилж, амжилтын хувийг хэмжээд л цааш үргэлжлүүлнэ.
+
+\textbf{6.1 Canary --- 20\% (4 төхөөрөмж), амжилтгүйн магадлал 30\%:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab02/ota\_agent.py }\AttributeTok{{-}{-}host}\NormalTok{ pi{-}team03.local }\AttributeTok{{-}{-}port}\NormalTok{ 1884 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}tokens{-}csv}\NormalTok{ lab02/out/bulk.csv }\AttributeTok{{-}{-}devices}\NormalTok{ 4 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}fail{-}rate}\NormalTok{ 0.3 }\AttributeTok{{-}{-}csv}\NormalTok{ lab02/out/ota{-}canary.csv}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{6.2 Шийдвэр гаргах.} Амжилтын хувь \textbf{95\%-иас доош} бол тараалтыг зогсооно. Таны үр дүн юу гэж байна?
+
+\textbf{6.3 Бүтэн тараалт} (canary амжилттай гэж үзвэл):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab02/ota\_agent.py }\AttributeTok{{-}{-}host}\NormalTok{ pi{-}team03.local }\AttributeTok{{-}{-}port}\NormalTok{ 1884 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}tokens{-}csv}\NormalTok{ lab02/out/bulk.csv }\AttributeTok{{-}{-}devices}\NormalTok{ 20 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}fail{-}rate}\NormalTok{ 0.3 }\AttributeTok{{-}{-}csv}\NormalTok{ lab02/out/ota{-}full.csv}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{6.4 Флотын төлөвийг тоолох.} ThingsBoard дээр төхөөрөмжүүдийн \texttt{current\_\allowbreak{}fw\_\allowbreak{}version} талбарыг харна. Хэдэн төхөөрөмж 1.0.0 дээр үлдсэн, хэд нь 1.1.0 руу шилжсэн бэ?
+
+\textbf{Хүснэгт 4}-ийг бөглөнө.
+
+\textbf{6.5 Хяналтын нийлбэрийн эвдрэлийг туршина.} ThingsBoard дээр шинэ багц үүсгээд checksum-ыг \textbf{зориудаар буруу} бичнэ (нэг тэмдэгт солино). Дараа нь агентыг ажиллуулна:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab02/ota\_agent.py }\AttributeTok{{-}{-}host}\NormalTok{ pi{-}team03.local }\AttributeTok{{-}{-}port}\NormalTok{ 1884 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}token} \OperatorTok{\textless{}}\NormalTok{ACCESS\_TOKEN}\OperatorTok{\textgreater{}}\NormalTok{ {-}{-}verbose}
+\end{Highlighting}
+\end{Shaded}
+
+Агент \texttt{CHECKSUM\_FAILED} гарган суулгахаас \textbf{татгалзах ёстой}. Энэ нь яагаад амин чухал вэ? (Санамж: сүлжээнд гарсан алдаа vs зориудын халдлага.)
+
+\hypertarget{ux430ux43bux445ux430ux43c-7-ux430ux448ux438ux433ux43bux430ux43bux442ux430ux430ux441-ux433ux430ux440ux433ux430ux445-ux431ux430-ux44dux440ux445-ux446ux443ux446ux43bux430ux445-20-ux43cux438ux43d}{%
+\subsection{Алхам 7 --- Ашиглалтаас гаргах ба эрх цуцлах (20 мин)}\label{ux430ux43bux445ux430ux43c-7-ux430ux448ux438ux433ux43bux430ux43bux442ux430ux430ux441-ux433ux430ux440ux433ux430ux445-ux431ux430-ux44dux440ux445-ux446ux443ux446ux43bux430ux445-20-ux43cux438ux43d}}
+
+\textbf{7.1 Токеноор баталгаажсан төхөөрөмжийг устгах:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab02/provision.py }\AttributeTok{{-}{-}url}\NormalTok{ http://localhost:8080 }\AttributeTok{{-}{-}prefix}\NormalTok{ jit }\AttributeTok{{-}{-}cleanup}
+\end{Highlighting}
+\end{Shaded}
+
+Устгасны дараа тухайн токеноор холбогдож үзнэ --- татгалзах ёстой.
+
+\textbf{7.2 Сертификаттай төхөөрөмжийг хүчингүй болгох:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{bash}\NormalTok{ lab02/make\_certs.sh revoke tls0002}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Одоо чухал асуулт:} \texttt{tls0002.crt} файл халдагчийн гарт үлдсэн байна. Брокер түүнийг \textbf{татгалзах уу?}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host}\NormalTok{ pi{-}team03.local }\AttributeTok{{-}{-}port}\NormalTok{ 8883 }\AttributeTok{{-}{-}tls} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}ca}\NormalTok{ lab02/certs/ca.crt }\AttributeTok{{-}{-}cert}\NormalTok{ /tmp/backup/tls0002.crt }\DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}key}\NormalTok{ /tmp/backup/tls0002.key }\AttributeTok{{-}{-}devices}\NormalTok{ 1 }\AttributeTok{{-}{-}count}\NormalTok{ 3}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+Сертификатыг файлын нэр солиод "хүчингүй болгосон" гэж үзэх нь \textbf{хангалтгүй}. Жинхэнэ цуцлалт нь CRL (Certificate Revocation List) эсвэл OCSP шаардана, эсвэл брокер дээр зөвшөөрөгдсөн CN-үүдийн жагсаалт (allow-list) хөтлөх хэрэгтэй. Үүнийг тайландаа тайлбарлана --- Лаб 7-д эрхийн удирдлагатай холбогдоно.
+\end{quote}
+
+\textbf{7.3} Амьдралын мөчлөгийн төлөвийн диаграмыг \texttt{lab02/lifecycle.md}-д Mermaid-аар зурна:
+
+\begin{verbatim}
+stateDiagram-v2
+    [*] --> Үүсгэсэн: provisioning
+    Үүсгэсэн --> Идэвхтэй: анхны холболт
+    Идэвхтэй --> Шинэчилж_буй: OTA оноогдов
+    Шинэчилж_буй --> Идэвхтэй: UPDATED
+    Шинэчилж_буй --> Идэвхтэй: FAILED (буцаалт)
+    Идэвхтэй --> Түдгэлзүүлсэн: эрх цуцлагдав
+    Түдгэлзүүлсэн --> Идэвхтэй: эрх сэргээв
+    Идэвхтэй --> Устгасан: ашиглалтаас гаргав
+    Түдгэлзүүлсэн --> Устгасан
+    Устгасан --> [*]
+\end{verbatim}
+
+Төлөв бүрд \textbf{өгөгдөлд юу тохиолдохыг} бичнэ (Хүснэгт 5).
+
+\hypertarget{ux430ux43bux445ux430ux43c-8-ux442ux430ux439ux43bux430ux43d-ux431ux430-commit-10-ux43cux438ux43d}{%
+\subsection{Алхам 8 --- Тайлан ба commit (10 мин)}\label{ux430ux43bux445ux430ux43c-8-ux442ux430ux439ux43bux430ux43d-ux431ux430-commit-10-ux43cux438ux43d}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ add }\AttributeTok{{-}A}
+\FunctionTok{git}\NormalTok{ status                       }\CommentTok{\# certs/, out/ ОРОХГҮЙ байх ёстой!}
+\FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 2: төхөөрөмжийн амьдралын мөчлөг"}
+\FunctionTok{git}\NormalTok{ tag lab02{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push origin main }\AttributeTok{{-}{-}tags}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux445ux4afux441ux43dux44dux433ux442ux4afux4afux434}{%
+\section{5. Хэмжилтийн хүснэгтүүд}\label{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux445ux4afux441ux43dux44dux433ux442ux4afux4afux434}}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-1-provisioning-ux438ux439ux43d-ux433ux4afux439ux446ux44dux442ux433ux44dux43b}{%
+\subsection{Хүснэгт 1 --- Provisioning-ийн гүйцэтгэл}\label{ux445ux4afux441ux43dux44dux433ux442-1-provisioning-ux438ux439ux43d-ux433ux4afux439ux446ux44dux442ux433ux44dux43b}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}llllll@{}}
+\toprule
+Горим & Тоо & Дундаж (мс) & Медиан (мс) & p95 (мс) & Нийт (сек) \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+bulk & 20 & & & & \\
+bulk & 100 & & & & \\
+jit & 20 & & & & \\
+\end{longtable}\endgroup
+
+Нэг төхөөрөмжид ногдох хугацаа 20 → 100 болоход өөрчлөгдсөн үү? ule{1.5cm}{0.4pt}\%
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-2-ux441ux442ux440ux430ux442ux435ux433ux438ux439ux43d-ux448ux438ux43dux436ux438ux43bux433ux44dux44d}{%
+\subsection{Хүснэгт 2 --- Стратегийн шинжилгээ}\label{ux445ux4afux441ux43dux44dux433ux442-2-ux441ux442ux440ux430ux442ux435ux433ux438ux439ux43d-ux448ux438ux43dux436ux438ux43bux433ux44dux44d}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+Шалгуур & Bulk & JIT \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Ашиглагдахгүй итгэмжлэл үүсэх үү & & \\
+Гол эрсдэл & & \\
+Үйлдвэрлэлийн шатанд юу шаардлагатай вэ & & \\
+Флот томрох үед хэрхэн ажиллах вэ & & \\
+\textbf{Бидний төсөлд сонгосон нь} & & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-3-mtls-ux438ux439ux43d-ux445ux430ux43dux434ux430ux43bux442ux44bux43d-ux448ux430ux43bux433ux430ux43bux442}{%
+\subsection{Хүснэгт 3 --- mTLS-ийн хандалтын шалгалт}\label{ux445ux4afux441ux43dux44dux433ux442-3-mtls-ux438ux439ux43d-ux445ux430ux43dux434ux430ux43bux442ux44bux43d-ux448ux430ux43bux433ux430ux43bux442}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
+\toprule
+Туршилт & Холбогдсон уу & Клиент талын алдаа & Брокерын лог \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Зөв сертификат & & & \\
+Сертификатгүй & & & \\
+Хуурамч CA & & & \\
+Цуцалсан сертификат (7.2) & & & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-4-ota-ux442ux430ux440ux430ux430ux43bux442ux44bux43d-ux4afux440-ux434ux4afux43d}{%
+\subsection{Хүснэгт 4 --- OTA тараалтын үр дүн}\label{ux445ux4afux441ux43dux44dux433ux442-4-ota-ux442ux430ux440ux430ux430ux43bux442ux44bux43d-ux4afux440-ux434ux4afux43d}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Тараалт
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Төхөөрөмж
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+UPDATED
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+ROLLED\_BACK
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Бусад
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Амжилт \%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Дундаж хугацаа (с)
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Canary (20\%) & 4 & & & & & \\
+Бүтэн & 20 & & & & & \\
+\end{longtable}\endgroup
+
+Тараалтын дараах флотын байдал: 1.0.0 дээр ule{1.5cm}{0.4pt} төхөөрөмж, 1.1.0 дээр ule{1.5cm}{0.4pt} төхөөрөмж.
+Хяналтын нийлбэр буруу үед агент юу хийсэн бэ: ule{1.5cm}{0.4pt}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-5-ux430ux43cux44cux434ux440ux430ux43bux44bux43d-ux43cux4e9ux447ux43bux4e9ux433-ux431ux430-ux4e9ux433ux4e9ux433ux434ux4e9ux43b}{%
+\subsection{Хүснэгт 5 --- Амьдралын мөчлөг ба өгөгдөл}\label{ux445ux4afux441ux43dux44dux433ux442-5-ux430ux43cux44cux434ux440ux430ux43bux44bux43d-ux43cux4e9ux447ux43bux4e9ux433-ux431ux430-ux4e9ux433ux4e9ux433ux434ux4e9ux43b}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Төлөв
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Төхөөрөмж холбогдож чадах уу
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Түүхэн өгөгдөлд юу тохиолдох вэ
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Итгэмжлэлийн байдал
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Үүсгэсэн & & & \\
+Идэвхтэй & & & \\
+Шинэчилж буй & & & \\
+Түдгэлзүүлсэн & & & \\
+Устгасан & & & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442}{%
+\section{6. Хяналтын асуулт}\label{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Bulk горимд үүсгэсэн боловч хэзээ ч ашиглагдаагүй 500 итгэмжлэл ямар эрсдэл дагуулах вэ?
+\item
+  JIT горимын бүртгэлийн түлхүүр алдагдвал халдагч юу хийж чадах вэ? Үүнийг хэрхэн хязгаарлах вэ?
+\item
+  Access token сүлжээгээр дамждаг, сертификатын хувийн түлхүүр дамждаггүй. Яагаад энэ нь чухал ялгаа вэ?
+\item
+  \texttt{verify\_peer} тохируулаагүй бол ямар халдлага боломжтой болох вэ?
+\item
+  Хяналтын нийлбэр шалгахгүйгээр firmware суулгавал ямар үр дагавар гарах вэ? Хоёр өөр хувилбар бод: (а) сүлжээний алдаа, (б) зориудын халдлага.
+\item
+  Canary тараалтын хэмжээг хэрхэн сонгох вэ? 20\% зөв үү, эсвэл флотын хэмжээнээс хамаарах уу?
+\item
+  Сертификатыг жинхэнээр цуцлахад юу шаардлагатай вэ? Файлын нэр солих нь яагаад хангалтгүй вэ?
+\item
+  Шинэчлэлийн явцад төхөөрөмжийн тэжээл тасарвал юу болох вэ? A/B хуваалт гэж юу вэ, энэ асуудлыг хэрхэн шийддэг вэ?
+\end{enumerate}
+
+\hypertarget{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux448ux430ux430ux440ux434ux43bux430ux433ux430}{%
+\section{7. Тайлангийн шаардлага}\label{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux448ux430ux430ux440ux434ux43bux430ux433ux430}}
+
+\begin{itemize}
+\tightlist
+\item[$\square$]
+  Хүснэгт 1--5 бүрэн
+\item[$\square$]
+  Алхам 4-ийн гурван алдааны мессеж \textbf{яг байгаагаар нь}
+\item[$\square$]
+  \texttt{lifecycle.md} төлөвийн диаграм
+\item[$\square$]
+  Хяналтын 8 асуултын хариулт
+\item[$\square$]
+  Багийн төсөлд сонгосон provisioning стратеги ба \textbf{үндэслэл}
+\item[$\square$]
+  Git commit hash, \texttt{lab02-done} тэмдэглэгээ
+\end{itemize}
+
+\hypertarget{ux43eux43dux43eux448ux438ux43bux433ux43eux43e}{%
+\section{8. Оношилгоо}\label{ux43eux43dux43eux448ux438ux43bux433ux43eux43e}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Шинж тэмдэг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шалтгаан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шийдэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\texttt{401\ Unauthorized} REST дээр & нууц үг солигдсон & \texttt{-\/-password}-оо шинэ утгаар өг \\
+\texttt{Connection\ refused\ :8883} & SSL сонсогч идэвхжээгүй & \texttt{docker\ compose\ logs\ emqx\ \textbackslash{}\textbar{}\ grep\ ssl} \\
+TLS handshake \texttt{unknown\ ca} & буруу \texttt{-\/-ca} эсвэл сертификат өөр CA-гаас & \texttt{openssl\ verify\ -CAfile} \\
+TLS handshake \texttt{hostname\ mismatch} & \texttt{SERVER\_CN} Pi-гийн нэртэй таарахгүй & сертификатыг зөв CN-ээр дахин үүсгэ, эсвэл \texttt{-\/-insecure} (зөвхөн лабораторид) \\
+OTA-д \texttt{fw\_state} өөрчлөгдөхгүй & firmware төхөөрөмжид оноогоогүй & Device → Manage firmware \\
+OTA \texttt{TIMEOUT} & 1884 биш 1883 порт руу холбогдсон & ThingsBoard-ын MQTT нь \textbf{1884} \\
+Агент \texttt{NO\_UPDATE} гэнэ & сервер дээрх хувилбар агентын \texttt{current\_version}-той ижил & ThingsBoard дээр шинэ хувилбар үүсгэ \\
+\end{longtable}\endgroup
+
+\hypertarget{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}{%
+\section{9. Үнэлгээний шалгуур (10 оноо)}\label{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+Шалгуур & Оноо \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+mTLS ажиллаж, гурван хандалтын шалгалт баримтжсан & 3 \\
+OTA тараалт canary + бүтэн хэлбэрээр гүйцэтгэгдэж хэмжигдсэн & 3 \\
+Хүснэгт 1--5 бодит үр дүнгээр бөглөгдсөн & 2 \\
+Амьдралын мөчлөгийн диаграм ба өгөгдлийн шинжилгээ & 1 \\
+Git цэвэр (сертификат, токен ороогүй), тэмдэглэгээтэй & 1 \\
+\end{longtable}\endgroup
+
+\textbf{Автомат 0 оноо:} \texttt{certs/}, \texttt{out/} доторх түлхүүр эсвэл токен Git санд орсон бол.

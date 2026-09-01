@@ -1,0 +1,15 @@
+# Grafana-гийн өгөгдлийн эх сурвалжийг автоматаар тохируулна (Лаб 5).
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB3
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8181
+    jsonData:
+      version: SQL
+      dbName: cnc302
+      httpMode: POST
+      insecureGrpc: true
+    isDefault: true
+    editable: true

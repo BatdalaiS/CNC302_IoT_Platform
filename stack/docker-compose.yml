@@ -1,0 +1,243 @@
+# CNC302 — багийн платформын стек
+# Энэ бол ЖИВЭЭ ФАЙЛ. Лаборатори бүрт та үүн рүү үйлчилгээ нэмнэ.
+# Профайл: core (Лаб1+), pipeline (Лаб5+), app (Лаб7+), ai (Лаб8)
+#
+# Ажиллуулах:  docker compose --profile core up -d
+# Шалгах:      docker compose ps
+# Зогсоох:     docker compose --profile core down
+
+name: cnc302
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+
+  # ─────────────────────────── MQTT брокер ───────────────────────────
+  emqx:
+    image: emqx/emqx:5.8.6
+    container_name: cnc302-emqx
+    profiles: [core]
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      EMQX_NODE__NAME: "emqx@127.0.0.1"
+      EMQX_NODE__COOKIE: "${EMQX_COOKIE}"
+      EMQX_DASHBOARD__DEFAULT_USERNAME: "admin"
+      EMQX_DASHBOARD__DEFAULT_PASSWORD: "${EMQX_DASHBOARD_PASSWORD}"
+      # Лаб 4-т энэ хязгаарыг өөрчилж туршина
+      EMQX_LISTENERS__TCP__DEFAULT__MAX_CONNECTIONS: "10000"
+    ports:
+      - "1883:1883"     # MQTT
+      - "8883:8883"     # MQTT over TLS (Лаб 2-т идэвхжүүлнэ)
+      - "8083:8083"     # MQTT over WebSocket
+      - "18083:18083"   # удирдлагын самбар
+    volumes:
+      - emqx-data:/opt/emqx/data
+      - emqx-log:/opt/emqx/log
+      - ./emqx/certs:/opt/emqx/etc/certs:ro   # Лаб 2
+    healthcheck:
+      test: ["CMD", "/opt/emqx/bin/emqx", "ctl", "status"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  # ─────────────────────── IoT платформ (ThingsBoard) ───────────────────────
+  # tb-postgres дүрс нь PostgreSQL-ийг дотроо агуулна — Pi дээр энэ нь хамгийн энгийн.
+  thingsboard:
+    image: thingsboard/tb-postgres:3.9.1
+    container_name: cnc302-thingsboard
+    profiles: [core]
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      TB_QUEUE_TYPE: in-memory
+      # Pi дээр JVM-ийн санах ойг хязгаарлахгүй бол OOM болно
+      JAVA_OPTS: "-Xms512m -Xmx1500m -XX:MaxDirectMemorySize=256m"
+    ports:
+      - "8080:9090"     # веб интерфейс
+      - "1884:1883"     # ThingsBoard-ын өөрийн MQTT (EMQX-тэй зөрчилдөхгүйн тулд 1884)
+      - "5683:5683/udp" # CoAP
+    volumes:
+      - tb-data:/data
+      - tb-logs:/var/log/thingsboard
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:9090/login"]
+      interval: 20s
+      timeout: 10s
+      retries: 20
+      start_period: 180s    # ThingsBoard эхлэхэд Pi дээр 2-3 минут шаардана
+    deploy:
+      resources:
+        limits:
+          memory: 2500m
+
+  # ─────────────────────── Цаг цувааны өгөгдлийн сан ───────────────────────
+  # InfluxDB 3 Core. Хэрэв энэ ажиллахгүй бол:
+  #   docker compose -f docker-compose.yml -f docker-compose.influx2.yml up -d
+  influxdb:
+    image: influxdb:3.2-core
+    container_name: cnc302-influxdb
+    profiles: [core]
+    restart: unless-stopped
+    logging: *default-logging
+    command:
+      - influxdb3
+      - serve
+      - --node-id=cnc302-node0
+      - --object-store=file
+      - --data-dir=/var/lib/influxdb3
+      - --http-bind=0.0.0.0:8181
+      - --without-auth          # ЗӨВХӨН ЛАБОРАТОРИД. Лаб 7-д аюулгүй байдлыг авч үзнэ.
+    ports:
+      - "8181:8181"
+    volumes:
+      - influx-data:/var/lib/influxdb3
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8181/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  # ─────────────────────────── Хяналтын самбар ───────────────────────────
+  grafana:
+    image: grafana/grafana:11.6.0
+    container_name: cnc302-grafana
+    profiles: [core]
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_PASSWORD}"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_INSTALL_PLUGINS: "grafana-clock-panel"
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/api/health || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  # ─────────────────────── Өгөгдлийн шугам (Лаб 5) ───────────────────────
+  nodered:
+    image: nodered/node-red:4.0
+    container_name: cnc302-nodered
+    profiles: [pipeline]
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      TZ: Asia/Ulaanbaatar
+      NODE_RED_ENABLE_PROJECTS: "true"
+    ports:
+      - "1880:1880"
+    volumes:
+      - nodered-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:1880/ >/dev/null || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  # ─────────────────────── Таних тэмдгийн сервер (Лаб 7) ───────────────────────
+  dex:
+    image: dexidp/dex:v2.41.1
+    container_name: cnc302-dex
+    profiles: [app]
+    restart: unless-stopped
+    logging: *default-logging
+    command: ["dex", "serve", "/etc/dex/config.yaml"]
+    ports:
+      - "5556:5556"
+    volumes:
+      - ./dex:/etc/dex:ro
+      - dex-data:/var/dex
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+
+  # ─────────────────────── GraphQL давхарга (Лаб 7) ───────────────────────
+  graphql-api:
+    build:
+      context: ../lab07/graphql-api
+    image: cnc302/graphql-api:lab07
+    container_name: cnc302-graphql
+    profiles: [app]
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      TB_URL: "http://thingsboard:9090"
+      TB_USER: "${TB_USER}"
+      TB_PASSWORD: "${TB_PASSWORD}"
+      INFLUX_URL: "http://influxdb:8181"
+      INFLUX_DB: "cnc302"
+      OIDC_ISSUER: "http://dex:5556/dex"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - thingsboard
+      - influxdb
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  # ─────────────────────── Локал LLM (Лаб 8) ───────────────────────
+  ollama:
+    image: ollama/ollama:0.5.13
+    container_name: cnc302-ollama
+    profiles: [ai]
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      OLLAMA_MAX_LOADED_MODELS: "1"
+      OLLAMA_NUM_PARALLEL: "1"
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    deploy:
+      resources:
+        limits:
+          memory: 3g
+
+volumes:
+  emqx-data:
+  emqx-log:
+  tb-data:
+  tb-logs:
+  influx-data:
+  grafana-data:
+  nodered-data:
+  dex-data:
+  ollama-data:

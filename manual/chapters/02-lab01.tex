@@ -1,0 +1,550 @@
+% Автоматаар үүсгэсэн — эх файл: lab01/README.md
+\chapter{Лаб 1 — Платформын стек ба ажиглалт (observability)}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+\endhead
+\bottomrule
+\endlastfoot
+\textbf{7 хоног} & III \\
+\textbf{Хугацаа} & 4 цаг \\
+\textbf{Багийн бүрэлдэхүүн} & 2--3 хүн \\
+\textbf{Суралцахуйн үр дүн} & ҮД6 (байршуулах), ҮД8 (баримтжуулах) \\
+\textbf{Үнэлгээ} & Бичгийн тайлан, 10 оноо \\
+\end{longtable}\endgroup
+
+\hypertarget{ux437ux43eux440ux438ux43bux433ux43e}{%
+\section{1. Зорилго}\label{ux437ux43eux440ux438ux43bux433ux43e}}
+
+Cloud-native IoT платформын үндсэн дөрвөн үйлчилгээг Raspberry Pi 5 дээр контейнерээр байршуулж, \textbf{платформ хэдий хэмжээний нөөц иддэгийг тоогоор тогтооно}.
+
+Энэ бол зөвхөн "суулгах" лаб биш. Лабораторийн гол бүтээгдэхүүн бол \textbf{нөөцийн төсвийн хүснэгт} --- Лаб 4-ийн ачааллын тестэд харьцуулах суурь болно. Хэмжилтгүй тайлан 5 оноо авна.
+
+\hypertarget{ux43bux430ux431ux44bux43d-ux442ux4e9ux433ux441ux433ux4e9ux43bux434-ux445ux430ux440ux438ux443ux43bux436-ux447ux430ux434ux430ux445-ux451ux441ux442ux43eux439-ux430ux441ux443ux443ux43bux442ux443ux443ux434}{%
+\subsection{Лабын төгсгөлд хариулж чадах ёстой асуултууд}\label{ux43bux430ux431ux44bux43d-ux442ux4e9ux433ux441ux433ux4e9ux43bux434-ux445ux430ux440ux438ux443ux43bux436-ux447ux430ux434ux430ux445-ux451ux441ux442ux43eux439-ux430ux441ux443ux443ux43bux442ux443ux443ux434}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Бидний платформ Pi-гийн санах ойн хэдэн хувийг эзэлж байна вэ? Хэдэн төхөөрөмж нэмэх зай үлдсэн бэ?
+\item
+  Аль үйлчилгээ хамгийн удаан эхэлдэг вэ, яагаад?
+\item
+  Ямар нэг үйлчилгээ унтарвал бид үүнийг хэдэн секундын дараа мэдэх вэ?
+\end{enumerate}
+
+\hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}{%
+\section{2. Урьдчилсан нөхцөл}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}}
+
+\texttt{SETUP.md}-ийн \textbf{Д. Бэлэн байдлын шалгалт} бүх мөр ✔ байх ёстой. Ялангуяа:
+
+\begin{itemize}
+\tightlist
+\item
+  Swap 2 GB (үгүй бол ThingsBoard эхлэхдээ OOM болно)
+\item
+  \texttt{cgroup\_enable=memory} идэвхтэй (үгүй бол \texttt{docker\ stats} санах ойг буруу харуулна)
+\item
+  Дүрсүүд урьдчилан татагдсан (\texttt{docker\ compose\ -\/-profile\ core\ pull})
+\end{itemize}
+
+\begin{quote}
+Хэрэв дүрс татаагүй бол лабораторийн эхний 30 минут татахад алдагдана. Энэ нь таны хариуцлага.
+\end{quote}
+
+\hypertarget{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}{%
+\section{3. Онолын сануулга}\label{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}}
+
+\textbf{Healthcheck vs "ажиллаж байна".} Контейнер \texttt{Up} төлөвтэй байх нь дотор нь ажиллаж буй програм ажиллагаатай гэсэн үг \textbf{биш}. ThingsBoard-ын Java процесс 2 минут эхэлж байхад контейнер аль хэдийн \texttt{Up} байна. Тиймээс \texttt{healthcheck} бичих ёстой --- тэр л жинхэнэ бэлэн байдлыг хэлнэ.
+
+\textbf{\texttt{start\_period} яагаад чухал вэ.} Healthcheck эхнээсээ уначихвал Docker контейнерийг \texttt{unhealthy} гэж тэмдэглэнэ. \texttt{start\_period} нь "энэ хугацаанд унасныг тоохгүй" гэсэн үг. ThingsBoard-д 180 секунд өгсөн шалтгаан энэ.
+
+\textbf{Санах ойн хязгаар.} \texttt{deploy.resources.limits.memory} тавихгүй бол нэг үйлчилгээ санах ойг бүхэлд нь идэж бусдыг уначихна. Хязгаар тавьсан үед харин тэр үйлчилгээ өөрөө OOM-оор унана --- энэ нь \textbf{илүү дээр}, учир нь алдаа тусгаарлагдана (fault isolation).
+
+\textbf{Ажиглалтын гурван багана:} лог (юу болсон), метрик (хэр их/хурдан), мөр (trace --- хаанаас хаашаа). Энэ лабд эхний хоёрыг авч үзнэ.
+
+\hypertarget{ux430ux43bux445ux43cux443ux443ux434}{%
+\section{4. Алхмууд}\label{ux430ux43bux445ux43cux443ux443ux434}}
+
+\hypertarget{ux430ux43bux445ux430ux43c-0-ux431ux44dux43bux442ux433ux44dux43b-ux431ux430-ux441ux443ux443ux440ux44c-ux442ux4e9ux43bux4e9ux432-15-ux43cux438ux43d}{%
+\subsection{Алхам 0 --- Бэлтгэл ба суурь төлөв (15 мин)}\label{ux430ux43bux445ux430ux43c-0-ux431ux44dux43bux442ux433ux44dux43b-ux431ux430-ux441ux443ux443ux440ux44c-ux442ux4e9ux43bux4e9ux432-15-ux43cux438ux43d}}
+
+Pi дээр, VS Code Remote-SSH терминалаас:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\FunctionTok{git}\NormalTok{ pull                       }\CommentTok{\# багийн сүүлийн төлөв}
+\BuiltInTok{cd}\NormalTok{ stack}
+\FunctionTok{cp} \AttributeTok{{-}n}\NormalTok{ .env.example .env        }\CommentTok{\# хэрэв байхгүй бол}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{.env} файлыг нээж \textbf{бүх нууц үгийг солино}. Дараа нь платформ эхлэхээс өмнөх Pi-гийн суурь төлөвийг тэмдэглэнэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{bash}\NormalTok{ ../tools/measure\_stack.sh}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{measurements/sysinfo-*.txt} файлаас дараах утгуудыг \textbf{хүснэгт 1} рүү бичнэ.
+
+\begin{quote}
+\textbf{Тэмдэглэл:} \texttt{vcgencmd\ get\_throttled} нь \texttt{0x0} биш бол Pi тэжээл эсвэл халалтын улмаас хязгаарлагдаж байна. Энэ тохиолдолд бүх хэмжилт гажина --- багшид хэлнэ.
+\end{quote}
+
+\hypertarget{ux430ux43bux445ux430ux43c-1-ux441ux442ux435ux43aux438ux439ux433-ux44dux445ux43bux4afux4afux43bux44dux445-30-ux43cux438ux43d}{%
+\subsection{Алхам 1 --- Стекийг эхлүүлэх (30 мин)}\label{ux430ux43bux445ux430ux43c-1-ux441ux442ux435ux43aux438ux439ux433-ux44dux445ux43bux4afux4afux43bux44dux445-30-ux43cux438ux43d}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core up }\AttributeTok{{-}d}
+\ExtensionTok{docker}\NormalTok{ compose ps}
+\end{Highlighting}
+\end{Shaded}
+
+Бүх үйлчилгээ \texttt{healthy} болтол хүлээнэ. ThingsBoard 2--4 минут авна:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{watch} \AttributeTok{{-}n}\NormalTok{ 5 }\StringTok{\textquotesingle{}docker ps {-}{-}format "table \{\{.Names\}\}\textbackslash{}t\{\{.Status\}\}"\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+Хөтчөөр шалгах (VS Code-ийн PORTS табаар дамжуулсны дараа):
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Үйлчилгээ
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хаяг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Анхны нэвтрэлт
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+EMQX самбар & http://localhost:18083 & \texttt{admin} / \texttt{.env}-д бичсэн \\
+ThingsBoard & http://localhost:8080 & \texttt{tenant@thingsboard.org} / \texttt{tenant} \\
+Grafana & http://localhost:3000 & \texttt{admin} / \texttt{.env}-д бичсэн \\
+InfluxDB эрүүл мэнд & http://localhost:8181/health & --- \\
+\end{longtable}\endgroup
+
+\textbf{ЗААВАЛ:} ThingsBoard-д анх нэвтэрсний дараа \texttt{tenant} нууц үгийг солино.
+
+\textbf{Хэрэв ThingsBoard эхлэхгүй бол}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ compose logs }\AttributeTok{{-}{-}tail}\OperatorTok{=}\NormalTok{200 thingsboard}
+\FunctionTok{free} \AttributeTok{{-}h}                                   \CommentTok{\# swap ашиглагдаж байна уу?}
+\ExtensionTok{docker}\NormalTok{ inspect cnc302{-}thingsboard }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}i}\NormalTok{ oomkilled}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{OOMKilled:\ true} бол \texttt{JAVA\_OPTS}-ын \texttt{-Xmx}-ийг 1200m болгож бууруулаад дахин оролдоно.
+
+\hypertarget{ux430ux43bux445ux430ux43c-2-ux44dux440ux4afux4afux43b-ux43cux44dux43dux434ux438ux439ux43d-ux448ux430ux43bux433ux430ux43bux442-ux431ux430-ux43bux43eux433-25-ux43cux438ux43d}{%
+\subsection{Алхам 2 --- Эрүүл мэндийн шалгалт ба лог (25 мин)}\label{ux430ux43bux445ux430ux43c-2-ux44dux440ux4afux4afux43b-ux43cux44dux43dux434ux438ux439ux43d-ux448ux430ux43bux433ux430ux43bux442-ux431ux430-ux43bux43eux433-25-ux43cux438ux43d}}
+
+\textbf{2.1} Healthcheck-ийн түүхийг үзнэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ inspect cnc302{-}emqx }\AttributeTok{{-}{-}format} \StringTok{\textquotesingle{}\{\{json .State.Health\}\}\textquotesingle{}} \KeywordTok{|} \ExtensionTok{python3} \AttributeTok{{-}m}\NormalTok{ json.tool}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{2.2} Одоо healthcheck-ийг \textbf{зориудаар эвдэж} юу болохыг ажиглана. \texttt{docker-compose.yml} дотор \texttt{grafana}-гийн healthcheck-ийн хаягийг буруу порт руу заана (\texttt{3000} → \texttt{3999}), дараа нь:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core up }\AttributeTok{{-}d}\NormalTok{ grafana}
+\FunctionTok{sleep}\NormalTok{ 90}
+\ExtensionTok{docker}\NormalTok{ ps }\AttributeTok{{-}{-}filter}\NormalTok{ name=cnc302{-}grafana }\AttributeTok{{-}{-}format} \StringTok{\textquotesingle{}\{\{.Names\}\} \{\{.Status\}\}\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+Хариу \texttt{(unhealthy)} болох ёстой. \textbf{Хэдэн секундын дараа тэмдэглэгдсэнийг хэмжинэ} --- \texttt{interval\ ×\ retries} томьёо биелж байна уу?
+
+Дараа нь буцааж зөв болгоно:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ checkout docker{-}compose.yml   }\CommentTok{\# эсвэл гараар засна}
+\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core up }\AttributeTok{{-}d}\NormalTok{ grafana}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{2.3} Логийн эргэлт (rotation) ажиллаж байгааг шалгана:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ inspect cnc302{-}emqx }\AttributeTok{{-}{-}format} \StringTok{\textquotesingle{}\{\{json .HostConfig.LogConfig\}\}\textquotesingle{}}
+\FunctionTok{sudo}\NormalTok{ du }\AttributeTok{{-}sh}\NormalTok{ /var/lib/docker/containers/}\PreprocessorTok{*}\NormalTok{/}\PreprocessorTok{*}\NormalTok{{-}json.log }\KeywordTok{|} \FunctionTok{sort} \AttributeTok{{-}h} \KeywordTok{|} \FunctionTok{tail} \AttributeTok{{-}5}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+Логийн хязгаар байхгүй бол хэдэн долоо хоногийн дараа Pi-гийн диск дүүрнэ. Лаб 5-д яг үүнийг зориудаар үүсгэнэ.
+\end{quote}
+
+\hypertarget{ux430ux43bux445ux430ux43c-3-ux44dux445ux43bux44dux445-ux445ux443ux433ux430ux446ux430ux430ux43dux44b-ux445ux44dux43cux436ux438ux43bux442-35-ux43cux438ux43d}{%
+\subsection{Алхам 3 --- Эхлэх хугацааны хэмжилт (35 мин)}\label{ux430ux43bux445ux430ux43c-3-ux44dux445ux43bux44dux445-ux445ux443ux433ux430ux446ux430ux430ux43dux44b-ux445ux44dux43cux436ux438ux43bux442-35-ux43cux438ux43d}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{bash}\NormalTok{ ../tools/measure\_stack.sh }\AttributeTok{{-}{-}startup}
+\end{Highlighting}
+\end{Shaded}
+
+Энэ нь стекийг зогсоож дахин эхлүүлээд үйлчилгээ бүрийн эхлэх хугацааг \texttt{measurements/startup-*.csv}-д бичнэ.
+
+\textbf{Хоёр удаа} ажиллуулна:
+1. Нэгдүгээр удаа --- өгөгдөлтэй (халуун эхлэлт)
+2. Хоёрдугаар удаа --- \texttt{docker\ compose\ -\/-profile\ core\ down} хийсний дараа шууд (мөн халуун)
+
+\textbf{Хүснэгт 2}-ыг бөглөнө. Дараа нь хариулна: \textbf{яагаад ThingsBoard бусдаас 10--50 дахин удаан эхэлдэг вэ?} (Хариултад JVM-ийн эхлэлт, өгөгдлийн сангийн шилжилт (migration), healthcheck-ийн \texttt{start\_period} гэсэн гурван хүчин зүйлийг дурдана.)
+
+\hypertarget{ux430ux43bux445ux430ux43c-4-ux430ux43cux440ux430ux43bux442ux44bux43d-ux4afux435ux438ux439ux43d-ux43dux4e9ux4e9ux446ux438ux439ux43d-ux445ux44dux440ux44dux433ux43bux44dux44d-40-ux43cux438ux43d}{%
+\subsection{Алхам 4 --- Амралтын үеийн нөөцийн хэрэглээ (40 мин)}\label{ux430ux43bux445ux430ux43c-4-ux430ux43cux440ux430ux43bux442ux44bux43d-ux4afux435ux438ux439ux43d-ux43dux4e9ux4e9ux446ux438ux439ux43d-ux445ux44dux440ux44dux433ux43bux44dux44d-40-ux43cux438ux43d}}
+
+Ачаалалгүй үед 10 минут ажиглана:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{bash}\NormalTok{ ../tools/measure\_stack.sh }\AttributeTok{{-}{-}watch}\NormalTok{ 600 15}
+\end{Highlighting}
+\end{Shaded}
+
+Ажиллаж байх хооронд өөр терминалд:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{free} \AttributeTok{{-}h}
+\ExtensionTok{docker}\NormalTok{ stats }\AttributeTok{{-}{-}no{-}stream}
+\ExtensionTok{vcgencmd}\NormalTok{ measure\_temp}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Хүснэгт 3}-ыг бөглөнө. Дараа нь \textbf{үлдэгдэл нөөцийг} тооцоолно:
+
+\begin{verbatim}
+Боломжтой санах ой  =  Pi-гийн нийт RAM − (бүх контейнерийн санах ой) − (OS-ийн хэрэглээ)
+\end{verbatim}
+
+\hypertarget{ux430ux43bux445ux430ux43c-5-ux430ux447ux430ux430ux43bux430ux43bux442ux430ux439-ux4afux435ux438ux439ux43d-ux445ux44dux440ux44dux433ux43bux44dux44d-30-ux43cux438ux43d}{%
+\subsection{Алхам 5 --- Ачаалалтай үеийн хэрэглээ (30 мин)}\label{ux430ux43bux445ux430ux43c-5-ux430ux447ux430ux430ux43bux430ux43bux442ux430ux439-ux4afux435ux438ux439ux43d-ux445ux44dux440ux44dux433ux43bux44dux44d-30-ux43cux438ux43d}}
+
+Одоо \textbf{зөөврийн компьютер дээрээс} виртуал төхөөрөмж холбоно:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# зөөврийн компьютер дээр, багийн сангийн үндсэн фолдероос}
+\BuiltInTok{source}\NormalTok{ .venv/bin/activate}
+\ExtensionTok{python}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host}\NormalTok{ pi{-}team03.local }\AttributeTok{{-}{-}devices}\NormalTok{ 20 }\AttributeTok{{-}{-}interval}\NormalTok{ 1 }\AttributeTok{{-}{-}qos}\NormalTok{ 1}
+\end{Highlighting}
+\end{Shaded}
+
+Үүнтэй зэрэг Pi дээр:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{bash}\NormalTok{ ../tools/measure\_stack.sh }\AttributeTok{{-}{-}watch}\NormalTok{ 300 10}
+\end{Highlighting}
+\end{Shaded}
+
+EMQX самбарын \textbf{Dashboard → Metrics} хэсгээс мессежийн хурдыг харна.
+
+\textbf{Хүснэгт 4}-ийг бөглөж, Хүснэгт 3-тай харьцуулна. \textbf{20 төхөөрөмж нэмэхэд юу өөрчлөгдсөн бэ?} CPU шугаман өссөн үү, эсвэл өссөнгүй юү?
+
+\hypertarget{ux430ux43bux445ux430ux43c-6-ux43dux4e9ux4e9ux446ux438ux439ux43d-ux442ux4e9ux441ux4e9ux432-ux433ux430ux440ux433ux430ux445-25-ux43cux438ux43d}{%
+\subsection{Алхам 6 --- Нөөцийн төсөв гаргах (25 мин)}\label{ux430ux43bux445ux430ux43c-6-ux43dux4e9ux4e9ux446ux438ux439ux43d-ux442ux4e9ux441ux4e9ux432-ux433ux430ux440ux433ux430ux445-25-ux43cux438ux43d}}
+
+Хүснэгт 3, 4-ийн үр дүнд тулгуурлан \textbf{Хүснэгт 5} (нөөцийн төсөв)-ийг бөглөнө.
+
+Дараа нь энгийн шугаман экстраполяци хийнэ:
+
+\begin{verbatim}
+нэг төхөөрөмжид ногдох CPU  =  (ачаалалтай CPU% − амралтын CPU%) / 20
+\end{verbatim}
+
+Үүнээс: \textbf{Pi-гийн CPU-г 80\% болгоход хэдэн төхөөрөмж хэрэгтэй вэ?}
+
+\begin{quote}
+Энэ бол зөвхөн \textbf{таамаг}. Лаб 4-т бид үүнийг бодитоор шалгаж, шугаман экстраполяци хаана алдагдахыг харна. Таамгаа тайландаа бичиж үлдээгээрэй --- Лаб 4-ийн тайланд буцаж харьцуулна.
+\end{quote}
+
+\hypertarget{ux430ux43bux445ux430ux43c-7-ux431ux430ux440ux438ux43cux442ux436ux443ux443ux43bux430ux43bux442-ux431ux430-commit-25-ux43cux438ux43d}{%
+\subsection{Алхам 7 --- Баримтжуулалт ба commit (25 мин)}\label{ux430ux43bux445ux430ux43c-7-ux431ux430ux440ux438ux43cux442ux436ux443ux443ux43bux430ux43bux442-ux431ux430-commit-25-ux43cux438ux43d}}
+
+\textbf{7.1 Архитектурын диаграм.} \texttt{lab01/architecture.md} файлд Mermaid диаграм зурна:
+
+\begin{verbatim}
+flowchart LR
+    subgraph laptop["Оюутны зөөврийн компьютер"]
+        sim["sim_device.py<br/>20 виртуал төхөөрөмж"]
+        browser["Хөтөч"]
+    end
+    subgraph pi["Raspberry Pi 5 — Docker"]
+        emqx["EMQX 5.8<br/>:1883 :18083"]
+        tb["ThingsBoard 3.9<br/>:8080"]
+        influx["InfluxDB 3<br/>:8181"]
+        graf["Grafana 11<br/>:3000"]
+    end
+    sim -- "MQTT QoS 1" --> emqx
+    browser -- HTTP --> tb
+    browser -- HTTP --> graf
+    graf -- SQL --> influx
+\end{verbatim}
+
+Диаграмд \textbf{порт, хувилбар, протоколыг заавал} бичнэ.
+
+\textbf{7.2} Тайланг бөглөнө: \texttt{cp\ report-template.md\ report.md} → бүх хүснэгтийг бөглөнө.
+
+\textbf{7.3} Commit:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\FunctionTok{git}\NormalTok{ add }\AttributeTok{{-}A}
+\FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 1: платформын стек, нөөцийн хэмжилт"}
+\FunctionTok{git}\NormalTok{ tag lab01{-}done}
+\FunctionTok{git}\NormalTok{ push origin main }\AttributeTok{{-}{-}tags}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{git\ status} цэвэр байх ёстой. \texttt{.env}, \texttt{measurements/} санд орох ёсгүй.
+
+\hypertarget{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux445ux4afux441ux43dux44dux433ux442ux4afux4afux434}{%
+\section{5. Хэмжилтийн хүснэгтүүд}\label{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux445ux4afux441ux43dux44dux433ux442ux4afux4afux434}}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-1-pi-ux433ux438ux439ux43d-ux441ux443ux443ux440ux44c-ux442ux4e9ux43bux4e9ux432-ux43fux43bux430ux442ux444ux43eux440ux43c-ux44dux445ux43bux44dux445ux44dux44dux441-ux4e9ux43cux43dux4e9}{%
+\subsection{Хүснэгт 1 --- Pi-гийн суурь төлөв (платформ эхлэхээс өмнө)}\label{ux445ux4afux441ux43dux44dux433ux442-1-pi-ux433ux438ux439ux43d-ux441ux443ux443ux440ux44c-ux442ux4e9ux43bux4e9ux432-ux43fux43bux430ux442ux444ux43eux440ux43c-ux44dux445ux43bux44dux445ux44dux44dux441-ux4e9ux43cux43dux4e9}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+Үзүүлэлт & Утга \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Модель & \\
+Цөмийн тоо & \\
+Нийт RAM & \\
+Ашиглагдсан RAM (сул) & \\
+Swap (нийт / ашиглагдсан) & \\
+Дискний сул зай & \\
+Температур & \\
+\texttt{get\_throttled} & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-2-ux44dux445ux43bux44dux445-ux445ux443ux433ux430ux446ux430ux430}{%
+\subsection{Хүснэгт 2 --- Эхлэх хугацаа}\label{ux445ux4afux441ux43dux44dux433ux442-2-ux44dux445ux43bux44dux445-ux445ux443ux433ux430ux446ux430ux430}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Үйлчилгээ
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Дүрсийн хувилбар
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Эхлэх хугацаа (с)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\texttt{healthy} болох хугацаа (с)
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+emqx & 5.8.6 & & \\
+thingsboard & 3.9.1 & & \\
+influxdb & 3.2-core & & \\
+grafana & 11.6.0 & & \\
+\textbf{Нийт стек бэлэн} & --- & & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-3-ux430ux43cux440ux430ux43bux442ux44bux43d-ux4afux435ux438ux439ux43d-ux445ux44dux440ux44dux433ux43bux44dux44d-10-ux43cux438ux43d-ux434ux443ux43dux434ux430ux436}{%
+\subsection{Хүснэгт 3 --- Амралтын үеийн хэрэглээ (10 мин дундаж)}\label{ux445ux4afux441ux43dux44dux433ux442-3-ux430ux43cux440ux430ux43bux442ux44bux43d-ux4afux435ux438ux439ux43d-ux445ux44dux440ux44dux433ux43bux44dux44d-10-ux43cux438ux43d-ux434ux443ux43dux434ux430ux436}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Үйлчилгээ
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+CPU \% (дундаж)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+CPU \% (дээд)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Санах ой (MiB)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Санах ой \%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хязгаар (MiB)
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+emqx & & & & & 1024 \\
+thingsboard & & & & & 2500 \\
+influxdb & & & & & 1024 \\
+grafana & & & & & 512 \\
+\textbf{Нийт} & & & & & \\
+\end{longtable}\endgroup
+
+Pi-гийн нийт RAM: ule{1.5cm}{0.4pt} MiB · OS + бусад: ule{1.5cm}{0.4pt} MiB · \textbf{Үлдэгдэл: ule{1.5cm}{0.4pt} MiB}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-4-ux430ux447ux430ux430ux43bux430ux43bux442ux430ux439-ux4afux435ux438ux439ux43d-ux445ux44dux440ux44dux433ux43bux44dux44d-20-ux442ux4e9ux445ux4e9ux4e9ux440ux4e9ux43cux436-1-ux43cux441ux436ux441}{%
+\subsection{Хүснэгт 4 --- Ачаалалтай үеийн хэрэглээ (20 төхөөрөмж, 1 мсж/с)}\label{ux445ux4afux441ux43dux44dux433ux442-4-ux430ux447ux430ux430ux43bux430ux43bux442ux430ux439-ux4afux435ux438ux439ux43d-ux445ux44dux440ux44dux433ux43bux44dux44d-20-ux442ux4e9ux445ux4e9ux4e9ux440ux4e9ux43cux436-1-ux43cux441ux436ux441}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
+\toprule
+Үйлчилгээ & CPU \% (дундаж) & Санах ой (MiB) & Хүснэгт 3-аас өөрчлөлт \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+emqx & & & \\
+thingsboard & & & \\
+influxdb & & & \\
+grafana & & & \\
+\end{longtable}\endgroup
+
+EMQX-ийн бүртгэсэн мессежийн хурд: ule{1.5cm}{0.4pt} мсж/с
+Pi-гийн температур ачаалалтай үед: ule{1.5cm}{0.4pt} °C
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-5-ux43dux4e9ux4e9ux446ux438ux439ux43d-ux442ux4e9ux441ux4e9ux432-ux431ux430-ux442ux430ux430ux43cux430ux433}{%
+\subsection{Хүснэгт 5 --- Нөөцийн төсөв ба таамаг}\label{ux445ux4afux441ux43dux44dux433ux442-5-ux43dux4e9ux4e9ux446ux438ux439ux43d-ux442ux4e9ux441ux4e9ux432-ux431ux430-ux442ux430ux430ux43cux430ux433}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+Асуулт & Хариулт & Тооцооны үндэслэл \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Платформын суурь санах ой & MiB & \\
+Үлдэгдэл санах ой & MiB & \\
+Нэг төхөөрөмжид ногдох CPU \% & & \\
+CPU 80\% болох төхөөрөмжийн тоо (таамаг) & & \\
+Санах ойгоор хязгаарлагдах уу, CPU-гаар уу? & & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442}{%
+\section{6. Хяналтын асуулт}\label{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442}}
+
+Тайландаа хариулна (тус бүр 2--4 өгүүлбэр):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \texttt{Up} төлөв ба \texttt{healthy} төлөвийн ялгаа юу вэ? Аль нь платформын бэлэн байдлыг илэрхийлэх вэ?
+\item
+  Grafana-гийн healthcheck-ийг эвдсэний дараа \texttt{unhealthy} болтол хэдэн секунд өнгөрсөн бэ? Энэ тоо \texttt{interval}, \texttt{retries}, \texttt{start\_period}-тэй хэрхэн уялдаж байна вэ?
+\item
+  Санах ойн хязгаар (\texttt{memory\ limit}) тавих нь яагаад хязгааргүй орхихоос \textbf{дээр} вэ? Алдааны тусгаарлалт гэж юу вэ?
+\item
+  Логийн эргэлт (\texttt{max-size}, \texttt{max-file}) тохируулаагүй бол 3 сарын дараа юу болох вэ? Тооцоолж үзнэ үү.
+\item
+  ThingsBoard-ын эхлэх хугацаа урт нь ямар практик асуудал үүсгэх вэ (жишээ нь Pi цахилгаан тасарсны дараа)?
+\item
+  Хүснэгт 5-ын таамаг ямар таамаглалууд дээр тулгуурласан бэ? Аль нь бодит байдалд эвдрэх магадлалтай вэ?
+\end{enumerate}
+
+\hypertarget{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux448ux430ux430ux440ux434ux43bux430ux433ux430}{%
+\section{7. Тайлангийн шаардлага}\label{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux448ux430ux430ux440ux434ux43bux430ux433ux430}}
+
+\texttt{lab01/report.md} дотор:
+
+\begin{itemize}
+\tightlist
+\item[$\square$]
+  Багийн гишүүд ба хувь нэмэр
+\item[$\square$]
+  Хүснэгт 1--5 бүрэн бөглөгдсөн
+\item[$\square$]
+  Архитектурын диаграм (\texttt{architecture.md}, Mermaid)
+\item[$\square$]
+  Хяналтын 6 асуултын хариулт
+\item[$\square$]
+  Тулгарсан асуудал ба шийдэл
+\item[$\square$]
+  \texttt{measurements/} доторх CSV-ийн нэр (файлыг Git-д оруулахгүй, зөвхөн нэрийг дурдана)
+\item[$\square$]
+  Git commit hash ба \texttt{lab01-done} тэмдэглэгээ
+\end{itemize}
+
+\hypertarget{ux43eux43dux43eux448ux438ux43bux433ux43eux43e}{%
+\section{8. Оношилгоо}\label{ux43eux43dux43eux448ux438ux43bux433ux43eux43e}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Шинж тэмдэг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Магадлалтай шалтгаан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шийдэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\texttt{docker\ stats} санах ойг 0 харуулна & cgroup memory идэвхгүй & SETUP Б.4-ийг дахин хийнэ \\
+ThingsBoard \texttt{Restarting} давтана & OOM & Swap 2 GB эсэхийг шалга; \texttt{-Xmx}-ийг 1200m болго \\
+\texttt{port\ is\ already\ allocated} & 1883 эсвэл 8080 өөр процесс эзэлсэн & \texttt{sudo\ ss\ -tlnp\ \textbackslash{}\textbar{}\ grep\ \textless{}порт\textgreater{}} \\
+InfluxDB эхлэхгүй, \texttt{-\/-without-auth} танихгүй & InfluxDB 3-ын CLI өөрчлөгдсөн & \texttt{docker\ run\ -\/-rm\ influxdb:3.2-core\ influxdb3\ serve\ -\/-help}; эсвэл influx2 нөөц хувилбар руу шилж \\
+EMQX самбарт нэвтэрч чадахгүй & \texttt{.env} уншигдаагүй & \texttt{docker\ compose\ config\ \textbackslash{}\textbar{}\ grep\ PASSWORD} \\
+Хөтчөөр хандаж чадахгүй & порт дамжуулаагүй & VS Code PORTS таб эсвэл SSH \texttt{-L} туннел \\
+Температур 80 °C давсан & хөргөлт хүрэлцэхгүй & идэвхтэй хөргөлт залга; хэмжилт гажина \\
+\end{longtable}\endgroup
+
+\hypertarget{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}{%
+\section{9. Үнэлгээний шалгуур (10 оноо)}\label{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Шалгуур
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Оноо
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Тэмдэглэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Дөрвөн үйлчилгээ ажиллаж, \texttt{healthy} төлөвтэй & 3 & Багш шалгах үед ажиллаж байх ёстой \\
+Хүснэгт 1--4 бодит хэмжилтээр бөглөгдсөн & 3 & Хуулсан/зохиосон тоо → 0 \\
+Хүснэгт 5-ын таамаг тооцооны үндэслэлтэй & 2 & Томьёо харагдах ёстой \\
+Git сан цэвэр, \texttt{.env} ороогүй, тэмдэглэгээтэй & 1 & \\
+Диаграм ба тайлангийн чанар & 1 & \\
+\end{longtable}\endgroup
+
+\textbf{Автомат 0 оноо:} \texttt{.env} эсвэл хувийн түлхүүр Git санд орсон тохиолдолд.

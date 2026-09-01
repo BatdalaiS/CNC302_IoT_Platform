@@ -1,0 +1,54 @@
+# Кодын үндсэн шалгалт — синтакс, YAML, Compose схем
+name: Код шалгах
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Python синтакс
+        run: |
+          python -m compileall -q tools lab02 lab03 lab04 lab05 lab06 lab07 lab08 manual
+          echo "✓ бүх .py хөрвүүлэгдэв"
+
+      - name: Shell синтакс
+        run: |
+          for f in $(find . -name '*.sh'); do bash -n "$f" || exit 1; done
+          echo "✓ бүх .sh зөв"
+
+      - name: YAML ба JSON
+        run: |
+          python - <<'EOF'
+          import glob, json, yaml, sys
+          bad = 0
+          for f in glob.glob('**/*.y*ml', recursive=True):
+              try: list(yaml.safe_load_all(open(f)))
+              except Exception as e: print('YAML FAIL', f, e); bad += 1
+          for f in glob.glob('**/*.json', recursive=True):
+              try: json.load(open(f))
+              except Exception as e: print('JSON FAIL', f, e); bad += 1
+          print('✓ бүх YAML/JSON зөв' if not bad else f'{bad} алдаа')
+          sys.exit(1 if bad else 0)
+          EOF
+
+      - name: Docker Compose схем
+        working-directory: stack
+        run: |
+          cp .env.example .env
+          sed -i 's/солино[^ ]*/ci-test-value/g' .env
+          docker compose --profile core --profile pipeline --profile app --profile ai config > /dev/null
+          echo "✓ compose схем зөв"
+
+      - name: Нууц файл ороогүй эсэх
+        run: |
+          if git ls-files | grep -E '(^|/)\.env$|\.key$|\.pem$|\.crt$'; then
+            echo "✗ Нууц файл санд орсон байна!"; exit 1
+          fi
+          echo "✓ нууц файл ороогүй"

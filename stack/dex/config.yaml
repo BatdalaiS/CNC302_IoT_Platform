@@ -1,0 +1,48 @@
+# CNC302 Лаб 7 — Dex OIDC таних тэмдгийн сервер
+# ЗӨВХӨН ЛАБОРАТОРИД. Статик хэрэглэгч, нууц үг файлд ил байна.
+issuer: http://dex:5556/dex
+
+storage:
+  type: sqlite3
+  config:
+    file: /var/dex/dex.db
+
+web:
+  http: 0.0.0.0:5556
+
+oauth2:
+  skipApprovalScreen: true
+  passwordConnector: local
+
+staticClients:
+  - id: cnc302
+    name: CNC302 GraphQL API
+    secret: cnc302-lab-secret
+    redirectURIs:
+      - http://localhost:8000/callback
+      - http://localhost:3000/login/generic_oauth   # Grafana
+      - urn:ietf:wg:oauth:2.0:oob
+
+enablePasswordDB: true
+
+# bcrypt hash-ууд: бүгд нууц үг = "cnc302"
+# Өөрөө үүсгэх:  htpasswd -bnBC 10 "" cnc302 | tr -d ':\n'
+staticPasswords:
+  - email: "viewer@cnc302.mn"
+    hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+    username: "viewer"
+    userID: "11111111-1111-1111-1111-111111111111"
+  - email: "operator@cnc302.mn"
+    hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+    username: "operator"
+    userID: "22222222-2222-2222-2222-222222222222"
+  - email: "admin@cnc302.mn"
+    hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+    username: "admin"
+    userID: "33333333-3333-3333-3333-333333333333"
+
+# ⚠ Dex-ийн статик хэрэглэгчид бүлэг (groups) агуулдаггүй.
+# Лаб 7-ын Алхам 5-д та үүнийг хэрхэн шийдэхийг судална:
+#   а) LDAP/GitHub холбогч ашиглах (бүлэг ирнэ)
+#   б) GraphQL API дээр имэйлээс үүрэг зурвасжуулах (email → role map)
+# Аль нь илүү зөв вэ? Тайландаа үндэслэлээ бич.

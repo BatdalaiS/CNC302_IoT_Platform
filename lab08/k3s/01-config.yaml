@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cnc302-config
+  namespace: cnc302
+data:
+  INFLUX_DB: "cnc302"
+  TZ: "Asia/Ulaanbaatar"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cnc302-secrets
+  namespace: cnc302
+type: Opaque
+stringData:
+  # ⚠ ЛАБОРАТОРИД. Үйлдвэрлэлд Sealed Secrets эсвэл External Secrets ашиглана.
+  EMQX_DASHBOARD_PASSWORD: "солино-заавал"
+  GRAFANA_PASSWORD: "солино-заавал"

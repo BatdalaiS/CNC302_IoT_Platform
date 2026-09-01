@@ -1,0 +1,20 @@
+# Хэвтээ автомат өргөтгөл. Лаб 4-ийн ачааллын тестийг K3s дээр давтаж
+# pod-ын тоо хэрхэн өөрчлөгдөхийг ажигла.
+#
+# ШААРДЛАГА: metrics-server. K3s-д анхнаасаа суусан байдаг:
+#   kubectl top nodes
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: {name: emqx, namespace: cnc302}
+spec:
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: emqx}
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target: {type: Utilization, averageUtilization: 70}
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 120

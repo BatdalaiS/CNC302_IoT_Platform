@@ -1,0 +1,232 @@
+% ============================================================================
+%  CNC302 — Лабораторийн ажлын гарын авлага
+%  Тохиргоо (preamble). XeLaTeX эсвэл LuaLaTeX-ээр хөрвүүлнэ.
+% ============================================================================
+
+% ── Хуудасны хэмжээ ─────────────────────────────────────────────────────────
+\usepackage[
+  a4paper,
+  top=22mm, bottom=22mm, left=24mm, right=20mm,
+  headheight=15pt, footskip=12mm
+]{geometry}
+
+% ── Фонт (кирилл үсэг) ──────────────────────────────────────────────────────
+\usepackage{fontspec}
+\usepackage{amssymb}   % $\square$ (pandoc-ийн checkbox жагсаалт)
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{DejaVu Serif}[
+  Scale=0.94,
+  BoldFont={DejaVu Serif Bold},
+  ItalicFont={DejaVu Serif Italic},
+  BoldItalicFont={DejaVu Serif Bold Italic}]
+\setsansfont{DejaVu Sans}[Scale=0.90]
+\setmonofont{DejaVu Sans Mono}[Scale=0.82]
+
+% Монгол хэлэнд тусгай мөр таслалт байхгүй тул зөөлөн зохицуулалт хийнэ
+\sloppy
+\emergencystretch=3em
+\hyphenpenalty=1000
+\tolerance=2000
+
+% ── Тусгай тэмдэгт (DejaVu Serif-д байхгүй, DejaVu Sans-аас авна) ──────────
+\usepackage{newunicodechar}
+\newfontfamily{\symfont}{DejaVu Sans}[Scale=0.90]
+\newcommand{\sym}[1]{{\symfont #1}}
+\newunicodechar{✓}{\sym{✓}}
+\newunicodechar{✔}{\sym{✔}}
+\newunicodechar{✗}{\sym{✗}}
+\newunicodechar{✘}{\sym{✘}}
+\newunicodechar{⚠}{\sym{⚠}}
+\newunicodechar{⚙}{\sym{⚙}}
+\newunicodechar{☰}{\sym{☰}}
+\newunicodechar{◆}{\sym{◆}}
+\newunicodechar{●}{\sym{●}}
+\newunicodechar{▼}{\sym{▼}}
+\newunicodechar{▲}{\sym{▲}}
+\newunicodechar{✖}{\sym{✖}}
+\newunicodechar{★}{\sym{★}}
+\newunicodechar{↔}{\sym{↔}}
+\newunicodechar{⌈}{\sym{⌈}}
+\newunicodechar{⌉}{\sym{⌉}}
+\newunicodechar{σ}{\sym{σ}}
+
+% ── Өнгө ────────────────────────────────────────────────────────────────────
+\usepackage{xcolor}
+\definecolor{cncblue}{HTML}{1F3864}
+\definecolor{cncmid}{HTML}{2E5496}
+\definecolor{cnclight}{HTML}{D9E2F3}
+\definecolor{cncgrey}{HTML}{F2F2F2}
+\definecolor{cncrule}{HTML}{8EA9DB}
+\definecolor{cncwarn}{HTML}{B45309}
+\definecolor{cncok}{HTML}{15803D}
+\definecolor{cncdanger}{HTML}{B91C1C}
+
+% ── Хүснэгт ─────────────────────────────────────────────────────────────────
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{tabularx}
+\usepackage{colortbl}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.18}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+% Урт хүснэгтийн толгойг давтахад "үргэлжлэл" гэж тэмдэглэнэ
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf,skip=4pt}
+
+% ── График, диаграм ─────────────────────────────────────────────────────────
+\usepackage{graphicx}
+\usepackage{float}
+
+% ── Жагсаалт ────────────────────────────────────────────────────────────────
+\usepackage{enumitem}
+\setlist{topsep=3pt,itemsep=1pt,parsep=1pt,leftmargin=*}
+\setlist[itemize]{label=\textcolor{cncmid}{\textbullet}}
+
+% ── Кодын блок ──────────────────────────────────────────────────────────────
+\usepackage{fvextra}
+\usepackage{framed}
+\fvset{
+  breaklines=true,
+  breakanywhere=true,
+  breaksymbolleft={},
+  breakindent=0pt,
+  fontsize=\footnotesize,
+  commandchars=\\\{\},
+}
+% pandoc-ийн highlighting макронууд (highlighting.tex файлаас)
+\input{highlighting}
+% Кодын хүрээг цэвэрлэх
+\definecolor{shadecolor}{HTML}{F7F8FA}
+\setlength{\FrameSep}{5pt}
+\setlength{\OuterFrameSep}{4pt}
+
+
+% ── Тэмдэглэл, анхааруулгын хайрцаг ─────────────────────────────────────────
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+
+\newtcolorbox{cncnote}{
+  breakable, enhanced,
+  colback=cnclight!30, colframe=cncmid,
+  boxrule=0pt, leftrule=2.5pt,
+  arc=0pt, outer arc=0pt,
+  left=7pt, right=7pt, top=5pt, bottom=5pt,
+  before skip=7pt, after skip=7pt,
+}
+
+% Markdown-ийн `>` блокийг хайрцаг болгоно
+\renewenvironment{quote}{\begin{cncnote}\small}{\end{cncnote}}
+
+% ── LaTeX-ийн бэлэн нэрсийг монголчлох ─────────────────────────────────────
+\renewcommand{\contentsname}{Агуулга}
+\renewcommand{\chaptername}{Бүлэг}
+\renewcommand{\appendixname}{Хавсралт}
+\renewcommand{\tablename}{Хүснэгт}
+\renewcommand{\figurename}{Зураг}
+\renewcommand{\listtablename}{Хүснэгтийн жагсаалт}
+\renewcommand{\listfigurename}{Зургийн жагсаалт}
+\renewcommand{\bibname}{Ном зүй}
+\renewcommand{\indexname}{Хэлхээ бүртгэл}
+\renewcommand{\partname}{Хэсэг}
+
+% ── Гарчиг ──────────────────────────────────────────────────────────────────
+\usepackage{titlesec}
+
+\titleformat{\chapter}[display]
+  {\normalfont\sffamily\bfseries\color{cncblue}}
+  {\raggedright\normalsize\sffamily\color{cncmid}\MakeUppercase{\chaptertitlename}\ \thechapter}
+  {6pt}
+  {\Huge\raggedright}
+  [\vspace{2pt}{\color{cncrule}\titlerule[1.2pt]}]
+\titlespacing*{\chapter}{0pt}{-18pt}{22pt}
+
+\titleformat{\section}
+  {\normalfont\sffamily\Large\bfseries\color{cncblue}}{\thesection}{0.7em}{}
+\titleformat{\subsection}
+  {\normalfont\sffamily\large\bfseries\color{cncmid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}
+  {\normalfont\sffamily\normalsize\bfseries\color{cncmid}}{\thesubsubsection}{0.5em}{}
+\titlespacing*{\section}{0pt}{14pt}{5pt}
+\titlespacing*{\subsection}{0pt}{11pt}{4pt}
+\titlespacing*{\subsubsection}{0pt}{9pt}{3pt}
+
+% Заавар өөрөө '1. Зорилго', 'Алхам 6' гэж дугаарласан тул LaTeX-ийн
+% давхар дугаарлалтыг унтраана (бүлэг л дугаарлагдана).
+\setcounter{secnumdepth}{0}
+\setcounter{tocdepth}{1}
+
+% ── Толгой, хөл ─────────────────────────────────────────────────────────────
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{cncrule}\leaders\hrule height \headrulewidth\hfill}}
+\fancyhead[L]{\footnotesize\sffamily\color{cncmid}CNC302 — Юмсын интернэтийн платформ ба хэрэглээ}
+\fancyhead[R]{\footnotesize\sffamily\color{cncmid}\leftmark}
+\fancyfoot[C]{\small\thepage}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\small\thepage}\renewcommand{\headrulewidth}{0pt}}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+
+% ── Холбоос ─────────────────────────────────────────────────────────────────
+\usepackage{hyperref}
+\hypersetup{
+  unicode=true,
+  bookmarks=true,
+  bookmarksnumbered=true,
+  colorlinks=true,
+  linkcolor=cncmid,
+  urlcolor=cncmid,
+  citecolor=cncmid,
+  pdftitle={CNC302 — Лабораторийн ажлын гарын авлага},
+  pdfauthor={С.Батдалай, ШУТИС МХТС Холбооны тэнхим},
+  pdfsubject={Cloud-Native IoT Platforms and Applications},
+  pdfkeywords={IoT, MQTT, Kubernetes, Edge AI, Raspberry Pi},
+}
+\urlstyle{same}
+
+% Урт URL-ийг таслах
+\usepackage{xurl}
+
+% ── Тусламжийн макронууд ────────────────────────────────────────────────────
+\newcommand{\labmeta}[5]{%
+  \begin{center}
+  \begin{tabular}{@{}>{\bfseries\sffamily\color{cncmid}}l l@{}}
+    \toprule
+    7 хоног & #1 \\
+    Хугацаа & #2 \\
+    Суралцахуйн үр дүн & #3 \\
+    Үнэлгээ & #4 \\
+    Гол хэмжилт & #5 \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \vspace{4pt}
+}
+
+% Хүснэгтийг жижигрүүлэх орчин (өргөн хүснэгтэд)
+\newenvironment{widetable}{\begingroup\scriptsize}{\endgroup}
+
+\newcommand{\keyterm}[1]{\textbf{\textcolor{cncblue}{#1}}}
+\newcommand{\file}[1]{\texttt{\small #1}}
+
+% Markdown-ийн шугам (---) -ийг зөөлөн зураас болгоно
+\providecommand{\mdrule}{\par\vspace{3pt}{\color{cncrule}\hrule height 0.4pt}\par\vspace{6pt}}
+
+% pandoc-ийн шаарддаг макронууд
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\providecommand{\pandocbounded}[1]{#1}
+\providecommand{\passthrough}[1]{#1}
+
+% ── Кодын орчны эцсийн тодорхойлолт ─────────────────────────────────────────
+% ЧУХАЛ: энэ хэсэг preamble-ийн ХАМГИЙН СҮҮЛД байх ёстой. tcolorbox зэрэг
+% багцууд verbatim орчныг дахин тодорхойлдог тул эрт тавибал үйлчлэхгүй.
+\AtBeginDocument{%
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{%
+    commandchars=\\\{\},breaklines=true,breakanywhere=true,%
+    breaksymbolleft={},fontsize=\scriptsize}%
+  \DefineVerbatimEnvironment{verbatim}{Verbatim}{%
+    breaklines=true,breakanywhere=true,breaksymbolleft={},fontsize=\scriptsize}%
+}

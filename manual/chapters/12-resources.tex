@@ -1,0 +1,90 @@
+% Автоматаар үүсгэсэн — эх файл: docs/resource-budget.md
+\chapter{Нөөцийн төсөв}
+
+Энэ хүснэгт нь \textbf{чиглүүлэх тооцоо}. Бодит утгыг Лаб 1-д өөрсдөө хэмжинэ.
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Үйлчилгээ
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Профайл
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Compose хязгаар
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хүлээгдэх амралтын хэрэглээ
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Тэмдэглэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+emqx & core & 1024 MiB & 150--250 MiB & Холболт нэмэгдэхэд өснө (\textasciitilde4 KiB/холболт) \\
+thingsboard & core & 2500 MiB & 1200--1800 MiB & JVM + Postgres нэг контейнерт \\
+influxdb & core & 1024 MiB & 250--500 MiB & Бичилтийн ачаалалтай өснө \\
+grafana & core & 512 MiB & 120--200 MiB & Самбарын тоогоор өснө \\
+nodered & pipeline & 512 MiB & 120--200 MiB & Урсгалын нарийвчлалаас хамаарна \\
+dex & app & 256 MiB & 30--60 MiB & \\
+graphql-api & app & 512 MiB & 80--150 MiB & Python/FastAPI \\
+ollama & ai & 3072 MiB & загвараас хамаарна & 1.5B загвар ≈ 1.2--2 GiB \\
+\end{longtable}\endgroup
+
+\hypertarget{ux43fux440ux43eux444ux430ux439ux43bux44bux43d-ux43dux438ux439ux43bux431ux44dux440}{%
+\section{Профайлын нийлбэр}\label{ux43fux440ux43eux444ux430ux439ux43bux44bux43d-ux43dux438ux439ux43bux431ux44dux440}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Хослол
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хязгаарын нийлбэр
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Практикт
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Дүгнэлт
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+core & 5.0 GiB & 1.7--2.7 GiB & Лаб 1--4-т тохиромжтой \\
+core + pipeline & 5.5 GiB & 1.9--2.9 GiB & Лаб 5 \\
+core + pipeline + app & 6.3 GiB & 2.0--3.1 GiB & Лаб 7 \\
+бүгд + ai & 9.4 GiB & \textbf{8 GiB давна} & Лаб 8-д зарим үйлчилгээг зогсооно \\
+\end{longtable}\endgroup
+
+\hypertarget{ux43bux430ux431-8-ux44bux43d-ux437ux4e9ux432ux43bux4e9ux43cux436}{%
+\section{Лаб 8-ын зөвлөмж}\label{ux43bux430ux431-8-ux44bux43d-ux437ux4e9ux432ux43bux4e9ux43cux436}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ compose stop nodered grafana dex graphql{-}api}
+\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ ai up }\AttributeTok{{-}d}\NormalTok{ ollama}
+\ExtensionTok{ollama}\NormalTok{ pull qwen2.5:1.5b        }\CommentTok{\# 3B{-}ээс дээш загвар Pi дээр хэт удаан}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux441ux430ux43dux430ux43cux436}{%
+\section{Санамж}\label{ux441ux430ux43dux430ux43cux436}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Swap 2 GB заавал.} Үгүй бол ThingsBoard эхлэхдээ OOM болно.
+\item
+  \texttt{deploy.resources.limits} нь хязгаар л тавьдаг, нөөц \textbf{баталгаажуулдаггүй}.
+\item
+  \texttt{docker\ stats}-ын санах ойн тоо зөв гарахад \texttt{cgroup\_enable=memory} хэрэгтэй.
+\item
+  Идэвхтэй хөргөлт байхгүй бол Pi 5 ачаалал дор 80 °C давж, давтамжаа бууруулна --- бүх хэмжилт гажина. \texttt{vcgencmd\ get\_throttled} нь \texttt{0x0} байх ёстой.
+\end{itemize}

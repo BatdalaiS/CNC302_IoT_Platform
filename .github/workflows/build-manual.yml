@@ -1,0 +1,49 @@
+# Markdown заавар өөрчлөгдөх бүрт PDF гарын авлагыг автоматаар хөрвүүлнэ.
+# Үр дүн: Actions → тухайн ажиллуулалт → Artifacts → cnc302-manual
+name: Гарын авлага хөрвүүлэх
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/README.md'
+      - 'SETUP.md'
+      - 'docs/**'
+      - 'manual/**'
+      - '.github/workflows/build-manual.yml'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: LaTeX ба pandoc суулгах
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            texlive-xetex texlive-latex-extra texlive-fonts-recommended \
+            fonts-dejavu pandoc
+
+      - name: PDF хөрвүүлэх
+        working-directory: manual
+        run: |
+          python3 build.py --src ..
+          xelatex -interaction=nonstopmode -halt-on-error main.tex > /dev/null
+          xelatex -interaction=nonstopmode -halt-on-error main.tex > /dev/null
+          xelatex -interaction=nonstopmode -halt-on-error main.tex | tail -3
+
+      - name: Чанарын шалгалт
+        working-directory: manual
+        run: |
+          echo "Дутуу тэмдэгт : $(grep -c 'Missing character' main.log || echo 0)"
+          echo "Хэтэрсэн мөр  : $(grep -c 'Overfull .hbox' main.log || echo 0)"
+          grep -o 'Output written on main.pdf ([0-9]* pages' main.log | head -1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cnc302-manual
+          path: manual/main.pdf
+          retention-days: 90

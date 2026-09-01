@@ -1,0 +1,231 @@
+% Автоматаар үүсгэсэн — эх файл: README.md
+\chapter{Гарын авлагын танилцуулга}
+
+\hypertarget{ux43bux430ux431ux43eux440ux430ux442ux43eux440ux438ux439ux43d-ux430ux436ux43bux44bux43d-ux441ux430ux43d}{%
+\section{Лабораторийн ажлын сан}\label{ux43bux430ux431ux43eux440ux430ux442ux43eux440ux438ux439ux43d-ux430ux436ux43bux44bux43d-ux441ux430ux43d}}
+
+Энэ сан нь CNC302 хичээлийн \textbf{найман лабораторийн ажлыг} агуулна. Найман лаборатори нь тус тусдаа биш --- \textbf{нэг ажиллаж буй платформыг үе шаттай өргөтгөж бүтээнэ}. Лаборатори бүрийн эцэст таны стек ажиллагаатай хэвээр байх ёстой бөгөөд дараагийн лаборатори үүн дээр үргэлжилнэ.
+
+\hypertarget{ux430ux436ux43bux44bux43d-ux43eux440ux447ux438ux43d}{%
+\section{1. Ажлын орчин}\label{ux430ux436ux43bux44bux43d-ux43eux440ux447ux438ux43d}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Төхөөрөмж
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Үүрэг
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\textbf{Оюутны зөөврийн компьютер} & Хөгжүүлэлт, удирдлага, дүрслэл. VS Code Remote-SSH-ээр Pi-д холбогдоно. Хөтчөөр ThingsBoard, Grafana, Edge Impulse Studio-д ханддаг. Виртуал төхөөрөмжийн флот, ачааллын тест энд ажиллана. \\
+\textbf{Raspberry Pi 5 (8 GB)} & Платформын ажиллагааны сервер. Docker Compose, дараа нь K3s. Бүх үйлчилгээ энд ажиллана. \\
+\textbf{Raspberry Pi AI Kit} & Лаб 6-д ирмэгийн дүгнэлт хурдасгах (тэнхимийн хамтын хэрэглээ). \\
+\end{longtable}\endgroup
+
+\begin{quote}
+\textbf{Зарчим:} Pi дээр \emph{ажиллуулна}, зөөврийн компьютер дээр \emph{бичнэ, хэмжинэ, харна}. Кодыг Pi дээр шууд засахгүй --- Git-ээр дамжуулна.
+\end{quote}
+
+\hypertarget{ux441ux430ux43dux433ux438ux439ux43d-ux431ux4afux442ux44dux446}{%
+\section{2. Сангийн бүтэц}\label{ux441ux430ux43dux433ux438ux439ux43d-ux431ux4afux442ux44dux446}}
+
+\begin{verbatim}
+CNC302-labs/
+├── README.md              ← энэ файл
+├── SETUP.md               ← Лаб 1-ээс өмнө нэг удаа хийх бэлтгэл
+├── stack/                 ← ЖИВЭЭ ФАЙЛ: багийн платформ. Лаборатори бүрт өсөж томорно
+│   ├── docker-compose.yml
+│   ├── docker-compose.influx2.yml   ← нөөц хувилбар (InfluxDB 2.7)
+│   ├── .env.example
+│   └── Makefile
+├── tools/                 ← бүх лабораторид хэрэглэгдэх хэрэгслүүд
+│   ├── sim_device.py      ← виртуал төхөөрөмжийн флот
+│   ├── qos_latency.py     ← MQTT QoS/саатлын хэмжилт
+│   ├── measure_stack.sh   ← нөөцийн хэрэглээний хэмжилт
+│   └── requirements.txt
+├── lab01/ … lab08/        ← лаборатори бүрийн заавар ба ажлын файлууд
+│   ├── README.md          ← ЗААВАР (энд бүх алхам, хүснэгт, үнэлгээ байна)
+│   ├── *.py *.sh          ← тухайн лабын хэрэгслүүд
+│   └── out/               ← гаралт (.gitignore-д, Git-д ОРОХГҮЙ)
+└── docs/
+    ├── report-template.md ← тайлангийн загвар (лаборатори бүрт хуулж ашиглана)
+    ├── troubleshooting.md
+    └── resource-budget.md
+\end{verbatim}
+
+\hypertarget{stack-ux444ux43eux43bux434ux435ux440ux44bux43d-ux434ux4afux440ux44dux43c}{%
+\subsection{\texorpdfstring{\texttt{stack/} фолдерын дүрэм}{stack/ фолдерын дүрэм}}\label{stack-ux444ux43eux43bux434ux435ux440ux44bux43d-ux434ux4afux440ux44dux43c}}
+
+\texttt{stack/docker-compose.yml} бол \textbf{таны багийн живээ файл}. Лаборатори бүрт та үүн рүү үйлчилгээ нэмж, тохиргоо өөрчилнө. Хэрэв та эвдэрсэн бол Git-ийн түүхээс сэргээнэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ log }\AttributeTok{{-}{-}oneline} \AttributeTok{{-}{-}}\NormalTok{ stack/docker{-}compose.yml}
+\FunctionTok{git}\NormalTok{ checkout }\OperatorTok{\textless{}}\NormalTok{commit}\OperatorTok{\textgreater{}}\NormalTok{ {-}{-} stack/docker{-}compose.yml}
+\end{Highlighting}
+\end{Shaded}
+
+Тиймээс \textbf{лаборатори бүрийн эцэст commit хийх} нь зөвхөн үнэлгээний шаардлага биш, өөрийн даатгал юм.
+
+\hypertarget{compose-ux43fux440ux43eux444ux430ux439ux43b-ux4afux439ux43bux447ux438ux43bux433ux44dux44dux433-ux441ux43eux43dux433ux43eux436-ux430ux436ux438ux43bux43bux443ux443ux43bux430ux445}{%
+\section{3. Compose профайл (үйлчилгээг сонгож ажиллуулах)}\label{compose-ux43fux440ux43eux444ux430ux439ux43b-ux4afux439ux43bux447ux438ux43bux433ux44dux44dux433-ux441ux43eux43dux433ux43eux436-ux430ux436ux438ux43bux43bux443ux443ux43bux430ux445}}
+
+Raspberry Pi 5-ын 8 GB санах ой бүх үйлчилгээг зэрэг ажиллуулахад хүрэлцэхгүй. Тиймээс үйлчилгээг \textbf{профайл}-аар бүлэглэсэн:
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Профайл
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Үйлчилгээ
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хэзээ
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\texttt{core} & emqx, thingsboard, influxdb, grafana & Лаб 1-ээс эхлэн үргэлж \\
+\texttt{pipeline} & nodered & Лаб 5-аас \\
+\texttt{app} & dex, graphql-api & Лаб 7-оос \\
+\texttt{ai} & ollama & Лаб 8 (бусдыг зогсоох шаардлагатай) \\
+\end{longtable}\endgroup
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# зөвхөн core}
+\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core up }\AttributeTok{{-}d}
+
+\CommentTok{\# core + pipeline}
+\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core }\AttributeTok{{-}{-}profile}\NormalTok{ pipeline up }\AttributeTok{{-}d}
+
+\CommentTok{\# Лаб 8: хүнд үйлчилгээг зогсоож ollama{-}г асаах}
+\ExtensionTok{docker}\NormalTok{ compose stop nodered grafana}
+\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ ai up }\AttributeTok{{-}d}\NormalTok{ ollama}
+\end{Highlighting}
+\end{Shaded}
+
+Санах ойн нарийвчилсан төсвийг \texttt{docs/resource-budget.md}-ээс үзнэ үү.
+
+\hypertarget{ux431ux430ux433ux438ux439ux43d-git-ux441ux430ux43dux433-ux44dux445ux43bux4afux4afux43bux44dux445}{%
+\section{4. Багийн Git санг эхлүүлэх}\label{ux431ux430ux433ux438ux439ux43d-git-ux441ux430ux43dux433-ux44dux445ux43bux4afux4afux43bux44dux445}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 1. Энэ санг үлгэр болгон хуулж авах (шууд clone биш — өөрийн түүх хэрэгтэй)}
+\FunctionTok{git}\NormalTok{ clone }\AttributeTok{{-}{-}depth}\NormalTok{ 1 }\OperatorTok{\textless{}}\NormalTok{багшийн{-}сангийн{-}хаяг}\OperatorTok{\textgreater{}}\NormalTok{ cnc302{-}labs{-}template}
+\FunctionTok{cp} \AttributeTok{{-}r}\NormalTok{ cnc302{-}labs{-}template }\OperatorTok{\textless{}}\NormalTok{багийн{-}нэр}\OperatorTok{\textgreater{}}\NormalTok{{-}cnc302}
+\BuiltInTok{cd} \OperatorTok{\textless{}}\NormalTok{багийн{-}нэр}\OperatorTok{\textgreater{}}\NormalTok{{-}cnc302}
+\FunctionTok{rm} \AttributeTok{{-}rf}\NormalTok{ .git }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ init }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ add . }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 1: эхлэл"}
+
+\CommentTok{\# 2. Өөрийн алсын санг холбох (GitHub/GitLab, хувийн сан)}
+\FunctionTok{git}\NormalTok{ remote add origin }\OperatorTok{\textless{}}\NormalTok{таны{-}сангийн{-}хаяг}\OperatorTok{\textgreater{}}
+\FunctionTok{git}\NormalTok{ push }\AttributeTok{{-}u}\NormalTok{ origin main}
+
+\CommentTok{\# 3. Багшид унших эрх өгөх}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Commit хийх дүрэм:} лаборатори бүрийн эцэст \texttt{git\ tag\ lab01-done} мэтээр тэмдэглэнэ. Багш үнэлгээг эдгээр тэмдэглэгээгээр шалгана.
+
+\textbf{Хэзээ ч commit хийхгүй:} \texttt{.env}, нууц үг, хувийн түлхүүр, \texttt{*.pem}, сертификат, том лог файл. \texttt{.gitignore} бэлэн байгаа.
+
+\hypertarget{ux43bux430ux431ux43eux440ux430ux442ux43eux440ux438ux439ux43d-ux436ux430ux433ux441ux430ux430ux43bux442}{%
+\section{5. Лабораторийн жагсаалт}\label{ux43bux430ux431ux43eux440ux430ux442ux43eux440ux438ux439ux43d-ux436ux430ux433ux441ux430ux430ux43bux442}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+№
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+7 хоног
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Нэр
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Гол хэмжилт
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & III & Платформын стек ба ажиглалт & Контейнер эхлэх хугацаа, RAM/CPU, үлдэгдэл нөөц \\
+2 & V & Төхөөрөмжийн бүрэн амьдралын мөчлөг & Provisioning хугацаа, OTA тараалтын амжилтын хувь \\
+3 & VII & MQTT 5.0 ба Unified Namespace & QoS 0/1/2-ийн саатал, дамжуулах чадвар \\
+4 & IX & Rule Engine ба ачааллын тест & Багтаамжийн хязгаар (холболт, мессеж/сек) \\
+5 & XI & Өгөгдлийн шугам ба эвдрэлийн туршилт & Өгөгдлийн алдагдал, сэргэх хугацаа \\
+6 & XII & Ирмэгийн хиймэл оюун & Дүгнэлтийн саатал, санах ой, нарийвчлал \\
+7 & XIV & Хэрэглээний давхарга ба аюулгүй байдал & Хандалтын шалгалтын үр дүн \\
+8 & XV & Дижитал ихэр, GenAI ба K3s & Шилжүүлэлтийн дараах ажиллагаа \\
+\end{longtable}\endgroup
+
+\hypertarget{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux435ux440ux4e9ux43dux445ux438ux439-ux448ux430ux430ux440ux434ux43bux430ux433ux430}{%
+\section{6. Тайлангийн ерөнхий шаардлага}\label{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux435ux440ux4e9ux43dux445ux438ux439-ux448ux430ux430ux440ux434ux43bux430ux433ux430}}
+
+Тайлангийн загвар: \texttt{docs/report-template.md} → \texttt{labNN/report.md} болгон хуулж бөглөнө (PDF болгон хөрвүүлж өгнө):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Багийн гишүүд ба хувь нэмэр} --- хэн юу хийсэн (нэг өгүүлбэрээр)
+\item
+  \textbf{Гүйцэтгэсэн алхмууд} --- товч, дэлгэцийн зураг биш харин \textbf{комманд ба гаралт}
+\item
+  \textbf{Хэмжилтийн хүснэгт} --- заавар дахь хоосон хүснэгтийг бөглөсөн байх
+\item
+  \textbf{Дүгнэлт} --- тоон үр дүн юу гэсэн үг вэ, төслийн шийдэлд хэрхэн нөлөөлөх вэ
+\item
+  \textbf{Тулгарсан асуудал ба шийдсэн арга}
+\item
+  \textbf{Git commit-ийн хаяг (hash)} --- тайланд харгалзах кодын төлөв
+\end{enumerate}
+
+\begin{quote}
+\textbf{Хамгийн чухал:} тайлан бол \textbf{нотолгоо}, дэлгэцийн зургийн цуглуулга биш. Тоон үр дүнгүй тайлан 50\%-иас дээш оноо авахгүй.
+\end{quote}
+
+Лаб 4 ба Лаб 8-ыг бичгийн тайлангийн оронд \textbf{10 минутын багийн үзүүлэн}-ээр үнэлнэ.
+
+\hypertarget{ux4afux43dux44dux43bux433ux44dux44d}{%
+\section{7. Үнэлгээ}\label{ux4afux43dux44dux43bux433ux44dux44d}}
+
+Лабораторийн ажил нийт дүнгийн \textbf{25\%} эзэлнэ (6 тайлан + 2 үзүүлэн). Лаборатори бүр 10 оноо:
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+Шалгуур & Оноо \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Ажиллагаатай үр дүн (стек ажиллаж байна) & 3 \\
+Хэмжилт бүрэн, зөв аргачлалаар хийгдсэн & 3 \\
+Дүгнэлт үндэслэлтэй, тоон баримтад тулгуурласан & 2 \\
+Git сан цэвэр, түүх ойлгомжтой & 1 \\
+Тайлангийн чанар, ойлгомжтой байдал & 1 \\
+\end{longtable}\endgroup
+
+Хугацаа хэтэрсэн тайлан өдөр тутам 10\% хасагдана.
+
+\hypertarget{ux430ux43dux445ux430ux430ux440ux443ux443ux43bux433ux430-ux445ux443ux432ux438ux43bux431ux430ux440ux44bux43d-ux44dux440ux441ux434ux44dux43b}{%
+\section{8. Анхааруулга --- хувилбарын эрсдэл}\label{ux430ux43dux445ux430ux430ux440ux443ux443ux43bux433ux430-ux445ux443ux432ux438ux43bux431ux430ux440ux44bux43d-ux44dux440ux441ux434ux44dux43b}}
+
+Энэ сан дахь бүх дүрс (image) тодорхой хувилбарт \textbf{бэхлэгдсэн} (pinned). Нээлттэй эхийн төслүүд, ялангуяа \textbf{InfluxDB 3 Core} болон \textbf{Edge Impulse}-ийн CLI, тохиргоо түргэн өөрчлөгддөг.
+
+\textbf{Багшид:} хичээлийн улирал эхлэхээс өмнө нэг Raspberry Pi дээр бүх найман лабыг эхнээс нь дуустал ажиллуулж шалгана уу. Хувилбар зөрчилдвөл:
+- InfluxDB 3-тэй асуудал гарвал: \texttt{docker\ compose\ -f\ docker-compose.yml\ -f\ docker-compose.influx2.yml\ up\ -d} (InfluxDB 2.7 нөөц хувилбар)
+- Дүрсийн arm64 дэмжлэгийг шалгах: \texttt{docker\ manifest\ inspect\ \textless{}image\textgreater{}\ \textbar{}\ grep\ arm64}
+
+\texttt{docs/troubleshooting.md}-д түгээмэл алдаа, шийдлийг цуглуулсан.

@@ -1,0 +1,5 @@
+fastapi>=0.115
+uvicorn[standard]>=0.32
+strawberry-graphql[fastapi]>=0.248
+httpx>=0.27
+python-jose[cryptography]>=3.3

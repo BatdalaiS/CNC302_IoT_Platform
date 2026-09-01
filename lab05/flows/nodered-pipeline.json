@@ -1,0 +1,220 @@
+[
+ {
+  "id": "cnc302tab",
+  "type": "tab",
+  "label": "CNC302 Лаб 5 — өгөгдлийн шугам",
+  "disabled": false,
+  "info": "MQTT → задлан шинжлэх → цонхны нэгтгэл → InfluxDB 3\nЛаб 5-д импортлоно. mqtt-broker зангилааны хаягийг шалгана уу."
+ },
+ {
+  "id": "broker",
+  "type": "mqtt-broker",
+  "name": "EMQX (local)",
+  "broker": "emqx",
+  "port": "1883",
+  "clientid": "nodered-cnc302",
+  "autoConnect": true,
+  "usetls": false,
+  "protocolVersion": "5",
+  "keepalive": "60",
+  "cleansession": true,
+  "birthTopic": "",
+  "closeTopic": "",
+  "willTopic": ""
+ },
+ {
+  "id": "mqttin",
+  "type": "mqtt in",
+  "z": "cnc302tab",
+  "name": "UNS telemetry",
+  "topic": "cnc302/+/+/+/+/telemetry",
+  "qos": "1",
+  "datatype": "auto-detect",
+  "broker": "broker",
+  "nl": false,
+  "rap": true,
+  "rh": 0,
+  "inputs": 0,
+  "x": 130,
+  "y": 120,
+  "wires": [
+   [
+    "parse"
+   ]
+  ]
+ },
+ {
+  "id": "parse",
+  "type": "function",
+  "z": "cnc302tab",
+  "name": "задлан шинжлэх + шошго",
+  "func": "// UNS сэдвээс шатлалыг гаргаж авна\n// cnc302/<site>/<area>/<line>/<device>/telemetry\nconst p = msg.topic.split('/');\nif (p.length !== 6) { node.warn('UNS схем зөрчсөн: ' + msg.topic); return null; }\nconst d = (typeof msg.payload === 'object') ? msg.payload : JSON.parse(msg.payload);\n\n// Өгөгдлийн чанарын шалгуур — хүрээнээс гарсныг хаяна\nif (d.temperature < -60 || d.temperature > 150) {\n    node.warn('temperature хүрээнээс гарсан: ' + d.temperature);\n    return null;\n}\n\nmsg.tags = { site: p[1], area: p[2], line: p[3], device: p[4] };\nmsg.payload = d;\nreturn msg;",
+  "outputs": 1,
+  "noerr": 0,
+  "x": 330,
+  "y": 120,
+  "wires": [
+   [
+    "batch",
+    "window"
+   ]
+  ]
+ },
+ {
+  "id": "window",
+  "type": "function",
+  "z": "cnc302tab",
+  "name": "60с цонхны нэгтгэл",
+  "func": "// Төхөөрөмж тус бүрээр 60 секундын гулсах цонх\nconst key = msg.tags.device;\nconst now = Date.now();\nlet w = flow.get('win_' + key) || [];\nw.push({ t: now, v: msg.payload.temperature });\nw = w.filter(x => now - x.t <= 60000);\nflow.set('win_' + key, w);\n\nif (w.length < 5) return null;   // хангалттай дээж цуглах хүртэл\n\nconst vals = w.map(x => x.v);\nconst avg = vals.reduce((a,b)=>a+b,0) / vals.length;\nreturn {\n    topic: 'agg',\n    tags: msg.tags,\n    payload: {\n        avg_temperature: Number(avg.toFixed(3)),\n        min_temperature: Math.min(...vals),\n        max_temperature: Math.max(...vals),\n        samples: vals.length\n    }\n};",
+  "outputs": 1,
+  "noerr": 0,
+  "x": 560,
+  "y": 200,
+  "wires": [
+   [
+    "lp_agg"
+   ]
+  ]
+ },
+ {
+  "id": "batch",
+  "type": "function",
+  "z": "cnc302tab",
+  "name": "line protocol (түүхий)",
+  "func": "// InfluxDB line protocol болгож хөрвүүлнэ\nconst t = msg.tags, d = msg.payload;\nconst esc = s => String(s).replace(/[ ,=]/g, '\\\\$&');\nconst tags = `site=${esc(t.site)},area=${esc(t.area)},line=${esc(t.line)},device=${esc(t.device)}`;\nconst fields = `temperature=${d.temperature},humidity=${d.humidity},vibration_rms=${d.vibration_rms}`;\nconst ts = d.ts || Date.now();\nmsg.payload = `telemetry,${tags} ${fields} ${ts}`;\nmsg.headers = { 'Content-Type': 'text/plain' };\nreturn msg;",
+  "outputs": 1,
+  "noerr": 0,
+  "x": 560,
+  "y": 120,
+  "wires": [
+   [
+    "influxwrite"
+   ]
+  ]
+ },
+ {
+  "id": "lp_agg",
+  "type": "function",
+  "z": "cnc302tab",
+  "name": "line protocol (нэгтгэл)",
+  "func": "const t = msg.tags, d = msg.payload;\nconst esc = s => String(s).replace(/[ ,=]/g, '\\\\$&');\nconst tags = `site=${esc(t.site)},area=${esc(t.area)},line=${esc(t.line)},device=${esc(t.device)}`;\nconst fields = `avg_temperature=${d.avg_temperature},min_temperature=${d.min_temperature},max_temperature=${d.max_temperature},samples=${d.samples}i`;\nmsg.payload = `telemetry_1m,${tags} ${fields} ${Date.now()}`;\nmsg.headers = { 'Content-Type': 'text/plain' };\nreturn msg;",
+  "outputs": 1,
+  "noerr": 0,
+  "x": 790,
+  "y": 200,
+  "wires": [
+   [
+    "influxwrite"
+   ]
+  ]
+ },
+ {
+  "id": "influxwrite",
+  "type": "http request",
+  "z": "cnc302tab",
+  "name": "InfluxDB 3 бичих",
+  "method": "POST",
+  "ret": "txt",
+  "paytoqs": "ignore",
+  "url": "http://influxdb:8181/api/v3/write_lp?db=cnc302&precision=millisecond",
+  "persist": true,
+  "proxy": "",
+  "insecureHTTPParser": false,
+  "authType": "",
+  "senderr": true,
+  "headers": [],
+  "x": 1010,
+  "y": 140,
+  "wires": [
+   [
+    "checkstatus"
+   ]
+  ]
+ },
+ {
+  "id": "checkstatus",
+  "type": "function",
+  "z": "cnc302tab",
+  "name": "бичилтийг шалгах",
+  "func": "// InfluxDB 204 буцаана. Өөр код бол алдаа — тоолж хадгална.\nconst code = msg.statusCode;\nif (code !== 204 && code !== 200) {\n    const n = (flow.get('write_errors') || 0) + 1;\n    flow.set('write_errors', n);\n    node.status({fill:'red', shape:'ring', text: `алдаа ${n}: ${code}`});\n    node.error(`InfluxDB бичилт амжилтгүй ${code}: ${msg.payload}`, msg);\n    return [null, msg];\n}\nconst ok = (flow.get('write_ok') || 0) + 1;\nflow.set('write_ok', ok);\nnode.status({fill:'green', shape:'dot', text: `бичсэн ${ok}`});\nreturn [msg, null];",
+  "outputs": 2,
+  "noerr": 0,
+  "x": 1230,
+  "y": 140,
+  "wires": [
+   [],
+   [
+    "deadletter"
+   ]
+  ]
+ },
+ {
+  "id": "deadletter",
+  "type": "file",
+  "z": "cnc302tab",
+  "name": "dead-letter файл",
+  "filename": "/data/deadletter.jsonl",
+  "filenameType": "str",
+  "appendNewline": true,
+  "createDir": true,
+  "overwriteFile": "false",
+  "encoding": "none",
+  "x": 1450,
+  "y": 180,
+  "wires": [
+   []
+  ]
+ },
+ {
+  "id": "stats",
+  "type": "inject",
+  "z": "cnc302tab",
+  "name": "10с тутам статистик",
+  "props": [
+   {
+    "p": "payload"
+   }
+  ],
+  "repeat": "10",
+  "crontab": "",
+  "once": false,
+  "payloadType": "date",
+  "x": 150,
+  "y": 300,
+  "wires": [
+   [
+    "statsfn"
+   ]
+  ]
+ },
+ {
+  "id": "statsfn",
+  "type": "function",
+  "z": "cnc302tab",
+  "name": "тоолуур",
+  "func": "const ok = flow.get('write_ok') || 0;\nconst err = flow.get('write_errors') || 0;\nnode.status({fill: err ? 'yellow':'green', shape:'dot', text:`ok=${ok} алдаа=${err}`});\nreturn { payload: { write_ok: ok, write_errors: err, ts: Date.now() } };",
+  "outputs": 1,
+  "noerr": 0,
+  "x": 350,
+  "y": 300,
+  "wires": [
+   [
+    "dbg"
+   ]
+  ]
+ },
+ {
+  "id": "dbg",
+  "type": "debug",
+  "z": "cnc302tab",
+  "name": "статистик",
+  "active": true,
+  "tosidebar": true,
+  "console": false,
+  "complete": "payload",
+  "targetType": "msg",
+  "x": 540,
+  "y": 300,
+  "wires": []
+ }
+]

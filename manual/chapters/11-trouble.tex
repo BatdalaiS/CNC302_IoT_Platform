@@ -1,0 +1,132 @@
+% Автоматаар үүсгэсэн — эх файл: docs/troubleshooting.md
+\chapter{Түгээмэл алдаа ба шийдэл}
+
+\hypertarget{docker-ux431ux430-ux441ux442ux435ux43a}{%
+\section{Docker ба стек}\label{docker-ux431ux430-ux441ux442ux435ux43a}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Алдаа
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шалтгаан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шийдэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\texttt{no\ space\ left\ on\ device} & дүрс, лог, боть хуримтлагдсан & \texttt{docker\ system\ df} → \texttt{docker\ system\ prune\ -a} (боть хэвээр үлдэнэ) \\
+\texttt{port\ is\ already\ allocated} & өөр процесс портыг эзэлсэн & \texttt{sudo\ ss\ -tlnp\ \textbackslash{}\textbar{}\ grep\ \textless{}порт\textgreater{}} \\
+Контейнер \texttt{Restarting} давтана & OOM эсвэл тохиргооны алдаа & \texttt{docker\ inspect\ \textless{}нэр\textgreater{}\ \textbackslash{}\textbar{}\ grep\ -i\ oomkilled}; логийг үз \\
+\texttt{exec\ format\ error} & дүрс arm64-д зориулагдаагүй & \texttt{docker\ manifest\ inspect\ \textless{}image\textgreater{}\ \textbackslash{}\textbar{}\ grep\ arm64} \\
+\texttt{docker\ stats} санах ойг 0 гэнэ & cgroup memory идэвхгүй & SETUP Б.4 \\
+Compose \texttt{.env} уншихгүй & \texttt{.env} файл \texttt{stack/} дотор биш & \texttt{docker\ compose\ config\ \textbackslash{}\textbar{}\ head} \\
+\end{longtable}\endgroup
+
+\hypertarget{thingsboard}{%
+\section{ThingsBoard}\label{thingsboard}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Алдаа
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шийдэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+3 минутаас удаан эхэлнэ & Pi дээр хэвийн. \texttt{start\_period:\ 180s} \\
+\texttt{OOMKilled} & swap 2 GB эсэхийг шалга; \texttt{JAVA\_OPTS} дахь \texttt{-Xmx}-ийг 1200m болго \\
+REST 401 & нууц үг солигдсон эсвэл токен хуучирсан \\
+MQTT холбогдохгүй & ThingsBoard-ын MQTT нь \textbf{1884} порт (EMQX 1883) \\
+Firmware төхөөрөмжид хүрэхгүй & Device → Manage firmware → багцыг оноох \\
+\end{longtable}\endgroup
+
+\hypertarget{emqx}{%
+\section{EMQX}\label{emqx}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Алдаа
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шийдэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+TLS \texttt{unknown\ ca} & \texttt{-\/-ca} буруу эсвэл сертификат өөр CA-гаас \\
+TLS \texttt{hostname\ mismatch} & серверийн CN нь Pi-гийн нэртэй таарахгүй \\
+Холболт 10000 дээр зогсоно & \texttt{EMQX\_\allowbreak{}LISTENERS\_\allowbreak{}\_\allowbreak{}TCP\_\allowbreak{}\_\allowbreak{}DEFAULT\_\allowbreak{}\_\allowbreak{}MAX\_\allowbreak{}CONNECTIONS} \\
+Самбарт нэвтрэхгүй & \texttt{.env} дэх \texttt{EMQX\_\allowbreak{}DASHBOARD\_\allowbreak{}PASSWORD}; эхний эхлэлтийн дараа зөвхөн самбараас солино \\
+\end{longtable}\endgroup
+
+\hypertarget{influxdb-3-core}{%
+\section{InfluxDB 3 Core}\label{influxdb-3-core}}
+
+InfluxDB 3 Core-ийн CLI түргэн өөрчлөгддөг. Хэрэв \texttt{-\/-without-auth} эсвэл \texttt{-\/-object-store} таних тэмдэг ажиллахгүй бол:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ run }\AttributeTok{{-}{-}rm}\NormalTok{ influxdb:3.2{-}core influxdb3 serve }\AttributeTok{{-}{-}help}
+\end{Highlighting}
+\end{Shaded}
+
+Шийдэгдэхгүй бол InfluxDB 2.7 руу шилжинэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}f}\NormalTok{ docker{-}compose.yml }\AttributeTok{{-}f}\NormalTok{ docker{-}compose.influx2.yml }\AttributeTok{{-}{-}profile}\NormalTok{ core up }\AttributeTok{{-}d}
+\end{Highlighting}
+\end{Shaded}
+
+Энэ тохиолдолд Grafana-гийн өгөгдлийн эх сурвалж (SQL биш Flux), Node-RED-ийн бичих зангилаа өөр болно --- \texttt{lab05/reference/influx2/} дотор бэлэн хувилбар байгаа.
+
+\hypertarget{ux441ux4afux43bux436ux44dux44d-ux431ux430-ux445ux43eux43bux431ux43eux43bux442}{%
+\section{Сүлжээ ба холболт}\label{ux441ux4afux43bux436ux44dux44d-ux431ux430-ux445ux43eux43bux431ux43eux43bux442}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Алдаа
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шийдэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\texttt{pi-team03.local} олдохгүй & mDNS ажиллахгүй байна --- IP хаягаар хандана (\texttt{hostname\ -I}) \\
+Хөтөч холбогдохгүй & VS Code PORTS таб эсвэл \texttt{ssh\ -L} туннел \\
+MQTT \texttt{Connection\ refused} & Pi дээр брокер ажиллаж байна уу: \texttt{docker\ compose\ ps} \\
+Гэнэт тасалдана & Wi-Fi эрчим хүч хэмнэх горим: \texttt{sudo\ iw\ wlan0\ set\ power\_save\ off} \\
+\end{longtable}\endgroup
+
+\hypertarget{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux447ux430ux43dux430ux440}{%
+\section{Хэмжилтийн чанар}\label{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux447ux430ux43dux430ux440}}
+
+\begin{itemize}
+\tightlist
+\item
+  Хэмжилтийн өмнө \textbf{бусад ачааллыг зогсооно} (\texttt{htop}-оор шалга)
+\item
+  Гурваас доошгүй удаа давтаж дунджийг авна
+\item
+  \texttt{vcgencmd\ get\_throttled} нь \texttt{0x0} биш бол хэмжилтийг хүчингүй гэж үз
+\item
+  Цагийн синхрончлолгүй бол саатлын хэмжилт утгагүй (\texttt{timedatectl\ status})
+\end{itemize}

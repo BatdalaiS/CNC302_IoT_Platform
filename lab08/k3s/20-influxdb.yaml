@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: influxdb, namespace: cnc302}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: influxdb}}
+  template:
+    metadata: {labels: {app: influxdb}}
+    spec:
+      containers:
+        - name: influxdb
+          image: influxdb:3.2-core
+          args:
+            - influxdb3
+            - serve
+            - --node-id=cnc302-k3s
+            - --object-store=file
+            - --data-dir=/var/lib/influxdb3
+            - --http-bind=0.0.0.0:8181
+            - --without-auth
+          ports: [{containerPort: 8181}]
+          resources:
+            requests: {memory: "256Mi", cpu: "100m"}
+            limits:   {memory: "1Gi",   cpu: "1000m"}
+          readinessProbe:
+            httpGet: {path: /health, port: 8181}
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          volumeMounts: [{name: data, mountPath: /var/lib/influxdb3}]
+      volumes:
+        - name: data
+          persistentVolumeClaim: {claimName: influx-data}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: {name: influx-data, namespace: cnc302}
+spec:
+  accessModes: [ReadWriteOnce]
+  resources: {requests: {storage: 5Gi}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: influxdb, namespace: cnc302}
+spec:
+  selector: {app: influxdb}
+  ports: [{port: 8181, targetPort: 8181}]

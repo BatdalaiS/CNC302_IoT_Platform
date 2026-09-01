@@ -1,0 +1,541 @@
+% Автоматаар үүсгэсэн — эх файл: lab04/README.md
+\chapter{Лаб 4 — Rule Engine ба ачааллын тест}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule
+\endhead
+\bottomrule
+\endlastfoot
+\textbf{7 хоног} & IX \\
+\textbf{Хугацаа} & 4 цаг \\
+\textbf{Суралцахуйн үр дүн} & ҮД2 (өргөтгөх), ҮД4, ҮД6, ҮД8 \\
+\textbf{Үнэлгээ} & \textbf{10 минутын багийн ҮЗҮҮЛЭН} (бичгийн тайлан биш), 10 оноо \\
+\end{longtable}\endgroup
+
+\hypertarget{ux437ux43eux440ux438ux43bux433ux43e}{%
+\section{1. Зорилго}\label{ux437ux43eux440ux438ux43bux433ux43e}}
+
+Энэ бол хичээлийн \textbf{гол лаборатори}. Хоёр асуултад тоон хариулт өгнө:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Мессежийг \textbf{хаана} боловсруулах вэ --- брокер дээр үү, платформ дээр үү, хэрэглэгч дээр үү?
+\item
+  Нэг Raspberry Pi 5 \textbf{хэдэн төхөөрөмж} даах вэ? Хязгаар нь юу вэ --- CPU, санах ой, эсвэл холболтын тоо?
+\end{enumerate}
+
+Лаб 1-д та шугаман экстраполяциар таамаг гаргасан. Өнөөдөр түүнийг \textbf{бодитоор шалгана}. Таамаг зөв гарах албагүй --- буруу гарвал тэр нь илүү сонирхолтой үр дүн.
+
+\begin{quote}
+\textbf{Анхаар:} энэ лабораторийг бичгийн тайлангаар биш, \textbf{үзүүлэнгээр} үнэлнэ. Багийн гурван гишүүн бүгд ярина. Слайд шаардлагагүй --- ажиллаж буй график, тоо л хангалттай.
+\end{quote}
+
+\hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}{%
+\section{2. Урьдчилсан нөхцөл}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}}
+
+\begin{itemize}
+\tightlist
+\item
+  Лаб 1--3 дууссан, \texttt{lab01}-ийн Хүснэгт 5 (нөөцийн төсөв) \textbf{гар дор байх ёстой}
+\item
+  Зөөврийн компьютер дээр Docker суусан (emqtt-bench-д хэрэгтэй)
+\item
+  Файлын дескрипторын хязгаар өргөжсөн:
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{ulimit} \AttributeTok{{-}n}                 \CommentTok{\# 1024 бол хангалтгүй}
+\BuiltInTok{ulimit} \AttributeTok{{-}n}\NormalTok{ 65535           }\CommentTok{\# Linux/macOS}
+\CommentTok{\# Windows: WSL2 дотор ажиллуулна}
+\end{Highlighting}
+\end{Shaded}
+
+Дүрсийг урьдчилан татна:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ pull emqx/emqtt{-}bench:0.4.20}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}{%
+\section{3. Онолын сануулга}\label{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}}
+
+\textbf{Мессежийг хаана боловсруулах вэ?}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Байрлал
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Давуу тал
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Сул тал
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Брокер дээр (EMQX Rule Engine) & хамгийн бага саатал, нэмэлт сүлжээний давхарга үгүй & брокерын CPU иднэ, дүрэм нь SQL-ээр хязгаарлагдмал \\
+Платформ дээр (ThingsBoard Rule Chain) & баялаг логик, төхөөрөмжийн контексттэй & нэмэлт үсрэлт, ThingsBoard-ын JVM ачаалагдана \\
+Тусдаа хэрэглэгч (Node-RED, Python) & бүрэн уян хатан, тусдаа өргөтгөнө & хамгийн их саатал, ажиллуулах нэмэлт үйлчилгээ \\
+\end{longtable}\endgroup
+
+Энэ шийдвэрийг \textbf{зөн совингоор биш, хэмжилтээр} гаргах ёстой. Өнөөдөр гурвуулангийнх нь саатлыг хэмжинэ.
+
+\textbf{Хэвтээ ба босоо өргөтгөл.} Pi 5-ыг "илүү том" болгож чадахгүй (босоо өргөтгөл боломжгүй). Тиймээс цорын ганц зам бол \textbf{хэвтээ} --- олон зангилаа. Гэхдээ өргөтгөхийн өмнө \textbf{хаана мөргөж байгааг} мэдэх ёстой.
+
+\textbf{Саturation (ханалт).} Систем ачаалал нэмэгдэхэд эхлээд шугаман өснө, дараа нь тэгширнэ, эцэст нь \textbf{буурна}. Сүүлийн үе шат хамгийн аюултай: систем ажиллаж байгаа мэт харагдаад бодит хүчин чадал нь буурна. Үүнийг олж харах нь энэ лабораторийн гол зорилго.
+
+\hypertarget{ux430ux43bux445ux43cux443ux443ux434}{%
+\section{4. Алхмууд}\label{ux430ux43bux445ux43cux443ux443ux434}}
+
+\hypertarget{ux430ux43bux445ux430ux43c-1-emqx-rule-engine-40-ux43cux438ux43d}{%
+\subsection{Алхам 1 --- EMQX Rule Engine (40 мин)}\label{ux430ux43bux445ux430ux43c-1-emqx-rule-engine-40-ux43cux438ux43d}}
+
+\textbf{1.1} EMQX самбар (\texttt{:18083}) → \textbf{Integration → Rules → Create}.
+
+Дүрэм 1 --- чичиргээний хэт өндөр утгыг шүүх:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}
+\NormalTok{  payload.device\_id      }\KeywordTok{as}\NormalTok{ device\_id,}
+\NormalTok{  payload.vibration\_rms  }\KeywordTok{as}\NormalTok{ vibration,}
+\NormalTok{  payload.temperature    }\KeywordTok{as}\NormalTok{ temperature,}
+\NormalTok{  clientid               }\KeywordTok{as} \KeywordTok{source}\NormalTok{,}
+  \DataTypeTok{timestamp}              \KeywordTok{as}\NormalTok{ ts}
+\KeywordTok{FROM}
+  \OtherTok{"cnc302/+/+/+/+/telemetry"}
+\KeywordTok{WHERE}
+\NormalTok{  payload.vibration\_rms }\OperatorTok{\textgreater{}} \FloatTok{1.5}
+\end{Highlighting}
+\end{Shaded}
+
+Үйлдэл (Action) нэмнэ: \textbf{Republish} → сэдэв \texttt{cnc302/alerts/vibration}.
+
+\textbf{1.2} Дүрмийг туршина:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# терминал 1 — дохиоллыг сонсоно}
+\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h} \VariableTok{$H} \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/alerts/\#\textquotesingle{}} \AttributeTok{{-}v}
+
+\CommentTok{\# терминал 2 — гажилтай өгөгдөл илгээнэ}
+\ExtensionTok{python}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}devices}\NormalTok{ 5 }\AttributeTok{{-}{-}interval}\NormalTok{ 1 }\AttributeTok{{-}{-}anomaly{-}rate}\NormalTok{ 0.2}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{1.3 Саатлыг хэмжинэ.} Дүрмийн боловсруулалт хэдэн миллисекунд нэмэв? EMQX самбарын дүрмийн статистик (\texttt{Matched}, \texttt{Failed}, \texttt{Rate}) хэсгээс уншина. \textbf{Хүснэгт 1}.
+
+\textbf{1.4} Дүрэм 2 --- нэгтгэл (window). EMQX-ийн SQL нь цонхны функцийг хязгаартай дэмждэг. Оролдож үзээд \textbf{боломжгүйг батал} --- энэ нь Лаб 5-д Node-RED хэрэгтэй болох шалтгаан:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \FunctionTok{avg}\NormalTok{(payload.temperature) }\KeywordTok{as}\NormalTok{ avg\_temp}
+\KeywordTok{FROM} \OtherTok{"cnc302/+/+/+/+/telemetry"}
+\KeywordTok{GROUP} \KeywordTok{BY}\NormalTok{ device\_id, }\DataTypeTok{INTERVAL} \DecValTok{60}\NormalTok{s   }\CommentTok{{-}{-} ← EMQX CE{-}д дэмжигдэх үү? Шалга.}
+\end{Highlighting}
+\end{Shaded}
+
+Үр дүнг тайландаа тэмдэглэ.
+
+\hypertarget{ux430ux43bux445ux430ux43c-2-thingsboard-rule-chain-30-ux43cux438ux43d}{%
+\subsection{Алхам 2 --- ThingsBoard Rule Chain (30 мин)}\label{ux430ux43bux445ux430ux43c-2-thingsboard-rule-chain-30-ux43cux438ux43d}}
+
+\textbf{2.1} ThingsBoard → \textbf{Rule chains → Root Rule Chain}.
+
+Гинжийг бүтээнэ: \texttt{Message\ Type\ Switch} → \texttt{Script\ (filter)} → \texttt{Create\ Alarm}.
+
+Script зангилааны фильтр:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{return}\NormalTok{ msg}\OperatorTok{.}\AttributeTok{vibration\_rms} \OperatorTok{\textgreater{}} \FloatTok{1.5}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{Create\ Alarm} зангилаад: төрөл \texttt{HighVibration}, ноцтой байдал \texttt{MAJOR}.
+
+\textbf{2.2} Лаб 2-т үүсгэсэн төхөөрөмжөөр туршина (ThingsBoard-ын MQTT нь \textbf{1884} порт):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}port}\NormalTok{ 1884 }\AttributeTok{{-}{-}devices}\NormalTok{ 3 }\DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}username} \OperatorTok{\textless{}}\NormalTok{ACCESS\_TOKEN}\OperatorTok{\textgreater{}}\NormalTok{ {-}{-}anomaly{-}rate 0.3 }\AttributeTok{{-}{-}interval}\NormalTok{ 1 }\DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}topic{-}prefix}\NormalTok{ v1/devices/me}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+ThingsBoard нь \texttt{v1/devices/me/telemetry} сэдэв хүлээдэг тул UNS сэдэв энд ажиллахгүй. Энэ өөрөө чухал ажиглалт: \textbf{платформ бүр өөрийн сэдвийн гэрээтэй}. UNS-ийг платформын гэрээтэй хэрхэн холбохыг тайландаа бод.
+\end{quote}
+
+\textbf{2.3} ThingsBoard-ын \textbf{Alarms} хэсэгт дохиолол үүссэнийг шалга. Саатлыг хэмжинэ: телеметр илгээснээс дохиолол гарах хүртэл. \textbf{Хүснэгт 1}-ийн 2-р мөр.
+
+\hypertarget{ux430ux43bux445ux430ux43c-3-ux430ux447ux430ux430ux43bux43bux44bux43d-ux442ux435ux441ux442ux438ux439ux43d-ux431ux44dux43bux442ux433ux44dux43b-25-ux43cux438ux43d}{%
+\subsection{Алхам 3 --- Ачааллын тестийн бэлтгэл (25 мин)}\label{ux430ux43bux445ux430ux43c-3-ux430ux447ux430ux430ux43bux43bux44bux43d-ux442ux435ux441ux442ux438ux439ux43d-ux431ux44dux43bux442ux433ux44dux43b-25-ux43cux438ux43d}}
+
+\textbf{3.1 Суурь төлөв.} Pi дээр:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack}
+\ExtensionTok{docker}\NormalTok{ compose stop nodered }\DecValTok{2}\OperatorTok{\textgreater{}}\NormalTok{/dev/null }\KeywordTok{||} \FunctionTok{true}   \CommentTok{\# ачаалал багасгана}
+\FunctionTok{make}\NormalTok{ stats}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{3.2 Дасгал ажиллуулалт} --- бүх зүйл ажиллаж байгааг батлах:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# зөөврийн компьютер дээр}
+\FunctionTok{bash}\NormalTok{ lab04/loadtest.sh pub pi{-}team03.local 10 1}
+\end{Highlighting}
+\end{Shaded}
+
+30 секунд ажиллуулаад Ctrl+C. EMQX самбарт 10 холболт харагдах ёстой.
+
+\textbf{3.3 Хэмжилт цуглуулагчийг бэлдэнэ.} Pi дээр (өөр терминалд):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\BuiltInTok{export} \VariableTok{EMQX\_DASHBOARD\_PASSWORD}\OperatorTok{=}\StringTok{\textquotesingle{}\textless{}таны .env дэх нууц үг\textgreater{}\textquotesingle{}}
+\ExtensionTok{python3}\NormalTok{ lab04/collect\_metrics.py }\AttributeTok{{-}{-}label}\NormalTok{ ramp }\AttributeTok{{-}{-}seconds}\NormalTok{ 900 }\AttributeTok{{-}{-}interval}\NormalTok{ 5}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux430ux43bux445ux430ux43c-4-ux448ux430ux442-ux434ux430ux440ux430ux430ux43bux441ux430ux43d-ux430ux447ux430ux430ux43bux43bux44bux43d-ux442ux435ux441ux442-75-ux43cux438ux43d}{%
+\subsection{Алхам 4 --- Шат дараалсан ачааллын тест (75 мин)}\label{ux430ux43bux445ux430ux43c-4-ux448ux430ux442-ux434ux430ux440ux430ux430ux43bux441ux430ux43d-ux430ux447ux430ux430ux43bux43bux44bux43d-ux442ux435ux441ux442-75-ux43cux438ux43d}}
+
+\textbf{Хамгийн чухал алхам.} Хоёр терминалыг зэрэг ажиллуулна:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Pi дээр — хэмжилт цуглуулагч (аль хэдийн ажиллаж байна)}
+\CommentTok{\# Зөөврийн компьютер дээр:}
+\FunctionTok{bash}\NormalTok{ lab04/loadtest.sh ramp pi{-}team03.local}
+\end{Highlighting}
+\end{Shaded}
+
+Шатууд: \textbf{10 → 50 → 100 → 250 → 500 → 1000} холболт, тус бүр 1 мсж/с, 120 секунд.
+
+\textbf{Шат бүрд тэмдэглэ (Хүснэгт 2):}
+- emqtt-bench-ийн мэдээлсэн бодит илгээх хурд
+- EMQX-ийн хүлээн авсан хурд
+- CPU \%, сул санах ой, температур
+- Алдагдсан мессеж (\texttt{emqx\_\allowbreak{}msg\_\allowbreak{}dropped})
+
+\textbf{Хэзээ зогсоох вэ.} Дараах шинж тэмдгийн аль нэг гарвал шатыг зогсоож, тэр цэгийг \textbf{хязгаар} гэж тэмдэглэнэ:
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Шинж тэмдэг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Утга
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Хүлээн авсан хурд \textless{} илгээсэн хурдын 95\% & брокер гүйцэхгүй байна \\
+\texttt{emqx\_\allowbreak{}msg\_\allowbreak{}dropped} \textgreater{} 0 & мессеж хаягдаж эхлэв \\
+Сул санах ой \textless{} 300 MiB & OOM ойрхон \\
+\texttt{throttled} ≠ \texttt{0x0} & Pi халж давтамжаа бууруулав --- \textbf{хэмжилт хүчингүй} \\
+CPU \textgreater{} 380\% (4 цөм × 100\%) & CPU ханалаа \\
+\end{longtable}\endgroup
+
+\begin{quote}
+\textbf{Хэрэв 1000 холболт хүртэл ямар ч асуудалгүй бол:} сайн байна! Ачааллыг нэмнэ --- \texttt{-I\ 500} (2 мсж/с) эсвэл \texttt{-c\ 2000}. Хязгаарыг олох хүртэл үргэлжлүүлнэ.
+\end{quote}
+
+\hypertarget{ux430ux43bux445ux430ux43c-5-ux448ux438ux43dux436ux438ux43bux433ux44dux44d-ux431ux430-ux43cux443ux440ux443ux439-35-ux43cux438ux43d}{%
+\subsection{Алхам 5 --- Шинжилгээ ба муруй (35 мин)}\label{ux430ux43bux445ux430ux43c-5-ux448ux438ux43dux436ux438ux43bux433ux44dux44d-ux431ux430-ux43cux443ux440ux443ux439-35-ux43cux438ux43d}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Pi дээр}
+\ExtensionTok{python3}\NormalTok{ lab04/plot\_scaling.py measurements/loadtest{-}ramp{-}}\PreprocessorTok{*}\NormalTok{.csv}
+\CommentTok{\# эсвэл зөөврийн компьютерт хуулж:}
+\ExtensionTok{python3}\NormalTok{ lab04/plot\_scaling.py loadtest{-}ramp{-}}\PreprocessorTok{*}\NormalTok{.csv }\AttributeTok{{-}{-}out}\NormalTok{ lab04/scaling.png}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Хүснэгт 3} (багтаамжийн шинжилгээ)-ыг бөглөнө.
+
+Дараа нь \textbf{Лаб 1-ийн таамагтайгаа харьцуулна}:
+
+\begin{verbatim}
+Лаб 1-ийн таамаг : ______ төхөөрөмж (шугаман экстраполяциар)
+Лаб 4-ийн бодит  : ______ төхөөрөмж
+Зөрүү            : ______ %
+\end{verbatim}
+
+\textbf{Хэрэв зөрүү 30\%-иас их бол}, шугаман экстраполяци яагаад алдагдсаныг тайлбарлана. Боломжит шалтгаанууд:
+- Холболт бүр тогтмол санах ой иднэ (шугаман), гэхдээ \textbf{context switch} нь шугаман биш
+- Дараалал дүүрэхэд саатал экспоненциалаар өснө
+- Температур өсөж CPU давтамж буурсан
+- Swap ашиглагдаж эхэлсэн (диск рүү бичих нь RAM-аас 1000 дахин удаан)
+
+\hypertarget{ux430ux43bux445ux430ux43c-6-ux431ux430ux433ux442ux430ux430ux43cux436ux438ux439ux43d-ux442ux43eux43cux44cux451ux43e-20-ux43cux438ux43d}{%
+\subsection{Алхам 6 --- Багтаамжийн томьёо (20 мин)}\label{ux430ux43bux445ux430ux43c-6-ux431ux430ux433ux442ux430ux430ux43cux436ux438ux439ux43d-ux442ux43eux43cux44cux451ux43e-20-ux43cux438ux43d}}
+
+Хэмжилтэд тулгуурлан \textbf{Хүснэгт 4}-ийг бөглөж, дараах томьёог гаргана:
+
+\begin{verbatim}
+Хэрэгтэй Pi-ийн тоо  =  ⌈ N_төхөөрөмж × R_мсж/с ⌉ / C_нэг_Pi × S
+
+  N  — төхөөрөмжийн тоо
+  R  — нэг төхөөрөмжийн мессежийн хурд
+  C  — нэг Pi-ийн хэмжсэн багтаамж (мсж/с), 70% ашиглалтаар
+  S  — аюулгүйн коэффициент (санал: 1.5)
+\end{verbatim}
+
+\textbf{Практик даалгавар:} Таны багийн төслийн хэрэглээнд (жишээ нь ухаалаг кампусын 400 өрөө × 3 мэдрэгч × 12 мсж/цаг) хэдэн Pi хэрэгтэй вэ? Тооцоог үзүүлэнд оруулна.
+
+\hypertarget{ux430ux43bux445ux430ux43c-7-ux4afux437ux4afux4afux43bux44dux43dux433ux438ux439ux43d-ux431ux44dux43bux442ux433ux44dux43b-15-ux43cux438ux43d}{%
+\subsection{Алхам 7 --- Үзүүлэнгийн бэлтгэл (15 мин)}\label{ux430ux43bux445ux430ux43c-7-ux4afux437ux4afux4afux43bux44dux43dux433ux438ux439ux43d-ux431ux44dux43bux442ux433ux44dux43b-15-ux43cux438ux43d}}
+
+\textbf{10 минутын үзүүлэн, гурван гишүүн бүгд ярина:}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Хэсэг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хугацаа
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хэн
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1. Rule Engine --- хаана боловсруулах шийдвэр, саатлын харьцуулалт & 3 мин & гишүүн 1 \\
+2. Ачааллын муруй --- хязгаар хаана, шинж тэмдэг юу байв & 4 мин & гишүүн 2 \\
+3. Багтаамжийн томьёо ба төслийн тооцоо; Лаб 1-ийн таамагтай харьцуулалт & 3 мин & гишүүн 3 \\
+\end{longtable}\endgroup
+
+\textbf{Заавал үзүүлэх зүйлс:} ачааллын муруйн график, хязгаарын цэг, Лаб 1-ийн таамаг ба бодит үр дүнгийн зөрүү.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ add }\AttributeTok{{-}A} \KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 4: Rule Engine, ачааллын тест"}
+\FunctionTok{git}\NormalTok{ tag lab04{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push origin main }\AttributeTok{{-}{-}tags}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux445ux4afux441ux43dux44dux433ux442ux4afux4afux434}{%
+\section{5. Хэмжилтийн хүснэгтүүд}\label{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux445ux4afux441ux43dux44dux433ux442ux4afux4afux434}}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-1-ux431ux43eux43bux43eux432ux441ux440ux443ux443ux43bux430ux43bux442ux44bux43d-ux431ux430ux439ux440ux43bux430ux43bux44bux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442}{%
+\subsection{Хүснэгт 1 --- Боловсруулалтын байрлалын харьцуулалт}\label{ux445ux4afux441ux43dux44dux433ux442-1-ux431ux43eux43bux43eux432ux441ux440ux443ux443ux43bux430ux43bux442ux44bux43d-ux431ux430ux439ux440ux43bux430ux43bux44bux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Байрлал
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Дундаж саатал (мс)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Нэмэгдсэн CPU \%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Логикийн уян хатан байдал (1--5)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Тэмдэглэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+EMQX Rule Engine & & & & \\
+ThingsBoard Rule Chain & & & & \\
+Node-RED (Лаб 5-д хэмжинэ) & & & & \\
+\end{longtable}\endgroup
+
+Цонхны нэгтгэл EMQX CE-д дэмжигдэв үү: ule{1.5cm}{0.4pt} Хэрэв үгүй бол хаана хийх вэ: ule{1.5cm}{0.4pt}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-2-ux430ux447ux430ux430ux43bux43bux44bux43d-ux448ux430ux442ux443ux443ux434}{%
+\subsection{Хүснэгт 2 --- Ачааллын шатууд}\label{ux445ux4afux441ux43dux44dux433ux442-2-ux430ux447ux430ux430ux43bux43bux44bux43d-ux448ux430ux442ux443ux443ux434}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Холболт
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Зорилтот мсж/с
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Бодит илгээсэн
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+EMQX хүлээн авсан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хүлээн авалт \%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+CPU \%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Сул RAM (MiB)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хаягдсан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+°C
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+throttled
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+10 & 10 & & & & & & & & \\
+50 & 50 & & & & & & & & \\
+100 & 100 & & & & & & & & \\
+250 & 250 & & & & & & & & \\
+500 & 500 & & & & & & & & \\
+1000 & 1000 & & & & & & & & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-3-ux431ux430ux433ux442ux430ux430ux43cux436ux438ux439ux43d-ux448ux438ux43dux436ux438ux43bux433ux44dux44d}{%
+\subsection{Хүснэгт 3 --- Багтаамжийн шинжилгээ}\label{ux445ux4afux441ux43dux44dux433ux442-3-ux431ux430ux433ux442ux430ux430ux43cux436ux438ux439ux43d-ux448ux438ux43dux436ux438ux43bux433ux44dux44d}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Асуулт
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хариулт
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Хүлээн авалт 95\%-аас доош унасан цэг & ule{1.5cm}{0.4pt} холболт \\
+Мессеж хаягдаж эхэлсэн цэг & ule{1.5cm}{0.4pt} холболт \\
+Хамгийн түрүүнд ханасан нөөц & CPU / RAM / холболт / диск \\
+Дээд тогтвортой чадвар & ule{1.5cm}{0.4pt} мсж/с \\
+Санах ой нэг холболтод & ule{1.5cm}{0.4pt} KiB \\
+CPU нэг мессежид & ule{1.5cm}{0.4pt} мс \\
+Температур хамгийн өндөр & ule{1.5cm}{0.4pt} °C, throttled: ule{1.5cm}{0.4pt} \\
+\end{longtable}\endgroup
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-4-ux43bux430ux431-1-ux438ux439ux43d-ux442ux430ux430ux43cux430ux433ux442ux430ux439-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442}{%
+\subsection{Хүснэгт 4 --- Лаб 1-ийн таамагтай харьцуулалт}\label{ux445ux4afux441ux43dux44dux433ux442-4-ux43bux430ux431-1-ux438ux439ux43d-ux442ux430ux430ux43cux430ux433ux442ux430ux439-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
+\toprule
+& Лаб 1 (таамаг) & Лаб 4 (бодит) & Зөрүү \% \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+CPU 80\% болох төхөөрөмжийн тоо & & & \\
+Нэг төхөөрөмжид ногдох CPU \% & & & \\
+\end{longtable}\endgroup
+
+Шугаман экстраполяци хаана алдагдсан бэ (2--4 өгүүлбэр):
+\par\noindent\rule{\linewidth}{0.4pt}\par
+
+Багтаамжийн томьёо (өөрсдийн тоогоор):
+\texttt{Pi-ийн\ тоо\ =\ N\ ×\ R\ /}ule\{1.5cm\}\{0.4pt\}\texttt{\{=latex\}\ ×\ 1.5}
+
+Төслийн тооцоо: ule{1.5cm}{0.4pt} төхөөрөмж × ule{1.5cm}{0.4pt} мсж/с → ule{1.5cm}{0.4pt} Pi
+
+\hypertarget{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442-ux4afux437ux4afux4afux43bux44dux43dux434-ux430ux43cux430ux430ux440-ux445ux430ux440ux438ux443ux43bux43dux430}{%
+\section{6. Хяналтын асуулт (үзүүлэнд амаар хариулна)}\label{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442-ux4afux437ux4afux4afux43bux44dux43dux434-ux430ux43cux430ux430ux440-ux445ux430ux440ux438ux443ux43bux43dux430}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Мессежийг брокер дээр боловсруулах нь платформ дээр боловсруулахаас хэдэн дахин хурдан байв? Ялгаа хаанаас гарав?
+\item
+  EMQX Rule Engine цонхны нэгтгэлийг дэмжсэн үү? Дэмжээгүй бол энэ нь архитектурт ямар үр дагавартай вэ?
+\item
+  Хамгийн түрүүнд ханасан нөөц юу байв? Энэ таны таамагтай таарсан уу?
+\item
+  Мессеж хаягдах ба саатал өсөх --- аль нь эхэлж илэрсэн бэ? Яагаад тэр дараалалтай вэ?
+\item
+  Хэрэв 10 000 төхөөрөмж холбох шаардлага гарвал юу хийх вэ? Хэвтээ өргөтгөл ямар шинэ асуудал үүсгэх вэ (сесс, retained мессеж, дүрэм)?
+\item
+  Ачааллын тестийг \textbf{үйлдвэрлэлийн} орчинд ажиллуулж болох уу? Ямар урьдчилан сэргийлэлт шаардлагатай вэ?
+\item
+  Температур ба throttle нь хэмжилтийн үнэн зөвд хэрхэн нөлөөлөв?
+\end{enumerate}
+
+\hypertarget{ux43eux43dux43eux448ux438ux43bux433ux43eux43e}{%
+\section{7. Оношилгоо}\label{ux43eux43dux43eux448ux438ux43bux433ux43eux43e}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Шинж тэмдэг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шалтгаан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шийдэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+emqtt-bench 1024 холболт дээр зогсоно & \texttt{ulimit\ -n} бага & \texttt{ulimit\ -n\ 65535} \\
+\texttt{connection\ refused} олноор & EMQX max\_connections & \texttt{EMQX\_\allowbreak{}LISTENERS\_\allowbreak{}\_\allowbreak{}TCP\_\allowbreak{}\_\allowbreak{}DEFAULT\_\allowbreak{}\_\allowbreak{}MAX\_\allowbreak{}CONNECTIONS} нэмэгдүүл \\
+Зөөврийн компьютер өөрөө ханана & ачаалал үүсгэгч нь Pi-аас өмнө мөргөв & хоёр компьютерээс зэрэг ачаална, эсвэл \texttt{-c}-г бууруулж \texttt{-I}-г нэмэгдүүл \\
+\texttt{collect\_metrics.py} EMQX API алдаа & нууц үг буруу & \texttt{export\ EMQX\_\allowbreak{}DASHBOARD\_\allowbreak{}PASSWORD=...} \\
+CPU 400\% харагдана & 4 цөмийн нийлбэр & 100\% = нэг цөм. 400\% = бүрэн ханалт \\
+throttled \texttt{0x50005} & тэжээл/халалт & идэвхтэй хөргөлт, 27W тэжээл; хэмжилтийг дахин хий \\
+Хурд огт өсөхгүй & \texttt{-I} буруу (миллисекунд!) & \texttt{-I\ 1000} = 1 мсж/с \\
+\end{longtable}\endgroup
+
+\hypertarget{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e-ux4afux437ux4afux4afux43bux44dux43dux433ux44dux44dux440}{%
+\section{8. Үнэлгээний шалгуур (10 оноо, үзүүлэнгээр)}\label{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e-ux4afux437ux4afux4afux43bux44dux43dux433ux44dux44dux440}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+Шалгуур & Оноо \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Rule Engine хоёр платформ дээр ажиллаж, саатал хэмжигдсэн & 2 \\
+Ачааллын тест бүрэн шатаар гүйцэтгэгдэж хязгаар олдсон & 3 \\
+Ачааллын муруй ба ханалтын шинжилгээ & 2 \\
+Лаб 1-ийн таамагтай харьцуулалт, зөрүүний тайлбар & 2 \\
+Гурван гишүүн бүгд оролцож, асуултад хариулсан & 1 \\
+\end{longtable}\endgroup
+
+\textbf{Онцгой оноо (+1):} хэрэв та хязгаарыг олохын тулд 1000-аас цааш явж, ханалтын муруйн \textbf{буурах} хэсгийг баримтжуулсан бол.

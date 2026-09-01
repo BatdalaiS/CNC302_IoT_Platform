@@ -1,0 +1,99 @@
+% Автоматаар үүсгэсэн — эх файл: lab08/k3s/README.md
+\chapter{K3s манифестууд}
+
+XIV долоо хоногийн бие даалтаар эдгээрийг УНШИЖ ойлгосон байх ёстой.
+
+\hypertarget{ux444ux430ux439ux43bux443ux443ux434}{%
+\section{Файлууд}\label{ux444ux430ux439ux43bux443ux443ux434}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+Файл & Агуулга \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\texttt{00-namespace.yaml} & тусгаарлагдсан нэрийн орон зай \\
+\texttt{01-config.yaml} & ConfigMap + Secret \\
+\texttt{10-emqx.yaml} & Deployment + PVC + NodePort Service \\
+\texttt{20-influxdb.yaml} & Deployment + PVC + ClusterIP Service \\
+\texttt{30-grafana.yaml} & Deployment + PVC + NodePort Service \\
+\texttt{90-hpa.yaml} & хэвтээ автомат өргөтгөл (сонголт) \\
+\end{longtable}\endgroup
+
+\hypertarget{ux430ux436ux438ux43bux43bux443ux443ux43bux430ux445}{%
+\section{Ажиллуулах}\label{ux430ux436ux438ux43bux43bux443ux443ux43bux430ux445}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 1. Docker Compose стекийг ЗОГСООНО (санах ой хуваалцахгүй)}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack }\KeywordTok{\&\&} \ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core }\AttributeTok{{-}{-}profile}\NormalTok{ pipeline down}
+
+\CommentTok{\# 2. K3s суулгах (нэг удаа)}
+\ExtensionTok{curl} \AttributeTok{{-}sfL}\NormalTok{ https://get.k3s.io }\KeywordTok{|} \FunctionTok{sh} \AttributeTok{{-}s} \AttributeTok{{-}} \AttributeTok{{-}{-}write{-}kubeconfig{-}mode}\NormalTok{ 644}
+\BuiltInTok{export} \VariableTok{KUBECONFIG}\OperatorTok{=}\NormalTok{/etc/rancher/k3s/k3s.yaml}
+\ExtensionTok{kubectl}\NormalTok{ get nodes}
+
+\CommentTok{\# 3. Байршуулах}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/lab08/k3s}
+\CommentTok{\# ⚠ 01{-}config.yaml дотор нууц үгээ солино!}
+\ExtensionTok{kubectl}\NormalTok{ apply }\AttributeTok{{-}f}\NormalTok{ .}
+
+\CommentTok{\# 4. Ажиглах}
+\ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 get pods }\AttributeTok{{-}w}
+\ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 describe pod }\OperatorTok{\textless{}}\NormalTok{нэр}\OperatorTok{\textgreater{}}
+\ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 logs }\AttributeTok{{-}f}\NormalTok{ deploy/emqx}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux445ux430ux43dux434ux430ux445}{%
+\section{Хандах}\label{ux445ux430ux43dux434ux430ux445}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+Үйлчилгээ & Хаяг \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+EMQX MQTT & \texttt{\textless{}pi\textgreater{}:31883} \\
+EMQX самбар & \texttt{http://\textless{}pi\textgreater{}:31083} \\
+Grafana & \texttt{http://\textless{}pi\textgreater{}:30300} \\
+InfluxDB & зөвхөн кластер дотроос (\texttt{influxdb:8181}) \\
+\end{longtable}\endgroup
+
+\hypertarget{compose-ux431ux430-kubernetes-ux438ux439ux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442}{%
+\section{Compose ба Kubernetes-ийн харьцуулалт}\label{compose-ux431ux430-kubernetes-ux438ux439ux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+Ойлголт & Docker Compose & Kubernetes \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Үйлчилгээ & \texttt{services:} & Deployment + Service \\
+Боть & \texttt{volumes:} & PersistentVolumeClaim \\
+Орчны хувьсагч & \texttt{environment:} & ConfigMap / Secret \\
+Эрүүл мэнд & \texttt{healthcheck:} & readinessProbe / livenessProbe \\
+Нөөцийн хязгаар & \texttt{deploy.resources} & \texttt{resources.requests/limits} \\
+Дахин эхлүүлэх & \texttt{restart:} & ReplicaSet (автоматаар) \\
+Порт нээх & \texttt{ports:} & NodePort / Ingress \\
+Өргөтгөх & гараар \texttt{-\/-scale} & \texttt{replicas} эсвэл HPA \\
+\end{longtable}\endgroup
+
+\textbf{\texttt{requests} ба \texttt{limits}-ийн ялгаа чухал:} \texttt{requests} нь товлогчид (scheduler)
+"энэ pod-д хамгийн багадаа ийм нөөц хэрэгтэй" гэж хэлнэ; \texttt{limits} нь дээд
+хязгаар. Compose-д зөвхөн limits байдаг --- тиймээс Kubernetes нөөцийг илүү
+ухаалаг хуваарилдаг.
+
+\hypertarget{ux443ux441ux442ux433ux430ux445}{%
+\section{Устгах}\label{ux443ux441ux442ux433ux430ux445}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{kubectl}\NormalTok{ delete }\AttributeTok{{-}f}\NormalTok{ .}
+\CommentTok{\# бүрэн устгах (PVC{-}тэй хамт өгөгдөл алдагдана!)}
+\ExtensionTok{kubectl}\NormalTok{ delete namespace cnc302}
+\end{Highlighting}
+\end{Shaded}

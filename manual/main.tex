@@ -1,0 +1,111 @@
+% ============================================================================
+%  CNC302 — ЮМСЫН ИНТЕРНЭТИЙН ПЛАТФОРМ БА ХЭРЭГЛЭЭ
+%  Лабораторийн ажлын гарын авлага
+%
+%  Хөрвүүлэх:   xelatex main.tex   (3 удаа, эсвэл latexmk -xelatex main.tex)
+%               эсвэл:  make
+%  Шаардлага:   XeLaTeX, DejaVu фонт (кирилл үсэгт)
+% ============================================================================
+\documentclass[11pt,a4paper,openany,oneside]{report}
+
+\input{preamble}
+
+% ── Гарчгийн хуудасны мэдээлэл ──────────────────────────────────────────────
+\newcommand{\coursecode}{CNC302}
+\newcommand{\coursename}{Юмсын интернэтийн платформ ба хэрэглээ}
+\newcommand{\coursenameen}{Cloud-Native IoT Platforms and Applications}
+\newcommand{\teacher}{С.Батдалай}
+\newcommand{\department}{Холбооны тэнхим}
+\newcommand{\school}{Мэдээлэл, холбооны технологийн сургууль}
+\newcommand{\university}{Шинжлэх Ухаан Технологийн Их Сургууль}
+\newcommand{\docversion}{1.0}
+\newcommand{\mndate}{2026 оны 8 дугаар сар}
+
+\begin{document}
+
+% ════════════════════════════ ГАРЧГИЙН ХУУДАС ════════════════════════════
+\begin{titlepage}
+\centering
+\vspace*{16mm}
+
+{\sffamily\large\textcolor{cncmid}{\university}\par}
+\vspace{2mm}
+{\sffamily\normalsize\textcolor{cncmid}{\school\ · \department}\par}
+
+\vspace{26mm}
+
+{\color{cncrule}\rule{\textwidth}{1.4pt}}
+\vspace{7mm}
+
+{\sffamily\bfseries\Huge\textcolor{cncblue}{\coursecode}\par}
+\vspace{5mm}
+{\sffamily\bfseries\LARGE\coursename\par}
+\vspace{3mm}
+{\sffamily\large\itshape\textcolor{cncmid}{\coursenameen}\par}
+
+\vspace{7mm}
+{\color{cncrule}\rule{\textwidth}{1.4pt}}
+
+\vspace{16mm}
+{\sffamily\bfseries\LARGE ЛАБОРАТОРИЙН АЖЛЫН\\[2mm] ГАРЫН АВЛАГА\par}
+
+\vspace{6mm}
+{\sffamily\large Найман лабораторийн ажил · $8 \times 4 = 32$ цаг\par}
+
+\vspace{24mm}
+
+\begin{minipage}{0.86\textwidth}
+\centering\small
+\begin{tabular}{@{}r@{\hspace{1.5em}}l@{}}
+\textbf{\sffamily Багш}            & \teacher \\[3pt]
+\textbf{\sffamily Лабораторийн платформ} & Оюутны зөөврийн компьютер + Raspberry Pi 5 \\[3pt]
+\textbf{\sffamily Хамрах хүрээ}    & IoT лавлах архитектурын 3, 4-р давхарга \\[3pt]
+\textbf{\sffamily Хувилбар}        & \docversion\ · \mndate \\
+\end{tabular}
+\end{minipage}
+
+\vfill
+
+\begin{minipage}{0.9\textwidth}
+\small\itshape\color{cncmid}
+Энэхүү гарын авлага дахь найман лаборатори нь тус тусдаа биш —
+нэг ажиллаж буй платформыг үе шаттай өргөтгөж бүтээнэ. Заавар бүр
+хэмжилтийн хүснэгт, хяналтын асуулт, үнэлгээний шалгуурыг агуулна.
+\end{minipage}
+
+\vspace{8mm}
+\end{titlepage}
+
+% ════════════════════════════ АГУУЛГА ════════════════════════════
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+\hypersetup{linkcolor=cncblue}
+\tableofcontents
+\hypersetup{linkcolor=cncmid}
+
+\cleardoublepage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% ════════════════════════════ БҮЛГҮҮД ════════════════════════════
+\input{chapters/00-intro}
+\input{chapters/01-setup}
+\input{chapters/02-lab01}
+\input{chapters/03-lab02}
+\input{chapters/04-lab03}
+\input{chapters/05-lab04}
+\input{chapters/06-lab05}
+\input{chapters/07-lab06}
+\input{chapters/08-lab07}
+\input{chapters/09-lab08}
+
+% ════════════════════════════ ХАВСРАЛТ ════════════════════════════
+\appendix
+
+\input{chapters/10-report}
+\input{chapters/11-trouble}
+\input{chapters/12-resources}
+\input{chapters/13-k3s}
+
+\end{document}

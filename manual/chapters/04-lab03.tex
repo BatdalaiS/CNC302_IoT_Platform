@@ -1,0 +1,537 @@
+% Автоматаар үүсгэсэн — эх файл: lab03/README.md
+\chapter{Лаб 3 — MQTT 5.0, Unified Namespace ба Sparkplug B}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+\endhead
+\bottomrule
+\endlastfoot
+\textbf{7 хоног} & VII \\
+\textbf{Хугацаа} & 4 цаг \\
+\textbf{Суралцахуйн үр дүн} & ҮД1 (шинжлэх), ҮД4 (зохиох), ҮД6 \\
+\textbf{Үнэлгээ} & Бичгийн тайлан, 10 оноо \\
+\end{longtable}\endgroup
+
+\hypertarget{ux437ux43eux440ux438ux43bux433ux43e}{%
+\section{1. Зорилго}\label{ux437ux43eux440ux438ux43bux433ux43e}}
+
+Гурван зүйлийг \textbf{тоогоор} тогтооно:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  MQTT 5.0-ийн шинэ боломжууд юу шийддэг вэ --- 3.1.1-тэй харьцуулахад
+\item
+  QoS 0/1/2-ын \textbf{бодит үнэ} --- саатал, чадвар, найдвартай байдлын солилцоо
+\item
+  Сэдвийн нэршлийг схемчилэх (UNS) нь яагаад архитектурын шийдвэр вэ
+\end{enumerate}
+
+Лабын гол бүтээгдэхүүн: \textbf{таны багийн төслийн UNS схем} ба \textbf{QoS сонголтын үндэслэл}. Энэ хоёрыг Лаб 4-өөс эцэс хүртэл ашиглана.
+
+\hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}{%
+\section{2. Урьдчилсан нөхцөл}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}}
+
+\begin{itemize}
+\tightlist
+\item
+  Лаб 1, 2 дууссан; \texttt{core} профайл ажиллаж байна
+\item
+  Бие даалт VI: MQTT 5.0 стандартын 3.3 (PUBLISH), 4.7 (Topic names) хэсгүүд уншсан
+\item
+  \texttt{mosquitto\_sub} эсвэл MQTT Explorer суусан
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ up }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ health}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}{%
+\section{3. Онолын сануулга}\label{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}}
+
+\textbf{QoS бол найдвартай байдлын баталгаа биш, дамжуулалтын гэрээ.}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lllll@{}}
+\toprule
+QoS & Гэрээ & Гар барилт & Давхардах уу & Алдагдах уу \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+0 & at most once & PUBLISH & үгүй & \textbf{тийм} \\
+1 & at least once & PUBLISH → PUBACK & \textbf{тийм} & үгүй \\
+2 & exactly once & PUBLISH → PUBREC → PUBREL → PUBCOMP & үгүй & үгүй \\
+\end{longtable}\endgroup
+
+QoS 2 нь дөрвөн алхамт гар барилт тул хамгийн удаан. Гэхдээ \textbf{энэ нь зөвхөн брокер хүртэлх баталгаа}. Брокероос цааш өгөгдлийн сан руу бичихэд алдаа гарвал QoS 2 ч аврахгүй. Энэ ойлголт Лаб 5-ын эвдрэлийн туршилтад чухал.
+
+\textbf{Burst vs steady-state.} 500 мессежийг нэг дор шидвэл хэмжсэн "саатал" нь үнэндээ \textbf{дараалалд хүлээсэн хугацаа}. Тогтвортой урсгал (\texttt{-\/-interval})-д хэмжсэн саатал нь \textbf{жинхэнэ сүлжээ + брокерын саатал}. Хоёулаа хэрэгтэй, гэхдээ ялгааг ойлгох ёстой.
+
+\textbf{Unified Namespace.} UNS бол технологи биш, \textbf{гэрээ}. "Аливаа өгөгдөл яг нэг л газар, урьдчилан таамаглах боломжтой нэрээр байрлана" гэсэн тохиролцоо. Схемгүй бол 2 жилийн дараа таны брокер дээр \texttt{temp}, \texttt{Temperature}, \texttt{temp\_c}, \texttt{sensor/1/t} гэсэн дөрвөн өөр нэр зэрэг оршино.
+
+\hypertarget{ux430ux43bux445ux43cux443ux443ux434}{%
+\section{4. Алхмууд}\label{ux430ux43bux445ux43cux443ux443ux434}}
+
+\hypertarget{ux430ux43bux445ux430ux43c-1-mqtt-5.0-ux438ux439ux43d-ux437ux443ux440ux433ux430ux430ux43d-ux431ux43eux43bux43eux43cux436-60-ux43cux438ux43d}{%
+\subsection{Алхам 1 --- MQTT 5.0-ийн зургаан боломж (60 мин)}\label{ux430ux43bux445ux430ux43c-1-mqtt-5.0-ux438ux439ux43d-ux437ux443ux440ux433ux430ux430ux43d-ux431ux43eux43bux43eux43cux436-60-ux43cux438ux43d}}
+
+Бүгдийг дараалан ажиллуулж, гаралтыг тайландаа хадгална.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302        }\CommentTok{\# зөөврийн компьютер дээр, .venv идэвхтэй}
+\VariableTok{H}\OperatorTok{=}\NormalTok{pi{-}team03.local}
+
+\ExtensionTok{python}\NormalTok{ lab03/mqtt5\_features.py }\AttributeTok{{-}{-}host} \VariableTok{$H}\NormalTok{ expiry  }\AttributeTok{{-}{-}expiry}\NormalTok{ 10}
+\ExtensionTok{python}\NormalTok{ lab03/mqtt5\_features.py }\AttributeTok{{-}{-}host} \VariableTok{$H}\NormalTok{ alias   }\AttributeTok{{-}{-}count}\NormalTok{ 1000}
+\ExtensionTok{python}\NormalTok{ lab03/mqtt5\_features.py }\AttributeTok{{-}{-}host} \VariableTok{$H}\NormalTok{ reqresp}
+\ExtensionTok{python}\NormalTok{ lab03/mqtt5\_features.py }\AttributeTok{{-}{-}host} \VariableTok{$H}\NormalTok{ shared  }\AttributeTok{{-}{-}subs}\NormalTok{ 3 }\AttributeTok{{-}{-}count}\NormalTok{ 300}
+\ExtensionTok{python}\NormalTok{ lab03/mqtt5\_features.py }\AttributeTok{{-}{-}host} \VariableTok{$H}\NormalTok{ session }\AttributeTok{{-}{-}expiry}\NormalTok{ 60}
+\ExtensionTok{python}\NormalTok{ lab03/mqtt5\_features.py }\AttributeTok{{-}{-}host} \VariableTok{$H}\NormalTok{ reason}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Хүснэгт 1}-ийг бөглөнө: боломж бүрд \emph{ямар асуудлыг шийдэж байна вэ}, \emph{MQTT 3.1.1-д үүнийг хэрхэн шийддэг байсан бэ}, \emph{бидний төсөлд хэрэгтэй юу}.
+
+\textbf{Alias-ийн туршилт (хэмжилттэй).} EMQX самбар → \textbf{Monitoring → Metrics} дээр \texttt{Bytes\ Received} утгыг тэмдэглээд:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# alias{-}гүйгээр 1000 мессеж}
+\ExtensionTok{python}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}devices}\NormalTok{ 1 }\AttributeTok{{-}{-}count}\NormalTok{ 1000 }\AttributeTok{{-}{-}interval}\NormalTok{ 0 }\DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}topic{-}prefix}\NormalTok{ cnc302 }\AttributeTok{{-}{-}site}\NormalTok{ ulaanbaatar }\AttributeTok{{-}{-}area}\NormalTok{ campus{-}north{-}building{-}a{-}floor{-}3}
+\end{Highlighting}
+\end{Shaded}
+
+Дахин \texttt{Bytes\ Received}-ийг тэмдэглэнэ. Дараа нь \texttt{alias} туршилтыг ажиллуулаад дахин тэмдэглэнэ. \textbf{Хүснэгт 2}.
+
+\hypertarget{ux430ux43bux445ux430ux43c-2-qos-ux438ux439ux43d-ux445ux44dux43cux436ux438ux43bux442-burst-ux431ux430-steady-state-50-ux43cux438ux43d}{%
+\subsection{Алхам 2 --- QoS-ийн хэмжилт: burst ба steady-state (50 мин)}\label{ux430ux43bux445ux430ux43c-2-qos-ux438ux439ux43d-ux445ux44dux43cux436ux438ux43bux442-burst-ux431ux430-steady-state-50-ux43cux438ux43d}}
+
+\textbf{2.1 Burst (дараалалд хүлээх)} --- \texttt{-\/-interval\ 0}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ tools/qos\_latency.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}sweep} \AttributeTok{{-}{-}count}\NormalTok{ 500 }\AttributeTok{{-}{-}payload}\NormalTok{ 200 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}csv}\NormalTok{ lab03/out/qos{-}burst.csv}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{2.2 Steady-state (жинхэнэ саатал)} --- 100 мсж/с:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ tools/qos\_latency.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}sweep} \AttributeTok{{-}{-}count}\NormalTok{ 500 }\AttributeTok{{-}{-}payload}\NormalTok{ 200 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}interval}\NormalTok{ 0.01 }\AttributeTok{{-}{-}csv}\NormalTok{ lab03/out/qos{-}steady.csv}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{2.3 Ачааллын хэмжээний нөлөө} --- 200 Б ба 2000 Б:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ tools/qos\_latency.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}qos}\NormalTok{ 1 }\AttributeTok{{-}{-}count}\NormalTok{ 500 }\AttributeTok{{-}{-}payload}\NormalTok{ 2000 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}interval}\NormalTok{ 0.01 }\AttributeTok{{-}{-}csv}\NormalTok{ lab03/out/qos{-}2000b.csv}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{2.4 Хуваалцсан захиалгын нөлөө:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ tools/qos\_latency.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}qos}\NormalTok{ 1 }\AttributeTok{{-}{-}count}\NormalTok{ 500 }\AttributeTok{{-}{-}interval}\NormalTok{ 0.01 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}shared}\NormalTok{ 3 }\AttributeTok{{-}{-}csv}\NormalTok{ lab03/out/qos{-}shared3.csv}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Хүснэгт 3} ба \textbf{Хүснэгт 4}-ийг бөглөнө.
+
+\begin{quote}
+\textbf{Ажигла:} burst горимд p50 нь 30--50 мс байхад steady-state горимд 1 мс-ээс бага байж магадгүй. Энэ 30 дахин ялгаа \textbf{брокерын гэм биш} --- та өөрөө дарааллыг дүүргэсэн. Тайландаа энэ ялгааг тайлбарлана.
+\end{quote}
+
+\hypertarget{ux430ux43bux445ux430ux43c-3-unified-namespace-ux441ux445ux435ux43c-ux437ux43eux445ux438ux43eux445-ux431ux430-ux448ux430ux43bux433ux430ux445-45-ux43cux438ux43d}{%
+\subsection{Алхам 3 --- Unified Namespace схем зохиох ба шалгах (45 мин)}\label{ux430ux43bux445ux430ux43c-3-unified-namespace-ux441ux445ux435ux43c-ux437ux43eux445ux438ux43eux445-ux431ux430-ux448ux430ux43bux433ux430ux445-45-ux43cux438ux43d}}
+
+\textbf{3.1 Одоогийн байдлыг харах.} Виртуал флотыг ажиллуулж байхад:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# терминал 1 (зөөврийн компьютер)}
+\ExtensionTok{python}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}devices}\NormalTok{ 8 }\AttributeTok{{-}{-}interval}\NormalTok{ 1 }\AttributeTok{{-}{-}lines}\NormalTok{ 3}
+
+\CommentTok{\# терминал 2}
+\ExtensionTok{python}\NormalTok{ lab03/uns\_tree.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}seconds}\NormalTok{ 30 }\AttributeTok{{-}{-}json}\NormalTok{ lab03/out/uns{-}before.json}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{3.2 Зөрчил үүсгэж, шалгагч барьж авахыг харах:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h} \VariableTok{$H} \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/UB/Campus/Line 1/DEV{-}1/temp\textquotesingle{}} \AttributeTok{{-}m} \StringTok{\textquotesingle{}\{"t":24\}\textquotesingle{}}
+\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h} \VariableTok{$H} \AttributeTok{{-}t} \StringTok{\textquotesingle{}sensors/room12/temperature\textquotesingle{}} \AttributeTok{{-}m} \StringTok{\textquotesingle{}24\textquotesingle{}}
+\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h} \VariableTok{$H} \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/ub/campus/line01/dev1/telemetry/raw\textquotesingle{}} \AttributeTok{{-}m} \StringTok{\textquotesingle{}\{\}\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+Эдгээрийг \textbf{шалгагч ажиллаж байх зуур} илгээнэ. Гаралтыг тайланд хуулна.
+
+\textbf{3.3 Багийн төслийн UNS схемээ зохионо.} \texttt{lab03/uns-schema.md} файлд:
+
+\begin{itemize}
+\tightlist
+\item
+  Таны төслийн шатлал (site / area / line / device) юу гэсэн үг вэ?
+\item
+  Ямар суваг (channel) хэрэгтэй вэ --- \texttt{telemetry}, \texttt{status}, \texttt{cmd}, \texttt{event}, \texttt{attributes}-ээс аль нь?
+\item
+  Хадгалагдах (retained) сэдвүүд аль нь вэ? Яагаад?
+\item
+  Тушаал (command) хаашаа очих вэ? Хариу хаанаас ирэх вэ?
+\item
+  10 жилийн дараа шинэ талбай нэмэхэд схем эвдрэх үү?
+\end{itemize}
+
+Дор хаяж \textbf{10 бодит сэдвийн жишээ} бичнэ.
+
+\textbf{3.4 Схемээ шалгуулах.} \texttt{uns\_tree.py}-ийн \texttt{-\/-strict} горим нь CI-д ашиглаж болно:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab03/uns\_tree.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}seconds}\NormalTok{ 20 }\AttributeTok{{-}{-}strict} \AttributeTok{{-}{-}prefix}\NormalTok{ cnc302}
+\BuiltInTok{echo} \StringTok{"гарах код: }\VariableTok{$?}\StringTok{"}     \CommentTok{\# 0 = цэвэр, 1 = зөрчилтэй}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+Энэ бол жижиг ч чухал санаа: \textbf{нэршлийн дүрмийг автоматаар шалгаж болно}. Багийн төсөлд үүнийг CI-д оруулбал схем аяндаа сахигдана.
+\end{quote}
+
+\hypertarget{ux430ux43bux445ux430ux43c-4-sparkplug-b-45-ux43cux438ux43d}{%
+\subsection{Алхам 4 --- Sparkplug B (45 мин)}\label{ux430ux43bux445ux430ux43c-4-sparkplug-b-45-ux43cux438ux43d}}
+
+⚠ \texttt{sparkplug\_lite.py} нь protobuf-гүй \textbf{хялбаршуулсан} хувилбар. Сэдвийн бүтэц, төлөвийн машин, seq нь стандартын дагуу; ачаалал нь JSON.
+
+\textbf{4.1 Хоёр терминалд зэрэг:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# терминал 1 — ажиглагч (платформ)}
+\ExtensionTok{python}\NormalTok{ lab03/sparkplug\_lite.py monitor }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}seconds}\NormalTok{ 90}
+
+\CommentTok{\# терминал 2 — ирмэгийн зангилаа}
+\ExtensionTok{python}\NormalTok{ lab03/sparkplug\_lite.py node }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}devices}\NormalTok{ 3 }\AttributeTok{{-}{-}seconds}\NormalTok{ 60 }\AttributeTok{{-}{-}interval}\NormalTok{ 1}
+\end{Highlighting}
+\end{Shaded}
+
+Ажигла: \textbf{NBIRTH → DBIRTH → DDATA \ldots{} → NDEATH}. DDATA дотор метрикийн \textbf{нэр байхгүй, зөвхөн alias} байгааг анзаар. Ажиглагч нь BIRTH-ээс сурсан хүснэгтээрээ нэрийг сэргээнэ.
+
+\textbf{4.2 Дарааллын тасалдал үүсгэх:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab03/sparkplug\_lite.py node }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}devices}\NormalTok{ 2 }\AttributeTok{{-}{-}seconds}\NormalTok{ 30 }\AttributeTok{{-}{-}drop{-}seq}\NormalTok{ 5}
+\end{Highlighting}
+\end{Shaded}
+
+Ажиглагч \texttt{⚠\ ДАРААЛЛЫН\ ТАСАЛДАЛ} гэж мэдээлэх ёстой.
+
+\textbf{4.3 Гэнэтийн салалт (Last Will).} Зангилааг ажиллуулаад \textbf{Ctrl+C-гүйгээр} терминалыг хааж алах:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab03/sparkplug\_lite.py node }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}devices}\NormalTok{ 2 }\AttributeTok{{-}{-}seconds}\NormalTok{ 300 }\KeywordTok{\&}
+\FunctionTok{sleep}\NormalTok{ 15}
+\BuiltInTok{kill} \AttributeTok{{-}9}\NormalTok{ \%1        }\CommentTok{\# гэнэт унтарлаа}
+\end{Highlighting}
+\end{Shaded}
+
+Ажиглагч дээр \texttt{NDEATH} \textbf{автоматаар} гарах ёстой --- учир нь брокер өөрөө Last Will-ийг нийтэлнэ. Хэдэн секундын дараа гарсныг тэмдэглэ (keepalive-тай холбоотой).
+
+\textbf{4.4 Report-by-exception.} \texttt{-\/-deadband} ашиглаж зөвхөн өөрчлөгдсөн утгыг илгээнэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab03/sparkplug\_lite.py node }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}devices}\NormalTok{ 3 }\AttributeTok{{-}{-}seconds}\NormalTok{ 30 }\AttributeTok{{-}{-}deadband}\NormalTok{ 0.5}
+\end{Highlighting}
+\end{Shaded}
+
+Deadband 0 ба 0.5 үед илгээсэн DDATA-гийн тоог харьцуулна. \textbf{Хүснэгт 5}.
+
+\hypertarget{ux430ux43bux445ux430ux43c-5-ux434ux4afux433ux43dux44dux43bux442-ux431ux430-ux437ux4e9ux432ux43bux4e9ux43cux436-30-ux43cux438ux43d}{%
+\subsection{Алхам 5 --- Дүгнэлт ба зөвлөмж (30 мин)}\label{ux430ux43bux445ux430ux43c-5-ux434ux4afux433ux43dux44dux43bux442-ux431ux430-ux437ux4e9ux432ux43bux4e9ux43cux436-30-ux43cux438ux43d}}
+
+\textbf{Хүснэгт 6} (төслийн шийдвэр)-ийг бөглөнө. Энэ бол лабораторийн гол үр дүн: таны баг цаашид ямар тохиргоо хэрэглэхээ \textbf{тоон үндэслэлтэйгээр} шийднэ.
+
+Дараа нь commit:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ add }\AttributeTok{{-}A} \KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ status          }\CommentTok{\# lab03/out/ орохгүй байх ёстой}
+\FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 3: MQTT 5.0, UNS схем, Sparkplug"}
+\FunctionTok{git}\NormalTok{ tag lab03{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push origin main }\AttributeTok{{-}{-}tags}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux445ux4afux441ux43dux44dux433ux442ux4afux4afux434}{%
+\section{5. Хэмжилтийн хүснэгтүүд}\label{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux445ux4afux441ux43dux44dux433ux442ux4afux4afux434}}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-1-mqtt-5.0-ux438ux439ux43d-ux431ux43eux43bux43eux43cux436ux443ux443ux434}{%
+\subsection{Хүснэгт 1 --- MQTT 5.0-ийн боломжууд}\label{ux445ux4afux441ux43dux44dux433ux442-1-mqtt-5.0-ux438ux439ux43d-ux431ux43eux43bux43eux43cux436ux443ux443ux434}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Боломж
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Ямар асуудлыг шийдэв
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+3.1.1-д хэрхэн шийддэг байсан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Ажиглагдсан үр дүн
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Бидний төсөлд
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Message Expiry & & & & \\
+Topic Alias & & & & \\
+Request/Response & & & & \\
+Shared Subscription & & & & \\
+Session Expiry & & & & \\
+Reason Code & & & & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-2-topic-alias-ux438ux439ux43d-ux445ux44dux43cux43dux44dux43bux442}{%
+\subsection{Хүснэгт 2 --- Topic Alias-ийн хэмнэлт}\label{ux445ux4afux441ux43dux44dux433ux442-2-topic-alias-ux438ux439ux43d-ux445ux44dux43cux43dux44dux43bux442}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Сэдвийн урт (Б)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Мессеж
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Bytes Received (EMQX)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Нэг мессежид (Б)
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Alias-гүй & & 1000 & & \\
+Alias-тай & & 1000 & & \\
+\textbf{Хэмнэлт \%} & & & & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-3-qos-burst-ux431ux430-steady-state}{%
+\subsection{Хүснэгт 3 --- QoS: burst ба steady-state}\label{ux445ux4afux441ux43dux44dux433ux442-3-qos-burst-ux431ux430-steady-state}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Горим
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+QoS
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+p50 (мс)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+p95 (мс)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+p99 (мс)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+max (мс)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Алдалт \%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Давхардал
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Чадвар (мсж/с)
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+burst & 0 & & & & & & & \\
+burst & 1 & & & & & & & \\
+burst & 2 & & & & & & & \\
+steady & 0 & & & & & & & \\
+steady & 1 & & & & & & & \\
+steady & 2 & & & & & & & \\
+\end{longtable}\endgroup
+
+burst ба steady-ийн p50-ийн ялгаа QoS 1 дээр: ule{1.5cm}{0.4pt} дахин. Шалтгаан: ule{1.5cm}{0.4pt}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-4-ux430ux447ux430ux430ux43bux430ux43b-ux431ux430-ux445ux443ux432ux430ux430ux43bux446ux441ux430ux43d-ux437ux430ux445ux438ux430ux43bux433ux44bux43d-ux43dux4e9ux43bux4e9ux4e9}{%
+\subsection{Хүснэгт 4 --- Ачаалал ба хуваалцсан захиалгын нөлөө}\label{ux445ux4afux441ux43dux44dux433ux442-4-ux430ux447ux430ux430ux43bux430ux43b-ux431ux430-ux445ux443ux432ux430ux430ux43bux446ux441ux430ux43d-ux437ux430ux445ux438ux430ux43bux433ux44bux43d-ux43dux4e9ux43bux4e9ux4e9}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
+\toprule
+Тохиргоо & p50 (мс) & p95 (мс) & Чадвар (мсж/с) \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+QoS 1, 200 Б, энгийн захиалга & & & \\
+QoS 1, 2000 Б, энгийн захиалга & & & \\
+QoS 1, 200 Б, shared × 3 & & & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-5-sparkplug-b-ux438ux439ux43d-ux430ux436ux438ux433ux43bux430ux43bux442}{%
+\subsection{Хүснэгт 5 --- Sparkplug B-ийн ажиглалт}\label{ux445ux4afux441ux43dux44dux433ux442-5-sparkplug-b-ux438ux439ux43d-ux430ux436ux438ux433ux43bux430ux43bux442}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+Асуулт & Хариулт \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+NBIRTH-д хэдэн метрик зарлагдав & \\
+DDATA-д метрикийн нэр дамжсан уу & \\
+Дарааллын тасалдал илэрсэн үү (\texttt{-\/-drop-seq\ 5}) & \\
+\texttt{kill\ -9}-ийн дараа NDEATH хэдэн секундын дараа гарав & \\
+DDATA-гийн тоо: deadband 0 vs 0.5 & / \\
+Deadband-ийн хэмнэлт \% & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-6-ux431ux430ux433ux438ux439ux43d-ux442ux4e9ux441ux43bux438ux439ux43d-ux448ux438ux439ux434ux432ux44dux440}{%
+\subsection{Хүснэгт 6 --- Багийн төслийн шийдвэр}\label{ux445ux4afux441ux43dux44dux433ux442-6-ux431ux430ux433ux438ux439ux43d-ux442ux4e9ux441ux43bux438ux439ux43d-ux448ux438ux439ux434ux432ux44dux440}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+Шийдвэр & Сонголт & Тоон үндэслэл \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Телеметрийн QoS & & \\
+Тушаалын (command) QoS & & \\
+Дохиоллын (alarm) QoS & & \\
+Session Expiry Interval & & \\
+Message Expiry (телеметр) & & \\
+Topic Alias хэрэглэх үү & & \\
+UNS угтвар ба шатлал & & \\
+Sparkplug B хэрэглэх үү & & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442}{%
+\section{6. Хяналтын асуулт}\label{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  QoS 2 нь QoS 1-ээс хэдэн дахин удаан байв? Энэ ялгаа зөвхөн гар барилтын алхмаас үүдэлтэй юу?
+\item
+  Burst ба steady-state саатлын ялгааг тайлбарла. Аль нь SLA-д бичихэд тохиромжтой вэ?
+\item
+  Батарейгаар ажилладаг төхөөрөмжид QoS 2 хэрэглэх нь ямар үнэтэй вэ? (Санамж: сэрүүн байх хугацаа, радио дамжуулалтын тоо.)
+\item
+  Session Expiry-г 24 цаг болговол брокерын санах ойд юу болох вэ? 1000 төхөөрөмж дээр тооцоолж үзнэ үү.
+\item
+  Shared subscription нь хэрэглэгчийг өргөтгөх боломж өгдөг. Гэхдээ мессежийн \textbf{дараалал} (ordering) юу болох вэ?
+\item
+  Message Expiry ба Session Expiry хоёрын ялгаа юу вэ? Аль нь ямар асуудал шийддэг вэ?
+\item
+  UNS схемгүйгээр 3 жил ажилласан систем дээр шинэ хэрэглэгч нэмэхэд ямар бэрхшээл гарах вэ?
+\item
+  Sparkplug B-гийн birth certificate байхгүй бол платформ шинээр холбогдоход юу мэдэхгүй вэ?
+\item
+  Sparkplug-ийн seq дугаар 256 дээр эргэлддэг. 1000 мсж/с урсгалд энэ хэр хурдан эргэх вэ? Асуудал болох уу?
+\item
+  \texttt{uns\_tree.py\ -\/-strict}-ийг CI-д оруулбал ямар ашиг гарах вэ? Ямар сул тал байна вэ?
+\end{enumerate}
+
+\hypertarget{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux448ux430ux430ux440ux434ux43bux430ux433ux430}{%
+\section{7. Тайлангийн шаардлага}\label{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux448ux430ux430ux440ux434ux43bux430ux433ux430}}
+
+\begin{itemize}
+\tightlist
+\item[$\square$]
+  Хүснэгт 1--6 бүрэн
+\item[$\square$]
+  \texttt{uns-schema.md} --- багийн UNS схем, 10 жишээ сэдэвтэй
+\item[$\square$]
+  Схемийн зөрчил илрүүлсэн гаралт (Алхам 3.2)
+\item[$\square$]
+  Sparkplug-ийн NBIRTH/DDATA/NDEATH бүхий гаралтын хэсэг
+\item[$\square$]
+  Хяналтын 10 асуултын хариулт
+\item[$\square$]
+  Git tag \texttt{lab03-done}
+\end{itemize}
+
+\hypertarget{ux43eux43dux43eux448ux438ux43bux433ux43eux43e}{%
+\section{8. Оношилгоо}\label{ux43eux43dux43eux448ux438ux43bux433ux43eux43e}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Шинж тэмдэг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шалтгаан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шийдэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\texttt{expiry} туршилт "дараа нь ч ирлээ" гэнэ & брокер Message Expiry дэмжихгүй & EMQX хувилбарыг шалга (5.x шаардлагатай) \\
+\texttt{shared} туршилтад нэг л захиалагч бүгдийг авна & \texttt{\$share} дэмжигдэхгүй эсвэл MQTT 3.1.1 холболт & \texttt{-\/-protocol} MQTTv5 эсэхийг шалга \\
+QoS 2-т \texttt{TIMEOUT} & \texttt{-\/-timeout} бага & \texttt{-\/-timeout\ 60} \\
+Саатал сөрөг гарна & цагийн зөрүү & нийтлэгч ба захиалагч \textbf{нэг машин} дээр байх ёстой \\
+\texttt{uns\_tree.py} мессеж олохгүй & \texttt{sim\_device.py} ажиллахгүй байна, эсвэл \texttt{-\/-filter} буруу & \texttt{mosquitto\_sub\ -t\ \textquotesingle{}\#\textquotesingle{}\ -v} \\
+Sparkplug NDEATH гарахгүй & keepalive хугацаа дуусаагүй & \texttt{-\/-keepalive} бага болгож туршина (30 → 10) \\
+p50 бүх QoS дээр ижил & \texttt{-\/-interval\ 0} --- бүгд дараалалд хүлээж байна & \texttt{-\/-interval\ 0.01} ашигла \\
+\end{longtable}\endgroup
+
+\hypertarget{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}{%
+\section{9. Үнэлгээний шалгуур (10 оноо)}\label{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+Шалгуур & Оноо \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Зургаан MQTT 5.0 туршилт гүйцэтгэгдэж баримтжсан & 2 \\
+QoS-ийн хэмжилт burst/steady хоёуланд хийгдсэн & 3 \\
+UNS схем зохиогдож, шалгагчаар баталгаажсан & 2 \\
+Sparkplug-ийн гурван ажиглалт (alias, seq gap, NDEATH) & 2 \\
+Хүснэгт 6 --- төслийн шийдвэр тоон үндэслэлтэй & 1 \\
+\end{longtable}\endgroup
+
+\textbf{Түгээмэл алдаа:} burst горимын саатлыг "брокерын саатал" гэж тайлбарлах. Энэ нь дарааллын хүлээлт --- үүнийг зөв тайлбарлаагүй бол Хүснэгт 3-ын оноо хасагдана.

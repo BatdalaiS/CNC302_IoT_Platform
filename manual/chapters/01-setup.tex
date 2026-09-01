@@ -1,0 +1,260 @@
+% Автоматаар үүсгэсэн — эх файл: SETUP.md
+\chapter{Ажлын орчны бэлтгэл}
+
+Хугацаа: \textbf{40--60 минут}. Үүнийг лабораторийн цагаар биш, \textbf{I долоо хоногийн бие даалтаар} гүйцэтгэнэ. Лаб 1 эхлэхэд энэ бүхэн бэлэн байх ёстой.
+
+\hypertarget{ux430.-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux434ux44dux44dux440}{%
+\section{А. Зөөврийн компьютер дээр}\label{ux430.-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux434ux44dux44dux440}}
+
+\hypertarget{ux430.1-ux448ux430ux430ux440ux434ux43bux430ux433ux430ux442ux430ux439-ux43fux440ux43eux433ux440ux430ux43c}{%
+\subsection{А.1 Шаардлагатай програм}\label{ux430.1-ux448ux430ux430ux440ux434ux43bux430ux433ux430ux442ux430ux439-ux43fux440ux43eux433ux440ux430ux43c}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Програм
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шалгах комманд
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Тайлбар
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Git & \texttt{git\ -\/-version} & 2.30+ \\
+Python & \texttt{python3\ -\/-version} & 3.10+ \\
+VS Code & --- & + \textbf{Remote - SSH}, \textbf{Docker}, \textbf{YAML} өргөтгөл \\
+SSH клиент & \texttt{ssh\ -V} & Windows 10/11-д суулгаастай \\
+MQTT Explorer & --- & http://mqtt-explorer.com (сонголт: \texttt{mosquitto\_sub}) \\
+\end{longtable}\endgroup
+
+\hypertarget{ux430.2-python-ux43eux440ux447ux438ux43d}{%
+\subsection{А.2 Python орчин}\label{ux430.2-python-ux43eux440ux447ux438ux43d}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd} \OperatorTok{\textless{}}\NormalTok{багийн{-}сан}\OperatorTok{\textgreater{}}
+\ExtensionTok{python3} \AttributeTok{{-}m}\NormalTok{ venv .venv}
+\BuiltInTok{source}\NormalTok{ .venv/bin/activate          }\CommentTok{\# Windows: .venv\textbackslash{}Scripts\textbackslash{}activate}
+\ExtensionTok{pip}\NormalTok{ install }\AttributeTok{{-}r}\NormalTok{ tools/requirements.txt}
+\end{Highlighting}
+\end{Shaded}
+
+Шалгах:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}dry{-}run} \AttributeTok{{-}{-}devices}\NormalTok{ 2 }\AttributeTok{{-}{-}count}\NormalTok{ 3}
+\end{Highlighting}
+\end{Shaded}
+
+Брокергүйгээр 6 мессежийн JSON хэвлэгдэх ёстой. Хэвлэгдэхгүй бол цааш явахгүй.
+
+\hypertarget{ux430.3-ssh-ux442ux4afux43bux445ux4afux4afux440-ux4afux4afux441ux433ux44dux445}{%
+\subsection{А.3 SSH түлхүүр үүсгэх}\label{ux430.3-ssh-ux442ux4afux43bux445ux4afux4afux440-ux4afux4afux441ux433ux44dux445}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ssh{-}keygen} \AttributeTok{{-}t}\NormalTok{ ed25519 }\AttributeTok{{-}C} \StringTok{"\textless{}таны{-}имэйл\textgreater{}"} \AttributeTok{{-}f}\NormalTok{ \textasciitilde{}/.ssh/cnc302}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+Нууц түлхүүрийг (\texttt{cnc302}) \textbf{хэзээ ч} Git санд оруулахгүй.
+\end{quote}
+
+\hypertarget{ux431.-raspberry-pi-5-ux434ux44dux44dux440}{%
+\section{Б. Raspberry Pi 5 дээр}\label{ux431.-raspberry-pi-5-ux434ux44dux44dux440}}
+
+\hypertarget{ux431.1-ux441ux438ux441ux442ux435ux43c-ux441ux443ux443ux43bux433ux430ux445}{%
+\subsection{Б.1 Систем суулгах}\label{ux431.1-ux441ux438ux441ux442ux435ux43c-ux441ux443ux443ux43bux433ux430ux445}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Raspberry Pi Imager → \textbf{Raspberry Pi OS Lite (64-bit)} (ширээний орчин шаардлагагүй)
+\item
+  Imager-ийн тохиргооны цэсэнд (⚙):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Хостын нэр: \texttt{pi-\textless{}багийн-нэр\textgreater{}} (жишээ: \texttt{pi-team03})
+  \item
+    Хэрэглэгч: \texttt{cnc302}, хүчтэй нууц үг
+  \item
+    SSH идэвхжүүлэх → \textbf{Allow public-key authentication only} → А.3-д үүсгэсэн \texttt{cnc302.pub}-ийн агуулгыг наах
+  \item
+    Wi-Fi эсвэл кабель сүлжээ (лабораторид \textbf{кабель} илүү тогтвортой)
+  \end{itemize}
+\item
+  NVMe SSD байвал үүнийг ашиглана --- microSD дээр InfluxDB, Postgres удаан ажиллана.
+\end{enumerate}
+
+\hypertarget{ux431.2-ux44dux445ux43dux438ux439-ux445ux43eux43bux431ux43eux43bux442-ux431ux430-ux448ux438ux43dux44dux447ux43bux44dux43b}{%
+\subsection{Б.2 Эхний холболт ба шинэчлэл}\label{ux431.2-ux44dux445ux43dux438ux439-ux445ux43eux43bux431ux43eux43bux442-ux431ux430-ux448ux438ux43dux44dux447ux43bux44dux43b}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ssh} \AttributeTok{{-}i}\NormalTok{ \textasciitilde{}/.ssh/cnc302 cnc302@pi{-}team03.local}
+
+\FunctionTok{sudo}\NormalTok{ apt update }\KeywordTok{\&\&} \FunctionTok{sudo}\NormalTok{ apt full{-}upgrade }\AttributeTok{{-}y}
+\FunctionTok{sudo}\NormalTok{ apt install }\AttributeTok{{-}y}\NormalTok{ git curl jq htop iotop stress{-}ng}
+\FunctionTok{sudo}\NormalTok{ reboot}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux431.3-docker-ux441ux443ux443ux43bux433ux430ux445}{%
+\subsection{Б.3 Docker суулгах}\label{ux431.3-docker-ux441ux443ux443ux43bux433ux430ux445}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{curl} \AttributeTok{{-}fsSL}\NormalTok{ https://get.docker.com }\KeywordTok{|} \FunctionTok{sudo}\NormalTok{ sh}
+\FunctionTok{sudo}\NormalTok{ usermod }\AttributeTok{{-}aG}\NormalTok{ docker }\VariableTok{$USER}
+\ExtensionTok{newgrp}\NormalTok{ docker                      }\CommentTok{\# эсвэл дахин нэвтэрнэ}
+
+\ExtensionTok{docker} \AttributeTok{{-}{-}version}
+\ExtensionTok{docker}\NormalTok{ compose version             }\CommentTok{\# v2.20+ байх ёстой}
+\ExtensionTok{docker}\NormalTok{ run }\AttributeTok{{-}{-}rm}\NormalTok{ hello{-}world}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux431.4-ux441ux430ux43dux430ux445-ux43eux439-ux441ux43eux43bux438ux445-ux444ux430ux439ux43bux44bux43d-ux442ux43eux445ux438ux440ux433ux43eux43e-ux437ux430ux430ux432ux430ux43b}{%
+\subsection{Б.4 Санах ой, солих файлын тохиргоо (ЗААВАЛ)}\label{ux431.4-ux441ux430ux43dux430ux445-ux43eux439-ux441ux43eux43bux438ux445-ux444ux430ux439ux43bux44bux43d-ux442ux43eux445ux438ux440ux433ux43eux43e-ux437ux430ux430ux432ux430ux43b}}
+
+ThingsBoard + Postgres нь эхлэх үедээ санах ой ихээр шаарддаг. Анхны тохиргоогоор Pi-гийн swap ердөө 200 MB --- энэ нь Лаб 1-д "container killed (OOM)" алдаа өгнө.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sudo}\NormalTok{ dphys{-}swapfile swapoff}
+\FunctionTok{sudo}\NormalTok{ sed }\AttributeTok{{-}i} \StringTok{\textquotesingle{}s/\^{}CONF\_SWAPSIZE=.*/CONF\_SWAPSIZE=2048/\textquotesingle{}}\NormalTok{ /etc/dphys{-}swapfile}
+\FunctionTok{sudo}\NormalTok{ dphys{-}swapfile setup}
+\FunctionTok{sudo}\NormalTok{ dphys{-}swapfile swapon}
+\FunctionTok{free} \AttributeTok{{-}h}                            \CommentTok{\# Swap: 2.0Gi байх ёстой}
+\end{Highlighting}
+\end{Shaded}
+
+cgroup санах ойн хязгаарлалтыг идэвхжүүлэх (\texttt{docker\ stats}-ын санах ойн тоо зөв гарахад шаардлагатай):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sudo}\NormalTok{ sed }\AttributeTok{{-}i} \StringTok{\textquotesingle{}1 s/$/ cgroup\_enable=memory cgroup\_memory=1/\textquotesingle{}}\NormalTok{ /boot/firmware/cmdline.txt}
+\FunctionTok{sudo}\NormalTok{ reboot}
+\end{Highlighting}
+\end{Shaded}
+
+Шалгах:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{ /proc/cgroups }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ memory   }\CommentTok{\# эхний баганад 1 байх ёстой}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux431.5-ux446ux430ux433ux438ux439ux43d-ux441ux438ux43dux445ux440ux43eux43dux447ux43bux43eux43b-ux437ux430ux430ux432ux430ux43b}{%
+\subsection{Б.5 Цагийн синхрончлол (ЗААВАЛ)}\label{ux431.5-ux446ux430ux433ux438ux439ux43d-ux441ux438ux43dux445ux440ux43eux43dux447ux43bux43eux43b-ux437ux430ux430ux432ux430ux43b}}
+
+Лаб 3, Лаб 5-ын саатлын хэмжилт цагийн зөрүүнээс шалтгаалж утгагүй болдог.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{timedatectl}\NormalTok{ set{-}timezone Asia/Ulaanbaatar}
+\FunctionTok{sudo}\NormalTok{ timedatectl set{-}ntp true}
+\ExtensionTok{timedatectl}\NormalTok{ status                 }\CommentTok{\# "System clock synchronized: yes"}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux431.6-ux441ux430ux43dux433ux430ux430-pi-ux434ux44dux44dux440-ux431ux430ux439ux440ux43bux443ux443ux43bux430ux445}{%
+\subsection{Б.6 Сангаа Pi дээр байрлуулах}\label{ux431.6-ux441ux430ux43dux433ux430ux430-pi-ux434ux44dux44dux440-ux431ux430ux439ux440ux43bux443ux443ux43bux430ux445}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mkdir} \AttributeTok{{-}p}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\FunctionTok{git}\NormalTok{ clone }\OperatorTok{\textless{}}\NormalTok{багийн{-}сангийн{-}хаяг}\OperatorTok{\textgreater{}}\NormalTok{ .}
+\FunctionTok{cp}\NormalTok{ stack/.env.example stack/.env}
+\FunctionTok{nano}\NormalTok{ stack/.env                    }\CommentTok{\# нууц үгсээ солино}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux432.-vs-code-remote-ssh-ux445ux43eux43bux431ux43eux43bux442}{%
+\section{В. VS Code Remote-SSH холболт}\label{ux432.-vs-code-remote-ssh-ux445ux43eux43bux431ux43eux43bux442}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  VS Code → \texttt{Ctrl+Shift+P} → \textbf{Remote-SSH: Add New SSH Host}
+\item
+  \texttt{ssh\ -i\ \textasciitilde{}/.ssh/cnc302\ cnc302@pi-team03.local}
+\item
+  Холбогдоод \texttt{\textasciitilde{}/cnc302} фолдерыг нээнэ
+\item
+  VS Code-ийн терминал одоо Pi дээр ажиллана
+\end{enumerate}
+
+\textbf{Порт дамжуулалт} (хөтчөөрөө Pi-гийн үйлчилгээнд хандах): VS Code-ийн \texttt{PORTS} таб → \texttt{Forward\ a\ Port} → 18083, 8080, 3000, 8181, 1880. Ингэснээр зөөврийн компьютерийн хөтөч дээр \texttt{localhost:8080} гэж ThingsBoard-д ханддаг болно.
+
+\begin{quote}
+Хэрэв VS Code ашиглахгүй бол SSH туннел:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ssh} \AttributeTok{{-}i}\NormalTok{ \textasciitilde{}/.ssh/cnc302 }\AttributeTok{{-}L}\NormalTok{ 8080:localhost:8080 }\AttributeTok{{-}L}\NormalTok{ 3000:localhost:3000 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}L}\NormalTok{ 18083:localhost:18083 }\AttributeTok{{-}L}\NormalTok{ 8181:localhost:8181 cnc302@pi{-}team03.local}
+\end{Highlighting}
+\end{Shaded}
+\end{quote}
+
+\hypertarget{ux433.-ux434ux4afux440ux441ux4afux4afux434ux438ux439ux433-ux443ux440ux44cux434ux447ux438ux43bux430ux43d-ux442ux430ux442ux430ux445-ux447ux443ux445ux430ux43b}{%
+\section{Г. Дүрсүүдийг урьдчилан татах (ЧУХАЛ)}\label{ux433.-ux434ux4afux440ux441ux4afux4afux434ux438ux439ux433-ux443ux440ux44cux434ux447ux438ux43bux430ux43d-ux442ux430ux442ux430ux445-ux447ux443ux445ux430ux43b}}
+
+Лабораторийн цагаар 3 GB дүрс татахад 20--30 минут алдана. \textbf{Бие даалтын цагаар} урьдчилан татна:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack}
+\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core pull}
+\end{Highlighting}
+\end{Shaded}
+
+Татаж дууссаны дараа шалгах:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ images }\AttributeTok{{-}{-}format} \StringTok{\textquotesingle{}\{\{.Repository\}\}:\{\{.Tag\}\}\textbackslash{}t\{\{.Size\}\}\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux434.-ux431ux44dux43bux44dux43d-ux431ux430ux439ux434ux43bux44bux43d-ux448ux430ux43bux433ux430ux43bux442}{%
+\section{Д. Бэлэн байдлын шалгалт}\label{ux434.-ux431ux44dux43bux44dux43d-ux431ux430ux439ux434ux43bux44bux43d-ux448ux430ux43bux433ux430ux43bux442}}
+
+Лаб 1-д ирэхээс өмнө эдгээр бүгд ✔ байх ёстой:
+
+\begin{itemize}
+\tightlist
+\item[$\square$]
+  \texttt{ssh} түлхүүрээр Pi-д нууц үггүй холбогдож байна
+\item[$\square$]
+  \texttt{docker\ run\ -\/-rm\ hello-world} ажиллаж байна
+\item[$\square$]
+  \texttt{free\ -h} → Swap 2.0Gi
+\item[$\square$]
+  \texttt{cat\ /proc/cgroups\ \textbar{}\ grep\ memory} → эхний багана 1
+\item[$\square$]
+  \texttt{timedatectl\ status} → synchronized: yes
+\item[$\square$]
+  \texttt{docker\ compose\ -\/-profile\ core\ pull} алдаагүй дууссан
+\item[$\square$]
+  VS Code Remote-SSH-ээр \texttt{\textasciitilde{}/cnc302} нээгдэж байна
+\item[$\square$]
+  Зөөврийн компьютер дээр \texttt{python\ tools/sim\_device.py\ -\/-dry-run} ажиллаж байна
+\item[$\square$]
+  Багийн Git санд эхний commit хийгдсэн, багш унших эрхтэй
+\end{itemize}
+
+Аль нэг нь ✘ бол лабораторийн өмнөх өдөр багшид хандана.
