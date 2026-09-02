@@ -1,8 +1,37 @@
 % Автоматаар үүсгэсэн — эх файл: docs/troubleshooting.md
 \chapter{Түгээмэл алдаа ба шийдэл}
 
-\hypertarget{docker-ux431ux430-ux441ux442ux435ux43a}{%
-\section{Docker ба стек}\label{docker-ux431ux430-ux441ux442ux435ux43a}}
+Эхлээд үргэлж: {[}Pi{]} \texttt{cd\ edge\ \&\allowbreak{}\&\allowbreak{}\ make\ check} ба {[}ЗК{]} \texttt{cd\ stack\ \&\allowbreak{}\&\allowbreak{}\ make\ health}.
+
+\hypertarget{ux433ux4afux4afux440-bridge-ux445ux43eux43bux431ux43eux433ux434ux43eux445ux433ux4afux439}{%
+\section{1. Гүүр (bridge) холбогдохгүй}\label{ux433ux4afux4afux440-bridge-ux445ux43eux43bux431ux43eux433ux434ux43eux445ux433ux4afux439}}
+
+\textbf{Шинж тэмдэг:} \texttt{make\ link} → \texttt{bridge/state\ 0}, эсвэл огт мессеж гарахгүй.
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шалгах
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Комманд ({[}Pi{]} Pi дээр)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хэвийн бол
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & Pi үүлийг харж байна уу & \texttt{ping\ -c3\ \$CLOUD\_HOST} & хариу ирнэ \\
+2 & 1883 порт нээлттэй юу & \texttt{nc\ -vz\ \$CLOUD\_HOST\ 1883} & succeeded \\
+3 & Гүүрний лог & \texttt{docker\ compose\ logs\ mosquitto\ \textbackslash{}\textbar{}\ tail\ -20} & "Connecting bridge" \\
+4 & bridge.conf үүссэн үү & \texttt{cat\ mosquitto/\allowbreak{}conf.\allowbreak{}d/\allowbreak{}bridge.\allowbreak{}conf} & \texttt{address\ \textless{}IP\textgreater{}:1883} \\
+\end{longtable}\endgroup
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
@@ -10,7 +39,7 @@
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
 \toprule
 \begin{minipage}[b]{\linewidth}\raggedright
-Алдаа
+Алдааны мөр
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Шалтгаан
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -20,89 +49,56 @@
 \endhead
 \bottomrule
 \endlastfoot
-\texttt{no\ space\ left\ on\ device} & дүрс, лог, боть хуримтлагдсан & \texttt{docker\ system\ df} → \texttt{docker\ system\ prune\ -a} (боть хэвээр үлдэнэ) \\
-\texttt{port\ is\ already\ allocated} & өөр процесс портыг эзэлсэн & \texttt{sudo\ ss\ -tlnp\ \textbackslash{}\textbar{}\ grep\ \textless{}порт\textgreater{}} \\
-Контейнер \texttt{Restarting} давтана & OOM эсвэл тохиргооны алдаа & \texttt{docker\ inspect\ \textless{}нэр\textgreater{}\ \textbackslash{}\textbar{}\ grep\ -i\ oomkilled}; логийг үз \\
-\texttt{exec\ format\ error} & дүрс arm64-д зориулагдаагүй & \texttt{docker\ manifest\ inspect\ \textless{}image\textgreater{}\ \textbackslash{}\textbar{}\ grep\ arm64} \\
-\texttt{docker\ stats} санах ойг 0 гэнэ & cgroup memory идэвхгүй & SETUP Б.4 \\
-Compose \texttt{.env} уншихгүй & \texttt{.env} файл \texttt{stack/} дотор биш & \texttt{docker\ compose\ config\ \textbackslash{}\textbar{}\ head} \\
+\texttt{Connection\ refused} & EMQX асаагүй & {[}ЗК{]} \texttt{cd\ stack\ \&\allowbreak{}\&\allowbreak{}\ make\ up} \\
+\texttt{Broken\ pipe} дахин дахин & Галт хана хааж байна & {[}ЗК{]} SETUP.md А.6 \\
+\texttt{No\ route\ to\ host} & Өөр дэд сүлжээ & Хоёуланг нэг свичид кабелиар \\
+\texttt{Error:\allowbreak{}\ Unknown\ configuration\ variable} & Тохиргооны түлхүүр буруу & \texttt{make\ bridge} дахин ажиллуул \\
+\texttt{address\ 192.\allowbreak{}168.\allowbreak{}1.\allowbreak{}100:\allowbreak{}1883} & \texttt{.env} засаагүй & \texttt{nano\ .env} → CLOUD\_HOST \\
 \end{longtable}\endgroup
 
-\hypertarget{thingsboard}{%
-\section{ThingsBoard}\label{thingsboard}}
+\begin{quote}
+\textbf{\texttt{localhost} бичих нь хамгийн түгээмэл алдаа.} Pi дээрх \texttt{localhost} нь Pi өөрөө. Зөөврийн компьютерийн \textbf{LAN IP} хэрэгтэй.
+\end{quote}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
-\toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Алдаа
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шийдэл
-\end{minipage} \\
-\midrule
-\endhead
-\bottomrule
-\endlastfoot
-3 минутаас удаан эхэлнэ & Pi дээр хэвийн. \texttt{start\_period:\ 180s} \\
-\texttt{OOMKilled} & swap 2 GB эсэхийг шалга; \texttt{JAVA\_OPTS} дахь \texttt{-Xmx}-ийг 1200m болго \\
-REST 401 & нууц үг солигдсон эсвэл токен хуучирсан \\
-MQTT холбогдохгүй & ThingsBoard-ын MQTT нь \textbf{1884} порт (EMQX 1883) \\
-Firmware төхөөрөмжид хүрэхгүй & Device → Manage firmware → багцыг оноох \\
-\end{longtable}\endgroup
+\hypertarget{ux433ux4afux4afux440-ux445ux43eux43bux431ux43eux433ux434ux441ux43eux43d-ux447-ux43cux435ux441ux441ux435ux436-ux4afux4afux43bux44dux43dux434-ux445ux4afux440ux44dux445ux433ux4afux439}{%
+\section{2. Гүүр холбогдсон ч мессеж үүлэнд хүрэхгүй}\label{ux433ux4afux4afux440-ux445ux43eux43bux431ux43eux433ux434ux441ux43eux43d-ux447-ux43cux435ux441ux441ux435ux436-ux4afux4afux43bux44dux43dux434-ux445ux4afux440ux44dux445ux433ux4afux439}}
 
-\hypertarget{emqx}{%
-\section{EMQX}\label{emqx}}
-
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
-\toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Алдаа
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шийдэл
-\end{minipage} \\
-\midrule
-\endhead
-\bottomrule
-\endlastfoot
-TLS \texttt{unknown\ ca} & \texttt{-\/-ca} буруу эсвэл сертификат өөр CA-гаас \\
-TLS \texttt{hostname\ mismatch} & серверийн CN нь Pi-гийн нэртэй таарахгүй \\
-Холболт 10000 дээр зогсоно & \texttt{EMQX\_\allowbreak{}LISTENERS\_\allowbreak{}\_\allowbreak{}TCP\_\allowbreak{}\_\allowbreak{}DEFAULT\_\allowbreak{}\_\allowbreak{}MAX\_\allowbreak{}CONNECTIONS} \\
-Самбарт нэвтрэхгүй & \texttt{.env} дэх \texttt{EMQX\_\allowbreak{}DASHBOARD\_\allowbreak{}PASSWORD}; эхний эхлэлтийн дараа зөвхөн самбараас солино \\
-\end{longtable}\endgroup
-
-\hypertarget{influxdb-3-core}{%
-\section{InfluxDB 3 Core}\label{influxdb-3-core}}
-
-InfluxDB 3 Core-ийн CLI түргэн өөрчлөгддөг. Хэрэв \texttt{-\/-without-auth} эсвэл \texttt{-\/-object-store} таних тэмдэг ажиллахгүй бол:
+Бараг үргэлж \textbf{сэдвийн угтвар зөрсөн}. Гүүр зөвхөн \texttt{cnc302/\textless{}SITE\textgreater{}/\#}-ийг дамжуулна.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{docker}\NormalTok{ run }\AttributeTok{{-}{-}rm}\NormalTok{ influxdb:3.2{-}core influxdb3 serve }\AttributeTok{{-}{-}help}
+\CommentTok{\# [Pi] Pi дээр — гүүр юуг дамжуулж байна}
+\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}topic\textquotesingle{}}\NormalTok{ edge/mosquitto/conf.d/bridge.conf}
+
+\CommentTok{\# [Pi] агент юу нийтэлж байна}
+\FunctionTok{grep} \AttributeTok{{-}E} \StringTok{\textquotesingle{}\^{}(SITE|AREA|LINE|DEVICE\_ID)=\textquotesingle{}}\NormalTok{ edge/.env}
+
+\CommentTok{\# [Pi] локал брокер дээр бодитоор юу байна}
+\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}t} \StringTok{\textquotesingle{}\#\textquotesingle{}} \AttributeTok{{-}v} \AttributeTok{{-}W}\NormalTok{ 5}
 \end{Highlighting}
 \end{Shaded}
 
-Шийдэгдэхгүй бол InfluxDB 2.7 руу шилжинэ:
+\texttt{SITE} хоёр газарт ижил байх ёстой. Өөрчилсөн бол \texttt{make\ bridge\ \&\allowbreak{}\&\allowbreak{}\ make\ restart}.
+
+\hypertarget{ux43aux43eux43dux442ux435ux439ux43dux435ux440-oom-ux431ux43eux43bux436-ux443ux43dux430ux43dux430-pi-pi}{%
+\section{3. Контейнер OOM болж унана ({[}Pi{]} Pi)}\label{ux43aux43eux43dux442ux435ux439ux43dux435ux440-oom-ux431ux43eux43bux436-ux443ux43dux430ux43dux430-pi-pi}}
+
+\textbf{Шинж тэмдэг:} контейнер өөрөө дахин эхэлнэ, \texttt{docker\ ps} дээр \texttt{Restarting}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}f}\NormalTok{ docker{-}compose.yml }\AttributeTok{{-}f}\NormalTok{ docker{-}compose.influx2.yml }\AttributeTok{{-}{-}profile}\NormalTok{ core up }\AttributeTok{{-}d}
+\ExtensionTok{docker}\NormalTok{ inspect cnc302{-}mosquitto }\AttributeTok{{-}{-}format} \StringTok{\textquotesingle{}\{\{.State.OOMKilled\}\}\textquotesingle{}}   \CommentTok{\# true бол OOM}
+\FunctionTok{dmesg} \KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}i} \StringTok{\textquotesingle{}killed process\textquotesingle{}} \KeywordTok{|} \FunctionTok{tail} \AttributeTok{{-}5}
+\FunctionTok{free} \AttributeTok{{-}m}
 \end{Highlighting}
 \end{Shaded}
-
-Энэ тохиолдолд Grafana-гийн өгөгдлийн эх сурвалж (SQL биш Flux), Node-RED-ийн бичих зангилаа өөр болно --- \texttt{lab05/reference/influx2/} дотор бэлэн хувилбар байгаа.
-
-\hypertarget{ux441ux4afux43bux436ux44dux44d-ux431ux430-ux445ux43eux43bux431ux43eux43bux442}{%
-\section{Сүлжээ ба холболт}\label{ux441ux4afux43bux436ux44dux44d-ux431ux430-ux445ux43eux43bux431ux43eux43bux442}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
 \toprule
 \begin{minipage}[b]{\linewidth}\raggedright
-Алдаа
+Шалтгаан
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Шийдэл
 \end{minipage} \\
@@ -110,23 +106,187 @@ InfluxDB 3 Core-ийн CLI түргэн өөрчлөгддөг. Хэрэв \text
 \endhead
 \bottomrule
 \endlastfoot
-\texttt{pi-team03.local} олдохгүй & mDNS ажиллахгүй байна --- IP хаягаар хандана (\texttt{hostname\ -I}) \\
-Хөтөч холбогдохгүй & VS Code PORTS таб эсвэл \texttt{ssh\ -L} туннел \\
-MQTT \texttt{Connection\ refused} & Pi дээр брокер ажиллаж байна уу: \texttt{docker\ compose\ ps} \\
-Гэнэт тасалдана & Wi-Fi эрчим хүч хэмнэх горим: \texttt{sudo\ iw\ wlan0\ set\ power\_save\ off} \\
+Swap тохируулаагүй & SETUP.md Б.5 \\
+\texttt{gpu\_mem} 64 хэвээр & SETUP.md Б.3 → 48 MiB чөлөөлнө \\
+VS Code сервер ажиллаж байна & \texttt{pkill\ -f\ vscode-server} \\
+Ширээний орчинтой OS суулгасан & Lite (64-bit) дахин суулга \\
+Үүлний үйлчилгээг Pi дээр асаах гэсэн & СТОП: Битгий. \texttt{stack/} нь \textbf{компьютер дээр}. \\
 \end{longtable}\endgroup
 
-\hypertarget{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux447ux430ux43dux430ux440}{%
-\section{Хэмжилтийн чанар}\label{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux447ux430ux43dux430ux440}}
+\hypertarget{exec-format-error-ux44dux441ux432ux44dux43b-no-matching-manifest}{%
+\section{\texorpdfstring{4. \texttt{exec\ format\ error} эсвэл \texttt{no\ matching\ manifest}}{4. exec format error эсвэл no matching manifest}}\label{exec-format-error-ux44dux441ux432ux44dux43b-no-matching-manifest}}
 
-\begin{itemize}
-\tightlist
-\item
-  Хэмжилтийн өмнө \textbf{бусад ачааллыг зогсооно} (\texttt{htop}-оор шалга)
-\item
-  Гурваас доошгүй удаа давтаж дунджийг авна
-\item
-  \texttt{vcgencmd\ get\_throttled} нь \texttt{0x0} биш бол хэмжилтийг хүчингүй гэж үз
-\item
-  Цагийн синхрончлолгүй бол саатлын хэмжилт утгагүй (\texttt{timedatectl\ status})
-\end{itemize}
+Pi 3B нь \textbf{arm64}. 32-bit OS суулгасан бол олон дүрс байхгүй.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{uname} \AttributeTok{{-}m}          \CommentTok{\# aarch64 байх ЁСТОЙ. armv7l бол 64{-}bit OS дахин суулга.}
+\ExtensionTok{docker}\NormalTok{ manifest inspect eclipse{-}mosquitto:2.0.20 }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}A2}\NormalTok{ arm64}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux445ux44dux43cux436ux438ux43bux442-ux442ux43eux433ux442ux432ux43eux440ux433ux4afux439-ux434ux430ux445ux438ux43d-ux434ux430ux432ux442ux430ux433ux434ux430ux445ux433ux4afux439}{%
+\section{5. Хэмжилт тогтворгүй, дахин давтагдахгүй}\label{ux445ux44dux43cux436ux438ux43bux442-ux442ux43eux433ux442ux432ux43eux440ux433ux4afux439-ux434ux430ux445ux438ux43d-ux434ux430ux432ux442ux430ux433ux434ux430ux445ux433ux4afux439}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{vcgencmd}\NormalTok{ get\_throttled}
+\ExtensionTok{vcgencmd}\NormalTok{ measure\_temp}
+\end{Highlighting}
+\end{Shaded}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Утга
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Утга нь юу вэ
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Үйлдэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\texttt{0x0} & хэвийн & цааш үргэлжлүүл \\
+\texttt{0x50000} & ӨМНӨ НЬ throttling болсон & хөргөөд дахин асаа, дахин хэмж \\
+\texttt{0x50005} & ЯГ ОДОО хүчдэл дутуу + throttling & тэжээлээ соль (5 V / 2.5 A) \\
+темп \textgreater{} 75 °C & хязгаарт ойрхон & хөргөгч, сэнс тавь \\
+\end{longtable}\endgroup
+
+\textbf{Throttling эхэлсэн хэмжилтийг тайланд бичиж болохгүй.} Хаяад дахин хий.
+
+Бусад шалтгаан:
+- microSD дүүрсэн: \texttt{df\ -h\ /} → 90\%+ бол лог, дүрс цэвэрлэ (\texttt{docker\ system\ prune})
+- Цаг синхрончлогдоогүй: \texttt{timedatectl\ status}
+- Wi-Fi ашиглаж байна: кабельд шилжүүлээрэй
+
+\hypertarget{influxdb-3-core-ux44dux445ux43bux44dux445ux433ux4afux439-ux43aux43eux43cux43cux430ux43dux434-ux442ux430ux43dux438ux445ux433ux4afux439}{%
+\section{6. InfluxDB 3 Core эхлэхгүй / комманд танихгүй}\label{influxdb-3-core-ux44dux445ux43bux44dux445ux433ux4afux439-ux43aux43eux43cux43cux430ux43dux434-ux442ux430ux43dux438ux445ux433ux4afux439}}
+
+InfluxDB 3-ийн CLI түргэн өөрчлөгддөг. Нөөц хувилбар руу шилжинэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# [ЗК] компьютер дээр}
+\BuiltInTok{cd}\NormalTok{ stack}
+\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}f}\NormalTok{ docker{-}compose.yml }\AttributeTok{{-}f}\NormalTok{ docker{-}compose.influx2.yml }\DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}profile}\NormalTok{ core up }\AttributeTok{{-}d}
+\end{Highlighting}
+\end{Shaded}
+
+InfluxDB 2.7-д API өөр: \texttt{/\allowbreak{}api/\allowbreak{}v2/\allowbreak{}write?\allowbreak{}org=\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{}\&\allowbreak{}bucket=\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{}} ба Flux/InfluxQL. Лаб 5-ын Node-RED урсгал дахь \texttt{http\ request} зангилааны URL-ийг тохируулна.
+
+\hypertarget{make-bridge-.env-ux43eux43bux434ux441ux43eux43dux433ux4afux439}{%
+\section{\texorpdfstring{7. \texttt{make\ bridge} → \texttt{.env\ олдсонгүй}}{7. make bridge → .env олдсонгүй}}\label{make-bridge-.env-ux43eux43bux434ux441ux43eux43dux433ux4afux439}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ edge}
+\FunctionTok{cp}\NormalTok{ .env.example .env}
+\FunctionTok{nano}\NormalTok{ .env}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{agent-paho-mqtt-ux441ux443ux443ux43bux433ux430ux430ux433ux4afux439-ux431ux430ux439ux43dux430}{%
+\section{\texorpdfstring{8. Agent: \texttt{paho-mqtt\ суулгаагүй\ байна}}{8. Agent: paho-mqtt суулгаагүй байна}}\label{agent-paho-mqtt-ux441ux443ux443ux43bux433ux430ux430ux433ux4afux439-ux431ux430ux439ux43dux430}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ venv        }\CommentTok{\# .venv үүсгэж хамаарлыг суулгана}
+\FunctionTok{make}\NormalTok{ agent}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{numpy} барих гэж оролдоод удаж байвал (Pi 3B дээр эх кодоос барих нь 20+ минут):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{.venv/bin/pip}\NormalTok{ install }\AttributeTok{{-}{-}index{-}url}\NormalTok{ https://www.piwheels.org/simple numpy}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{docker-desktop-ollama-ux44dux445ux43bux44dux445ux433ux4afux439-ux43bux430ux431-8}{%
+\section{9. Docker Desktop: Ollama эхлэхгүй (Лаб 8)}\label{docker-desktop-ollama-ux44dux445ux43bux44dux445ux433ux4afux439-ux43bux430ux431-8}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ info }\AttributeTok{{-}{-}format} \StringTok{\textquotesingle{}\{\{.MemTotal\}\}\textquotesingle{}} \KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}\{printf "\%.1f GB\textbackslash{}n", $1/1024/1024/1024\}\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+4 GB-аас бага бол → Settings → Resources → Memory → 6 GB → Apply \& Restart.
+
+Хүнд үйлчилгээг зогсооно:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ compose stop nodered grafana dex graphql{-}api}
+\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ ai up }\AttributeTok{{-}d}\NormalTok{ ollama}
+\ExtensionTok{docker}\NormalTok{ compose exec ollama ollama pull qwen2.5:1.5b}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{k3s-pod-pending-ux44dux441ux432ux44dux43b-oomkilled-ux43bux430ux431-8}{%
+\section{\texorpdfstring{10. K3s pod \texttt{Pending} эсвэл \texttt{OOMKilled} (Лаб 8)}{10. K3s pod Pending эсвэл OOMKilled (Лаб 8)}}\label{k3s-pod-pending-ux44dux441ux432ux44dux43b-oomkilled-ux43bux430ux431-8}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 describe pod }\OperatorTok{\textless{}}\NormalTok{нэр}\OperatorTok{\textgreater{}} \KeywordTok{|} \FunctionTok{tail} \AttributeTok{{-}25}
+\ExtensionTok{kubectl}\NormalTok{ top nodes}
+\ExtensionTok{kubectl}\NormalTok{ top pods }\AttributeTok{{-}n}\NormalTok{ cnc302}
+\end{Highlighting}
+\end{Shaded}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Шалтгаан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шийдэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Docker зэрэг ажиллаж байна & \texttt{sudo\ systemctl\ stop\ docker} \\
+traefik/servicelb асаалттай & K3s-ийг \texttt{-\/\allowbreak{}-disable\ traefik\ -\/\allowbreak{}-disable\ servicelb}-ээр дахин суулга \\
+\texttt{requests} хэт өндөр & \texttt{01-config.yaml}, манифестийн requests-ийг бага болго \\
+Дүрс олдохгүй (\texttt{ErrImagePull}) & \texttt{docker\ save\ cnc302/edge-agent:v1\ \textbackslash{}\textbar{}\ sudo\ k3s\ ctr\ images\ import\ -} \\
+metrics-server байхгүй → HPA \texttt{\textless{}unknown\textgreater{}} & metrics-server-ийг битгий унтраа \\
+\end{longtable}\endgroup
+
+\hypertarget{git-pi-ux431ux430-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux434ux44dux44dux440ux445-ux445ux443ux432ux438ux43bux431ux430ux440-ux437ux4e9ux440ux4e9ux432}{%
+\section{11. Git: Pi ба компьютер дээрх хувилбар зөрөв}\label{git-pi-ux431ux430-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux434ux44dux44dux440ux445-ux445ux443ux432ux438ux43bux431ux430ux440-ux437ux4e9ux440ux4e9ux432}}
+
+Кодыг Pi дээр шууд засаад мартах нь энэ курсын хамгийн түгээмэл алдагдсан ажил.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# [Pi] Pi дээр}
+\FunctionTok{git}\NormalTok{ status }\AttributeTok{{-}{-}short}          \CommentTok{\# засвар байвал commit хийж push хийнэ}
+\FunctionTok{git}\NormalTok{ add }\AttributeTok{{-}A} \KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб N: Pi дээрх засвар"} \KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push}
+
+\CommentTok{\# [ЗК] компьютер дээр}
+\FunctionTok{git}\NormalTok{ pull }\AttributeTok{{-}{-}rebase}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Зөвлөмж:} VS Code Remote-SSH ашиглавал нэг л хуулбар дээр ажиллана --- энэ асуудал үүсэхгүй.
+
+\hypertarget{ux43dux443ux443ux446-ux43cux44dux434ux44dux44dux43bux44dux43b-git-ux434-ux43eux440ux447ux438ux445ux432ux43eux43b}{%
+\section{12. Нууц мэдээлэл Git-д орчихвол}\label{ux43dux443ux443ux446-ux43cux44dux434ux44dux44dux43bux44dux43b-git-ux434-ux43eux440ux447ux438ux445ux432ux43eux43b}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ rm }\AttributeTok{{-}{-}cached}\NormalTok{ stack/.env edge/mosquitto/conf.d/bridge.conf lab02/out/devices.csv}
+\FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Нууц файлыг устгав"}
+\end{Highlighting}
+\end{Shaded}
+
+⚠ Түүхэнд үлдсэн хэвээр. \textbf{Нууц үг, түлхүүрийг бүгдийг нь солино.} Push хийсэн бол \texttt{git\ filter-repo} шаардлагатай --- багшид хандана.

@@ -1,7 +1,103 @@
 % Автоматаар үүсгэсэн — эх файл: docs/resource-budget.md
 \chapter{Нөөцийн төсөв}
 
-Энэ хүснэгт нь \textbf{чиглүүлэх тооцоо}. Бодит утгыг Лаб 1-д өөрсдөө хэмжинэ.
+Энэ бол \textbf{чиглүүлэх тооцоо}. Бодит утгыг Лаб 1-д өөрсдөө хэмжинэ.
+
+\hypertarget{pi-raspberry-pi-3b-1-gb-ux44bux43d-ux430ux440ux438ux444ux43cux435ux442ux438ux43a}{%
+\section{1. {[}Pi{]} Raspberry Pi 3B --- 1 GB-ын арифметик}\label{pi-raspberry-pi-3b-1-gb-ux44bux43d-ux430ux440ux438ux444ux43cux435ux442ux438ux43a}}
+
+\hypertarget{ux44eux443-ux445ux430ux430ux43dux430-ux44fux432ux434ux430ux433-ux432ux44d}{%
+\subsection{Юу хаана явдаг вэ}\label{ux44eux443-ux445ux430ux430ux43dux430-ux44fux432ux434ux430ux433-ux432ux44d}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Хэсэг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+MiB
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Тэмдэглэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Нийт физик санах ой & 1024 & \\
+GPU-д (\texttt{gpu\_mem=16}) & −16 & анхдагч 64 → 48 MiB хэмнэнэ \\
+Цөм + firmware & \textasciitilde85 & \\
+\textbf{Системд харагдах (\texttt{MemTotal})} & \textbf{\textasciitilde925} & \texttt{free\ -m} энийг харуулна \\
+Pi OS Lite, headless, амарч байгаа & −90\ldots−130 & systemd, sshd, journald \\
+Docker демон & −60\ldots−80 & \texttt{dockerd} + \texttt{containerd} \\
+\textbf{Ажилд боломжтой} & \textbf{\textasciitilde720\ldots780} & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux438ux440ux43cux44dux433ux438ux439ux43d-ux4afux439ux43bux447ux438ux43bux433ux44dux44dux43dux438ux439-ux442ux4e9ux441ux4e9ux432}{%
+\subsection{Ирмэгийн үйлчилгээний төсөв}\label{ux438ux440ux43cux44dux433ux438ux439ux43d-ux4afux439ux43bux447ux438ux43bux433ux44dux44dux43dux438ux439-ux442ux4e9ux441ux4e9ux432}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Үйлчилгээ
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Compose хязгаар
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Бодит амралтын хэрэглээ
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Тэмдэглэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\texttt{mosquitto} & 128 MiB & 12--25 MiB & Дараалал дүүрэхэд өснө: 100k мессеж × 250 B ≈ 25 MiB \\
+ирмэгийн агент (venv) & 200 MiB (systemd) & 45--70 MiB & numpy \textasciitilde25 MiB эзэлнэ \\
++ TFLite дүгнэлт (Лаб 6) & ↑ & +40\ldots+90 MiB & загварын хэмжээ ба цонхноос хамаарна \\
+VS Code Remote сервер & --- & \textbf{150--250 MiB} & ⚠ хэмжилтийн өмнө таслах! \\
+\end{longtable}\endgroup
+
+\textbf{Нийлбэр (Лаб 1--5):} \textasciitilde120 MiB → \textbf{600 MiB илүүдэлтэй.} Тав тухтай.
+\textbf{Нийлбэр (Лаб 6, дүгнэлттэй):} \textasciitilde200 MiB → \textbf{520 MiB илүүдэлтэй.} Хангалттай.
+\textbf{Лаб 8 (K3s):} доорх §3-ыг үзнэ үү --- энэ нь хамгийн чанга.
+
+\hypertarget{ux445ux44dux437ux44dux44d-ux430ux43dux445ux430ux430ux440ux430ux445-ux432ux44d}{%
+\subsection{Хэзээ анхаарах вэ}\label{ux445ux44dux437ux44dux44d-ux430ux43dux445ux430ux430ux440ux430ux445-ux432ux44d}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{free} \AttributeTok{{-}m} \KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}/Mem:/\{print $7 " MiB available"\}\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Үлдэгдэл
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Утга
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\textgreater{} 400 MiB & хэвийн \\
+150--400 MiB & болгоомжтой --- шинэ үйлчилгээ нэмэхээс өмнө хэмж \\
+\textless{} 150 MiB & \textbf{аюултай} --- swap идэвхжиж, бүх саатал 10--100 дахин өснө \\
+swap \texttt{si/so} \textgreater{} 0 & аль хэдийн хязгаарт хүрсэн. Энэ нь \textbf{хэмжилт}, алдаа биш. \\
+\end{longtable}\endgroup
+
+\texttt{tools/\allowbreak{}measure\_stack.\allowbreak{}sh\ -\/\allowbreak{}-role\ edge} эдгээрийг автоматаар шалгана.
+
+\hypertarget{ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux4afux4afux43bux43dux438ux439-ux434ux430ux432ux445ux430ux440ux433ux430}{%
+\section{2. {[}ЗК{]} Зөөврийн компьютер --- үүлний давхарга}\label{ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux4afux4afux43bux43dux438ux439-ux434ux430ux432ux445ux430ux440ux433ux430}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
@@ -17,7 +113,7 @@
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Compose хязгаар
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хүлээгдэх амралтын хэрэглээ
+Хүлээгдэх хэрэглээ
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Тэмдэглэл
 \end{minipage} \\
@@ -25,66 +121,83 @@ Compose хязгаар
 \endhead
 \bottomrule
 \endlastfoot
-emqx & core & 1024 MiB & 150--250 MiB & Холболт нэмэгдэхэд өснө (\textasciitilde4 KiB/холболт) \\
-thingsboard & core & 2500 MiB & 1200--1800 MiB & JVM + Postgres нэг контейнерт \\
-influxdb & core & 1024 MiB & 250--500 MiB & Бичилтийн ачаалалтай өснө \\
-grafana & core & 512 MiB & 120--200 MiB & Самбарын тоогоор өснө \\
-nodered & pipeline & 512 MiB & 120--200 MiB & Урсгалын нарийвчлалаас хамаарна \\
-dex & app & 256 MiB & 30--60 MiB & \\
-graphql-api & app & 512 MiB & 80--150 MiB & Python/FastAPI \\
-ollama & ai & 3072 MiB & загвараас хамаарна & 1.5B загвар ≈ 1.2--2 GiB \\
+\texttt{emqx} & core & 1024 MiB & 150--250 MiB & Холболт нэмэгдэхэд \textasciitilde4 KiB/холболт \\
+\texttt{influxdb} & core & 1024 MiB & 250--500 MiB & Бичилтийн ачаалалтай өснө \\
+\texttt{grafana} & core & 512 MiB & 120--200 MiB & Самбарын тоогоор өснө \\
+\texttt{registry} & core & 384 MiB & 60--110 MiB & FastAPI + SQLite \\
+\texttt{nodered} & pipeline & 512 MiB & 120--200 MiB & Урсгалын нарийвчлалаас \\
+\texttt{dex} & app & 256 MiB & 30--60 MiB & \\
+\texttt{graphql-api} & app & 512 MiB & 80--150 MiB & Python/FastAPI \\
+\texttt{ollama} & ai & 4096 MiB & загвараас & qwen2.5:1.5b q4 ≈ 1.2--1.6 GiB + KV \\
+\texttt{thingsboard} & tb (сонголт) & 2500 MiB & 1200--1800 MiB & зөвхөн Лаб 2-ын харьцуулалт \\
 \end{longtable}\endgroup
 
 \hypertarget{ux43fux440ux43eux444ux430ux439ux43bux44bux43d-ux43dux438ux439ux43bux431ux44dux440}{%
-\section{Профайлын нийлбэр}\label{ux43fux440ux43eux444ux430ux439ux43bux44bux43d-ux43dux438ux439ux43bux431ux44dux440}}
+\subsection{Профайлын нийлбэр}\label{ux43fux440ux43eux444ux430ux439ux43bux44bux43d-ux43dux438ux439ux43bux431ux44dux440}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Хослол
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хязгаарын нийлбэр
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Практикт
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Дүгнэлт
-\end{minipage} \\
+Хослол & Хязгаарын нийлбэр & Практикт & Docker Desktop-д хэрэгтэй \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
-core & 5.0 GiB & 1.7--2.7 GiB & Лаб 1--4-т тохиромжтой \\
-core + pipeline & 5.5 GiB & 1.9--2.9 GiB & Лаб 5 \\
-core + pipeline + app & 6.3 GiB & 2.0--3.1 GiB & Лаб 7 \\
-бүгд + ai & 9.4 GiB & \textbf{8 GiB давна} & Лаб 8-д зарим үйлчилгээг зогсооно \\
+core & 2.9 GiB & 0.6--1.1 GiB & 4 GB \\
+core + pipeline & 3.4 GiB & 0.7--1.3 GiB & 4 GB \\
+core + pipeline + app & 4.2 GiB & 0.8--1.5 GiB & 4 GB \\
++ ai (Лаб 8) & 8.2 GiB & 2.0--3.1 GiB & \textbf{6 GB} \\
+core + tb (Лаб 2 сонголт) & 5.4 GiB & 1.8--2.9 GiB & \textbf{6 GB} \\
 \end{longtable}\endgroup
 
-\hypertarget{ux43bux430ux431-8-ux44bux43d-ux437ux4e9ux432ux43bux4e9ux43cux436}{%
-\section{Лаб 8-ын зөвлөмж}\label{ux43bux430ux431-8-ux44bux43d-ux437ux4e9ux432ux43bux4e9ux43cux436}}
+\begin{quote}
+\textbf{Харьцуулалт:} ThingsBoard ГАНЦААРАА 1.2--1.8 GiB эзэлнэ --- энэ нь Pi 3B-ийн НИЙТ санах ойноос \textbf{хоёр дахин их}. Лаб 2-ын хяналтын асуултад: "яагаад ирмэг дээр бүрэн платформ ажиллуулж болохгүй вэ?" гэдгийн тоон хариулт нь энэ.
+\end{quote}
+
+\hypertarget{pi-ux43bux430ux431-8-k3s-ux438ux439ux43d-ux441ux430ux43dux430ux445-ux43eux439ux43d-ux442ux4e9ux441ux4e9ux432}{%
+\section{3. {[}Pi{]} Лаб 8 --- K3s-ийн санах ойн төсөв}\label{pi-ux43bux430ux431-8-k3s-ux438ux439ux43d-ux441ux430ux43dux430ux445-ux43eux439ux43d-ux442ux4e9ux441ux4e9ux432}}
+
+Лаб 8-д Pi дээр \textbf{Docker-ийг зогсоож}, K3s-ийг ажиллуулна. Хоёуланг зэрэг ажиллуулах орон зай байхгүй.
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+Хэсэг & Requests & Бодит \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+k3s server (containerd + kubelet + API + sqlite) & --- & 250--350 MiB \\
+coredns & 70 MiB & \textasciitilde25 MiB \\
+metrics-server (HPA-д ЗААВАЛ) & 70 MiB & \textasciitilde30 MiB \\
+local-path-provisioner & --- & \textasciitilde10 MiB \\
+\texttt{mosquitto} pod & 64 MiB & 12--25 MiB \\
+\texttt{edge-agent} pod & 64 MiB & 45--70 MiB \\
+\textbf{Нийт requests} & \textbf{268 MiB} & \\
+\textbf{Бодит нийлбэр} & & \textbf{\textasciitilde400--510 MiB} \\
+Allocatable (925 − цөм − k3s үндэс) & \textasciitilde825 MiB & \\
+\end{longtable}\endgroup
+
+\textbf{Дүгнэлт:} ажиллана, гэхдээ \texttt{traefik} ба \texttt{servicelb}-ийг заавал унтраана (тус бүр 60--90 MiB). HPA 2 хувь болтол өргөжиж чадна; 3 дахь хувь OOMKilled болно --- \textbf{энэ нь Лаб 8-ын гол ажиглалт}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{docker}\NormalTok{ compose stop nodered grafana dex graphql{-}api}
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ ai up }\AttributeTok{{-}d}\NormalTok{ ollama}
-\ExtensionTok{ollama}\NormalTok{ pull qwen2.5:1.5b        }\CommentTok{\# 3B{-}ээс дээш загвар Pi дээр хэт удаан}
+\ExtensionTok{curl} \AttributeTok{{-}sfL}\NormalTok{ https://get.k3s.io }\KeywordTok{|} \FunctionTok{sh} \AttributeTok{{-}s} \AttributeTok{{-}} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}disable}\NormalTok{ traefik }\AttributeTok{{-}{-}disable}\NormalTok{ servicelb }\AttributeTok{{-}{-}write{-}kubeconfig{-}mode}\NormalTok{ 644}
 \end{Highlighting}
 \end{Shaded}
 
 \hypertarget{ux441ux430ux43dux430ux43cux436}{%
-\section{Санамж}\label{ux441ux430ux43dux430ux43cux436}}
+\section{4. Санамж}\label{ux441ux430ux43dux430ux43cux436}}
 
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Swap 2 GB заавал.} Үгүй бол ThingsBoard эхлэхдээ OOM болно.
+  \texttt{deploy.resources.limits} нь \textbf{хязгаар} л тавьдаг, нөөц \textbf{баталгаажуулдаггүй}. Pi дээр хязгаарыг давсан контейнерийг цөм OOM-оор устгана; лог нь \texttt{docker\ inspect\ \textless{}c\textgreater{}\ \textbar{}\ grep\ OOMKilled}.
 \item
-  \texttt{deploy.resources.limits} нь хязгаар л тавьдаг, нөөц \textbf{баталгаажуулдаггүй}.
+  \texttt{docker\ stats}-ын санах ойн тоо зөв гарахад \texttt{cgroup\_enable=memory} хэрэгтэй (SETUP.md Б.5).
 \item
-  \texttt{docker\ stats}-ын санах ойн тоо зөв гарахад \texttt{cgroup\_enable=memory} хэрэгтэй.
+  Идэвхтэй хөргөлт байхгүй бол Pi 3B ачаалал дор 80 °C давж, давтамжаа бууруулна --- бүх хэмжилт гажина. \texttt{vcgencmd\ get\_throttled} нь \textbf{\texttt{0x0}} байх ёстой.
 \item
-  Идэвхтэй хөргөлт байхгүй бол Pi 5 ачаалал дор 80 °C давж, давтамжаа бууруулна --- бүх хэмжилт гажина. \texttt{vcgencmd\ get\_throttled} нь \texttt{0x0} байх ёстой.
+  microSD-гийн бичих хурд (10--25 MB/s) нь InfluxDB, mosquitto persistence, swap гурвыг зэрэг хязгаарлана. Лаб 5-д үүнийг бодитоор хэмжинэ.
+\item
+  Хэмжилтийн өмнө \textbf{VS Code Remote серверийг таслах}: \texttt{pkill\ -f\ vscode-server}. 150--250 MiB ялгаа гарна.
 \end{itemize}

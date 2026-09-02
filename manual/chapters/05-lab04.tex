@@ -1,5 +1,5 @@
 % Автоматаар үүсгэсэн — эх файл: lab04/README.md
-\chapter{Лаб 4 — Rule Engine ба ачааллын тест}
+\chapter{Лаб 4 — Багтаамжийн хязгаар: ирмэг ба үүл}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
@@ -10,28 +10,43 @@
 \endlastfoot
 \textbf{7 хоног} & IX \\
 \textbf{Хугацаа} & 4 цаг \\
-\textbf{Суралцахуйн үр дүн} & ҮД2 (өргөтгөх), ҮД4, ҮД6, ҮД8 \\
+\textbf{Суралцахуйн үр дүн} & ҮД2 (өргөтгөх боломжтой backend), ҮД4, ҮД6, ҮД8 \\
 \textbf{Үнэлгээ} & \textbf{10 минутын багийн ҮЗҮҮЛЭН} (бичгийн тайлан биш), 10 оноо \\
+\textbf{Гол хэмжилт} & Аль нөөц ХАМГИЙН ТҮРҮҮНД ханав --- RAM, CPU, 100 Mbit уплинк эсвэл microSD \\
 \end{longtable}\endgroup
 
 \hypertarget{ux437ux43eux440ux438ux43bux433ux43e}{%
 \section{1. Зорилго}\label{ux437ux43eux440ux438ux43bux433ux43e}}
 
-Энэ бол хичээлийн \textbf{гол лаборатори}. Хоёр асуултад тоон хариулт өгнө:
+Энэ бол хичээлийн \textbf{гол лаборатори}. Та нэг брокер биш, \textbf{хоёр брокерыг} ачаалж, тэдгээрийн хязгаарыг харьцуулна:
+
+\begin{itemize}
+\tightlist
+\item
+  {[}Pi{]} Raspberry Pi 3B дээрх \textbf{mosquitto} --- 1 GB RAM, 4×Cortex-A53, 100 Mbit уплинк (USB 2.0), microSD
+\item
+  {[}ЗК{]} Зөөврийн компьютер дээрх \textbf{EMQX} --- олон GB RAM, олон цөм, SSD
+\end{itemize}
+
+Гурван асуултад тоон хариулт өгнө:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  Мессежийг \textbf{хаана} боловсруулах вэ --- брокер дээр үү, платформ дээр үү, хэрэглэгч дээр үү?
+  Хоёр брокер тус бүр хэдэн холболт, хэдэн мессеж/сек даах вэ?
 \item
-  Нэг Raspberry Pi 5 \textbf{хэдэн төхөөрөмж} даах вэ? Хязгаар нь юу вэ --- CPU, санах ой, эсвэл холболтын тоо?
+  \textbf{Аль нөөц түрүүлж ханав?} --- RAM, CPU, уплинк, эсвэл microSD. Хариултаа \textbf{нотол}, зүгээр битгий бич.
+\item
+  Мессежийг хаана боловсруулах вэ --- брокер дээр (EMQX rule engine) үү, тусдаа хэрэглэгч дээр үү?
 \end{enumerate}
 
-Лаб 1-д та шугаман экстраполяциар таамаг гаргасан. Өнөөдөр түүнийг \textbf{бодитоор шалгана}. Таамаг зөв гарах албагүй --- буруу гарвал тэр нь илүү сонирхолтой үр дүн.
+\begin{quote}
+\textbf{Хамгийн чухал зарчим:} "Pi 3B 200 холболт даасан" гэдэг нь хариулт биш. "200 холболт дээр сул RAM 118 MiB болж swap \texttt{si/so} тэгээс өссөн, харин CPU 140\% буюу 4 цөмийн 35\% л байсан --- тиймээс хязгаар нь \textbf{санах ой}" гэдэг нь хариулт. Үзүүлэнгийн оноо энэ ялгаан дээр тогтоно.
+\end{quote}
 
 \begin{quote}
-\textbf{Анхаар:} энэ лабораторийг бичгийн тайлангаар биш, \textbf{үзүүлэнгээр} үнэлнэ. Багийн гурван гишүүн бүгд ярина. Слайд шаардлагагүй --- ажиллаж буй график, тоо л хангалттай.
+\textbf{Анхаар:} энэ лабораторийг \textbf{үзүүлэнгээр} үнэлнэ. Багийн гурван гишүүн бүгд ярина. Слайд шаардлагагүй --- ажиллаж буй график ба тоо хангалттай.
 \end{quote}
 
 \hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}{%
@@ -40,33 +55,89 @@
 \begin{itemize}
 \tightlist
 \item
-  Лаб 1--3 дууссан, \texttt{lab01}-ийн Хүснэгт 5 (нөөцийн төсөв) \textbf{гар дор байх ёстой}
+  Лаб 1--3 дууссан. \textbf{Лаб 1-ийн Хүснэгт 1.5 (ирмэгийн ачааллын хариу үйлдэл) ба Лаб 3-ын Хүснэгт 3.6 (ачааллын хэмжээний нөлөө) гар дор байх ёстой} --- өнөөдөр тэдгээрээс таамаг гаргана.
 \item
-  Зөөврийн компьютер дээр Docker суусан (emqtt-bench-д хэрэгтэй)
-\item
-  Файлын дескрипторын хязгаар өргөжсөн:
+  {[}ЗК{]} Файлын дескрипторын хязгаар өргөжсөн, дүрс татагдсан:
 \end{itemize}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\BuiltInTok{ulimit} \AttributeTok{{-}n}                 \CommentTok{\# 1024 бол хангалтгүй}
-\BuiltInTok{ulimit} \AttributeTok{{-}n}\NormalTok{ 65535           }\CommentTok{\# Linux/macOS}
-\CommentTok{\# Windows: WSL2 дотор ажиллуулна}
-\end{Highlighting}
-\end{Shaded}
-
-Дүрсийг урьдчилан татна:
-
-\begin{Shaded}
-\begin{Highlighting}[]
+\BuiltInTok{ulimit} \AttributeTok{{-}n}                     \CommentTok{\# 1024 бол хангалтгүй}
+\BuiltInTok{ulimit} \AttributeTok{{-}n}\NormalTok{ 65535               }\CommentTok{\# Linux/macOS; Windows дээр WSL2 дотор}
 \ExtensionTok{docker}\NormalTok{ pull emqx/emqtt{-}bench:0.4.20}
 \end{Highlighting}
 \end{Shaded}
 
+\begin{itemize}
+\tightlist
+\item
+  {[}Pi{]} Pi бэлэн: \texttt{cd\ \textasciitilde{}/cnc302/edge\ \&\&\ make\ check\ \&\&\ make\ mem} → бүгд OK, throttle \texttt{0x0}
+\item
+  {[}ЗК{]} EMQX-ийн нууц үг терминалд бэлэн:
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{export} \VariableTok{EMQX\_DASHBOARD\_PASSWORD}\OperatorTok{=}\StringTok{\textquotesingle{}\textless{}stack/.env дэх утга\textgreater{}\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  {[}Pi{]} Pi дээр терминал бүрд: \texttt{set\ -a\ \&\&\ source\ \textasciitilde{}/cnc302/edge/.env\ \&\&\ set\ +a}
+\end{itemize}
+
 \hypertarget{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}{%
 \section{3. Онолын сануулга}\label{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}}
 
-\textbf{Мессежийг хаана боловсруулах вэ?}
+\hypertarget{ux445ux430ux43dux430ux43bux442-saturation-ux433ux443ux440ux432ux430ux43d-ux4afux435-ux448ux430ux442ux442ux430ux439}{%
+\subsection{Ханалт (saturation) гурван үе шаттай}\label{ux445ux430ux43dux430ux43bux442-saturation-ux433ux443ux440ux432ux430ux43d-ux4afux435-ux448ux430ux442ux442ux430ux439}}
+
+Ачаалал нэмэгдэхэд систем эхлээд \textbf{шугаман} өснө, дараа нь \textbf{тэгширнэ}, эцэст нь \textbf{буурна}. Сүүлийн үе шат хамгийн аюултай: систем ажиллаж байгаа мэт харагдаад бодит хүчин чадал нь буурсан байдаг. Түүнийг олж харах нь энэ лабораторийн зорилго.
+
+\hypertarget{ux434ux4e9ux440ux432ux4e9ux43d-ux431ux43eux43bux43eux43cux436ux438ux442-ux445ux44fux437ux433ux430ux430ux440ux43bux430ux433ux447-ux431ux430-ux442ux44dux434ux433ux44dux44dux440ux438ux439ux43d-ux433ux430ux440ux44bux43d-ux4afux441ux44dux433}{%
+\subsection{Дөрвөн боломжит хязгаарлагч ба тэдгээрийн гарын үсэг}\label{ux434ux4e9ux440ux432ux4e9ux43d-ux431ux43eux43bux43eux43cux436ux438ux442-ux445ux44fux437ux433ux430ux430ux440ux43bux430ux433ux447-ux431ux430-ux442ux44dux434ux433ux44dux44dux440ux438ux439ux43d-ux433ux430ux440ux44bux43d-ux4afux441ux44dux433}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Хязгаарлагч
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Ямар тоогоор илэрнэ
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хаанаас харах
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\textbf{RAM} & сул RAM буурч 150 MiB-ээс доош, swap \texttt{si/so} \textgreater{} 0 & \texttt{measure\_stack.sh}, \texttt{vmstat\ 1} \\
+\textbf{CPU} & нийт CPU 380--400\% (4 цөм × 100\%) & \texttt{docker\ stats}, \texttt{cpu\_\allowbreak{}total\_\allowbreak{}pct} \\
+\textbf{Уплинк} & Mbit/с 90--95-д ойртоно, саатал огцом өснө & \texttt{docker\ stats} NET I/O, тооцоо \\
+\textbf{microSD} & I/O хүлээлт (\texttt{wa}) өснө, mosquitto-гийн persistence удаашрана & \texttt{vmstat\ 1}, \texttt{iostat} \\
+\end{longtable}\endgroup
+
+Pi 3B дээр \textbf{ихэвчлэн RAM түрүүлдэг, CPU биш} --- гэхдээ энэ бол таамаг. Өнөөдөр үүнийг батлах эсвэл няцаах нь та.
+
+\hypertarget{ux443ux43fux43bux438ux43dux43aux438ux439ux43d-ux430ux440ux438ux444ux43cux435ux442ux438ux43a-ux445ux44dux43cux436ux438ux445ux44dux44dux441ux44dux44d-ux4e9ux43cux43dux4e9-ux442ux43eux43eux446ux43eux43eux43b}{%
+\subsection{Уплинкийн арифметик --- хэмжихээсээ ӨМНӨ тооцоол}\label{ux443ux43fux43bux438ux43dux43aux438ux439ux43d-ux430ux440ux438ux444ux43cux435ux442ux438ux43a-ux445ux44dux43cux436ux438ux445ux44dux44dux441ux44dux44d-ux4e9ux43cux43dux4e9-ux442ux43eux43eux446ux43eux43eux43b}}
+
+\begin{verbatim}
+Bitrate (Mbit/с) = N_холболт × R_мсж/с × S_байт × 8 / 1 000 000
+\end{verbatim}
+
+\texttt{loadtest.sh} нь \texttt{pub} горимд яг үүнийг өөрөө хэвлэдэг. 100 Mbit холбоос дээр бодит хүрэх дээд хурд \textbf{\textasciitilde90--95 Mbit/с} бөгөөд Ethernet нь USB 2.0-тэй зурвасаа хуваана.
+
+\begin{quote}
+\textbf{Урхи:} \texttt{loadtest.sh}-ийн анхдагч сэдэв нь \texttt{cnc302/\allowbreak{}bench/\allowbreak{}\%i/\allowbreak{}telemetry}. Гүүр нь зөвхөн \texttt{cnc302/\textless{}SITE\textgreater{}/\#}-ийг үүл рүү дамжуулдаг тул \textbf{анхдагч ачаалал уплинкийг огт хөндөхгүй} --- зөвхөн Pi-гийн mosquitto-г ачаална. Уплинкийг ачаалах бол \texttt{TOPIC}-ыг гүүрээр дамжих угтвартай болгох ёстой (Алхам 3.3).
+\end{quote}
+
+\hypertarget{ux445ux430ux430ux43dux430-ux431ux43eux43bux43eux432ux441ux440ux443ux443ux43bux430ux445-ux432ux44d}{%
+\subsection{Хаана боловсруулах вэ}\label{ux445ux430ux430ux43dux430-ux431ux43eux43bux43eux432ux441ux440ux443ux443ux43bux430ux445-ux432ux44d}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
@@ -84,300 +155,146 @@
 \endhead
 \bottomrule
 \endlastfoot
-Брокер дээр (EMQX Rule Engine) & хамгийн бага саатал, нэмэлт сүлжээний давхарга үгүй & брокерын CPU иднэ, дүрэм нь SQL-ээр хязгаарлагдмал \\
-Платформ дээр (ThingsBoard Rule Chain) & баялаг логик, төхөөрөмжийн контексттэй & нэмэлт үсрэлт, ThingsBoard-ын JVM ачаалагдана \\
-Тусдаа хэрэглэгч (Node-RED, Python) & бүрэн уян хатан, тусдаа өргөтгөнө & хамгийн их саатал, ажиллуулах нэмэлт үйлчилгээ \\
+Брокер дээр (EMQX rule engine) & хамгийн бага саатал, нэмэлт үсрэлт үгүй & брокерын CPU иднэ, SQL-ээр хязгаарлагдмал \\
+Тусдаа хэрэглэгч (Node-RED, Python) & бүрэн уян хатан, тусад нь өргөтгөнө & нэмэлт үсрэлт, нэмэлт үйлчилгээ \\
+Ирмэг дээр (агент) & уплинк хэмнэнэ, холбоос тасарсан ч ажиллана & Pi-гийн CPU/RAM хязгаартай \\
 \end{longtable}\endgroup
-
-Энэ шийдвэрийг \textbf{зөн совингоор биш, хэмжилтээр} гаргах ёстой. Өнөөдөр гурвуулангийнх нь саатлыг хэмжинэ.
-
-\textbf{Хэвтээ ба босоо өргөтгөл.} Pi 5-ыг "илүү том" болгож чадахгүй (босоо өргөтгөл боломжгүй). Тиймээс цорын ганц зам бол \textbf{хэвтээ} --- олон зангилаа. Гэхдээ өргөтгөхийн өмнө \textbf{хаана мөргөж байгааг} мэдэх ёстой.
-
-\textbf{Саturation (ханалт).} Систем ачаалал нэмэгдэхэд эхлээд шугаман өснө, дараа нь тэгширнэ, эцэст нь \textbf{буурна}. Сүүлийн үе шат хамгийн аюултай: систем ажиллаж байгаа мэт харагдаад бодит хүчин чадал нь буурна. Үүнийг олж харах нь энэ лабораторийн гол зорилго.
 
 \hypertarget{ux430ux43bux445ux43cux443ux443ux434}{%
 \section{4. Алхмууд}\label{ux430ux43bux445ux43cux443ux443ux434}}
 
-\hypertarget{ux430ux43bux445ux430ux43c-1-emqx-rule-engine-40-ux43cux438ux43d}{%
-\subsection{Алхам 1 --- EMQX Rule Engine (40 мин)}\label{ux430ux43bux445ux430ux43c-1-emqx-rule-engine-40-ux43cux438ux43d}}
+\hypertarget{ux430ux43bux445ux430ux43c-1-ux441ux443ux443ux440ux44c-ux442ux4e9ux43bux4e9ux432-ux445ux43eux451ux440-ux445ux43eux441ux442-ux434ux44dux44dux440-20-ux43cux438ux43d-piux437ux43a}{%
+\subsection{Алхам 1 --- Суурь төлөв, хоёр хост дээр (20 мин) {[}Pi{]}{[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-1-ux441ux443ux443ux440ux44c-ux442ux4e9ux43bux4e9ux432-ux445ux43eux451ux440-ux445ux43eux441ux442-ux434ux44dux44dux440-20-ux43cux438ux43d-piux437ux43a}}
 
-\textbf{1.1} EMQX самбар (\texttt{:18083}) → \textbf{Integration → Rules → Create}.
-
-Дүрэм 1 --- чичиргээний хэт өндөр утгыг шүүх:
+Ачаалал өгөхийн өмнөх төлөв. Дараагийн бүх тоо үүнтэй харьцуулагдана.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{SELECT}
-\NormalTok{  payload.device\_id      }\KeywordTok{as}\NormalTok{ device\_id,}
-\NormalTok{  payload.vibration\_rms  }\KeywordTok{as}\NormalTok{ vibration,}
-\NormalTok{  payload.temperature    }\KeywordTok{as}\NormalTok{ temperature,}
-\NormalTok{  clientid               }\KeywordTok{as} \KeywordTok{source}\NormalTok{,}
-  \DataTypeTok{timestamp}              \KeywordTok{as}\NormalTok{ ts}
-\KeywordTok{FROM}
-  \OtherTok{"cnc302/+/+/+/+/telemetry"}
-\KeywordTok{WHERE}
-\NormalTok{  payload.vibration\_rms }\OperatorTok{\textgreater{}} \FloatTok{1.5}
+\CommentTok{\# [Pi] Pi дээр}
+\ExtensionTok{pkill} \AttributeTok{{-}f}\NormalTok{ vscode{-}server                       }\CommentTok{\# 150–250 MiB чөлөөлнө}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \ExtensionTok{./tools/measure\_stack.sh} \AttributeTok{{-}{-}role}\NormalTok{ edge}
+\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}t} \StringTok{\textquotesingle{}$SYS/broker/clients/connected\textquotesingle{}} \AttributeTok{{-}C}\NormalTok{ 1}
+\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}t} \StringTok{\textquotesingle{}$SYS/broker/messages/stored\textquotesingle{}} \AttributeTok{{-}C}\NormalTok{ 1}
+\CommentTok{\# [ЗК] компьютер дээр}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \ExtensionTok{./tools/measure\_stack.sh} \AttributeTok{{-}{-}role}\NormalTok{ cloud}
 \end{Highlighting}
 \end{Shaded}
 
-Үйлдэл (Action) нэмнэ: \textbf{Republish} → сэдэв \texttt{cnc302/alerts/vibration}.
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-4.1-ux441ux443ux443ux440ux44c-ux442ux4e9ux43bux4e9ux432}{%
+\subsubsection{Хүснэгт 4.1 --- Суурь төлөв}\label{ux445ux4afux441ux43dux44dux433ux442-4.1-ux441ux443ux443ux440ux44c-ux442ux4e9ux43bux4e9ux432}}
 
-\textbf{1.2} Дүрмийг туршина:
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+Хэмжигдэхүүн & {[}Pi{]} ирмэг (Pi 3B) & {[}ЗК{]} үүл (компьютер) \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Сул RAM (MiB) & & \\
+Swap ашигласан (MiB) & & \\
+CPU \% (сул үед) & & \\
+Температур (°C) / \texttt{get\_throttled} & / & --- \\
+Брокерын одоогийн холболт & & \\
+Брокерын RAM (MiB) & & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux430ux43bux445ux430ux43c-2-ux442ux430ux430ux43cux430ux433-ux445ux44fux437ux433ux430ux430ux440ux44bux433-ux445ux44dux43cux436ux438ux445ux44dux44dux441ux44dux44d-ux4e9ux43cux43dux4e9-ux442ux43eux43eux446ux43eux43eux43b-25-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 2 --- Таамаг: хязгаарыг ХЭМЖИХЭЭСЭЭ ӨМНӨ тооцоол (25 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-2-ux442ux430ux430ux43cux430ux433-ux445ux44fux437ux433ux430ux430ux440ux44bux433-ux445ux44dux43cux436ux438ux445ux44dux44dux441ux44dux44d-ux4e9ux43cux43dux4e9-ux442ux43eux43eux446ux43eux43eux43b-25-ux43cux438ux43d-ux437ux43a}}
+
+Багаараа цаасан дээр тооцоолж, \textbf{дараа нь битгий засаарай}. Буруу таамаг бол сонирхолтой үр дүн; засварласан таамаг бол оноогүй.
+
+\textbf{2.1 Уплинкийн таазыг тооцоол} (200 байт ачаалал, 1 мсж/с нэг холболтод):
+
+\begin{verbatim}
+1 мессеж = 200 Б × 8 = 1 600 бит
+100 Mbit/с ÷ 1 600 бит = ______ мсж/с   ← онолын дээд хязгаар
+Ачааллын шатууд 10…500 холболт × 1 мсж/с = 10…500 мсж/с
+→ Уплинк ханах уу? ______  (Хэдэн % ашиглагдах вэ: ______)
+\end{verbatim}
+
+\textbf{2.2 Санах ойн таазыг тооцоол.} Лаб 1-ийн Хүснэгт 1.5-аас нэг холболтод ногдох RAM-ыг гарга:
+
+\begin{verbatim}
+ΔRAM (MiB) / Δхолболт = ______ KiB/холболт
+Сул RAM (Хүснэгт 4.1) − 150 MiB нөөц = ______ MiB ашиглаж болно
+→ RAM ханах холболтын тоо ≈ ______
+\end{verbatim}
+
+\textbf{2.3 CPU-гийн таазыг тооцоол.} Лаб 1-д хэмжсэн нэг мессежид ногдох CPU-гаас:
+
+\begin{verbatim}
+4 цөм × 100% = 400% боломжтой;  70% ашиглалтаар = 280%
+→ CPU ханах мессежийн хурд ≈ ______ мсж/с
+\end{verbatim}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-4.2-ux442ux430ux430ux43cux430ux433-ux445ux44dux43cux436ux438ux445ux44dux44dux441-ux4e9ux43cux43dux4e9-ux431ux4e9ux433ux43bux4e9ux43dux4e9}{%
+\subsubsection{Хүснэгт 4.2 --- Таамаг (хэмжихээс ӨМНӨ бөглөнө)}\label{ux445ux4afux441ux43dux44dux433ux442-4.2-ux442ux430ux430ux43cux430ux433-ux445ux44dux43cux436ux438ux445ux44dux44dux441-ux4e9ux43cux43dux4e9-ux431ux4e9ux433ux43bux4e9ux43dux4e9}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+Нөөц & Ханах цэг (холболт эсвэл мсж/с) & Тооцооны үндэс \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+RAM & & \\
+CPU & & \\
+100 Mbit уплинк & & \\
+microSD (persistence) & & \\
+\textbf{Бидний таамаг: ХАМГИЙН ТҮРҮҮНД ханах нөөц} & & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux430ux43bux445ux430ux43c-3-ux438ux440ux43cux44dux433ux438ux439ux43d-ux430ux447ux430ux430ux43bux43bux44bux43d-ux442ux435ux441ux442-60-ux43cux438ux43d-ux437ux43api}{%
+\subsection{Алхам 3 --- Ирмэгийн ачааллын тест (60 мин) {[}ЗК{]}{[}Pi{]}}\label{ux430ux43bux445ux430ux43c-3-ux438ux440ux43cux44dux433ux438ux439ux43d-ux430ux447ux430ux430ux43bux43bux44bux43d-ux442ux435ux441ux442-60-ux43cux438ux43d-ux437ux43api}}
+
+\textbf{3.1 Дасгал ажиллуулалт} --- бүх зүйл холбогдож байгааг батлах:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# терминал 1 — дохиоллыг сонсоно}
-\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h} \VariableTok{$H} \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/alerts/\#\textquotesingle{}} \AttributeTok{{-}v}
-
-\CommentTok{\# терминал 2 — гажилтай өгөгдөл илгээнэ}
-\ExtensionTok{python}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}devices}\NormalTok{ 5 }\AttributeTok{{-}{-}interval}\NormalTok{ 1 }\AttributeTok{{-}{-}anomaly{-}rate}\NormalTok{ 0.2}
+\CommentTok{\# [ЗК] компьютер дээрээс Pi рүү (ачаалал ҮРГЭЛЖ өөр хостоос ирнэ)}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \FunctionTok{bash}\NormalTok{ lab04/loadtest.sh }\AttributeTok{{-}{-}target}\NormalTok{ edge pub }\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{ 10 1}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{1.3 Саатлыг хэмжинэ.} Дүрмийн боловсруулалт хэдэн миллисекунд нэмэв? EMQX самбарын дүрмийн статистик (\texttt{Matched}, \texttt{Failed}, \texttt{Rate}) хэсгээс уншина. \textbf{Хүснэгт 1}.
-
-\textbf{1.4} Дүрэм 2 --- нэгтгэл (window). EMQX-ийн SQL нь цонхны функцийг хязгаартай дэмждэг. Оролдож үзээд \textbf{боломжгүйг батал} --- энэ нь Лаб 5-д Node-RED хэрэгтэй болох шалтгаан:
+30 секунд ажиллуулаад Ctrl+C. {[}Pi{]} Pi дээр холболт харагдах ёстой:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{SELECT} \FunctionTok{avg}\NormalTok{(payload.temperature) }\KeywordTok{as}\NormalTok{ avg\_temp}
-\KeywordTok{FROM} \OtherTok{"cnc302/+/+/+/+/telemetry"}
-\KeywordTok{GROUP} \KeywordTok{BY}\NormalTok{ device\_id, }\DataTypeTok{INTERVAL} \DecValTok{60}\NormalTok{s   }\CommentTok{{-}{-} ← EMQX CE{-}д дэмжигдэх үү? Шалга.}
+\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}t} \StringTok{\textquotesingle{}$SYS/broker/clients/connected\textquotesingle{}} \AttributeTok{{-}C}\NormalTok{ 1   }\CommentTok{\# ≈ 10}
 \end{Highlighting}
 \end{Shaded}
 
-Үр дүнг тайландаа тэмдэглэ.
-
-\hypertarget{ux430ux43bux445ux430ux43c-2-thingsboard-rule-chain-30-ux43cux438ux43d}{%
-\subsection{Алхам 2 --- ThingsBoard Rule Chain (30 мин)}\label{ux430ux43bux445ux430ux43c-2-thingsboard-rule-chain-30-ux43cux438ux43d}}
-
-\textbf{2.1} ThingsBoard → \textbf{Rule chains → Root Rule Chain}.
-
-Гинжийг бүтээнэ: \texttt{Message\ Type\ Switch} → \texttt{Script\ (filter)} → \texttt{Create\ Alarm}.
-
-Script зангилааны фильтр:
+\textbf{3.2 Бүтэн шат дараалсан тест.} Гурван терминалыг \textbf{зэрэг} ажиллуулна:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ControlFlowTok{return}\NormalTok{ msg}\OperatorTok{.}\AttributeTok{vibration\_rms} \OperatorTok{\textgreater{}} \FloatTok{1.5}\OperatorTok{;}
-\end{Highlighting}
-\end{Shaded}
+\CommentTok{\# [Pi] терминал 1 — систем хэмжилт}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \ExtensionTok{./tools/measure\_stack.sh} \AttributeTok{{-}{-}role}\NormalTok{ edge }\AttributeTok{{-}{-}watch}\NormalTok{ 900 5}
 
-\texttt{Create\ Alarm} зангилаад: төрөл \texttt{HighVibration}, ноцтой байдал \texttt{MAJOR}.
+\CommentTok{\# [Pi] терминал 2 — үзүүлэлт цуглуулагч (CSV{-}д \textasciigrave{}target=edge\textasciigrave{} бичигдэнэ)}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \ExtensionTok{python3}\NormalTok{ lab04/collect\_metrics.py }\AttributeTok{{-}{-}target}\NormalTok{ edge }\AttributeTok{{-}{-}label}\NormalTok{ ramp }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}seconds}\NormalTok{ 900 }\AttributeTok{{-}{-}emqx} \StringTok{"http://}\VariableTok{$CLOUD\_HOST}\StringTok{:18083"}
 
-\textbf{2.2} Лаб 2-т үүсгэсэн төхөөрөмжөөр туршина (ThingsBoard-ын MQTT нь \textbf{1884} порт):
+\CommentTok{\# [Pi] терминал 3 — swap{-}ын хяналт. si/so \textgreater{} 0 бол ХЯЗГААР ОЛДЛОО}
+\FunctionTok{vmstat}\NormalTok{ 1}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\ExtensionTok{python}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}port}\NormalTok{ 1884 }\AttributeTok{{-}{-}devices}\NormalTok{ 3 }\DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}{-}username} \OperatorTok{\textless{}}\NormalTok{ACCESS\_TOKEN}\OperatorTok{\textgreater{}}\NormalTok{ {-}{-}anomaly{-}rate 0.3 }\AttributeTok{{-}{-}interval}\NormalTok{ 1 }\DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}{-}topic{-}prefix}\NormalTok{ v1/devices/me}
+\CommentTok{\# [ЗК] ачаалал үүсгэгч — шатууд: 10 25 50 100 200 350 500}
+\FunctionTok{bash}\NormalTok{ lab04/loadtest.sh }\AttributeTok{{-}{-}target}\NormalTok{ edge ramp }\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{quote}
-ThingsBoard нь \texttt{v1/devices/me/telemetry} сэдэв хүлээдэг тул UNS сэдэв энд ажиллахгүй. Энэ өөрөө чухал ажиглалт: \textbf{платформ бүр өөрийн сэдвийн гэрээтэй}. UNS-ийг платформын гэрээтэй хэрхэн холбохыг тайландаа бод.
+⚠ \textbf{\texttt{vmstat\ 1}-ийн \texttt{si}/\texttt{so} багана тэгээс өссөн мөчид зогсоо.} Тэр бол хязгаар. Цааш шахах нь Pi-г царцааж, microSD-г элээнэ. Энэ нь алдаа биш --- \textbf{энэ бол таны хэмжилт}.
 \end{quote}
-
-\textbf{2.3} ThingsBoard-ын \textbf{Alarms} хэсэгт дохиолол үүссэнийг шалга. Саатлыг хэмжинэ: телеметр илгээснээс дохиолол гарах хүртэл. \textbf{Хүснэгт 1}-ийн 2-р мөр.
-
-\hypertarget{ux430ux43bux445ux430ux43c-3-ux430ux447ux430ux430ux43bux43bux44bux43d-ux442ux435ux441ux442ux438ux439ux43d-ux431ux44dux43bux442ux433ux44dux43b-25-ux43cux438ux43d}{%
-\subsection{Алхам 3 --- Ачааллын тестийн бэлтгэл (25 мин)}\label{ux430ux43bux445ux430ux43c-3-ux430ux447ux430ux430ux43bux43bux44bux43d-ux442ux435ux441ux442ux438ux439ux43d-ux431ux44dux43bux442ux433ux44dux43b-25-ux43cux438ux43d}}
-
-\textbf{3.1 Суурь төлөв.} Pi дээр:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack}
-\ExtensionTok{docker}\NormalTok{ compose stop nodered }\DecValTok{2}\OperatorTok{\textgreater{}}\NormalTok{/dev/null }\KeywordTok{||} \FunctionTok{true}   \CommentTok{\# ачаалал багасгана}
-\FunctionTok{make}\NormalTok{ stats}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{3.2 Дасгал ажиллуулалт} --- бүх зүйл ажиллаж байгааг батлах:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# зөөврийн компьютер дээр}
-\FunctionTok{bash}\NormalTok{ lab04/loadtest.sh pub pi{-}team03.local 10 1}
-\end{Highlighting}
-\end{Shaded}
-
-30 секунд ажиллуулаад Ctrl+C. EMQX самбарт 10 холболт харагдах ёстой.
-
-\textbf{3.3 Хэмжилт цуглуулагчийг бэлдэнэ.} Pi дээр (өөр терминалд):
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\BuiltInTok{export} \VariableTok{EMQX\_DASHBOARD\_PASSWORD}\OperatorTok{=}\StringTok{\textquotesingle{}\textless{}таны .env дэх нууц үг\textgreater{}\textquotesingle{}}
-\ExtensionTok{python3}\NormalTok{ lab04/collect\_metrics.py }\AttributeTok{{-}{-}label}\NormalTok{ ramp }\AttributeTok{{-}{-}seconds}\NormalTok{ 900 }\AttributeTok{{-}{-}interval}\NormalTok{ 5}
-\end{Highlighting}
-\end{Shaded}
-
-\hypertarget{ux430ux43bux445ux430ux43c-4-ux448ux430ux442-ux434ux430ux440ux430ux430ux43bux441ux430ux43d-ux430ux447ux430ux430ux43bux43bux44bux43d-ux442ux435ux441ux442-75-ux43cux438ux43d}{%
-\subsection{Алхам 4 --- Шат дараалсан ачааллын тест (75 мин)}\label{ux430ux43bux445ux430ux43c-4-ux448ux430ux442-ux434ux430ux440ux430ux430ux43bux441ux430ux43d-ux430ux447ux430ux430ux43bux43bux44bux43d-ux442ux435ux441ux442-75-ux43cux438ux43d}}
-
-\textbf{Хамгийн чухал алхам.} Хоёр терминалыг зэрэг ажиллуулна:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# Pi дээр — хэмжилт цуглуулагч (аль хэдийн ажиллаж байна)}
-\CommentTok{\# Зөөврийн компьютер дээр:}
-\FunctionTok{bash}\NormalTok{ lab04/loadtest.sh ramp pi{-}team03.local}
-\end{Highlighting}
-\end{Shaded}
-
-Шатууд: \textbf{10 → 50 → 100 → 250 → 500 → 1000} холболт, тус бүр 1 мсж/с, 120 секунд.
-
-\textbf{Шат бүрд тэмдэглэ (Хүснэгт 2):}
-- emqtt-bench-ийн мэдээлсэн бодит илгээх хурд
-- EMQX-ийн хүлээн авсан хурд
-- CPU \%, сул санах ой, температур
-- Алдагдсан мессеж (\texttt{emqx\_\allowbreak{}msg\_\allowbreak{}dropped})
-
-\textbf{Хэзээ зогсоох вэ.} Дараах шинж тэмдгийн аль нэг гарвал шатыг зогсоож, тэр цэгийг \textbf{хязгаар} гэж тэмдэглэнэ:
-
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
-\toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Шинж тэмдэг
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Утга
-\end{minipage} \\
-\midrule
-\endhead
-\bottomrule
-\endlastfoot
-Хүлээн авсан хурд \textless{} илгээсэн хурдын 95\% & брокер гүйцэхгүй байна \\
-\texttt{emqx\_\allowbreak{}msg\_\allowbreak{}dropped} \textgreater{} 0 & мессеж хаягдаж эхлэв \\
-Сул санах ой \textless{} 300 MiB & OOM ойрхон \\
-\texttt{throttled} ≠ \texttt{0x0} & Pi халж давтамжаа бууруулав --- \textbf{хэмжилт хүчингүй} \\
-CPU \textgreater{} 380\% (4 цөм × 100\%) & CPU ханалаа \\
-\end{longtable}\endgroup
 
 \begin{quote}
-\textbf{Хэрэв 1000 холболт хүртэл ямар ч асуудалгүй бол:} сайн байна! Ачааллыг нэмнэ --- \texttt{-I\ 500} (2 мсж/с) эсвэл \texttt{-c\ 2000}. Хязгаарыг олох хүртэл үргэлжлүүлнэ.
+\textbf{Санамж:} ирмэгийн ачаалал mosquitto руу очиж байгаа тул CSV дэх \texttt{emqx\_connections} багана \textbf{үүлний} EMQX-ийг харуулна, ачааллыг биш. Ирмэгийн холболтын тоог шат бүрд \texttt{\$SYS/\allowbreak{}broker/\allowbreak{}clients/\allowbreak{}connected}-оос \textbf{гараар} бичиж ав. Энэ өөрөө сургамж: хэмжилтийн хэрэгсэл юуг хэмжиж байгааг үргэлж мэдэж бай.
 \end{quote}
 
-\hypertarget{ux430ux43bux445ux430ux43c-5-ux448ux438ux43dux436ux438ux43bux433ux44dux44d-ux431ux430-ux43cux443ux440ux443ux439-35-ux43cux438ux43d}{%
-\subsection{Алхам 5 --- Шинжилгээ ба муруй (35 мин)}\label{ux430ux43bux445ux430ux43c-5-ux448ux438ux43dux436ux438ux43bux433ux44dux44d-ux431ux430-ux43cux443ux440ux443ux439-35-ux43cux438ux43d}}
+Шат бүрд \texttt{emqtt-bench}-ийн гаралт (илгээсэн хурд) ба Pi-гийн үзүүлэлтийг бичнэ:
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# Pi дээр}
-\ExtensionTok{python3}\NormalTok{ lab04/plot\_scaling.py measurements/loadtest{-}ramp{-}}\PreprocessorTok{*}\NormalTok{.csv}
-\CommentTok{\# эсвэл зөөврийн компьютерт хуулж:}
-\ExtensionTok{python3}\NormalTok{ lab04/plot\_scaling.py loadtest{-}ramp{-}}\PreprocessorTok{*}\NormalTok{.csv }\AttributeTok{{-}{-}out}\NormalTok{ lab04/scaling.png}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{Хүснэгт 3} (багтаамжийн шинжилгээ)-ыг бөглөнө.
-
-Дараа нь \textbf{Лаб 1-ийн таамагтайгаа харьцуулна}:
-
-\begin{verbatim}
-Лаб 1-ийн таамаг : ______ төхөөрөмж (шугаман экстраполяциар)
-Лаб 4-ийн бодит  : ______ төхөөрөмж
-Зөрүү            : ______ %
-\end{verbatim}
-
-\textbf{Хэрэв зөрүү 30\%-иас их бол}, шугаман экстраполяци яагаад алдагдсаныг тайлбарлана. Боломжит шалтгаанууд:
-- Холболт бүр тогтмол санах ой иднэ (шугаман), гэхдээ \textbf{context switch} нь шугаман биш
-- Дараалал дүүрэхэд саатал экспоненциалаар өснө
-- Температур өсөж CPU давтамж буурсан
-- Swap ашиглагдаж эхэлсэн (диск рүү бичих нь RAM-аас 1000 дахин удаан)
-
-\hypertarget{ux430ux43bux445ux430ux43c-6-ux431ux430ux433ux442ux430ux430ux43cux436ux438ux439ux43d-ux442ux43eux43cux44cux451ux43e-20-ux43cux438ux43d}{%
-\subsection{Алхам 6 --- Багтаамжийн томьёо (20 мин)}\label{ux430ux43bux445ux430ux43c-6-ux431ux430ux433ux442ux430ux430ux43cux436ux438ux439ux43d-ux442ux43eux43cux44cux451ux43e-20-ux43cux438ux43d}}
-
-Хэмжилтэд тулгуурлан \textbf{Хүснэгт 4}-ийг бөглөж, дараах томьёог гаргана:
-
-\begin{verbatim}
-Хэрэгтэй Pi-ийн тоо  =  ⌈ N_төхөөрөмж × R_мсж/с ⌉ / C_нэг_Pi × S
-
-  N  — төхөөрөмжийн тоо
-  R  — нэг төхөөрөмжийн мессежийн хурд
-  C  — нэг Pi-ийн хэмжсэн багтаамж (мсж/с), 70% ашиглалтаар
-  S  — аюулгүйн коэффициент (санал: 1.5)
-\end{verbatim}
-
-\textbf{Практик даалгавар:} Таны багийн төслийн хэрэглээнд (жишээ нь ухаалаг кампусын 400 өрөө × 3 мэдрэгч × 12 мсж/цаг) хэдэн Pi хэрэгтэй вэ? Тооцоог үзүүлэнд оруулна.
-
-\hypertarget{ux430ux43bux445ux430ux43c-7-ux4afux437ux4afux4afux43bux44dux43dux433ux438ux439ux43d-ux431ux44dux43bux442ux433ux44dux43b-15-ux43cux438ux43d}{%
-\subsection{Алхам 7 --- Үзүүлэнгийн бэлтгэл (15 мин)}\label{ux430ux43bux445ux430ux43c-7-ux4afux437ux4afux4afux43bux44dux43dux433ux438ux439ux43d-ux431ux44dux43bux442ux433ux44dux43b-15-ux43cux438ux43d}}
-
-\textbf{10 минутын үзүүлэн, гурван гишүүн бүгд ярина:}
-
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
-\toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Хэсэг
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хугацаа
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хэн
-\end{minipage} \\
-\midrule
-\endhead
-\bottomrule
-\endlastfoot
-1. Rule Engine --- хаана боловсруулах шийдвэр, саатлын харьцуулалт & 3 мин & гишүүн 1 \\
-2. Ачааллын муруй --- хязгаар хаана, шинж тэмдэг юу байв & 4 мин & гишүүн 2 \\
-3. Багтаамжийн томьёо ба төслийн тооцоо; Лаб 1-ийн таамагтай харьцуулалт & 3 мин & гишүүн 3 \\
-\end{longtable}\endgroup
-
-\textbf{Заавал үзүүлэх зүйлс:} ачааллын муруйн график, хязгаарын цэг, Лаб 1-ийн таамаг ба бодит үр дүнгийн зөрүү.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{git}\NormalTok{ add }\AttributeTok{{-}A} \KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 4: Rule Engine, ачааллын тест"}
-\FunctionTok{git}\NormalTok{ tag lab04{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push origin main }\AttributeTok{{-}{-}tags}
-\end{Highlighting}
-\end{Shaded}
-
-\hypertarget{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux445ux4afux441ux43dux44dux433ux442ux4afux4afux434}{%
-\section{5. Хэмжилтийн хүснэгтүүд}\label{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux445ux4afux441ux43dux44dux433ux442ux4afux4afux434}}
-
-\hypertarget{ux445ux4afux441ux43dux44dux433ux442-1-ux431ux43eux43bux43eux432ux441ux440ux443ux443ux43bux430ux43bux442ux44bux43d-ux431ux430ux439ux440ux43bux430ux43bux44bux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442}{%
-\subsection{Хүснэгт 1 --- Боловсруулалтын байрлалын харьцуулалт}\label{ux445ux4afux441ux43dux44dux433ux442-1-ux431ux43eux43bux43eux432ux441ux440ux443ux443ux43bux430ux43bux442ux44bux43d-ux431ux430ux439ux440ux43bux430ux43bux44bux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442}}
-
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}@{}}
-\toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Байрлал
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Дундаж саатал (мс)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Нэмэгдсэн CPU \%
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Логикийн уян хатан байдал (1--5)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Тэмдэглэл
-\end{minipage} \\
-\midrule
-\endhead
-\bottomrule
-\endlastfoot
-EMQX Rule Engine & & & & \\
-ThingsBoard Rule Chain & & & & \\
-Node-RED (Лаб 5-д хэмжинэ) & & & & \\
-\end{longtable}\endgroup
-
-Цонхны нэгтгэл EMQX CE-д дэмжигдэв үү: ule{1.5cm}{0.4pt} Хэрэв үгүй бол хаана хийх вэ: ule{1.5cm}{0.4pt}
-
-\hypertarget{ux445ux4afux441ux43dux44dux433ux442-2-ux430ux447ux430ux430ux43bux43bux44bux43d-ux448ux430ux442ux443ux443ux434}{%
-\subsection{Хүснэгт 2 --- Ачааллын шатууд}\label{ux445ux4afux441ux43dux44dux433ux442-2-ux430ux447ux430ux430ux43bux43bux44bux43d-ux448ux430ux442ux443ux443ux434}}
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-4.3-ux438ux440ux43cux44dux433-pi-3b-mosquitto-ux448ux430ux442ux443ux443ux434}{%
+\subsubsection{Хүснэгт 4.3 --- Ирмэг (Pi 3B, mosquitto): шатууд}\label{ux445ux4afux441ux43dux44dux433ux442-4.3-ux438ux440ux43cux44dux433-pi-3b-mosquitto-ux448ux430ux442ux443ux443ux434}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
@@ -398,103 +315,314 @@ Node-RED (Лаб 5-д хэмжинэ) & & & & \\
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Бодит илгээсэн
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-EMQX хүлээн авсан
+mosquitto холболт (\texttt{\$SYS})
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хүлээн авалт \%
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-CPU \%
+CPU \% (4 цөм = 400)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Сул RAM (MiB)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хаягдсан
+Swap \texttt{si/so}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Уплинк Mbit/с
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 °C
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-throttled
+\texttt{throttled}
 \end{minipage} \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
 10 & 10 & & & & & & & & \\
+25 & 25 & & & & & & & & \\
 50 & 50 & & & & & & & & \\
 100 & 100 & & & & & & & & \\
-250 & 250 & & & & & & & & \\
+200 & 200 & & & & & & & & \\
+350 & 350 & & & & & & & & \\
 500 & 500 & & & & & & & & \\
-1000 & 1000 & & & & & & & & \\
 \end{longtable}\endgroup
 
-\hypertarget{ux445ux4afux441ux43dux44dux433ux442-3-ux431ux430ux433ux442ux430ux430ux43cux436ux438ux439ux43d-ux448ux438ux43dux436ux438ux43bux433ux44dux44d}{%
-\subsection{Хүснэгт 3 --- Багтаамжийн шинжилгээ}\label{ux445ux4afux441ux43dux44dux433ux442-3-ux431ux430ux433ux442ux430ux430ux43cux436ux438ux439ux43d-ux448ux438ux43dux436ux438ux43bux433ux44dux44d}}
+\textbf{Хэзээ зогсоох вэ:} сул RAM \textless{} 150 MiB, \texttt{si/so} \textgreater{} 0, \texttt{throttled} ≠ \texttt{0x0}, брокер шинэ холболт авахаа больсон (скрипт өөрөө илрүүлж зогсоно), эсвэл хүлээн авалт илгээсний 95\%-иас доош.
+
+\textbf{3.3 Уплинкийг зориудаар ачаалах.} Дээрх шатууд уплинкийг \textbf{хөндөөгүй} (яагаад? --- §3-ын урхи). Одоо сэдвийг гүүрээр дамжих угтвартай болгож, ачааллыг том болгоно:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# [ЗК] компьютер дээрээс. 200 холболт × 5 мсж/с × 2000 Б ≈ 16 Mbit/с}
+\VariableTok{TOPIC}\OperatorTok{=}\StringTok{"cnc302/}\VariableTok{$SITE}\StringTok{/}\VariableTok{$AREA}\StringTok{/}\VariableTok{$LINE}\StringTok{/bench{-}\%i/telemetry"} \VariableTok{PAYLOAD\_SIZE}\OperatorTok{=}\NormalTok{2000 }\DataTypeTok{\textbackslash{}}
+  \FunctionTok{bash}\NormalTok{ lab04/loadtest.sh }\AttributeTok{{-}{-}target}\NormalTok{ edge pub }\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{ 200 5}
+\end{Highlighting}
+\end{Shaded}
+
+{[}Pi{]} зэрэг ажиглана (\texttt{docker\ stats}-ийн NET I/O өсөлт ба Хүснэгт 4.3-ын Mbit баганатай харьцуул):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ stats }\AttributeTok{{-}{-}no{-}stream} \AttributeTok{{-}{-}format} \StringTok{\textquotesingle{}table \{\{.Name\}\}\textbackslash{}t\{\{.NetIO\}\}\textbackslash{}t\{\{.MemUsage\}\}\textbackslash{}t\{\{.CPUPerc\}\}\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+Ачааллыг 5 → 10 мсж/с болгож давт. Уплинкийн ашиглалт 90 Mbit/с рүү ойртож байна уу, эсвэл түүнээс өмнө RAM/CPU ханаж байна уу?
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-4.4-ux443ux43fux43bux438ux43dux43aux438ux439ux43d-ux430ux447ux430ux430ux43bux430ux43b-ux441ux44dux434ux44dux432-ux433ux4afux4afux440ux44dux44dux440-ux434ux430ux43cux436ux438ux43dux430}{%
+\subsubsection{Хүснэгт 4.4 --- Уплинкийн ачаалал (сэдэв гүүрээр дамжина)}\label{ux445ux4afux441ux43dux44dux433ux442-4.4-ux443ux43fux43bux438ux43dux43aux438ux439ux43d-ux430ux447ux430ux430ux43bux430ux43b-ux441ux44dux434ux44dux432-ux433ux4afux4afux440ux44dux44dux440-ux434ux430ux43cux436ux438ux43dux430}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}@{}}
 \toprule
 \begin{minipage}[b]{\linewidth}\raggedright
-Асуулт
+Холболт × мсж/с × Б
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хариулт
+Тооцоолсон Mbit/с
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хэмжсэн Mbit/с
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Сул RAM (MiB)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+CPU \%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Гүүрээр үүлэнд хүрсэн үү
 \end{minipage} \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
-Хүлээн авалт 95\%-аас доош унасан цэг & ule{1.5cm}{0.4pt} холболт \\
-Мессеж хаягдаж эхэлсэн цэг & ule{1.5cm}{0.4pt} холболт \\
-Хамгийн түрүүнд ханасан нөөц & CPU / RAM / холболт / диск \\
-Дээд тогтвортой чадвар & ule{1.5cm}{0.4pt} мсж/с \\
-Санах ой нэг холболтод & ule{1.5cm}{0.4pt} KiB \\
-CPU нэг мессежид & ule{1.5cm}{0.4pt} мс \\
-Температур хамгийн өндөр & ule{1.5cm}{0.4pt} °C, throttled: ule{1.5cm}{0.4pt} \\
+200 × 5 × 2000 & & & & & \\
+200 × 10 × 2000 & & & & & \\
+ule{1.5cm}{0.4pt} & & & & & \\
 \end{longtable}\endgroup
 
-\hypertarget{ux445ux4afux441ux43dux44dux433ux442-4-ux43bux430ux431-1-ux438ux439ux43d-ux442ux430ux430ux43cux430ux433ux442ux430ux439-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442}{%
-\subsection{Хүснэгт 4 --- Лаб 1-ийн таамагтай харьцуулалт}\label{ux445ux4afux441ux43dux44dux433ux442-4-ux43bux430ux431-1-ux438ux439ux43d-ux442ux430ux430ux43cux430ux433ux442ux430ux439-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442}}
+\hypertarget{ux430ux43bux445ux430ux43c-4-ux4afux4afux43bux43dux438ux439-ux430ux447ux430ux430ux43bux43bux44bux43d-ux442ux435ux441ux442-45-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 4 --- Үүлний ачааллын тест (45 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-4-ux4afux4afux43bux43dux438ux439-ux430ux447ux430ux430ux43bux43bux44bux43d-ux442ux435ux441ux442-45-ux43cux438ux43d-ux437ux43a}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
+Ижил аргачлал, өөр зорилт. Шатууд \textbf{50 100 250 500 1000 2000}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# [ЗК] терминал 1 — цуглуулагч (CSV{-}д \textasciigrave{}target=cloud\textasciigrave{})}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \ExtensionTok{python3}\NormalTok{ lab04/collect\_metrics.py }\AttributeTok{{-}{-}target}\NormalTok{ cloud }\AttributeTok{{-}{-}label}\NormalTok{ ramp }\AttributeTok{{-}{-}seconds}\NormalTok{ 900}
+
+\CommentTok{\# [ЗК] терминал 2 — ачаалал}
+\FunctionTok{bash}\NormalTok{ lab04/loadtest.sh }\AttributeTok{{-}{-}target}\NormalTok{ cloud ramp localhost}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+Ачаалал үүсгэгч ба брокер нэг машин дээр байвал \textbf{компьютер өөрөө хязгаарлагч} болж мэднэ. Хоёр дахь машинаас (эсвэл багийн нөгөө гишүүний компьютерээс) ачаалж чадвал илүү зөв. Аль нөхцөлд хэмжсэнээ үзүүлэнд заавал хэл.
+\end{quote}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-4.5-ux4afux4afux43b-ux43aux43eux43cux43fux44cux44eux442ux435ux440-emqx-ux448ux430ux442ux443ux443ux434}{%
+\subsubsection{Хүснэгт 4.5 --- Үүл (компьютер, EMQX): шатууд}\label{ux445ux4afux441ux43dux44dux433ux442-4.5-ux4afux4afux43b-ux43aux43eux43cux43fux44cux44eux442ux435ux440-emqx-ux448ux430ux442ux443ux443ux434}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}@{}}
 \toprule
-& Лаб 1 (таамаг) & Лаб 4 (бодит) & Зөрүү \% \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Холболт
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Зорилтот мсж/с
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+EMQX холболт
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+EMQX хүлээн авсан мсж/с
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хаягдсан (\texttt{msg\_dropped})
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+CPU \%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Сул RAM (MiB)
+\end{minipage} \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
-CPU 80\% болох төхөөрөмжийн тоо & & & \\
-Нэг төхөөрөмжид ногдох CPU \% & & & \\
+50 & 50 & & & & & \\
+100 & 100 & & & & & \\
+250 & 250 & & & & & \\
+500 & 500 & & & & & \\
+1000 & 1000 & & & & & \\
+2000 & 2000 & & & & & \\
 \end{longtable}\endgroup
 
-Шугаман экстраполяци хаана алдагдсан бэ (2--4 өгүүлбэр):
-\par\noindent\rule{\linewidth}{0.4pt}\par
+\hypertarget{ux430ux43bux445ux430ux43c-5-emqx-rule-engine-ux43cux435ux441ux441ux435ux436ux438ux439ux433-ux431ux440ux43eux43aux435ux440-ux434ux44dux44dux440-ux447ux438ux433ux43bux4afux4afux43bux44dux445-30-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 5 --- EMQX rule engine: мессежийг брокер дээр чиглүүлэх (30 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-5-emqx-rule-engine-ux43cux435ux441ux441ux435ux436ux438ux439ux433-ux431ux440ux43eux43aux435ux440-ux434ux44dux44dux440-ux447ux438ux433ux43bux4afux4afux43bux44dux445-30-ux43cux438ux43d-ux437ux43a}}
 
-Багтаамжийн томьёо (өөрсдийн тоогоор):
-\texttt{Pi-ийн\ тоо\ =\ N\ ×\ R\ /}ule\{1.5cm\}\{0.4pt\}\texttt{\{=latex\}\ ×\ 1.5}
+\textbf{5.1} EMQX самбар (\texttt{:18083}) → \textbf{Integration → Rules → Create}. Чичиргээний хэт өндөр утгыг шүүх дүрэм:
 
-Төслийн тооцоо: ule{1.5cm}{0.4pt} төхөөрөмж × ule{1.5cm}{0.4pt} мсж/с → ule{1.5cm}{0.4pt} Pi
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}
+\NormalTok{  payload.device\_id     }\KeywordTok{as}\NormalTok{ device\_id,}
+\NormalTok{  payload.vibration\_rms }\KeywordTok{as}\NormalTok{ vibration,}
+\NormalTok{  payload.temperature   }\KeywordTok{as}\NormalTok{ temperature,}
+\NormalTok{  clientid              }\KeywordTok{as} \KeywordTok{source}\NormalTok{,}
+  \DataTypeTok{timestamp}             \KeywordTok{as}\NormalTok{ ts}
+\KeywordTok{FROM}
+  \OtherTok{"cnc302/+/+/+/+/telemetry"}
+\KeywordTok{WHERE}
+\NormalTok{  payload.vibration\_rms }\OperatorTok{\textgreater{}} \FloatTok{1.5}
+\end{Highlighting}
+\end{Shaded}
 
-\hypertarget{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442-ux4afux437ux4afux4afux43bux44dux43dux434-ux430ux43cux430ux430ux440-ux445ux430ux440ux438ux443ux43bux43dux430}{%
-\section{6. Хяналтын асуулт (үзүүлэнд амаар хариулна)}\label{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442-ux4afux437ux4afux4afux43bux44dux43dux434-ux430ux43cux430ux430ux440-ux445ux430ux440ux438ux443ux43bux43dux430}}
+Үйлдэл (Action): \textbf{Republish} → сэдэв \texttt{cnc302/alerts/vibration}.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  Мессежийг брокер дээр боловсруулах нь платформ дээр боловсруулахаас хэдэн дахин хурдан байв? Ялгаа хаанаас гарав?
-\item
-  EMQX Rule Engine цонхны нэгтгэлийг дэмжсэн үү? Дэмжээгүй бол энэ нь архитектурт ямар үр дагавартай вэ?
-\item
-  Хамгийн түрүүнд ханасан нөөц юу байв? Энэ таны таамагтай таарсан уу?
-\item
-  Мессеж хаягдах ба саатал өсөх --- аль нь эхэлж илэрсэн бэ? Яагаад тэр дараалалтай вэ?
-\item
-  Хэрэв 10 000 төхөөрөмж холбох шаардлага гарвал юу хийх вэ? Хэвтээ өргөтгөл ямар шинэ асуудал үүсгэх вэ (сесс, retained мессеж, дүрэм)?
-\item
-  Ачааллын тестийг \textbf{үйлдвэрлэлийн} орчинд ажиллуулж болох уу? Ямар урьдчилан сэргийлэлт шаардлагатай вэ?
-\item
-  Температур ба throttle нь хэмжилтийн үнэн зөвд хэрхэн нөлөөлөв?
-\end{enumerate}
+\textbf{5.2 Туршина:}
 
-\hypertarget{ux43eux43dux43eux448ux438ux43bux433ux43eux43e}{%
-\section{7. Оношилгоо}\label{ux43eux43dux43eux448ux438ux43bux433ux43eux43e}}
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# [ЗК] терминал 1 — дохиоллыг сонсоно; терминал 2 — гажилтай өгөгдөл илгээнэ}
+\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/alerts/\#\textquotesingle{}} \AttributeTok{{-}v}
+\ExtensionTok{python3}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}target}\NormalTok{ cloud }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\AttributeTok{{-}{-}devices}\NormalTok{ 5 }\AttributeTok{{-}{-}interval}\NormalTok{ 1 }\AttributeTok{{-}{-}anomaly{-}rate}\NormalTok{ 0.2}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{5.3 Ачаалалтай үед дүрэм ажиллаж байна уу?} Алхам 4-ийн 500 холболтын шатыг дахин ажиллуулж, дүрмийн статистик (\texttt{Matched}, \texttt{Failed}, \texttt{Rate}) ба EMQX-ийн CPU-г дүрэмгүй үетэй харьцуул.
+
+\textbf{5.4 Цонхны нэгтгэл.} EMQX CE-д доорх дэмжигдэх эсэхийг \textbf{шалгаж, үр дүнг бич} --- дэмжигдэхгүй бол энэ нь Лаб 5-д Node-RED хэрэгтэй болох шалтгаан:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \FunctionTok{avg}\NormalTok{(payload.temperature) }\KeywordTok{as}\NormalTok{ avg\_temp}
+\KeywordTok{FROM} \OtherTok{"cnc302/+/+/+/+/telemetry"}
+\KeywordTok{GROUP} \KeywordTok{BY}\NormalTok{ device\_id, }\DataTypeTok{INTERVAL} \DecValTok{60}\NormalTok{s}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-4.6-ux431ux43eux43bux43eux432ux441ux440ux443ux443ux43bux430ux43bux442ux44bux43d-ux431ux430ux439ux440ux43bux430ux43b}{%
+\subsubsection{Хүснэгт 4.6 --- Боловсруулалтын байрлал}\label{ux445ux4afux441ux43dux44dux433ux442-4.6-ux431ux43eux43bux43eux432ux441ux440ux443ux443ux43bux430ux43bux442ux44bux43d-ux431ux430ux439ux440ux43bux430ux43b}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Байрлал
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Дундаж саатал (мс)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Нэмэгдсэн CPU \%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+500 холболт дээр ажиллав уу
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Логикийн уян хатан (1--5)
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+EMQX rule engine ({[}ЗК{]}) & & & & \\
+Ирмэгийн агентын шүүлт ({[}Pi{]}, Лаб 1) & & & & \\
+Node-RED ({[}ЗК{]}, Лаб 5-д хэмжинэ) & --- & --- & --- & \\
+\end{longtable}\endgroup
+
+Цонхны нэгтгэл EMQX CE-д дэмжигдэв үү: ule{1.5cm}{0.4pt} Хэрэв үгүй бол хаана хийх вэ: ule{1.5cm}{0.4pt}
+
+\hypertarget{ux430ux43bux445ux430ux43c-6-ux445ux43eux451ux440-ux43cux443ux440ux443ux439-ux43dux44dux433-ux442ux44dux43dux445ux43bux44dux433-ux445ux430ux43dux430ux43bux442ux44bux43d-ux448ux438ux43dux436ux438ux43bux433ux44dux44d-30-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 6 --- Хоёр муруй, нэг тэнхлэг: ханалтын шинжилгээ (30 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-6-ux445ux43eux451ux440-ux43cux443ux440ux443ux439-ux43dux44dux433-ux442ux44dux43dux445ux43bux44dux433-ux445ux430ux43dux430ux43bux442ux44bux43d-ux448ux438ux43dux436ux438ux43bux433ux44dux44d-30-ux43cux438ux43d-ux437ux43a}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# [ЗК] хоёр хостын CSV{-}г нэг дор өгнө (Pi{-}гийнхийг эхлээд хуулж ав)}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\FunctionTok{scp}\NormalTok{ pi@}\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{:\textasciitilde{}/cnc302/measurements/loadtest{-}edge{-}ramp{-}}\PreprocessorTok{*}\NormalTok{.csv measurements/}
+\ExtensionTok{python3}\NormalTok{ lab04/plot\_scaling.py measurements/loadtest{-}edge{-}}\PreprocessorTok{*}\NormalTok{.csv }\DataTypeTok{\textbackslash{}}
+\NormalTok{        measurements/loadtest{-}cloud{-}}\PreprocessorTok{*}\NormalTok{.csv }\AttributeTok{{-}{-}out}\NormalTok{ lab04/scaling.png}
+\end{Highlighting}
+\end{Shaded}
+
+matplotlib байхгүй бол ASCII график гарна (edge = ●, cloud = ○) --- үзүүлэнд ч хангалттай.
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-4.7-ux430ux43bux44c-ux43dux4e9ux4e9ux446-ux442ux4afux440ux4afux4afux43bux436-ux445ux430ux43dux430ux432}{%
+\subsubsection{Хүснэгт 4.7 --- Аль нөөц түрүүлж ханав}\label{ux445ux4afux441ux43dux44dux433ux442-4.7-ux430ux43bux44c-ux43dux4e9ux4e9ux446-ux442ux4afux440ux4afux4afux43bux436-ux445ux430ux43dux430ux432}}
+
+Багана бүрд \textbf{тоо ба эх сурвалж} бич. "RAM ханасан" гэсэн ганц үг оноо авахгүй.
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Нөөц
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Ирмэг: ханасан уу, ямар тоогоор
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Үүл: ханасан уу, ямар тоогоор
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Нотолгоо (хүснэгт/багана)
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+RAM (сул MiB, swap si/so) & & & \\
+CPU (\% 400-аас) & & & \\
+Уплинк (Mbit/с 95-аас) & & & \\
+microSD (I/O хүлээлт \texttt{wa}) & & & \\
+Холболтын тоо / файлын дескриптор & & & \\
+\textbf{ХАМГИЙН ТҮРҮҮНД ханасан нь} & & & \\
+\end{longtable}\endgroup
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-4.8-ux442ux430ux430ux43cux430ux433-ux431ux430-ux431ux43eux434ux438ux442}{%
+\subsubsection{Хүснэгт 4.8 --- Таамаг ба бодит}\label{ux445ux4afux441ux43dux44dux433ux442-4.8-ux442ux430ux430ux43cux430ux433-ux431ux430-ux431ux43eux434ux438ux442}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
+\toprule
+& Таамаг (Хүснэгт 4.2) & Бодит & Зөрүү \% \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Ирмэгийн дээд холболт & & & \\
+Ирмэгийн дээд мсж/с & & & \\
+Түрүүлж ханасан нөөц & & & таарсан уу: тийм/үгүй \\
+Үүлний дээд холболт & & & \\
+\end{longtable}\endgroup
+
+Зөрүү 30\%-иас их бол шалтгааныг 2--4 өгүүлбэрээр бич. Боломжит шалтгаанууд: холболт бүрийн тогтмол зардал шугаман биш; дараалал дүүрэхэд саатал экспоненциалаар өснө; температур өсөж давтамж буурсан; swap эхэлсэн (microSD рүү бичих нь RAM-аас олон зуун дахин удаан).
+
+\hypertarget{ux430ux43bux445ux430ux43c-7-ux431ux430ux433ux442ux430ux430ux43cux436ux438ux439ux43d-ux442ux43eux43cux44cux451ux43e-ux431ux430-ux442ux4e9ux441ux43bux438ux439ux43d-ux442ux43eux43eux446ux43eux43e-15-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 7 --- Багтаамжийн томьёо ба төслийн тооцоо (15 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-7-ux431ux430ux433ux442ux430ux430ux43cux436ux438ux439ux43d-ux442ux43eux43cux44cux451ux43e-ux431ux430-ux442ux4e9ux441ux43bux438ux439ux43d-ux442ux43eux43eux446ux43eux43e-15-ux43cux438ux43d-ux437ux43a}}
+
+\begin{verbatim}
+Шаардлагатай ирмэгийн зангилааны тоо =  ⌈ N × R ⌉ / C_edge × S
+
+  N        — төхөөрөмжийн тоо
+  R        — нэг төхөөрөмжийн мессежийн хурд (мсж/с)
+  C_edge   — хэмжсэн багтаамж (мсж/с), 70% ашиглалтаар
+  S        — аюулгүйн коэффициент (санал: 1.5)
+\end{verbatim}
+
+Өөрсдийн тоогоор бөглө:
+
+\begin{verbatim}
+C_edge (70%) = ______ мсж/с      C_cloud (70%) = ______ мсж/с
+Төслийн ачаалал: ______ төхөөрөмж × ______ мсж/с = ______ мсж/с
+→ Хэрэгтэй Pi: ______     → Нэг үүл хангалттай юу: ______
+Нэг Pi-д ногдох дээд төхөөрөмж (RAM-аар хязгаарлавал): ______
+\end{verbatim}
+
+Дараа нь хариул: \textbf{ижил ачааллыг үүл дээр авах уу, эсвэл ирмэг нэмэх үү?} Уплинкийн зардал, тасалдалд тэсвэртэй байдал, төхөөрөмжийн үнэ гурвыг харьцуул (Лаб 5-д уплинк тасрахад юу болохыг үзнэ).
+
+\hypertarget{ux430ux43bux445ux430ux43c-8-ux4afux437ux4afux4afux43bux44dux43dux433ux438ux439ux43d-ux431ux44dux43bux442ux433ux44dux43b-ux431ux430-commit-15-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 8 --- Үзүүлэнгийн бэлтгэл ба commit (15 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-8-ux4afux437ux4afux4afux43bux44dux43dux433ux438ux439ux43d-ux431ux44dux43bux442ux433ux44dux43b-ux431ux430-commit-15-ux43cux438ux43d-ux437ux43a}}
+
+\textbf{10 минут, гурван гишүүн бүгд ярина:}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
@@ -502,7 +630,121 @@ CPU 80\% болох төхөөрөмжийн тоо & & & \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
 \toprule
 \begin{minipage}[b]{\linewidth}\raggedright
-Шинж тэмдэг
+Хэсэг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хугацаа
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хэн
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1. Таамаг ба арифметик (Хүснэгт 4.2), аргачлал & 3 мин & гишүүн 1 \\
+2. Хоёр муруй нэг тэнхлэгт, аль нөөц түрүүлж ханав (4.3--4.5, 4.7) & 4 мин & гишүүн 2 \\
+3. Rule engine, багтаамжийн томьёо, төслийн тооцоо (4.6, 4.8) & 3 мин & гишүүн 3 \\
+\end{longtable}\endgroup
+
+\textbf{Заавал үзүүлэх:} ханалтын график, хязгаарын цэг, таамаг--бодит зөрүү, ханасан нөөцийн \textbf{нотолгоо}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\FunctionTok{git}\NormalTok{ add lab04/}
+\CommentTok{\# measurements/ нь .gitignore{-}д — тайланд хэрэгтэй CSV{-}г зориудаар албадан нэмнэ}
+\FunctionTok{git}\NormalTok{ add }\AttributeTok{{-}f}\NormalTok{ measurements/loadtest{-}edge{-}ramp{-}}\PreprocessorTok{*}\NormalTok{.csv measurements/loadtest{-}cloud{-}ramp{-}}\PreprocessorTok{*}\NormalTok{.csv}
+\FunctionTok{git}\NormalTok{ status }\AttributeTok{{-}{-}short}
+\FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 4: ирмэг ба үүлний багтаамжийн хязгаар"}
+\FunctionTok{git}\NormalTok{ tag lab04{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\AttributeTok{{-}{-}tags}
+\CommentTok{\# Нууц файл ороогүйг ЗААВАЛ шалга}
+\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}E} \StringTok{\textquotesingle{}\textbackslash{}.env$|bridge\textbackslash{}.conf$|\textbackslash{}.key$|\textbackslash{}.crt$|devices\textbackslash{}.csv\textquotesingle{}}   \CommentTok{\# хоосон байх ЁСТОЙ}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442ux443ux443ux434-ux4afux437ux4afux4afux43bux44dux43dux434-ux430ux43cux430ux430ux440-ux445ux430ux440ux438ux443ux43bux43dux430}{%
+\section{5. Хяналтын асуултууд (үзүүлэнд амаар хариулна)}\label{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442ux443ux443ux434-ux4afux437ux4afux4afux43bux44dux43dux434-ux430ux43cux430ux430ux440-ux445ux430ux440ux438ux443ux43bux43dux430}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Хүснэгт 4.7-д ирмэг дээр аль нөөц түрүүлж ханав? Тухайн шатанд сул RAM хэдэн MiB, CPU хэдэн \%, уплинк хэдэн Mbit/с байв --- гурвуулангийн тоог хэл. Яагаад нөгөө хоёр нь хязгаарлагч биш вэ?
+\item
+  Хүснэгт 4.2-ын таамаг ба Хүснэгт 4.8-ын бодит үр дүн хэдэн хувиар зөрөв? Шугаман экстраполяци яг хаанаас алдагдав?
+\item
+  Хүснэгт 4.3-т swap \texttt{si/so} тэгээс өссөн шат аль вэ? Түүнээс хойшхи саатлын тоог яагаад тайланд оруулж болохгүй вэ?
+\item
+  Хүснэгт 4.4-т тооцоолсон ба хэмжсэн Mbit/с хэр таарав? Зөрүү гарсан бол хаана алдагдав (TCP толгой, MQTT толгой, ACK урсгал, гүүрний QoS)?
+\item
+  Хүснэгт 4.3 ба 4.5-ын дээд мсж/с хэдэн дахин зөрөв? Тэр харьцаа нь техник хангамжийн (RAM, цөм) харьцаатай таарч байна уу, эсвэл програм хангамжийн (mosquitto vs EMQX) ялгаа нь давамгайлав уу?
+\item
+  Хүснэгт 4.6-д rule engine 500 холболт дээр ажиллав уу? Хэрэв EMQX-ийн CPU дүрэмтэй үед мэдэгдэхүйц өссөн бол 10 000 төхөөрөмжийн флотод юу хийх вэ?
+\item
+  Таны төслийн тооцоогоор (Алхам 7) хэдэн Pi хэрэгтэй гарав? Хэрэв ирмэг дээр 90\% шүүлт хийж, зөвхөн 10\%-ийг үүл рүү илгээвэл энэ тоо хэрхэн өөрчлөгдөх вэ --- уплинкийн арифметикээр хариул.
+\end{enumerate}
+
+\hypertarget{ux445ux4afux43bux44dux44dux43bux433ux44dux43d-ux4e9ux433ux4e9ux445-ux437ux4afux439ux43b}{%
+\section{6. Хүлээлгэн өгөх зүйл}\label{ux445ux4afux43bux44dux44dux43bux433ux44dux43d-ux4e9ux433ux4e9ux445-ux437ux4afux439ux43b}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Зүйл
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Байрлал
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & 10 минутын үзүүлэн (гурван гишүүн) & хичээл дээр \\
+2 & Ачааллын муруй (хоёр зорилт нэг тэнхлэгт) & \texttt{lab04/scaling.png} эсвэл ASCII гаралт \\
+3 & Хоёр хостын түүхий CSV & \texttt{measurements/\allowbreak{}loadtest-edge-*.\allowbreak{}csv}, \texttt{loadtest-cloud-*.csv} \\
+4 & Хүснэгт 4.1--4.8 (слайд эсвэл нэг хуудас) & \texttt{lab04/tables.md} \\
+5 & Git tag & \texttt{lab04-done} \\
+\end{longtable}\endgroup
+
+\hypertarget{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}{%
+\section{7. Үнэлгээний шалгуур (10 оноо)}\label{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Шалгуур
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Оноо
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Хоёр зорилт (ирмэг ба үүл) бүрэн шатаар ачаалагдаж, хязгаар нь олдсон & 3 \\
+\textbf{Түрүүлж ханасан нөөц зөв тогтоогдож, тоогоор нотлогдсон} (Хүснэгт 4.7) & 3 \\
+Уплинкийн арифметик хийгдэж, хэмжилттэй харьцуулагдсан (4.2, 4.4) & 2 \\
+Rule engine ажиллаж, ачаалалтай үед хэмжигдсэн & 1 \\
+Гурван гишүүн бүгд ярьж, асуултад хариулсан & 1 \\
+\end{longtable}\endgroup
+
+\textbf{Онцгой оноо (+1):} ханалтын муруйн \textbf{буурах} хэсгийг баримтжуулсан бол (ачаалал нэмэгдэхэд хүлээн авалт буурсан).
+
+\textbf{Оноо хасах гол шалтгаан:} ханасан нөөцийг нотолгоогүй нэрлэх; throttle \texttt{0x0} биш үеийн тоог хүчинтэй мэт үзүүлэх.
+
+\hypertarget{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}{%
+\section{8. Түгээмэл алдаа}\label{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Шинж
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Шалтгаан
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -513,29 +755,12 @@ CPU 80\% болох төхөөрөмжийн тоо & & & \\
 \bottomrule
 \endlastfoot
 emqtt-bench 1024 холболт дээр зогсоно & \texttt{ulimit\ -n} бага & \texttt{ulimit\ -n\ 65535} \\
-\texttt{connection\ refused} олноор & EMQX max\_connections & \texttt{EMQX\_\allowbreak{}LISTENERS\_\allowbreak{}\_\allowbreak{}TCP\_\allowbreak{}\_\allowbreak{}DEFAULT\_\allowbreak{}\_\allowbreak{}MAX\_\allowbreak{}CONNECTIONS} нэмэгдүүл \\
-Зөөврийн компьютер өөрөө ханана & ачаалал үүсгэгч нь Pi-аас өмнө мөргөв & хоёр компьютерээс зэрэг ачаална, эсвэл \texttt{-c}-г бууруулж \texttt{-I}-г нэмэгдүүл \\
-\texttt{collect\_metrics.py} EMQX API алдаа & нууц үг буруу & \texttt{export\ EMQX\_\allowbreak{}DASHBOARD\_\allowbreak{}PASSWORD=...} \\
-CPU 400\% харагдана & 4 цөмийн нийлбэр & 100\% = нэг цөм. 400\% = бүрэн ханалт \\
-throttled \texttt{0x50005} & тэжээл/халалт & идэвхтэй хөргөлт, 27W тэжээл; хэмжилтийг дахин хий \\
-Хурд огт өсөхгүй & \texttt{-I} буруу (миллисекунд!) & \texttt{-I\ 1000} = 1 мсж/с \\
+Ачаалал өгсөн ч Pi дээр юу ч өөрчлөгдөхгүй & ачаалал үүлний EMQX рүү явж байна & \texttt{-\/-target\ edge} ба \texttt{\textless{}PI-IP\textgreater{}}-ээ шалга \\
+Уплинк огт ачаалагдахгүй & сэдэв \texttt{cnc302/\textless{}SITE\textgreater{}/} угтваргүй & Алхам 3.3-ын \texttt{TOPIC=} \\
+\texttt{collect\_metrics.py} EMQX API алдаа & нууц үг буруу & \texttt{export\ EMQX\_\allowbreak{}DASHBOARD\_\allowbreak{}PASSWORD=\allowbreak{}…} эсвэл \texttt{-\/-no-emqx} \\
+CSV-д \texttt{emqx\_connections} ирмэгийн ачааллыг харуулахгүй & тэр багана үүлний EMQX-ийнх & \texttt{\$SYS/\allowbreak{}broker/\allowbreak{}clients/\allowbreak{}connected}-оос гараар бич \\
+Pi гэнэт хариу өгөхөө болино & swap + microSD дүүрсэн & тэжээл унтраахаас өмнө 2 мин хүлээ; шатыг буулга \\
+CPU 400\% харагдана & 4 цөмийн нийлбэр & 100\% = нэг цөм, 400\% = бүрэн ханалт \\
+\texttt{throttled} ≠ \texttt{0x0} & халалт эсвэл сул тэжээл & хөргөлт, 5 V/2.5 A тэжээл; хэмжилтийг \textbf{дахин} хий \\
+Компьютер өөрөө эхэлж ханана & ачаалал үүсгэгч нэг машин дээр & өөр машинаас ачаал, эсвэл \texttt{-c} багасгаж хурдыг нэмэгдүүл \\
 \end{longtable}\endgroup
-
-\hypertarget{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e-ux4afux437ux4afux4afux43bux44dux43dux433ux44dux44dux440}{%
-\section{8. Үнэлгээний шалгуур (10 оноо, үзүүлэнгээр)}\label{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e-ux4afux437ux4afux4afux43bux44dux43dux433ux44dux44dux440}}
-
-\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
-\toprule
-Шалгуур & Оноо \\
-\midrule
-\endhead
-\bottomrule
-\endlastfoot
-Rule Engine хоёр платформ дээр ажиллаж, саатал хэмжигдсэн & 2 \\
-Ачааллын тест бүрэн шатаар гүйцэтгэгдэж хязгаар олдсон & 3 \\
-Ачааллын муруй ба ханалтын шинжилгээ & 2 \\
-Лаб 1-ийн таамагтай харьцуулалт, зөрүүний тайлбар & 2 \\
-Гурван гишүүн бүгд оролцож, асуултад хариулсан & 1 \\
-\end{longtable}\endgroup
-
-\textbf{Онцгой оноо (+1):} хэрэв та хязгаарыг олохын тулд 1000-аас цааш явж, ханалтын муруйн \textbf{буурах} хэсгийг баримтжуулсан бол.

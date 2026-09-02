@@ -1,12 +1,16 @@
-# CNC302 — багийн платформын стек
-# Энэ бол ЖИВЭЭ ФАЙЛ. Лаборатори бүрт та үүн рүү үйлчилгээ нэмнэ.
-# Профайл: core (Лаб1+), pipeline (Лаб5+), app (Лаб7+), ai (Лаб8)
+# CNC302 — ҮҮЛНИЙ ДАВХАРГА  (оюутны ЗӨӨВРИЙН КОМПЬЮТЕР дээр ажиллана)
 #
-# Ажиллуулах:  docker compose --profile core up -d
-# Шалгах:      docker compose ps
-# Зогсоох:     docker compose --profile core down
+# ⚠ Энэ файлыг Raspberry Pi 3B дээр ажиллуулах гэж БҮҮ оролд.
+#   Pi 3B-д 1 GB санах ой байдаг — энэ стек 3–5 GB шаардана.
+#   Pi дээр ажиллах хэсэг нь ../edge/docker-compose.yml файлд байна.
+#
+# Профайл: core (Лаб1+), pipeline (Лаб5+), app (Лаб7+), ai (Лаб8), tb (сонголт)
+#
+#   docker compose --profile core up -d
+#   docker compose ps
+#   docker compose --profile core down
 
-name: cnc302
+name: cnc302-cloud
 
 x-logging: &default-logging
   driver: json-file
@@ -16,7 +20,9 @@ x-logging: &default-logging
 
 services:
 
-  # ─────────────────────────── MQTT брокер ───────────────────────────
+  # ─────────────────────────── MQTT брокер (үүл) ───────────────────────────
+  # Pi дээрх mosquitto энэ брокер руу гүүр (bridge) татна.
+  # 0.0.0.0 дээр сонсох ёстой — Pi нь LAN-аар холбогдоно.
   emqx:
     image: emqx/emqx:5.8.6
     container_name: cnc302-emqx
@@ -30,11 +36,13 @@ services:
       EMQX_DASHBOARD__DEFAULT_PASSWORD: "${EMQX_DASHBOARD_PASSWORD}"
       # Лаб 4-т энэ хязгаарыг өөрчилж туршина
       EMQX_LISTENERS__TCP__DEFAULT__MAX_CONNECTIONS: "10000"
+      # Лаб 2-т mTLS-ийг энд асаана
+      EMQX_LISTENERS__SSL__DEFAULT__ENABLE: "${EMQX_TLS_ENABLE:-false}"
     ports:
-      - "1883:1883"     # MQTT
-      - "8883:8883"     # MQTT over TLS (Лаб 2-т идэвхжүүлнэ)
-      - "8083:8083"     # MQTT over WebSocket
-      - "18083:18083"   # удирдлагын самбар
+      - "1883:1883"     # MQTT      ← Pi-гийн гүүр энд холбогдоно
+      - "8883:8883"     # MQTT/TLS  (Лаб 2)
+      - "8083:8083"     # MQTT/WebSocket (Лаб 7)
+      - "18083:18083"   # удирдлагын самбар + REST API
     volumes:
       - emqx-data:/opt/emqx/data
       - emqx-log:/opt/emqx/log
@@ -50,38 +58,8 @@ services:
         limits:
           memory: 1g
 
-  # ─────────────────────── IoT платформ (ThingsBoard) ───────────────────────
-  # tb-postgres дүрс нь PostgreSQL-ийг дотроо агуулна — Pi дээр энэ нь хамгийн энгийн.
-  thingsboard:
-    image: thingsboard/tb-postgres:3.9.1
-    container_name: cnc302-thingsboard
-    profiles: [core]
-    restart: unless-stopped
-    logging: *default-logging
-    environment:
-      TB_QUEUE_TYPE: in-memory
-      # Pi дээр JVM-ийн санах ойг хязгаарлахгүй бол OOM болно
-      JAVA_OPTS: "-Xms512m -Xmx1500m -XX:MaxDirectMemorySize=256m"
-    ports:
-      - "8080:9090"     # веб интерфейс
-      - "1884:1883"     # ThingsBoard-ын өөрийн MQTT (EMQX-тэй зөрчилдөхгүйн тулд 1884)
-      - "5683:5683/udp" # CoAP
-    volumes:
-      - tb-data:/data
-      - tb-logs:/var/log/thingsboard
-    healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:9090/login"]
-      interval: 20s
-      timeout: 10s
-      retries: 20
-      start_period: 180s    # ThingsBoard эхлэхэд Pi дээр 2-3 минут шаардана
-    deploy:
-      resources:
-        limits:
-          memory: 2500m
-
   # ─────────────────────── Цаг цувааны өгөгдлийн сан ───────────────────────
-  # InfluxDB 3 Core. Хэрэв энэ ажиллахгүй бол:
+  # InfluxDB 3 Core. Ажиллахгүй бол:
   #   docker compose -f docker-compose.yml -f docker-compose.influx2.yml up -d
   influxdb:
     image: influxdb:3.2-core
@@ -96,7 +74,7 @@ services:
       - --object-store=file
       - --data-dir=/var/lib/influxdb3
       - --http-bind=0.0.0.0:8181
-      - --without-auth          # ЗӨВХӨН ЛАБОРАТОРИД. Лаб 7-д аюулгүй байдлыг авч үзнэ.
+      - --without-auth          # ЗӨВХӨН ЛАБОРАТОРИД. Лаб 7-д үүнийг шүүмжилнэ.
     ports:
       - "8181:8181"
     volumes:
@@ -143,6 +121,37 @@ services:
         limits:
           memory: 512m
 
+  # ─────────────── Төхөөрөмжийн бүртгэл ба OTA сервер (Лаб 2) ───────────────
+  # Энэ бол ThingsBoard-ыг орлох ХӨНГӨН бүртгэл. Кодыг нь та ../lab02-д уншина —
+  # худалдааны платформ юу хийдгийг далд биш, ил харна.
+  registry:
+    build:
+      context: ../lab02/registry
+    image: cnc302/registry:lab02
+    container_name: cnc302-registry
+    profiles: [core]
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      EMQX_API: "http://emqx:18083/api/v5"
+      EMQX_API_KEY: "${EMQX_API_KEY}"
+      EMQX_API_SECRET: "${EMQX_API_SECRET}"
+      MQTT_HOST: "emqx"
+      MQTT_PORT: "1883"
+      DB_PATH: "/data/registry.db"
+      FW_DIR: "/data/firmware"
+    ports:
+      - "8090:8090"
+    volumes:
+      - registry-data:/data
+    depends_on:
+      emqx:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 384m
+
   # ─────────────────────── Өгөгдлийн шугам (Лаб 5) ───────────────────────
   nodered:
     image: nodered/node-red:4.0
@@ -168,7 +177,7 @@ services:
         limits:
           memory: 512m
 
-  # ─────────────────────── Таних тэмдгийн сервер (Лаб 7) ───────────────────────
+  # ─────────────────── Таних тэмдгийн сервер (Лаб 7) ───────────────────
   dex:
     image: dexidp/dex:v2.41.1
     container_name: cnc302-dex
@@ -196,16 +205,13 @@ services:
     restart: unless-stopped
     logging: *default-logging
     environment:
-      TB_URL: "http://thingsboard:9090"
-      TB_USER: "${TB_USER}"
-      TB_PASSWORD: "${TB_PASSWORD}"
+      REGISTRY_URL: "http://registry:8090"
       INFLUX_URL: "http://influxdb:8181"
       INFLUX_DB: "cnc302"
       OIDC_ISSUER: "http://dex:5556/dex"
     ports:
       - "8000:8000"
     depends_on:
-      - thingsboard
       - influxdb
     deploy:
       resources:
@@ -213,6 +219,7 @@ services:
           memory: 512m
 
   # ─────────────────────── Локал LLM (Лаб 8) ───────────────────────
+  # ⚠ Pi 3B дээр НЭГ Ч ХУВИЛБАР ажиллахгүй (1 GB). Зөвхөн зөөврийн компьютер.
   ollama:
     image: ollama/ollama:0.5.13
     container_name: cnc302-ollama
@@ -229,15 +236,14 @@ services:
     deploy:
       resources:
         limits:
-          memory: 3g
+          memory: 4g
 
 volumes:
   emqx-data:
   emqx-log:
-  tb-data:
-  tb-logs:
   influx-data:
   grafana-data:
+  registry-data:
   nodered-data:
   dex-data:
   ollama-data:

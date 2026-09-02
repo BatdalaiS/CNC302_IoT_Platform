@@ -18,8 +18,8 @@
 \newcommand{\department}{Холбооны тэнхим}
 \newcommand{\school}{Мэдээлэл, холбооны технологийн сургууль}
 \newcommand{\university}{Шинжлэх Ухаан Технологийн Их Сургууль}
-\newcommand{\docversion}{1.0}
-\newcommand{\mndate}{2026 оны 8 дугаар сар}
+\newcommand{\docversion}{2.0 · Raspberry Pi 3B}
+\newcommand{\mndate}{2026 оны 9 дүгээр сар}
 
 \begin{document}
 
@@ -58,7 +58,8 @@
 \centering\small
 \begin{tabular}{@{}r@{\hspace{1.5em}}l@{}}
 \textbf{\sffamily Багш}            & \teacher \\[3pt]
-\textbf{\sffamily Лабораторийн платформ} & Оюутны зөөврийн компьютер + Raspberry Pi 5 \\[3pt]
+\textbf{\sffamily Үүлний давхарга}  & Оюутны зөөврийн компьютер (Docker Compose) \\[3pt]
+\textbf{\sffamily Ирмэгийн давхарга} & Raspberry Pi 3B (1 GB) \\[3pt]
 \textbf{\sffamily Хамрах хүрээ}    & IoT лавлах архитектурын 3, 4-р давхарга \\[3pt]
 \textbf{\sffamily Хувилбар}        & \docversion\ · \mndate \\
 \end{tabular}
@@ -69,8 +70,11 @@
 \begin{minipage}{0.9\textwidth}
 \small\itshape\color{cncmid}
 Энэхүү гарын авлага дахь найман лаборатори нь тус тусдаа биш —
-нэг ажиллаж буй платформыг үе шаттай өргөтгөж бүтээнэ. Заавар бүр
-хэмжилтийн хүснэгт, хяналтын асуулт, үнэлгээний шалгуурыг агуулна.
+нэг ажиллаж буй платформыг үе шаттай өргөтгөж бүтээнэ. Платформ нь
+хоёр төхөөрөмж дээр тархсан: хүнд үйлчилгээ зөөврийн компьютер дээр
+(үүл), хурдан хариу шаардсан үйлчилгээ Raspberry Pi 3B дээр (ирмэг).
+Заавар бүр хэмжилтийн хүснэгт, хяналтын асуулт, үнэлгээний шалгуурыг
+агуулна.
 \end{minipage}
 
 \vspace{8mm}
@@ -91,6 +95,7 @@
 % ════════════════════════════ БҮЛГҮҮД ════════════════════════════
 \input{chapters/00-intro}
 \input{chapters/01-setup}
+\input{chapters/01b-edge}
 \input{chapters/02-lab01}
 \input{chapters/03-lab02}
 \input{chapters/04-lab03}

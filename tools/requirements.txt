@@ -1,3 +1,25 @@
+# CNC302 — нийтлэг хэрэгслүүдийн хамаарал (tools/, lab04/, lab05/)
+#
+#   python3 -m venv .venv && .venv/bin/pip install -r tools/requirements.txt
+#
+# ⚠ Эдгээрийг ихэвчлэн ЗӨӨВРИЙН КОМПЬЮТЕР дээр суулгана. Raspberry Pi 3B дээр
+#   зөвхөн хөнгөн нь хэрэгтэй (paho-mqtt, requests) — ирмэгийн агентын
+#   хамаарал тусдаа: edge/agent/requirements.txt.
+#
+# Хувилбарыг СУЛ бэхэлнэ: доод хязгаар нь API-г, дээд хязгаар нь дараагийн
+# гол хувилбарын эвдрэлийг барина.
+
+# MQTT 5.0 клиент — sim_device.py, qos_latency.py, data_integrity.py
 paho-mqtt>=2.1,<3
-requests>=2.31
-tabulate>=0.9
+
+# HTTP — EMQX REST API (collect_metrics.py), InfluxDB 3 query_sql (data_integrity.py)
+requests>=2.31,<3
+
+# Хүснэгтэн гаралт
+tabulate>=0.9,<1
+
+# ── СОНГОЛТОТ ───────────────────────────────────────────────────────────────
+# matplotlib нь Pi 3B-д хэт хүнд (компиляц + ~200 MiB) тул ЭНД ОРУУЛААГҮЙ.
+# lab04/plot_scaling.py нь түүнгүйгээр ASCII графикаар ажиллана. Зөөврийн
+# компьютер дээр PNG гаргах бол гараар:
+#   pip install "matplotlib>=3.8,<4"

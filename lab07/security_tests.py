@@ -6,8 +6,18 @@ CNC302 Лаб 7 — Хандалтын хяналтын АВТОМАТ ШАЛГ�
 Энэ скрипт нь эмзэг байдлыг зориудаар хайна. Улаанаар гарсан мөр бүр
 таны системийн бодит асуудал.
 
-  python3 security_tests.py --api http://pi-team03.local:8000
-  python3 security_tests.py --api http://pi-team03.local:8000 --json out/sec.json
+Бүх үйлчилгээ ҮҮЛНИЙ давхаргад (зөөврийн компьютер) ажиллана: GraphQL API
+:8000, бүртгэл (registry) :8090, InfluxDB :8181. Pi 3B дээр зөвхөн ирмэгийн
+mosquitto ба агент байгаа тул энд шалгах зүйл байхгүй.
+
+  python3 security_tests.py --api http://localhost:8000
+  python3 security_tests.py --api http://localhost:8000 \
+      --influx http://localhost:8181 --registry http://localhost:8090 \
+      --json lab07/out/security-before.json
+
+ХҮЛЭЭГДЭХ ҮР ДҮН (засварын өмнө): ЯГ ХОЁР ноцтой асуудал — хоёулаа
+`decode_token()`-ы санаатай эмзэг байдлаас үүдэлтэй (гарын үсэг ба
+хугацаа шалгагдаагүй).
 """
 from __future__ import annotations
 import argparse, base64, json, sys, time
@@ -40,14 +50,20 @@ def denied(r) -> bool:
         return True
 
 
-def record(name: str, status: str, detail: str, severity: str = "medium") -> None:
+def record(name: str, status: str, detail: str, severity: str = "medium",
+           deliberate: bool = False) -> None:
+    """
+    deliberate=True гэдэг нь `graphql-api/main.py` дотор ЗОРИУДААР үлдээсэн
+    эмзэг байдлыг шалгаж буй тест. Дэд бүтцийн тохиргооны олдвороос
+    (InfluxDB, registry) ялгаж дүгнэхэд хэрэгтэй.
+    """
     icon = {"ТЭНЦСЭН": "✓", "УНАСАН": "✗", "АНХААР": "⚠"}[status]
     color = {"ТЭНЦСЭН": "\033[32m", "УНАСАН": "\033[31m", "АНХААР": "\033[33m"}[status]
     print(f"  {color}{icon} {name:<46}{status}\033[0m")
     if status != PASS:
         print(f"      {detail}")
     results.append({"test": name, "status": status, "detail": detail,
-                    "severity": severity})
+                    "severity": severity, "deliberate": deliberate})
 
 
 def gql(api: str, query: str, token: str | None = None, timeout=15):
@@ -60,7 +76,8 @@ def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--api", default="http://localhost:8000")
     p.add_argument("--influx", default="http://localhost:8181")
-    p.add_argument("--tb", default="http://localhost:8080")
+    # ThingsBoard-ыг Лаб 2-ын өөрсдийн бүртгэл орлосон (:8090)
+    p.add_argument("--registry", default="http://localhost:8090")
     p.add_argument("--json", help="үр дүнг JSON-д бичих")
     a = p.parse_args()
 
@@ -87,7 +104,8 @@ def main() -> int:
     who = r.json().get("data", {}).get("whoami", "")
     if "admin" in who:
         record("Хуурамч гарын үсэгтэй токен татгалзсан", FAIL,
-               f"ГАРЫН ҮСГИЙГ ШАЛГААГҮЙ! Хариу: {who}", "critical")
+               f"ГАРЫН ҮСГИЙГ ШАЛГААГҮЙ! Хариу: {who}", "critical",
+               deliberate=True)
     else:
         record("Хуурамч гарын үсэгтэй токен татгалзсан", PASS, "")
 
@@ -107,7 +125,7 @@ def main() -> int:
     r = gql(a.api, "{ whoami }", et)
     if "admin" in r.json().get("data", {}).get("whoami", ""):
         record("Хугацаа дууссан токен татгалзсан", FAIL,
-               "exp талбарыг шалгаагүй", "high")
+               "exp талбарыг шалгаагүй", "high", deliberate=True)
     else:
         record("Хугацаа дууссан токен татгалзсан", PASS, "")
 
@@ -118,20 +136,25 @@ def main() -> int:
         record("Introspection хаагдсан", WARN,
                "Схем бүрэн уншигдаж байна. Үйлдвэрлэлд хаах ёстой "
                "(strawberry.Schema(..., config=StrawberryConfig(...)) эсвэл "
-               "нэвтэрсэн хэрэглэгчид л зөвшөөрөх).", "low")
+               "нэвтэрсэн хэрэглэгчид л зөвшөөрөх).", "low", deliberate=True)
     else:
         record("Introspection хаагдсан", PASS, "")
 
     # Асуулгын нийлмэл байдал: нэг хүсэлтэд 200 давхар нэрлэсэн (alias) талбар.
     # Энэ бол GraphQL-ийн бодит DoS вектор — REST-д ийм зүйл боломжгүй.
+    #
+    # Анхаар: ЗААВАЛ хүчинтэй үүрэгтэй токентой явуулна. Токенгүй бол RBAC
+    # татгалзаж, шалгалт "тэнцсэн" гэж БУРУУ дүгнэнэ (гарын үсгийн тестийн
+    # base64url-тай яг адил урхи).
+    dt = forge_jwt({"sub": "dos", "groups": ["viewer"]})
     aliases = " ".join(f"a{i}: devices(limit: 50) {{ name }}" for i in range(200))
     try:
-        r = gql(a.api, "{ " + aliases + " }", timeout=25)
+        r = gql(a.api, "{ " + aliases + " }", dt, timeout=25)
         if r.status_code == 200 and "errors" not in r.json():
             record("Асуулгын нийлмэл байдлын хязгаар", WARN,
                    "200 давхар нэрлэсэн талбартай асуулга хүлээн авагдав — "
                    "DoS эрсдэл. strawberry-д QueryDepthLimiter / "
-                   "cost analysis нэмэх ёстой.", "medium")
+                   "cost analysis нэмэх ёстой.", "medium", deliberate=True)
         else:
             record("Асуулгын нийлмэл байдлын хязгаар", PASS, "")
     except Exception:
@@ -159,20 +182,38 @@ def main() -> int:
 
     # ── 7. Дэд бүтцийн ил задгай байдал ──
     print("\n7. Дэд бүтцийн үйлчилгээ ил байна уу")
-    for name, url, why in (
-        ("InfluxDB танилтгүй уншигдана", f"{a.influx}/health",
-         "InfluxDB нь --without-auth горимд ажиллаж байна"),
-        ("ThingsBoard нэвтрэх хуудас", f"{a.tb}/login", "хэвийн"),
-    ):
-        try:
-            r = httpx.get(url, timeout=6)
-            if "InfluxDB" in name and r.status_code == 200:
-                record(name, FAIL, why + " — Лаб 7-т токен идэвхжүүлэх ёстой",
-                       "high")
-            else:
-                record(name, PASS, "")
-        except Exception:
-            record(name, PASS, "хандах боломжгүй")
+
+    # 7.1 InfluxDB — --without-auth горим (Zero Trust-ийн илэрхий зөрчил)
+    try:
+        r = httpx.get(f"{a.influx}/health", timeout=6)
+        if r.status_code == 200:
+            record("InfluxDB танилтгүй уншигдана", FAIL,
+                   "InfluxDB нь --without-auth горимд ажиллаж байна "
+                   "— Лаб 7-т токен идэвхжүүлэх ёстой", "high")
+        else:
+            record("InfluxDB танилтгүй уншигдана", PASS, "")
+    except Exception:
+        record("InfluxDB танилтгүй уншигдана", PASS, "хандах боломжгүй")
+
+    # 7.2 Бүртгэл (registry) — ThingsBoard-ыг орлосон өөрсдийн үйлчилгээ.
+    #     Лаб 2-т ЗОРИУДААР нээлттэй үлдээсэн: JIT `claim` нь хуваалцсан
+    #     нууцгүйгээр ажиллана. Энэ бол мэдэгдэж буй цоорхой тул АНХААР
+    #     зэрэглэлтэй — "ноцтой хоёр" жагсаалтад орохгүй, гэхдээ тайланд
+    #     заавал бичигдэнэ.
+    try:
+        r = httpx.get(f"{a.registry}/devices", timeout=6)
+        if r.status_code == 200:
+            n = len(r.json().get("devices", []))
+            record("Бүртгэл (registry) танилтгүй уншигдана", WARN,
+                   f"Токенгүйгээр {n} төхөөрөмжийн бүртгэл уншигдав "
+                   f"({a.registry}/devices). Бүртгэлийн API-д API түлхүүр "
+                   f"эсвэл mTLS нэмэх ёстой (Лаб 2-ын хяналтын асуулт).",
+                   "medium")
+        else:
+            record("Бүртгэл (registry) танилтгүй уншигдана", PASS, "")
+    except Exception:
+        record("Бүртгэл (registry) танилтгүй уншигдана", PASS,
+               "хандах боломжгүй")
 
     # ── дүн ──
     print(f"\n{'═'*66}")
@@ -182,15 +223,31 @@ def main() -> int:
           f"УНАСАН {counts[FAIL]}")
     crit = [r for r in results if r["severity"] in ("critical", "high")
             and r["status"] == FAIL]
-    if crit:
-        print(f"\n  ⚠ {len(crit)} ноцтой асуудал:")
-        for r in crit:
+    intended = [r for r in crit if r["deliberate"]]
+    infra = [r for r in crit if not r["deliberate"]]
+    if intended:
+        print(f"\n  ⚠ САНААТАЙ ЭМЗЭГ БАЙДАЛ — {len(intended)} ширхэг "
+              f"(graphql-api/main.py, `decode_token`):")
+        for r in intended:
+            print(f"    · [{r['severity']}] {r['test']}")
+            print(f"      {r['detail']}")
+        if len(intended) != 2:
+            print("    ⚠ Засварын өмнө энэ тоо ЯГ 2 байх ёстой. Өөр тоо гарвал "
+                  "шалгалт эсвэл API буруу ажиллаж байна.")
+    else:
+        print("\n  ✓ Санаатай эмзэг байдал илрээгүй — засвар ажиллаж байна.")
+    if infra:
+        print(f"\n  ⚠ Дэд бүтцийн ноцтой олдвор — {len(infra)} ширхэг "
+              f"(код биш, тохиргоо):")
+        for r in infra:
             print(f"    · [{r['severity']}] {r['test']}")
             print(f"      {r['detail']}")
     print(f"{'═'*66}\n")
 
     if a.json:
-        json.dump({"api": a.api, "results": results, "summary": counts},
+        json.dump({"api": a.api, "results": results, "summary": counts,
+                   "deliberate_criticals": len(intended),
+                   "infra_criticals": len(infra)},
                   open(a.json, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
         print(f"JSON: {a.json}")
     return 1 if counts[FAIL] else 0

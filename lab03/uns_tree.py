@@ -33,7 +33,25 @@ from collections import defaultdict
 import paho.mqtt.client as mqtt
 from paho.mqtt.enums import CallbackAPIVersion
 
-CHANNELS = {"telemetry", "status", "cmd", "event", "attributes"}
+# Зөвшөөрөгдсөн суваг. Энэ жагсаалт бол ТОХИРОЛЦОО — таны багийн UNS схем
+# өөр байж болно, гэхдээ ил бичигдсэн, ХЯЗГААРЛАГДМАЛ байх ёстой.
+# Хэрэв шинэ суваг нэмэх бол энд бич — эс бөгөөс `--strict` унана.
+CHANNELS = {
+    "telemetry",    # хэмжилтийн өгөгдөл
+    "status",       # retained: онлайн/офлайн (LWT)
+    "health",       # төхөөрөмжийн эрүүл мэнд (темп, RAM, throttle)
+    "anomaly",      # илэрсэн онцгой тохиолдол (Лаб 6)
+    "cmd",          # үүлээс ирэх команд
+    "config",       # үүлээс ирэх тохиргоо
+    "event",        # бизнесийн үйл явдал
+    "attributes",   # удаан өөрчлөгддөг шинж чанар
+}
+
+# Хоёр хэсэгтэй суваг (channel/subchannel). Эдгээр нь 7 хэсэгтэй сэдэв үүсгэнэ.
+COMPOUND_CHANNELS = {
+    "bridge",       # bridge/state
+    "ota",          # ota/offer, ota/request, ota/chunk/N, ota/state
+}
 SEG_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,31}$")
 
 
@@ -71,12 +89,20 @@ def validate(topic: str, prefix: str) -> list[str]:
 
     if parts[0] != prefix:
         problems.append(f"угтвар '{parts[0]}' ≠ '{prefix}'")
-    if len(parts) != 6:
+
+    # Ердийн суваг → 6 хэсэг.  Нийлмэл суваг (bridge/state, ota/chunk/7) → 7–8.
+    compound = len(parts) >= 6 and parts[5] in COMPOUND_CHANNELS
+    if compound:
+        if not 7 <= len(parts) <= 8:
+            problems.append(f"'{parts[5]}' нийлмэл суваг тул 7–8 хэсэгтэй байх "
+                            f"ёстой, {len(parts)} байна")
+    elif len(parts) != 6:
         problems.append(f"{len(parts)} хэсэгтэй, 6 байх ёстой "
                         "(prefix/site/area/line/device/channel)")
-    if len(parts) >= 6 and parts[5] not in CHANNELS:
+
+    if len(parts) >= 6 and parts[5] not in CHANNELS | COMPOUND_CHANNELS:
         problems.append(f"суваг '{parts[5]}' зөвшөөрөгдөөгүй "
-                        f"({'|'.join(sorted(CHANNELS))})")
+                        f"({'|'.join(sorted(CHANNELS | COMPOUND_CHANNELS))})")
     for i, seg in enumerate(parts):
         if not SEG_RE.match(seg):
             problems.append(f"{i}-р хэсэг '{seg}': зөвхөн жижиг үсэг, тоо, "

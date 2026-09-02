@@ -92,7 +92,7 @@ def run_node(a) -> None:
     node_metrics = [
         metric("bdSeq", 0, bd_seq, "Int64"),
         metric("Node Control/Rebirth", 1, False, "Boolean"),
-        metric("Properties/Hardware", 2, "Raspberry Pi 5", "String"),
+        metric("Properties/Hardware", 2, "Raspberry Pi 3B", "String"),
         metric("Properties/OS", 3, "Raspberry Pi OS 64-bit", "String"),
     ]
     c.publish(topic(group, "NBIRTH", node),

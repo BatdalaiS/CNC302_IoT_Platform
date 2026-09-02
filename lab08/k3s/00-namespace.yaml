@@ -1,3 +1,12 @@
+# CNC302 Лаб 8 — K3s дээрх ИРМЭГИЙН ажлын ачаалал
+#
+# ⚠ Энэ манифестууд RASPBERRY PI 3B дээр ажиллана (1 GB RAM).
+#   Тиймээс энд ЗӨВХӨН ирмэгийн хоёр үйлчилгээ байна:
+#     mosquitto (гүүртэй брокер)  +  edge-agent (мэдрэгч ба дүгнэлт)
+#   EMQX, InfluxDB, Grafana нь ҮҮЛНИЙ давхаргад — зөөврийн компьютер
+#   дээр Docker Compose-оор (../../stack/docker-compose.yml). Тэдгээрийг
+#   Pi 3B-ийн K3s рүү оруулах гэж ОРОЛДОЖ БОЛОХГҮЙ: зөвхөн InfluxDB
+#   өөрөө 1 GB-ийг бүхэлд нь идэх болно.
 apiVersion: v1
 kind: Namespace
 metadata:

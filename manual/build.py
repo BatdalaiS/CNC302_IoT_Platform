@@ -21,6 +21,7 @@ OUT = "chapters"
 CHAPTERS = [
     ("README.md",                 "00-intro.tex",      "Гарын авлагын танилцуулга", "chapter"),
     ("SETUP.md",                  "01-setup.tex",      "Ажлын орчны бэлтгэл",       "chapter"),
+    ("edge/README.md",            "01b-edge.tex",      "Ирмэгийн давхарга — лавлах", "chapter"),
     ("lab01/README.md",           "02-lab01.tex",      None, "chapter"),
     ("lab02/README.md",           "03-lab02.tex",      None, "chapter"),
     ("lab03/README.md",           "04-lab03.tex",      None, "chapter"),
@@ -37,9 +38,14 @@ CHAPTERS = [
 
 # DejaVu фонтод байхгүй тэмдэгтүүдийг орлуулна
 GLYPH_MAP = {
+    # Ажлын байрны тэмдэглэгээ. DejaVu-д эдгээр эможи БАЙХГҮЙ тул хэвлэмэл
+    # хувилбарт товчилсон текстээр орлуулна (Markdown-д эможи хэвээр).
+    "💻": "[ЗК]",       # зөөврийн компьютер (үүлний давхарга)
+    "🥧": "[Pi]",       # Raspberry Pi 3B (ирмэгийн давхарга)
     "⭐": "",           # хүснэгтийн тэмдэглэгээ — доор текстээр орлоно
     "⛔": "СТОП:",
     "🔒": "",
+    "�": "",       # эвдэрсэн кодчилолын үлдэгдэл
     "☒": "[x]",
     "☐": "[ ]",
     " ": " ",
@@ -51,6 +57,11 @@ GLYPH_MAP = {
 
 def preprocess(md: str) -> str:
     """Markdown-ийг pandoc-т өгөхийн өмнө цэвэрлэнэ."""
+    # GitHub-д зориулсан толгой (badge, Actions-ийн заавар) нь хэвлэмэл
+    # хувилбарт хэрэггүй. `<!-- GitHub толгой -->`-оос эхний `# ` гарчиг
+    # хүртэлх хэсгийг бүхэлд нь хасна.
+    md = re.sub(r"^<!--\s*GitHub толгой\s*-->.*?(?=^# )", "", md,
+                flags=re.S | re.M)
     # ⭐ тэмдэгтэй хүснэгтийн гарчгийг текстээр тэмдэглэнэ
     md = re.sub(r"^(###\s+.*?)\s*⭐\s*$", r"\1 (ГОЛ ХҮСНЭГТ)", md, flags=re.M)
     for k, v in GLYPH_MAP.items():
@@ -158,8 +169,14 @@ def postprocess(tex: str) -> str:
         inner = m.group(1)
         if inner.count("\\_") >= 2:
             inner = inner.replace("\\_", "\\_\\allowbreak{}")
+        # Урт URL / зам нь мөрөнд багтахгүй тул тусгаарлагчийн ДАРАА таслах
+        # боломж нэмнэ (жишээ: http://influxdb:8181/api/v3/write_lp?db=…).
+        # \allowbreak нь зөвхөн БОЛОМЖ өгнө — шаардлагагүй бол таслахгүй.
+        if len(inner) > 24:
+            for sep in ("/", "?", "\\&", "=", ":", "."):
+                inner = inner.replace(sep, sep + "\\allowbreak{}")
         return "\\texttt{" + inner + "}"
-    tex = re.sub(r"\\texttt\{((?:[^{}]|\\[{}_])*)\}", brk, tex)
+    tex = re.sub(r"\\texttt\{((?:[^{}]|\\[{}_&%#$])*)\}", brk, tex)
 
     # \tightlist-ийг хэвээр үлдээнэ (preamble-д тодорхойлсон)
     # Хоосон догол мөрийг цэгцлэнэ

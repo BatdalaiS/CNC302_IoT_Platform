@@ -1,19 +1,38 @@
 #!/usr/bin/env python3
 """
-CNC302 Лаб 6 — Ирмэгийн дүгнэлтийн гүйцэтгэлийг хэмжих
+CNC302 Лаб 6 — Ирмэгийн дүгнэлтийн гүйцэтгэлийг хэмжих (Raspberry Pi 3B)
 
 Лабораторийн гол хэрэгсэл. Загварын НАРИЙВЧЛАЛ биш, БАЙРШУУЛАЛТЫН ӨРТӨГ-ийг
-хэмжинэ: саатал, санах ой, CPU, эрчим хүчний ойролцоо тооцоо.
+хэмжинэ: саатал, санах ой, CPU, дулаан.
+
+⚠ ХУРДАСГУУР БАЙХГҮЙ. Pi 3B-д PCIe байхгүй тул Raspberry Pi AI Kit
+  (Hailo-8L) ФИЗИКИЙН ХУВЬД холбогдох боломжгүй. Тиймээс энэ хэрэгсэлд
+  hailo backend БАЙХГҮЙ. Бүх хэмжилт 4×Cortex-A53 @1.2 ГГц CPU дээр
+  (NEON бий, крипто өргөтгөл байхгүй) хийгдэнэ.
+
+⚠ MobileNet-ийн зэрэглэлийн зурган загвар Pi 3B дээр ЗОРИУДААР хэт удаан.
+  Хэдэн зуун мс, бүр секунд гарна — энэ нь алдаа биш, ХЭМЖИХ ЁСТОЙ БАРИМТ.
+  "Хэр удаан вэ, яагаад вэ" гэдгийг тоогоор нотлох нь даалгаврын нэг хэсэг.
+  Харин БОДИТООР байршуулах загвар бол жижиг ХҮСНЭГТ/ЦОНХНЫ гажил илрүүлэгч
+  (3–5 оролт, хэдэн KiB) — edge/agent/edge_agent.py яг түүнийг ачаална.
 
 Дэмжигдэх backend:
   tflite      TensorFlow Lite / LiteRT (.tflite)     — CPU
-  eim         Edge Impulse Linux runner (.eim)       — CPU эсвэл хурдасгуур
+  eim         Edge Impulse Linux runner (.eim)       — CPU
   onnx        ONNX Runtime (.onnx)                   — CPU
   synthetic   загваргүй суурь (аргачлалыг турших)    — хаана ч ажиллана
 
+Хэмжилтийн үнэн зөвийн ГУРВАН НӨХЦӨЛ (Pi 3B дээр):
+  1. ЗААВАЛ халаана. A53-ын давтамж 600 МГц-ээс 1.2 ГГц рүү өгсөх, кэш
+     дүүрэх хүртэл эхний дүгнэлтүүд удаан. --cold нь халаалтыг алгасна
+     (зөвхөн "халаалт яагаад хэрэгтэй вэ" гэсэн туршилтад).
+  2. `vcgencmd get_throttled`-ыг ӨМНӨ ба ДАРАА нь уншина. Өөрчлөгдвөл
+     тухайн ажиллалт ХҮЧИНГҮЙ — throttling эхэлмэгц бүх саатал гажина.
+  3. --threads анхдагчаар 2 (доорх тайлбарыг үз).
+
 Жишээ:
   # Аргачлалыг турших (загваргүй)
-  python3 benchmark_inference.py --backend synthetic --runs 500
+  python3 benchmark_inference.py --backend synthetic --runs 500 --device-label pi3b
 
   # float32 ба int8 загварыг харьцуулах
   python3 benchmark_inference.py --backend tflite --model models/model_float32.tflite --runs 300
@@ -22,9 +41,12 @@ CNC302 Лаб 6 — Ирмэгийн дүгнэлтийн гүйцэтгэлий
   # Edge Impulse-ийн байршуулсан загвар
   python3 benchmark_inference.py --backend eim --model models/anomaly.eim --runs 300
 
-  # Бүх үр дүнг нэг CSV-д хуримтлуулж эцэст нь харьцуулах
-  python3 benchmark_inference.py --backend tflite --model models/model_int8.tflite \\
-      --label int8-cpu --csv lab06/out/bench.csv
+  # НЭГ ХҮСНЭГТ: Pi 3B CPU / зөөврийн компьютерийн CPU / багшийн лавлах мөр
+  python3 benchmark_inference.py --backend synthetic --device-label pi3b \\
+      --label synth-t2 --csv lab06/out/bench.csv        # Pi 3B дээр
+  python3 benchmark_inference.py --backend synthetic --device-label laptop-cpu \\
+      --label synth-t2 --csv lab06/out/bench.csv        # зөөврийн компьютер дээр
+  # → нэг CSV, device_label баганаар нь ялгана
 """
 from __future__ import annotations
 
@@ -39,6 +61,11 @@ import sys
 import time
 
 import numpy as np
+
+# Халаалтын ЗААВАЛ байх доод хязгаар. --warmup үүнээс бага байсан ч
+# энэ тоо руу өснө (--cold-оос бусад тохиолдолд).
+MIN_WARMUP = 20
+WARMUP_MAX = 5000
 
 
 # ─────────────────────────── систем ба нөөц ───────────────────────────
@@ -74,6 +101,48 @@ def read_temp() -> float:
 
 def model_size_kib(path: str | None) -> float:
     return os.path.getsize(path) / 1024 if path and os.path.exists(path) else 0.0
+
+
+# ────────────────── Pi 3B: throttling-ийн хяналт ──────────────────
+# Хэмжилтийн үнэн зөвд ХАМГИЙН чухал шалгалт. Хүчдэл дутах эсвэл 80 °C
+# давахад SoC давтамжаа бууруулна — тэр мөчөөс хойшхи бүх саатал гажина.
+THROTTLE_BITS = {
+    0: "яг одоо хүчдэл дутуу байна",
+    1: "яг одоо давтамж хязгаарлагдсан (arm_freq capped)",
+    2: "яг одоо THROTTLING болж байна",
+    3: "яг одоо зөөлөн дулааны хязгаар идэвхтэй",
+    16: "ачаалснаас хойш хүчдэл дутсан",
+    17: "ачаалснаас хойш давтамж хязгаарлагдсан",
+    18: "ачаалснаас хойш throttling болсон",
+    19: "ачаалснаас хойш зөөлөн дулааны хязгаарт хүрсэн",
+}
+
+
+def throttled_hex() -> str | None:
+    """
+    `vcgencmd get_throttled` → '0x0' бол бүх зүйл хэвийн.
+    Pi биш (эсвэл vcgencmd байхгүй) бол None буцаана — тэр тохиолдолд
+    шалгалт зүгээр л алгасагдана.
+    """
+    try:
+        r = subprocess.run(["vcgencmd", "get_throttled"], capture_output=True,
+                           text=True, timeout=3)
+        if r.returncode == 0 and "=" in r.stdout:
+            return r.stdout.strip().split("=", 1)[1]
+    except Exception:  # noqa: BLE001
+        pass
+    return None
+
+
+def throttle_reasons(value: str | None) -> list[str]:
+    """0x50005 гэх мэт утгыг монголоор тайлбарлана."""
+    if not value:
+        return []
+    try:
+        v = int(value, 16)
+    except ValueError:
+        return []
+    return [t for bit, t in THROTTLE_BITS.items() if v & (1 << bit)]
 
 
 # ─────────────────────────── backend-ууд ───────────────────────────
@@ -241,10 +310,23 @@ def benchmark(be: Backend, a) -> dict:
     gc.collect()
     mem_before = rss_mib()
     temp_before = read_temp()
+    thr_before = throttled_hex()
 
-    # Халаалт — эхний дуудлагууд ямагт удаан (кэш, JIT, санах ойн хуваарилалт)
-    for _ in range(a.warmup):
+    # ЗААВАЛ ХАЛААХ. Pi 3B дээр эхний дуудлагууд ямагт удаан: кэш хоосон,
+    # санах ой хуваарилагдаагүй, ondemand governor давтамжийг 600 МГц-ээс
+    # 1.2 ГГц рүү өсгөж амжаагүй байдаг. Халаалтгүй хэмжилтийн p99 нь
+    # загварын биш, эхлэлийн өртгийг хэмждэг.
+    warm = 0 if a.cold else max(a.warmup, MIN_WARMUP)
+    t_warm0 = time.perf_counter()
+    for _ in range(warm):
         be.infer(sample)
+    # Хугацааны доод хязгаар: удаан загварт дүгнэлтийн тоо хангалттай, харин
+    # хурдан загварт governor 1.2 ГГц хүртэл өсөх хугацаа хэрэгтэй. WARMUP_MAX
+    # нь маш хурдан машин дээр халаалт хэдэн зуун мянга болохоос сэргийлнэ.
+    while (not a.cold and warm < WARMUP_MAX
+           and (time.perf_counter() - t_warm0) < a.warmup_seconds):
+        be.infer(sample)
+        warm += 1
 
     gc.collect()
     mem_after_warm = rss_mib()
@@ -263,14 +345,17 @@ def benchmark(be: Backend, a) -> dict:
     gc.collect()
     mem_peak = rss_mib()
     temp_after = read_temp()
+    thr_after = throttled_hex()
     lat.sort()
 
     return {
         "label": a.label or be.name,
+        "device_label": a.device_label,      # pi3b | laptop-cpu | reference …
         "backend": be.name,
         "model": os.path.basename(a.model) if a.model else "",
         "model_kib": round(model_size_kib(a.model), 1),
         "runs": a.runs,
+        "warmup_done": warm,
         "threads": a.threads,
         "lat_p50_ms": round(percentile(lat, 50), 3),
         "lat_p95_ms": round(percentile(lat, 95), 3),
@@ -289,15 +374,51 @@ def benchmark(be: Backend, a) -> dict:
         "temp_before_c": temp_before,
         "temp_after_c": temp_after,
         "temp_delta_c": round(temp_after - temp_before, 1),
+        "throttled_before": thr_before or "n/a",
+        "throttled_after": thr_after or "n/a",
+        "throttled_changed": bool(thr_before and thr_after
+                                  and thr_before != thr_after),
     }
 
 
+def warn_throttled(r: dict) -> None:
+    """
+    Throttling нь хэмжилтийг ХҮЧИНГҮЙ болгоно. Чимээгүй өнгөрөөвөл оюутан
+    гажсан тоог тайландаа бичнэ — тиймээс энд ЧАНГА анхааруулна.
+    """
+    if r["throttled_before"] == "n/a":
+        return                       # Pi биш — шалгалт байхгүй
+    if r["throttled_changed"]:
+        print(f"\n{'!'*64}")
+        print("  ⚠⚠ АНХААР: АЖИЛЛАЛТЫН ЯВЦАД THROTTLING ТОХИОЛДЛОО!")
+        print(f"  vcgencmd get_throttled:  {r['throttled_before']}"
+              f"  →  {r['throttled_after']}")
+        for t in throttle_reasons(r["throttled_after"]):
+            print(f"    · {t}")
+        print("  ЭНЭ ХЭМЖИЛТ ХҮЧИНГҮЙ. Тайланд бүү оруул. Хийх зүйл:")
+        print("    1. Pi-г хөргөж (радиатор/сэнс), 5 минут амраа")
+        print("    2. Тэжээлийг шалга — 5V/2.5A эх үүсвэр ЗААВАЛ "
+              "(USB порт, сул кабель болохгүй)")
+        print("    3. vcgencmd get_throttled нь 0x0 болсны дараа дахин ажиллуул")
+        print(f"{'!'*64}")
+    elif throttle_reasons(r["throttled_before"]):
+        print("\n  ⚠ Санамж: ажиллалт эхлэхээс ӨМНӨ throttling-ийн тэмдэглэгээ "
+              f"байсан ({r['throttled_before']}):")
+        for t in throttle_reasons(r["throttled_before"]):
+            print(f"      · {t}")
+        print("    Ажиллалтын явцад өөрчлөгдөөгүй тул тоог ашиглаж болно, "
+              "гэхдээ шалтгааныг тайландаа тэмдэглэ.")
+
+
 def print_result(r: dict, info: dict) -> None:
-    print(f"\n{'═'*64}\n  {r['label']}  ({r['backend']})\n{'═'*64}")
+    print(f"\n{'═'*64}\n  {r['label']}  ({r['backend']} @ {r['device_label']})"
+          f"\n{'═'*64}")
     for k, v in info.items():
         print(f"  {k:<22} {v}")
     print(f"  {'-'*60}")
     rows = [
+        ("Төхөөрөмж", r["device_label"]),
+        ("Халаалт", f"{r['warmup_done']} дүгнэлт"),
         ("Загварын хэмжээ", f"{r['model_kib']:.1f} KiB"),
         ("Санах ой (загвар)", f"{r['mem_model_mib']:.1f} MiB"),
         ("Санах ой (оргил)", f"{r['mem_peak_mib']:.1f} MiB"),
@@ -310,6 +431,8 @@ def print_result(r: dict, info: dict) -> None:
         ("CPU нэг дүгнэлтэд", f"{r['cpu_ms_per_infer']:.3f} мс"),
         ("CPU ашиглалт", f"{r['cpu_efficiency']:.2f} цөм"),
         ("Температур", f"{r['temp_before_c']:.1f} → {r['temp_after_c']:.1f} °C"),
+        ("Throttle (өмнө → дараа)",
+         f"{r['throttled_before']} → {r['throttled_after']}"),
     ]
     for k, v in rows:
         print(f"  {k:<24} {v:>28}")
@@ -322,12 +445,25 @@ def main() -> int:
     p.add_argument("--backend", choices=list(BACKENDS), default="synthetic")
     p.add_argument("--model", help=".tflite / .eim / .onnx файл")
     p.add_argument("--runs", type=int, default=300)
-    p.add_argument("--warmup", type=int, default=30)
-    p.add_argument("--threads", type=int, default=1,
-                   help="CPU урсгалын тоо (1 vs 4-ийг харьцуулж үз!)")
+    p.add_argument("--warmup", type=int, default=30,
+                   help=f"халаалтын дүгнэлтийн тоо (доод хязгаар {MIN_WARMUP})")
+    p.add_argument("--warmup-seconds", type=float, default=2.0,
+                   help="халаалтын доод ХУГАЦАА, сек (governor 1.2 ГГц хүрэх)")
+    p.add_argument("--cold", action="store_true",
+                   help="халаалтыг БҮРЭН алгасах — зөвхөн 'халаалт яагаад "
+                        "хэрэгтэй вэ' туршилтад. Тоо нь хүчингүй.")
+    # Pi 3B-д 4 цөм бий ч --threads 4 нь ихэвчлэн 2-оос УДААН гардаг:
+    # A53 цөмүүд нэг л санах ойн сувгийг (LPDDR2, ~1.6 GB/s) хуваалцдаг тул
+    # 4 урсгал зурвасын өргөнд түгжигдээд, дээрээс нь дулаан нэмэгдэж
+    # throttling-ийг хурдасгана. Тиймээс анхдагч нь 2 — 1/2/4-ийг ӨӨРӨӨ хэмж.
+    p.add_argument("--threads", type=int, default=2,
+                   help="CPU урсгалын тоо (Pi 3B: 1 vs 2 vs 4-ийг харьцуул!)")
     p.add_argument("--window", type=int, default=125,
                    help="synthetic backend-ийн оролтын урт")
     p.add_argument("--label", help="CSV дэх мөрийн шошго")
+    p.add_argument("--device-label", default="unknown",
+                   help="ямар төмөр дээр хэмжив: pi3b | laptop-cpu | reference "
+                        "— CSV-д хадгалагдаж нэг хүснэгтэд харьцуулагдана")
     p.add_argument("--csv", help="үр дүнг CSV-д НЭМЖ бичих")
     p.add_argument("--json", help="үр дүнг JSON-д бичих")
     a = p.parse_args()
@@ -345,10 +481,16 @@ def main() -> int:
         return 3
 
     info = be.describe()
-    print(f"→ {a.backend}: {a.runs} дүгнэлт ({a.warmup} халаалт), "
+    warm_txt = "ХАЛААЛТГҮЙ (--cold)" if a.cold else \
+        f"{max(a.warmup, MIN_WARMUP)}+ халаалт / ≥{a.warmup_seconds:.1f} сек"
+    print(f"→ {a.backend} @ {a.device_label}: {a.runs} дүгнэлт ({warm_txt}), "
           f"оролт={be.input_shape}, урсгал={a.threads}", file=sys.stderr)
+    if a.cold:
+        print("  ⚠ --cold: халаалтгүй тоо нь ЗӨВХӨН харьцуулалтад, "
+              "тайлангийн үндсэн хүснэгтэд бүү оруул.", file=sys.stderr)
     r = benchmark(be, a)
     print_result(r, info)
+    warn_throttled(r)
 
     if a.csv:
         os.makedirs(os.path.dirname(a.csv) or ".", exist_ok=True)
@@ -368,7 +510,10 @@ def main() -> int:
     print(f"\n  Санамж: 100 Гц мэдрэгчид дүгнэлт 10 мс-ээс бага байх ёстой. "
           f"Таных: p99 = {r['lat_p99_ms']:.2f} мс → "
           f"{'НИЙЦЭЖ БАЙНА' if r['lat_p99_ms'] < 10 else 'НИЙЦЭХГҮЙ'}")
-    return 0
+    print("  Харьцуулалт: ижил --label-тай мөрийг pi3b ба laptop-cpu дээр "
+          "авч, CSV-гээ нэг хүснэгт болго.")
+    # throttling гарсан бол алдааны кодоор буцна — оюутан анзаарахгүй өнгөрөхгүй
+    return 4 if r["throttled_changed"] else 0
 
 
 if __name__ == "__main__":

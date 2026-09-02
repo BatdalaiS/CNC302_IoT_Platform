@@ -1,0 +1,30 @@
+# CNC302 — ирмэгийн агентыг systemd-ээр байнга ажиллуулах
+#
+#   sudo cp cnc302-edge-agent.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now cnc302-edge-agent
+#   journalctl -u cnc302-edge-agent -f
+#
+# Яагаад systemd вэ: Pi тэжээлээ алдаад дахин асахад агент өөрөө сэргэнэ.
+# Лаб 5-д яг үүнийг шалгана (Pi-г унтрааж асаана).
+
+[Unit]
+Description=CNC302 edge agent
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cnc302
+WorkingDirectory=/home/cnc302/cnc302/edge
+EnvironmentFile=/home/cnc302/cnc302/edge/.env
+ExecStart=/home/cnc302/cnc302/edge/.venv/bin/python agent/edge_agent.py
+Restart=always
+RestartSec=5
+
+# 1 GB RAM-ын хамгаалалт: агент 200 MiB давбал systemd үүнийг таслана
+MemoryMax=200M
+Nice=5
+
+[Install]
+WantedBy=multi-user.target

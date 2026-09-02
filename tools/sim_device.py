@@ -2,25 +2,47 @@
 """
 CNC302 — виртуал төхөөрөмжийн флот (MQTT 5.0)
 
-Зөөврийн компьютер дээр ажиллаж, Raspberry Pi дээрх брокерт бодит төхөөрөмж
-мэт холбогдоно. Лаб 2-оос эхлэн бүх лабораторид хэрэглэгдэнэ.
+Лаб 2-оос эхлэн бүх лабораторид хэрэглэгдэнэ.
+
+── ХОЁР ХОСТЫН БҮТЭЦ, ХОЁР ЗОРИЛТ ──────────────────────────────────────────
+Хичээлийн стек хоёр хостод хуваагдсан:
+
+  · үүл  (cloud) — зөөврийн компьютер: EMQX, InfluxDB, Grafana, registry …
+  · ирмэг (edge) — Raspberry Pi 3B: mosquitto + үүл рүү татсан гүүр (bridge)
+
+Виртуал флотыг ХОЁУЛАНГИЙНХ НЬ аль руу ч чиглүүлж болно, гэхдээ утга нь өөр:
+
+  --target cloud  → EMQX рүү шууд. Зөөврийн компьютер хүчирхэг тул энд
+                    хязгаар нь ихэвчлэн олдохгүй. Энэ бол "жишиг шугам".
+  --target edge   → Pi-гийн mosquitto руу. ЭНЭ НЬ СОНИРХОЛТОЙ ХЭМЖИЛТ:
+                    бүх мессеж Pi-гаас гүүрээр дамжин 100 Mbit холбоосоор
+                    гарна. Pi 3B дээр Ethernet нь USB 2.0 дээр сууж байгаа
+                    тул бодит хурд ~90–95 Mbit бөгөөд USB-тэй өрсөлддөг.
+                    Хязгаар нь CPU биш, ихэнхдээ RAM (1 GB) эсвэл уплинк.
+
+`--target` нь зөвхөн АНХДАГЧ ЗӨВЛӨМЖИЙГ (хаяг/порт) л өөрчилнө; бодит хаягийг
+`--host`/`--port` тодорхойлно — тэдгээр нь үргэлж давамгайлна.
 
 Жишээ:
   # Брокергүйгээр ачааллыг шалгах (SETUP-ийн шалгалт)
   python sim_device.py --dry-run --devices 2 --count 3
 
-  # 10 төхөөрөмж, 2 секунд тутам, Pi дээрх EMQX рүү
-  python sim_device.py --host pi-team03.local --devices 10 --interval 2
+  # 10 төхөөрөмж, 2 секунд тутам, зөөврийн компьютерийн EMQX рүү
+  python sim_device.py --target cloud --host 192.168.1.100 --devices 10 --interval 2
 
-  # TLS + клиентийн сертификаттай (Лаб 2)
-  python sim_device.py --host pi-team03.local --port 8883 --tls \\
+  # Мөн 10 төхөөрөмж, харин Pi-гийн mosquitto руу (уплинкийг ачаална)
+  python sim_device.py --target edge --host pi3b-01.local --devices 10 --interval 2
+
+  # TLS + клиентийн сертификаттай (Лаб 2) — EMQX-ийн 8883
+  python sim_device.py --target cloud --host 192.168.1.100 --port 8883 --tls \\
       --ca certs/ca.crt --cert certs/dev001.crt --key certs/dev001.key --devices 1
 
   # Гажил үүсгэх (Лаб 5, Лаб 6)
-  python sim_device.py --host pi-team03.local --devices 5 --anomaly-rate 0.05
+  python sim_device.py --target edge --host pi3b-01.local --devices 5 --anomaly-rate 0.05
 
 Тэмдэглэл: 200-аас олон холболт шаардвал энэ скриптийн оронд `emqtt-bench`
-ашиглана (Лаб 4-ийн зааврыг үзнэ үү).
+ашиглана (Лаб 4-ийн зааврыг үзнэ үү). Pi-гийн mosquitto-д 200 холболт аль
+хэдийн их ачаалал болохыг санаарай.
 """
 from __future__ import annotations
 
@@ -60,6 +82,48 @@ class Stats:
 
 
 STOP = threading.Event()
+
+# --target-ийн зөвлөмжүүд. Зөвхөн ТАЙЛБАР — холболтыг --host/--port шийднэ.
+TARGET_HINTS = {
+    "edge": {
+        "host": "pi3b-01.local",
+        "port": 1883,
+        "what": "Raspberry Pi 3B дээрх mosquitto (ирмэгийн брокер)",
+        "note": "мессеж Pi-гийн 100 Mbit уплинкээр гүүрдэнэ — энэ нь хэмжих гол зам",
+    },
+    "cloud": {
+        "host": "192.168.1.100",
+        "port": 1883,
+        "what": "зөөврийн компьютер дээрх EMQX (үүлний брокер)",
+        "note": "гүүрийг тойрч шууд холбогдоно — жишиг шугамын хэмжилт",
+    },
+}
+
+
+def target_banner(args: argparse.Namespace) -> str:
+    """Эхлэх үеийн товч мэдээлэл (--target-ийн дагуу)."""
+    hint = TARGET_HINTS[args.target]
+    used_default = args.host == "localhost"
+    lines = [
+        "─" * 72,
+        f"  Зорилт (--target)  : {args.target} — {hint['what']}",
+        f"  Анхдагч зөвлөмж    : {hint['host']}:{hint['port']}",
+        f"  Бодит холболт      : {args.host}:{args.port}"
+        + ("   ← --host заагаагүй тул localhost" if used_default else ""),
+        f"  Тэмдэглэл          : {hint['note']}",
+        f"  Флот               : {args.devices} төхөөрөмж, "
+        f"{args.interval} сек тутам, QoS {args.qos}",
+        f"  UNS угтвар         : {args.topic_prefix}/{args.site}/{args.area}/"
+        f"<line>/<device>/telemetry",
+        "─" * 72,
+    ]
+    if args.target == "edge" and used_default:
+        lines.insert(
+            -1,
+            "  ⚠ --target edge боловч --host заагаагүй. Pi-гийн хаягийг өгнө үү, "
+            "эс бөгөөс\n    уплинк огт ачаалагдахгүй.",
+        )
+    return "\n".join(lines)
 
 
 # ──────────────────────── дохионы загварчлал ────────────────────────
@@ -214,7 +278,16 @@ def build_parser() -> argparse.ArgumentParser:
         epilog=__doc__,
     )
     conn = p.add_argument_group("холболт")
-    conn.add_argument("--host", default="localhost", help="брокерийн хаяг")
+    conn.add_argument(
+        "--target", choices=["edge", "cloud"], default="cloud",
+        help=("аль брокер рүү чиглэж байгааг заана. Зөвхөн анхдагч ЗӨВЛӨМЖ ба "
+              "эхлэх мэдээллийг өөрчилнө — бодит хаягийг --host шийднэ.  "
+              f"edge = {TARGET_HINTS['edge']['host']}:{TARGET_HINTS['edge']['port']} "
+              "(Pi 3B mosquitto, 100 Mbit уплинкийг ачаална);  "
+              f"cloud = {TARGET_HINTS['cloud']['host']}:{TARGET_HINTS['cloud']['port']} "
+              "(зөөврийн компьютерийн EMQX). Анхдагч: cloud"))
+    conn.add_argument("--host", default="localhost",
+                      help="брокерийн хаяг (--target-ийн зөвлөмжөөс давамгайлна)")
     conn.add_argument("--port", type=int, default=1883)
     conn.add_argument("--keepalive", type=int, default=60)
     conn.add_argument("--username")
@@ -240,8 +313,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     uns = p.add_argument_group("Unified Namespace")
     uns.add_argument("--topic-prefix", default="cnc302")
-    uns.add_argument("--site", default="ulaanbaatar")
-    uns.add_argument("--area", default="campus")
+    # Анхдагчууд нь edge/.env.example болон гүүрний bridge.conf-той тааруулсан:
+    # гүүр нь cnc302/<site>/# сэдвийг л үүл рүү дамжуулдаг тул site таарах ёстой.
+    uns.add_argument("--site", default="shutis")
+    uns.add_argument("--area", default="mhts")
     uns.add_argument("--lines", type=int, default=2, help="үйлдвэрлэлийн шугамын тоо")
 
     p.add_argument("--dry-run", action="store_true",
@@ -253,6 +328,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> int:
     args = build_parser().parse_args()
+
+    print(target_banner(args), file=sys.stderr)
 
     if args.dry_run:
         if not args.count:
@@ -268,6 +345,11 @@ def main() -> int:
     if args.devices > 200:
         print("АНХААР: 200-аас олон холболтод emqtt-bench ашиглана уу "
               "(Лаб 4-ийн заавар).", file=sys.stderr)
+    if args.target == "edge" and args.devices > 100:
+        print("АНХААР: Pi 3B-гийн mosquitto руу 100-аас олон холболт өгч байна. "
+              "Хэмжилтийн зэрэгцээ `tools/measure_stack.sh --role edge --watch` "
+              "ажиллуулж, сул RAM болон throttle-ыг заавал бүртгэ.",
+              file=sys.stderr)
 
     stats = Stats()
 

@@ -1,209 +1,168 @@
 #!/usr/bin/env python3
 """
-CNC302 Лаб 2 — Төхөөрөмжийн provisioning (ThingsBoard REST API)
+CNC302 — ТӨХӨӨРӨМЖ БҮРТГЭХ ХЭРЭГСЭЛ (registry үйлчилгээний клиент).
 
-Хоёр стратегийг харьцуулна:
+Хоёр загварыг харьцуулна:
 
-  bulk : Бүх төхөөрөмжийг урьдчилан платформ дээр үүсгэж, итгэмжлэлийг
-         үйлдвэрлэлийн шатанд төхөөрөмжид суулгана. Урьдчилан таамаглах
-         боломжтой, гэхдээ ашиглагдахгүй итгэмжлэл олноор үлддэг.
+  BULK (бөөнөөр)  — үйлдвэрээс гарахаас өмнө бүх төхөөрөмжийг бүртгэнэ.
+                    + Урьдчилан хянагдана, нэвтрэлт бэлэн
+                    − Ашиглагдахгүй байж болзошгүй мянган бүртгэл үлдэнэ,
+                      нууц үг нь бүтээгдэхүүнд суух ёстой
 
-  jit  : Төхөөрөмж анх холбогдох үедээ өөрийгөө бүртгүүлнэ (just-in-time).
-         Хэрэглэгдэхгүй итгэмжлэл үүсэхгүй, гэхдээ бүртгэлийн түлхүүр
-         (provision key) алдагдвал хэн ч төхөөрөмж нэмж чадна.
+  JIT (яг цагт нь) — төхөөрөмж анх залгагдахдаа өөрөө бүртгүүлнэ.
+                    + Зөвхөн бодитоор ашиглагдсан нь бүртгэгдэнэ
+                    − Бүртгүүлэх мөчид нь ХЭН БОЛОХЫГ нь батлах хэрэгтэй,
+                      эс бөгөөс хэн ч флотод нэвтэрч болно
 
-Жишээ:
-  python provision.py --url http://localhost:8080 --mode bulk --count 20
-  python provision.py --url http://localhost:8080 --mode bulk --count 20 --csv bulk.csv
-  python provision.py --url http://localhost:8080 --list
-  python provision.py --url http://localhost:8080 --cleanup
+Лаб 2-т хоёуланг нь хийж, хугацааг хэмжиж, хяналтын асуултад хариулна.
+
+Хэрэглээ:
+    python3 provision.py bulk --count 50 --out out/devices.csv
+    python3 provision.py jit  --device-id pi3b-01
+    python3 provision.py list
+    python3 provision.py revoke --device-id dev0007
+    python3 provision.py cleanup --prefix dev
 """
 from __future__ import annotations
 
 import argparse
 import csv
-import statistics
+import os
 import sys
 import time
+from pathlib import Path
 
-import requests
+import httpx
 
-TIMEOUT = 20
-
-
-class TB:
-    """ThingsBoard REST API-ийн нимгэн бүрхүүл."""
-
-    def __init__(self, url: str, user: str, password: str) -> None:
-        self.url = url.rstrip("/")
-        self.s = requests.Session()
-        r = self.s.post(
-            f"{self.url}/api/auth/login",
-            json={"username": user, "password": password},
-            timeout=TIMEOUT,
-        )
-        r.raise_for_status()
-        self.s.headers["X-Authorization"] = f"Bearer {r.json()['token']}"
-
-    def create_device(self, name: str, profile: str | None = None) -> dict:
-        body: dict = {"name": name, "type": "default", "label": "CNC302 lab device"}
-        if profile:
-            body["deviceProfileId"] = {"id": profile, "entityType": "DEVICE_PROFILE"}
-        r = self.s.post(f"{self.url}/api/device", json=body, timeout=TIMEOUT)
-        r.raise_for_status()
-        return r.json()
-
-    def credentials(self, device_id: str) -> dict:
-        r = self.s.get(
-            f"{self.url}/api/device/{device_id}/credentials", timeout=TIMEOUT
-        )
-        r.raise_for_status()
-        return r.json()
-
-    def list_devices(self, page_size: int = 200) -> list[dict]:
-        r = self.s.get(
-            f"{self.url}/api/tenant/devices",
-            params={"pageSize": page_size, "page": 0},
-            timeout=TIMEOUT,
-        )
-        r.raise_for_status()
-        return r.json().get("data", [])
-
-    def delete_device(self, device_id: str) -> None:
-        self.s.delete(f"{self.url}/api/device/{device_id}", timeout=TIMEOUT)
-
-    def set_server_attributes(self, device_id: str, attrs: dict) -> None:
-        self.s.post(
-            f"{self.url}/api/plugins/telemetry/DEVICE/{device_id}/SERVER_SCOPE",
-            json=attrs,
-            timeout=TIMEOUT,
-        )
+DEFAULT_URL = os.getenv("REGISTRY_URL", "http://localhost:8090")
 
 
-def provision_bulk(tb: TB, prefix: str, count: int) -> list[dict]:
-    """Бүх төхөөрөмжийг урьдчилан үүсгэнэ."""
-    rows = []
-    for i in range(count):
-        name = f"{prefix}{i:04d}"
-        t0 = time.perf_counter()
-        dev = tb.create_device(name)
-        cred = tb.credentials(dev["id"]["id"])
-        dt = (time.perf_counter() - t0) * 1000
-        tb.set_server_attributes(
-            dev["id"]["id"],
-            {"provisioned_at": int(time.time() * 1000), "provision_mode": "bulk"},
-        )
-        rows.append(
-            {
-                "name": name,
-                "device_id": dev["id"]["id"],
-                "access_token": cred["credentialsId"],
-                "mode": "bulk",
-                "ms": round(dt, 1),
-            }
-        )
-        print(f"  [{i+1}/{count}] {name}  {dt:6.1f} мс", file=sys.stderr)
-    return rows
+def api(url: str, method: str, path: str, **kw):
+    try:
+        r = httpx.request(method, url.rstrip("/") + path, timeout=30.0, **kw)
+    except httpx.HTTPError as e:
+        sys.exit(f"✗ бүртгэлийн үйлчилгээнд хүрэхгүй байна ({url}): {e}\n"
+                 f"  Зөөврийн компьютер дээр:  cd stack && make up")
+    if r.status_code >= 400:
+        sys.exit(f"✗ {method} {path} → {r.status_code}: {r.text[:300]}")
+    return r.json()
 
 
-def provision_jit(tb: TB, prefix: str, count: int, delay: float) -> list[dict]:
-    """
-    Just-in-time: төхөөрөмж 'ажилд орох' үедээ л үүснэ.
-    Энд бид төхөөрөмжүүд санамсаргүй хугацаанд ирж байгааг дуурайна.
-    """
-    rows = []
-    for i in range(count):
-        time.sleep(delay)
-        name = f"{prefix}{i:04d}"
-        t0 = time.perf_counter()
-        dev = tb.create_device(name)
-        cred = tb.credentials(dev["id"]["id"])
-        dt = (time.perf_counter() - t0) * 1000
-        tb.set_server_attributes(
-            dev["id"]["id"],
-            {"provisioned_at": int(time.time() * 1000), "provision_mode": "jit"},
-        )
-        rows.append(
-            {
-                "name": name,
-                "device_id": dev["id"]["id"],
-                "access_token": cred["credentialsId"],
-                "mode": "jit",
-                "ms": round(dt, 1),
-            }
-        )
-        print(f"  [{i+1}/{count}] {name}  {dt:6.1f} мс (JIT)", file=sys.stderr)
-    return rows
+# ─────────────────────────── bulk ───────────────────────────
+def cmd_bulk(a) -> int:
+    print(f"БӨӨНӨӨР бүртгэж байна: {a.count} төхөөрөмж, угтвар '{a.prefix}'…")
+    t0 = time.perf_counter()
+    res = api(a.url, "POST", "/devices",
+              json={"prefix": a.prefix, "count": a.count, "label": a.label})
+    dt = time.perf_counter() - t0
+
+    out = Path(a.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with open(out, "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["device_id", "username", "password", "emqx"])
+        for d in res["devices"]:
+            w.writerow([d["id"], d["id"], d.get("password", ""), d.get("emqx", "")])
+
+    per = dt / max(1, res["created"]) * 1000
+    print(f"✓ {res['created']} төхөөрөмж, {dt:.2f} сек "
+          f"({per:.1f} мс/төхөөрөмж)")
+    print(f"  нэвтрэлтийн мэдээлэл → {out}")
+    print(f"  ⚠ ЭНЭ ФАЙЛ НУУЦ. .gitignore-д байгаа — Git-д БҮҮ оруул.")
+    print(f"\n  ХЭМЖИЛТ (тайланд бич):  bulk, {a.count} ш, {dt:.2f} сек, "
+          f"{per:.1f} мс/төх.")
+    return 0
 
 
-def summarize(rows: list[dict]) -> None:
-    if not rows:
-        return
-    ms = [r["ms"] for r in rows]
-    ms_sorted = sorted(ms)
-    p95 = ms_sorted[min(int(0.95 * (len(ms_sorted) - 1)), len(ms_sorted) - 1)]
-    print(
-        f"\nДүн ({rows[0]['mode']}): {len(rows)} төхөөрөмж\n"
-        f"  дундаж : {statistics.fmean(ms):7.1f} мс\n"
-        f"  медиан : {statistics.median(ms):7.1f} мс\n"
-        f"  p95    : {p95:7.1f} мс\n"
-        f"  дээд   : {max(ms):7.1f} мс\n"
-        f"  нийт   : {sum(ms)/1000:7.2f} сек",
-        file=sys.stderr,
-    )
+# ─────────────────────────── jit ───────────────────────────
+def cmd_jit(a) -> int:
+    print(f"JIT бүртгэл: {a.device_id}")
+    t0 = time.perf_counter()
+    res = api(a.url, "POST", "/devices/claim",
+              json={"device_id": a.device_id, "secret": a.secret})
+    dt = (time.perf_counter() - t0) * 1000
+    print(f"✓ {res['id']}  нууц үг={res['password']}  ({dt:.1f} мс)")
+    if res.get("note"):
+        print(f"  тэмдэглэл: {res['note']}")
+    print(f"\n  ХЯНАЛТЫН АСУУЛТ: энэ дуудлагад ямар ч баталгаа байхгүй.")
+    print(f"  Хэн ч device_id сонгоод флотод нэвтэрч чадна. Үүнийг хэрхэн засах вэ?")
+    print(f"  (Хариу: үйлдвэрийн X.509 сертификат — make_certs.sh-ийг үзнэ үү)")
+    return 0
+
+
+# ─────────────────────────── list / revoke ───────────────────────────
+def cmd_list(a) -> int:
+    res = api(a.url, "GET", f"/devices?limit={a.limit}"
+                            + (f"&state={a.state}" if a.state else ""))
+    devs = res["devices"]
+    if not devs:
+        print("(хоосон)")
+        return 0
+    print(f"{'ID':<14}{'төлөв':<14}{'хувилбар':<12}{'сүүлд харагдсан'}")
+    print("-" * 60)
+    for d in devs:
+        seen = (time.strftime("%H:%M:%S", time.localtime(d["last_seen"]))
+                if d.get("last_seen") else "—")
+        print(f"{d['id']:<14}{d['state']:<14}{d['fw_version']:<12}{seen}")
+    print(f"\nнийт {len(devs)}")
+    return 0
+
+
+def cmd_revoke(a) -> int:
+    res = api(a.url, "DELETE", f"/devices/{a.device_id}")
+    print(f"✓ {res['id']} хүчингүй боллоо (EMQX: {res['emqx']})")
+    print("  Одоо тухайн төхөөрөмж дахин холбогдож чадахгүй.")
+    print("  ХЯНАЛТЫН АСУУЛТ: аль хэдийн ХОЛБОГДСОН session яах вэ?")
+    print("  (EMQX самбар → Clients → тухайн клиентийг гараар таслах шаардлагатай)")
+    return 0
+
+
+def cmd_cleanup(a) -> int:
+    res = api(a.url, "GET", "/devices?limit=2000")
+    victims = [d["id"] for d in res["devices"] if d["id"].startswith(a.prefix)]
+    if not victims:
+        print("устгах зүйл алга")
+        return 0
+    print(f"{len(victims)} төхөөрөмжийг хүчингүй болгоно…")
+    for d in victims:
+        api(a.url, "DELETE", f"/devices/{d}")
+    print(f"✓ {len(victims)} ширхэг")
+    return 0
 
 
 def main() -> int:
-    p = argparse.ArgumentParser(description="ThingsBoard төхөөрөмжийн provisioning")
-    p.add_argument("--url", default="http://localhost:8080")
-    p.add_argument("--user", default="tenant@thingsboard.org")
-    p.add_argument("--password", default="tenant")
-    p.add_argument("--mode", choices=["bulk", "jit"], default="bulk")
-    p.add_argument("--prefix", default="dev")
-    p.add_argument("--count", type=int, default=10)
-    p.add_argument("--jit-delay", type=float, default=0.5,
-                   help="JIT горимд төхөөрөмж хоорондын завсар (сек)")
-    p.add_argument("--csv", help="үр дүн ба итгэмжлэлийг CSV-д бичих")
-    p.add_argument("--list", action="store_true", help="одоо байгаа төхөөрөмжүүд")
-    p.add_argument("--cleanup", action="store_true",
-                   help="--prefix-ээр эхэлсэн БҮХ төхөөрөмжийг устгах")
-    args = p.parse_args()
+    p = argparse.ArgumentParser(description="CNC302 төхөөрөмж бүртгэх хэрэгсэл")
+    p.add_argument("--url", default=DEFAULT_URL,
+                   help=f"бүртгэлийн үйлчилгээ (анхдагч: {DEFAULT_URL})")
+    sub = p.add_subparsers(dest="cmd", required=True)
 
-    tb = TB(args.url, args.user, args.password)
+    b = sub.add_parser("bulk", help="бөөнөөр бүртгэх")
+    b.add_argument("--count", type=int, default=50)
+    b.add_argument("--prefix", default="dev")
+    b.add_argument("--label", default="cnc302-fleet")
+    b.add_argument("--out", default="out/devices.csv")
+    b.set_defaults(fn=cmd_bulk)
 
-    if args.list:
-        devs = tb.list_devices()
-        print(f"{len(devs)} төхөөрөмж:")
-        for d in devs:
-            print(f"  {d['name']:<16} {d['id']['id']}")
-        return 0
+    j = sub.add_parser("jit", help="төхөөрөмж өөрөө бүртгүүлэх")
+    j.add_argument("--device-id", required=True)
+    j.add_argument("--secret", default="")
+    j.set_defaults(fn=cmd_jit)
 
-    if args.cleanup:
-        devs = [d for d in tb.list_devices() if d["name"].startswith(args.prefix)]
-        print(f"{len(devs)} төхөөрөмж устгана ('{args.prefix}*')…", file=sys.stderr)
-        for d in devs:
-            tb.delete_device(d["id"]["id"])
-            print(f"  устгав: {d['name']}", file=sys.stderr)
-        return 0
+    l = sub.add_parser("list", help="жагсаалт")
+    l.add_argument("--limit", type=int, default=50)
+    l.add_argument("--state", choices=["provisioned", "active", "revoked"])
+    l.set_defaults(fn=cmd_list)
 
-    print(f"→ {args.mode} горимоор {args.count} төхөөрөмж үүсгэж байна…",
-          file=sys.stderr)
-    t0 = time.perf_counter()
-    rows = (provision_bulk(tb, args.prefix, args.count) if args.mode == "bulk"
-            else provision_jit(tb, args.prefix, args.count, args.jit_delay))
-    wall = time.perf_counter() - t0
+    r = sub.add_parser("revoke", help="хүчингүй болгох")
+    r.add_argument("--device-id", required=True)
+    r.set_defaults(fn=cmd_revoke)
 
-    summarize(rows)
-    print(f"  бодит хугацаа: {wall:7.2f} сек", file=sys.stderr)
+    c = sub.add_parser("cleanup", help="угтвараар бөөнөөр хүчингүй болгох")
+    c.add_argument("--prefix", default="dev")
+    c.set_defaults(fn=cmd_cleanup)
 
-    if args.csv:
-        with open(args.csv, "w", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
-            w.writeheader()
-            w.writerows(rows)
-        print(f"\nCSV: {args.csv}  ← ЭНЭ ФАЙЛД ИТГЭМЖЛЭЛ БАЙНА, Git-д оруулахгүй!",
-              file=sys.stderr)
-    return 0
+    a = p.parse_args()
+    return a.fn(a)
 
 
 if __name__ == "__main__":

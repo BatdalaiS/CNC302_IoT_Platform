@@ -8,18 +8,37 @@ CNC302 — MQTT QoS-ийн саатал ба дамжуулах чадварын
   илгээх агшин (ns)  ──MQTT──▶ брокер ──▶ хүлээн авах агшин (ns)
   саатал = хүлээн авсан − илгээсэн
 
-Жишээ:
-  # QoS 1, 500 мессеж
-  python qos_latency.py --host pi-team03.local --qos 1 --count 500
+── ГУРВАН ЗАМЫГ ХАРЬЦУУЛНА (--path) ────────────────────────────────────────
+Стек хоёр хостод хуваагдсан тул нэг мессеж гурван өөр замаар явж болно.
+`--path` нь ЗӨВХӨН ШОШГО: юу хэмжиж байгааг үр дүнд болон CSV-д тэмдэглэнэ.
 
-  # Гурван QoS-ийг дараалан хэмжиж хүснэгт гаргах
-  python qos_latency.py --host pi-team03.local --sweep --count 500
+  loopback  нийтлэгч ба брокер НЭГ машин дээр (localhost).
+            Сүлжээ огт оролцохгүй → брокер өөрөө хэдэн мс иддэгийг харуулна.
+  lan       зөөврийн компьютер → тэр компьютер дээрх EMQX рүү LAN-аар.
+  bridge    Pi 3B → ирмэгийн mosquitto → ГҮҮР → зөөврийн EMQX.
+            Хамгийн урт зам: хоёр брокер + 100 Mbit уплинк.
+
+⚠ Pi 3B-гийн Ethernet нь USB 2.0 дээр сууж, USB-тэй зурвасаа хуваадаг. Тиймээс
+  LAN болон bridge замын саатлын СҮҮЛ (tail) нь Pi 5-тай харьцуулахад хамаагүй
+  өргөн байна. Дундаж (p50) сайхан харагдаж болох ч тэр нь ХУУРАМЧ тайтгарал:
+  үйлдвэрийн систем дэх ХАРИУ ҮЙЛДЛИЙН БАТАЛГААГ p99 тодорхойлдог. Тайланд p50
+  биш, **p99-ийг** гол тоо болгон бичнэ.
+
+Жишээ:
+  # Брокертойгоо нэг машин дээр — брокерын өөрийн саатал
+  python qos_latency.py --path loopback --host localhost --qos 1 --count 500
+
+  # Зөөврийн компьютер → EMQX, гурван QoS-ийг дараалан
+  python qos_latency.py --path lan --host 192.168.1.100 --sweep --count 500
+
+  # Pi дээрээс ажиллуулж, гүүрээр дамжих замыг хэмжих
+  python qos_latency.py --path bridge --host localhost --qos 1 --count 500
 
   # Хуваалцсан захиалга (shared subscription) — 3 хэрэглэгч
-  python qos_latency.py --host pi-team03.local --qos 1 --count 500 --shared 3
+  python qos_latency.py --path lan --host 192.168.1.100 --qos 1 --count 500 --shared 3
 
   # Үр дүнг CSV болгон хадгалах (тайланд оруулна)
-  python qos_latency.py --host pi-team03.local --sweep --count 500 --csv qos.csv
+  python qos_latency.py --path lan --host 192.168.1.100 --sweep --csv qos-lan.csv
 """
 from __future__ import annotations
 
@@ -59,7 +78,8 @@ class Measurement:
             if len(self.seen) >= self.expected:
                 self.done.set()
 
-    def summary(self, qos: int, payload_bytes: int) -> dict:
+    def summary(self, qos: int, payload_bytes: int, path: str = "loopback",
+                host: str = "") -> dict:
         lat = sorted(self.latencies_ms)
         received = len(lat)
         lost = self.expected - received
@@ -76,6 +96,8 @@ class Measurement:
             return lat[k]
 
         return {
+            "path": path,            # loopback | lan | bridge — аль замыг хэмжсэн
+            "host": host,
             "qos": qos,
             "payload_bytes": payload_bytes,
             "sent": self.expected,
@@ -150,18 +172,25 @@ def run_once(args: argparse.Namespace, qos: int) -> dict:
     for c in sub_clients:
         c.loop_stop(); c.disconnect()
 
-    res = m.summary(qos, args.payload)
+    res = m.summary(qos, args.payload, path=args.path, host=args.host)
     res["publish_span_s"] = round(publish_span, 3)
     res["publish_rate_msg_s"] = round(args.count / max(publish_span, 1e-6), 1)
     res["subscribers"] = n_subs
     return res
 
 
+PATH_LABELS = {
+    "loopback": "нийтлэгч ба брокер нэг машин дээр (сүлжээгүй)",
+    "lan":      "зөөврийн компьютер → EMQX, LAN-аар",
+    "bridge":   "Pi 3B → ирмэгийн mosquitto → гүүр → EMQX",
+}
+
+
 def print_table(rows: list[dict]) -> None:
-    cols = ["qos", "subscribers", "sent", "received", "lost", "loss_pct",
+    cols = ["path", "qos", "subscribers", "sent", "received", "lost", "loss_pct",
             "duplicates", "p50_ms", "p95_ms", "p99_ms", "max_ms",
             "publish_rate_msg_s", "throughput_msg_s"]
-    head = ["QoS", "Sub", "Илгээв", "Ирсэн", "Алдсан", "Алдалт%",
+    head = ["Зам", "QoS", "Sub", "Илгээв", "Ирсэн", "Алдсан", "Алдалт%",
             "Давхар", "p50 мс", "p95 мс", "p99 мс", "max мс",
             "Илгээх/с", "Хүлээн/с"]
     widths = [max(len(h), 9) for h in head]
@@ -169,6 +198,8 @@ def print_table(rows: list[dict]) -> None:
     print("  ".join("-" * w for w in widths))
     for r in rows:
         print("  ".join(str(r[c]).rjust(w) for c, w in zip(cols, widths)))
+    print("\n  ГОЛ ТОО нь p99 — дундаж биш. Pi 3B дээр 100 Mbit холбоос USB-тэй")
+    print("  зурвасаа хуваадаг тул p50 сайн байхад p99 хэд дахин том гарч болно.")
 
 
 def main() -> int:
@@ -179,6 +210,14 @@ def main() -> int:
     p.add_argument("--port", type=int, default=1883)
     p.add_argument("--username")
     p.add_argument("--password")
+    p.add_argument("--path", choices=["loopback", "lan", "bridge"],
+                   default="loopback",
+                   help=("хэмжиж буй ЗАМЫН шошго. Үр дүн болон CSV-д бичигдэнэ "
+                         "тул гурван замыг хожим харьцуулж болно.  "
+                         "loopback = " + PATH_LABELS["loopback"] + ";  "
+                         "lan = " + PATH_LABELS["lan"] + ";  "
+                         "bridge = " + PATH_LABELS["bridge"] + ".  "
+                         "Анхдагч: loopback"))
     p.add_argument("--topic", default="cnc302/bench/latency")
     p.add_argument("--qos", type=int, default=1, choices=[0, 1, 2])
     p.add_argument("--count", type=int, default=500, help="мессежийн тоо")
@@ -192,11 +231,17 @@ def main() -> int:
     p.add_argument("--csv", help="үр дүнг CSV файлд бичих")
     args = p.parse_args()
 
+    print(f"→ Зам: {args.path} — {PATH_LABELS[args.path]}", file=sys.stderr)
+    print(f"→ Брокер: {args.host}:{args.port}", file=sys.stderr)
+    if args.path in ("lan", "bridge"):
+        print("→ Санамж: p99-ийг ажигла. Pi 3B-гийн 100 Mbit холбоос USB 2.0 дээр "
+              "сууж байгаа тул саатлын сүүл өргөн байна.", file=sys.stderr)
+
     qos_list = [0, 1, 2] if args.sweep else [args.qos]
     rows = []
     for q in qos_list:
         print(f"→ QoS {q} хэмжиж байна ({args.count} мессеж, "
-              f"{args.payload} байт)…", file=sys.stderr)
+              f"{args.payload} байт, зам={args.path})…", file=sys.stderr)
         rows.append(run_once(args, q))
         time.sleep(1.0)
 

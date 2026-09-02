@@ -1,7 +1,9 @@
 % Автоматаар үүсгэсэн — эх файл: lab06/README.md
-\chapter{Лаб 6 — Ирмэгийн хиймэл оюуны байршуулалт ба гүйцэтгэлийн хэмжилт}
+\chapter{Лаб 6 — Ирмэгийн хиймэл оюун: CPU дээр}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
 \toprule
 \endhead
 \bottomrule
@@ -10,390 +12,420 @@
 \textbf{Хугацаа} & 4 цаг \\
 \textbf{Суралцахуйн үр дүн} & ҮД5 (шинжлэх), ҮД7 (хэмжих) \\
 \textbf{Үнэлгээ} & Бичгийн тайлан, 10 оноо \\
+\textbf{Гол хэмжилт} & Дүгнэлтийн саатал (p99), санах ой, ирмэгийн шүүлтийн үр ашиг \\
 \end{longtable}\endgroup
 
 \hypertarget{ux437ux43eux440ux438ux43bux433ux43e}{%
 \section{1. Зорилго}\label{ux437ux43eux440ux438ux43bux433ux43e}}
 
-⚠ \textbf{Энэ лаборатори загвар СУРГАХ тухай биш.} Сургалтыг X--XI долоо хоногийн бие даалтаар Edge Impulse Studio дээр аль хэдийн хийсэн байх ёстой.
-
-Энд бид \textbf{байршуулалтын өртгийг} хэмжинэ:
+Энэ лаборатори загвар \textbf{сургах} тухай биш. Сургалт X--XI долоо хоногийн бие даалтаар аль хэдийн хийгдсэн байх ёстой (§2). Лабораторийн 4 цагт бид \textbf{байршуулалтын өртгийг} хэмжинэ:
 
 \begin{verbatim}
-  нарийвчлал  ←→  саатал  ←→  санах ой  ←→  эрчим хүч
+  нарийвчлал  ←→  саатал  ←→  санах ой  ←→  зурвасын өргөн
 \end{verbatim}
 
-Загвар 97\% нарийвчлалтай байж болно --- гэвч дүгнэлт нь 800 мс авдаг бол 100 Гц мэдрэгчид \textbf{ашиггүй}. Ирмэгийн ML-ийн жинхэнэ ажил бол энэ дөрвөн хэмжигдэхүүний хооронд ухаалаг солилцоо хийх явдал.
+Хамгийн чухал нь: \textbf{энэ курсын ирмэг бол хурдасгуургүй CPU.} Raspberry Pi 3B-д PCIe байхгүй тул Raspberry Pi AI Kit (Hailo-8L) \textbf{физикийн хувьд} холбогдох боломжгүй. Энэ бол дутагдал биш, \textbf{заах нөхцөл}: бодит үйлдвэрийн ирмэгийн зангилааны олонх нь яг ийм байдаг --- хэдэн зуун МГц-ийн ARM, хэдэн зуун MiB RAM, хурдасгуургүй.
 
-\hypertarget{ux445ux430ux440ux438ux443ux43bux430ux445-ux451ux441ux442ux43eux439-ux430ux441ux443ux443ux43bux442ux443ux443ux434}{%
-\subsection{Хариулах ёстой асуултууд}\label{ux445ux430ux440ux438ux443ux43bux430ux445-ux451ux441ux442ux43eux439-ux430ux441ux443ux443ux43bux442ux443ux443ux434}}
+Дөрвөн асуултад тоон хариулт өгнө:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  int8 квантчилал саатлыг хэдэн дахин багасгав? Нарийвчлалыг хэр алдав?
+  int8 квантчилал 4×Cortex-A53 дээр саатлыг хэдэн дахин багасгав?
 \item
-  Дүгнэлтийг ирмэг дээр хийх нь үүлэн рүү илгээхээс хэзээ \textbf{дээр} вэ?
+  4 цөмийг бүгдийг ашиглах нь үргэлж дээр үү? (Санамж: \textbf{үгүй}. Үүнийг нотол.)
 \item
-  4 цөмийг бүгдийг ашиглах нь үргэлж дээр үү?
+  MobileNet зэрэглэлийн зурган загвар Pi 3B дээр \textbf{хэр удаан} вэ? Тэр тоо юуг хэлж байна вэ?
+\item
+  Ирмэг дээр шүүлт хийснээр 100 Mbit уплинкээр явах мессеж, байт \textbf{хэдэн хувиар} буурав?
 \end{enumerate}
+
+\begin{quote}
+\textbf{Гол зарчим:} Pi 3B дээр байршуулж болох цорын ганц бодит загвар бол \textbf{жижиг хүснэгтэн/цонхны гажил илрүүлэгч} (3--5 оролт, хэдэн KiB). Зурган загвар нь харьцуулалтын \textbf{сөрөг жишээ} болж орно --- хэр удаан болохыг хэмжих нь даалгаврын нэг хэсэг.
+\end{quote}
 
 \hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b-ux431ux438ux435-ux434ux430ux430ux43bux442ux430ux430ux440-ux443ux440ux44cux434ux447ux438ux43bux430ux43d-ux445ux438ux439ux43dux44d}{%
 \section{2. Урьдчилсан нөхцөл --- БИЕ ДААЛТААР УРЬДЧИЛАН ХИЙНЭ}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b-ux431ux438ux435-ux434ux430ux430ux43bux442ux430ux430ux440-ux443ux440ux44cux434ux447ux438ux43bux430ux43d-ux445ux438ux439ux43dux44d}}
 
-Лабораторийн цагаар загвар сургах хугацаа \textbf{байхгүй}. Дараах зүйлс бэлэн байх ёстой:
+Лабораторийн цагаар загвар сургах хугацаа \textbf{байхгүй}. Дараах зүйлс бэлэн байх ёстой.
 
-\hypertarget{x-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-ux4e9ux433ux4e9ux433ux434ux4e9ux43b-ux446ux443ux433ux43bux443ux443ux43bux430ux445}{%
-\subsection{X долоо хоног --- өгөгдөл цуглуулах}\label{x-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-ux4e9ux433ux4e9ux433ux434ux4e9ux43b-ux446ux443ux433ux43bux443ux443ux43bux430ux445}}
+\hypertarget{x-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-ux4e9ux433ux4e9ux433ux434ux4e9ux43b-ux446ux443ux433ux43bux443ux443ux43bux430ux445-pi}{%
+\subsection{X долоо хоног --- өгөгдөл цуглуулах {[}Pi{]}}\label{x-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-ux4e9ux433ux4e9ux433ux434ux4e9ux43b-ux446ux443ux433ux43bux443ux443ux43bux430ux445-pi}}
+
+Ирмэгийн агент нь \texttt{telemetry} суваг руу \texttt{proc\_\allowbreak{}temp\_\allowbreak{}c}, \texttt{vibration\_g}, \texttt{rpm} гурван талбар нийтэлдэг. Загвар яг эдгээр дээр сурна.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# 1) Хэвийн ажиллагааны өгөгдөл}
-\ExtensionTok{python3}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}devices}\NormalTok{ 1 }\AttributeTok{{-}{-}interval}\NormalTok{ 0.1 }\KeywordTok{\&}
-\ExtensionTok{python3}\NormalTok{ lab06/collect\_data.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}label}\NormalTok{ normal }\AttributeTok{{-}{-}seconds}\NormalTok{ 300}
+\CommentTok{\# [Pi] терминал 1 — агент, хэвийн ажиллагаа  (дараа нь {-}{-}anomaly{-}rate 1.0{-}оор давт)}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \ExtensionTok{.venv/bin/python}\NormalTok{ agent/edge\_agent.py }\AttributeTok{{-}{-}interval}\NormalTok{ 0.5 }\AttributeTok{{-}{-}anomaly{-}rate}\NormalTok{ 0.0}
 
-\CommentTok{\# 2) Гажилтай өгөгдөл}
-\ExtensionTok{python3}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}devices}\NormalTok{ 1 }\AttributeTok{{-}{-}interval}\NormalTok{ 0.1 }\AttributeTok{{-}{-}anomaly{-}rate}\NormalTok{ 1.0 }\KeywordTok{\&}
-\ExtensionTok{python3}\NormalTok{ lab06/collect\_data.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}label}\NormalTok{ anomaly }\AttributeTok{{-}{-}seconds}\NormalTok{ 120}
+\CommentTok{\# [Pi] терминал 2 — цуглуулагч (ирмэгийн брокероос)}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\ExtensionTok{python3}\NormalTok{ lab06/collect\_data.py }\AttributeTok{{-}{-}label}\NormalTok{ normal  }\AttributeTok{{-}{-}seconds}\NormalTok{ 300 }\AttributeTok{{-}{-}device}\NormalTok{ pi3b{-}01}
+\ExtensionTok{python3}\NormalTok{ lab06/collect\_data.py }\AttributeTok{{-}{-}label}\NormalTok{ anomaly }\AttributeTok{{-}{-}seconds}\NormalTok{ 120 }\AttributeTok{{-}{-}device}\NormalTok{ pi3b{-}01}
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{xi-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-edge-impulse-ux434ux44dux44dux440-ux441ux443ux440ux433ux430ux445}{%
-\subsection{XI долоо хоног --- Edge Impulse дээр сургах}\label{xi-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-edge-impulse-ux434ux44dux44dux440-ux441ux443ux440ux433ux430ux445}}
+Гаралт: \texttt{lab06/data/normal-*.csv}, \texttt{lab06/data/anomaly-*.csv}.
+
+\hypertarget{xi-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-ux441ux443ux440ux433ux430ux43bux442-ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux434ux44dux44dux440}{%
+\subsection{XI долоо хоног --- сургалт {[}ЗК{]} зөөврийн компьютер дээр}\label{xi-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-ux441ux443ux440ux433ux430ux43bux442-ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux434ux44dux44dux440}}
+
+Сургалт \textbf{үүлний давхаргад} явагдана. Pi 3B дээр сургах гэж бүү оролд.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  https://studio.edgeimpulse.com --- төслөө үүсгэнэ
+  https://studio.edgeimpulse.com дээр төсөл үүсгэнэ (эсвэл Keras → TFLite converter локалаар)
 \item
   \textbf{Data acquisition → Upload data} → \texttt{lab06/data/*.csv}, шошготой нь
 \item
-  \textbf{Impulse design}: Time series data (цонх 1000 мс, алхам 500 мс) → Spectral Analysis → \textbf{Anomaly Detection (K-means)} эсвэл Classification
+  \textbf{Impulse design} → Time series (цонх 1000 мс, алхам 500 мс) → Spectral Analysis → \textbf{Anomaly Detection (K-means)} эсвэл жижиг Dense classifier
 \item
-  \textbf{EON Tuner} ажиллуулж хамгийн жижиг, хамгийн хурдан хувилбарыг олно
+  \textbf{EON Tuner} --- хамгийн жижиг, хамгийн хурдан хувилбарыг сонгоно
 \item
-  \textbf{Deployment} → дараах \textbf{гурвуулангийг} татаж авна:
+  \textbf{Deployment} → дараахыг татаж \texttt{lab06/models/} руу хийнэ:
 
   \begin{itemize}
   \tightlist
   \item
-    \texttt{TensorFlow\ Lite\ (float32)} → \texttt{lab06/models/model\_float32.tflite}
+    \texttt{TensorFlow\ Lite\ (float32)} → \texttt{model\_float32.tflite}
   \item
-    \texttt{TensorFlow\ Lite\ (int8\ quantized)} → \texttt{lab06/models/model\_int8.tflite}
+    \texttt{TensorFlow\ Lite\ (int8\ quantized)} → \texttt{model\_int8.tflite}
   \item
-    \texttt{Linux\ (AARCH64)} → \texttt{lab06/models/anomaly.eim}
+    (сонголт) \texttt{Linux\ (AARCH64)} → \texttt{anomaly.eim}
   \end{itemize}
 \item
-  Studio-гийн \textbf{Model testing} хуудсаас нарийвчлалыг тэмдэглэнэ (Хүснэгт 1-д хэрэгтэй)
+  \textbf{Model testing} хуудсын нарийвчлалыг тэмдэглэ --- Хүснэгт 6.1-д хэрэгтэй
 \end{enumerate}
 
-\hypertarget{pi-ux434ux44dux44dux440-ux43eux440ux447ux438ux43d-ux431ux44dux43bux434ux44dux445}{%
-\subsection{Pi дээр орчин бэлдэх}\label{pi-ux434ux44dux44dux440-ux43eux440ux447ux438ux43d-ux431ux44dux43bux434ux44dux445}}
+\hypertarget{xi-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-ux441ux4e9ux440ux4e9ux433-ux436ux438ux448ux44dux44dux43dux438ux439-ux437ux430ux433ux432ux430ux440ux44bux433-ux442ux430ux442ux430ux445-ux437ux43a}{%
+\subsection{XI долоо хоног --- сөрөг жишээний загварыг татах {[}ЗК{]}}\label{xi-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-ux441ux4e9ux440ux4e9ux433-ux436ux438ux448ux44dux44dux43dux438ux439-ux437ux430ux433ux432ux430ux440ux44bux433-ux442ux430ux442ux430ux445-ux437ux43a}}
+
+Зурган загварыг \textbf{компьютер дээр} татаж, Pi рүү хуулна (Pi дээр татах нь удаан):
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{pip3}\NormalTok{ install }\AttributeTok{{-}{-}break{-}system{-}packages}\NormalTok{ numpy ai{-}edge{-}litert edge\_impulse\_linux}
-\ExtensionTok{python3} \AttributeTok{{-}c} \StringTok{"from ai\_edge\_litert.interpreter import Interpreter; print(\textquotesingle{}OK\textquotesingle{})"}
-\FunctionTok{chmod}\NormalTok{ +x lab06/models/anomaly.eim}
+\CommentTok{\# [ЗК] MobileNet зэрэглэлийн квантчилсан .tflite (жишээ эх сурвалж)}
+\ExtensionTok{curl} \AttributeTok{{-}L} \AttributeTok{{-}o}\NormalTok{ /tmp/mnet.tgz }\DataTypeTok{\textbackslash{}}
+\NormalTok{  https://storage.googleapis.com/download.tensorflow.org/models/tflite\_11\_05\_08/mobilenet\_v1\_1.0\_224\_quant.tgz}
+\FunctionTok{tar} \AttributeTok{{-}xzf}\NormalTok{ /tmp/mnet.tgz }\AttributeTok{{-}C}\NormalTok{ /tmp}
+\FunctionTok{scp}\NormalTok{ /tmp/mobilenet\_v1\_1.0\_224\_quant.tflite pi@}\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{:\textasciitilde{}/cnc302/lab06/models/mobilenet\_224\_quant.tflite}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{quote}
-\textbf{Загвар бэлэн болоогүй бол} лабораторид \texttt{-\/-backend\ synthetic} ашиглаж бүх аргачлалыг гүйцэтгэж болно. Оноо хасагдана (3 оноо), гэхдээ лабораторийг алдахгүй.
+Холбоос ажиллахгүй бол Kaggle Models / TF Hub-аас дурын \textbf{MobileNet зэрэглэлийн 224×224 .tflite} загварыг ав. Аль загвар байх нь чухал биш --- \textbf{зурган загвар ямар зэрэглэлийн удаан болохыг} хэмжих нь чухал.
+\end{quote}
+
+\hypertarget{pi-ux434ux44dux44dux440-ux43eux440ux447ux438ux43d-ux431ux44dux43bux434ux44dux445-pi}{%
+\subsection{Pi дээр орчин бэлдэх {[}Pi{]}}\label{pi-ux434ux44dux44dux440-ux43eux440ux447ux438ux43d-ux431ux44dux43bux434ux44dux445-pi}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ venv          }\CommentTok{\# .venv байхгүй бол үүсгэнэ}
+\ExtensionTok{.venv/bin/pip}\NormalTok{ install numpy ai{-}edge{-}litert}
+\ExtensionTok{.venv/bin/python} \AttributeTok{{-}c} \StringTok{"from ai\_edge\_litert.interpreter import Interpreter; print(\textquotesingle{}OK\textquotesingle{})"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+\textbf{Загвар бэлэн болоогүй бол} бүх алхмыг \texttt{-\/-backend\ synthetic}-ээр гүйцэтгэж болно. Аргачлал бүрэн хадгалагдана, гэхдээ дээд оноо \textbf{7} болно.
 \end{quote}
 
 \hypertarget{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}{%
 \section{3. Онолын сануулга}\label{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}}
 
-\textbf{Квантчилал.} float32 жинг int8 болгоно: 4 дахин бага санах ой, бүхэл тоон арифметик тул CPU дээр 2--4 дахин хурдан. Үнэ нь нарийвчлалын бага зэргийн алдагдал (ихэвчлэн \textless{} 1\%).
+\hypertarget{ux44fux430ux433ux430ux430ux434-ux445ux443ux440ux434ux430ux441ux433ux443ux443ux440-ux431ux430ux439ux445ux433ux4afux439-ux432ux44d}{%
+\subsection{Яагаад хурдасгуур байхгүй вэ}\label{ux44fux430ux433ux430ux430ux434-ux445ux443ux440ux434ux430ux441ux433ux443ux443ux440-ux431ux430ux439ux445ux433ux4afux439-ux432ux44d}}
 
-\textbf{Халаалт (warmup) яагаад чухал вэ.} Эхний хэдэн дүгнэлт үргэлж удаан: санах ойн хуваарилалт, кэш дүүрэх, зарим backend-д JIT. Халаалтын дүгнэлтийг хэмжилтэд оруулбал \textbf{p99 гуйвуулагдана}. \texttt{benchmark\_inference.py} анхдагчаар 30 удаа халаана.
-
-\textbf{p50 биш p99.} Бодит цагийн систем дунджаар биш, \textbf{хамгийн муу тохиолдлоор} төлөвлөгддөг. 100 Гц мэдрэгчид p99 \textless{} 10 мс байх ёстой.
-
-\textbf{Ирмэг vs үүл --- хэзээ аль нь вэ.}
-
-\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
 \toprule
-Шалгуур & Ирмэг дээр & Үүлэн дээр \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Үзүүлэлт
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pi 3B
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Үр дагавар
+\end{minipage} \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
-Саатал & 1--50 мс & 50--500 мс (сүлжээнээс хамаарна) \\
-Сүлжээгүй үед & ажиллана & ажиллахгүй \\
-Зурвасын өргөн & зөвхөн үр дүн & бүх түүхий өгөгдөл \\
-Нууцлал & өгөгдөл гарахгүй & өгөгдөл гарна \\
-Загвар шинэчлэх & OTA шаардана (Лаб 2!) & шууд \\
-Тооцооллын хүч & хязгаартай & бараг хязгааргүй \\
+Өргөтгөлийн шугам & \textbf{PCIe байхгүй} & Hailo-8L / AI Kit \textbf{боломжгүй} \\
+CPU & 4 × Cortex-A53 @ 1.2 ГГц & NEON бий, ARMv8 крипто өргөтгөл \textbf{байхгүй} \\
+Санах ойн зурвас & LPDDR2, \textasciitilde1.6 GB/с, \textbf{нэг суваг} & 4 урсгал зурвасанд түгжигдэнэ \\
+NPU / GPU тооцоолол & байхгүй & бүх дүгнэлт CPU дээр \\
 \end{longtable}\endgroup
+
+Тиймээс энэ лабораторид Hailo-гийн мөр байх боловч зөвхөн \textbf{багшийн лавлагааны мөр} (тэнхимд Pi 5 + AI Kit байвал) --- өөрсдийн төмөр дээр ажиллуулах боломжгүй.
+
+\hypertarget{ux43aux432ux430ux43dux442ux447ux438ux43bux430ux43b}{%
+\subsection{Квантчилал}\label{ux43aux432ux430ux43dux442ux447ux438ux43bux430ux43b}}
+
+float32 жинг int8 болгоно: 4 дахин бага санах ой, бүхэл тоон арифметик тул CPU дээр 2--4 дахин хурдан. Үнэ нь нарийвчлалын бага зэргийн алдагдал (ихэвчлэн \textless{} 1\%). \textbf{Жижиг загварт} де/квантчилалын нэмэлт зардал ашгийг идэж, int8 нь float32-оос удаан гарч болно --- энэ нь алдаа биш, тайлбарлах ёстой ажиглалт.
+
+\hypertarget{ux445ux430ux43bux430ux430ux43bux442-warm-up-p99-throttling-ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux433ux443ux440ux432ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}{%
+\subsection{Халаалт (warm-up), p99, throttling --- хэмжилтийн гурван нөхцөл}\label{ux445ux430ux43bux430ux430ux43bux442-warm-up-p99-throttling-ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux433ux443ux440ux432ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Халаалт.} Pi 3B-гийн \texttt{ondemand} governor давтамжийг 600 МГц-ээс 1.2 ГГц рүү өсгөх, кэш дүүрэх хүртэл эхний дүгнэлтүүд удаан. Халаалтгүй p99 нь \textbf{загварын биш, эхлэлийн өртгийг} хэмжинэ. Скрипт доод тал нь 20 дүгнэлт + 2 секунд халаана; \texttt{-\/-cold} нь халаалтыг бүрэн алгасна (зөвхөн харьцуулалтад).
+\item
+  \textbf{p50 биш p99.} Бодит цагийн систем дунджаар биш, \textbf{хамгийн муу тохиолдлоор} төлөвлөгддөг. 100 Гц мэдрэгчид p99 \textless{} 10 мс байх ёстой --- скрипт төгсгөлд үүнийг өөрөө шалгаж хэвлэнэ.
+\item
+  \textbf{Throttling.} \texttt{vcgencmd\ get\_throttled} ажиллалтын \textbf{өмнө ба дараа} уншигдана. Өөрчлөгдвөл скрипт чанга анхааруулж, гаралтын код \textbf{4} буцаана. Тэр тоог тайланд оруулж болохгүй.
+\end{enumerate}
 
 \hypertarget{ux430ux43bux445ux43cux443ux443ux434}{%
 \section{4. Алхмууд}\label{ux430ux43bux445ux43cux443ux443ux434}}
 
-\hypertarget{ux430ux43bux445ux430ux43c-1-ux441ux443ux443ux440ux44c-ux431ux430-ux430ux440ux433ux430ux447ux43bux430ux43bux44bux433-ux431ux430ux442ux43bux430ux445-25-ux43cux438ux43d}{%
-\subsection{Алхам 1 --- Суурь ба аргачлалыг батлах (25 мин)}\label{ux430ux43bux445ux430ux43c-1-ux441ux443ux443ux440ux44c-ux431ux430-ux430ux440ux433ux430ux447ux43bux430ux43bux44bux433-ux431ux430ux442ux43bux430ux445-25-ux43cux438ux43d}}
-
-Загваргүйгээр хэмжилтийн аргачлалыг шалгана:
+\hypertarget{ux430ux43bux445ux430ux43c-1-ux431ux44dux43bux44dux43d-ux431ux430ux439ux434ux430ux43b-ux431ux430-ux430ux440ux433ux430ux447ux43bux430ux43bux44bux433-ux431ux430ux442ux43bux430ux445-25-ux43cux438ux43d-pi}{%
+\subsection{Алхам 1 --- Бэлэн байдал ба аргачлалыг батлах (25 мин) {[}Pi{]}}\label{ux430ux43bux445ux430ux43c-1-ux431ux44dux43bux44dux43d-ux431ux430ux439ux434ux430ux43b-ux431ux430-ux430ux440ux433ux430ux447ux43bux430ux43bux44bux433-ux431ux430ux442ux43bux430ux445-25-ux43cux438ux43d-pi}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ synthetic }\AttributeTok{{-}{-}runs}\NormalTok{ 500 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}threads}\NormalTok{ 1 }\AttributeTok{{-}{-}label}\NormalTok{ baseline{-}t1 }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+\ExtensionTok{pkill} \AttributeTok{{-}f}\NormalTok{ vscode{-}server              }\CommentTok{\# 150–250 MiB чөлөөлнө}
+\ExtensionTok{./tools/measure\_stack.sh} \AttributeTok{{-}{-}role}\NormalTok{ edge}
+\ExtensionTok{vcgencmd}\NormalTok{ get\_throttled              }\CommentTok{\# 0x0 байх ЁСТОЙ}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{Халаалтын нөлөөг харна.} \texttt{-\/-warmup\ 0} ба \texttt{-\/-warmup\ 50}-ыг харьцуулна:
+Загваргүйгээр аргачлалыг шалгана:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ synthetic }\AttributeTok{{-}{-}runs}\NormalTok{ 200 }\AttributeTok{{-}{-}warmup}\NormalTok{ 0 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}label}\NormalTok{ no{-}warmup }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
-\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ synthetic }\AttributeTok{{-}{-}runs}\NormalTok{ 200 }\AttributeTok{{-}{-}warmup}\NormalTok{ 50 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}label}\NormalTok{ warm{-}50 }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ synthetic }\AttributeTok{{-}{-}runs}\NormalTok{ 500 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}threads}\NormalTok{ 2 }\AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ synth{-}t2 }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
 \end{Highlighting}
 \end{Shaded}
 
-\texttt{lat\_\allowbreak{}max\_\allowbreak{}ms} ба \texttt{lat\_\allowbreak{}p99\_\allowbreak{}ms}-ийн ялгааг тэмдэглэ. \textbf{Хүснэгт 2}-ын эхний хоёр мөр.
+\textbf{Халаалтын нөлөөг тусад нь харна} (\texttt{-\/-cold} vs хэвийн):
 
-\hypertarget{ux430ux43bux445ux430ux43c-2-float32-ux431ux430-int8-50-ux43cux438ux43d}{%
-\subsection{Алхам 2 --- float32 ба int8 (50 мин)}\label{ux430ux43bux445ux430ux43c-2-float32-ux431ux430-int8-50-ux43cux438ux43d}}
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ synthetic }\AttributeTok{{-}{-}runs}\NormalTok{ 200 }\AttributeTok{{-}{-}cold} \DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ synth{-}cold }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ synthetic }\AttributeTok{{-}{-}runs}\NormalTok{ 200 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ synth{-}warm }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-6.1-ux445ux430ux43bux430ux430ux43bux442ux44bux43d-ux43dux4e9ux43bux4e9ux4e9-synthetic-200-ux434ux4afux433ux43dux44dux43bux442}{%
+\subsubsection{Хүснэгт 6.1 --- Халаалтын нөлөө (synthetic, 200 дүгнэлт)}\label{ux445ux4afux441ux43dux44dux433ux442-6.1-ux445ux430ux43bux430ux430ux43bux442ux44bux43d-ux43dux4e9ux43bux4e9ux4e9-synthetic-200-ux434ux4afux433ux43dux44dux43bux442}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}llllll@{}}
+\toprule
+Шошго & p50 (мс) & p99 (мс) & \textbf{max (мс)} & σ (мс) & Халаалт хийсэн \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\texttt{synth-cold} (\texttt{-\/-cold}) & & & & & 0 \\
+\texttt{synth-warm} & & & & & \\
+\textbf{max-ийн ялгаа (дахин)} & & & & & \\
+\end{longtable}\endgroup
+
+\begin{quote}
+Хэрэв \texttt{max} хоёр дахин ч ялгаагүй бол Pi тань аль хэдийн халсан байна. 5 минут амраагаад давт.
+\end{quote}
+
+\hypertarget{ux430ux43bux445ux430ux43c-2-float32-ux431ux430-int8-35-ux43cux438ux43d-pi}{%
+\subsection{Алхам 2 --- float32 ба int8 (35 мин) {[}Pi{]}}\label{ux430ux43bux445ux430ux43c-2-float32-ux431ux430-int8-35-ux43cux438ux43d-pi}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ tflite }\DataTypeTok{\textbackslash{}}
     \AttributeTok{{-}{-}model}\NormalTok{ lab06/models/model\_float32.tflite }\AttributeTok{{-}{-}runs}\NormalTok{ 300 }\AttributeTok{{-}{-}threads}\NormalTok{ 1 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}label}\NormalTok{ float32{-}t1 }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+    \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ f32{-}t1 }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
 
 \ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ tflite }\DataTypeTok{\textbackslash{}}
     \AttributeTok{{-}{-}model}\NormalTok{ lab06/models/model\_int8.tflite }\AttributeTok{{-}{-}runs}\NormalTok{ 300 }\AttributeTok{{-}{-}threads}\NormalTok{ 1 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}label}\NormalTok{ int8{-}t1 }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+    \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ int8{-}t1 }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{Хүснэгт 1} ба \textbf{Хүснэгт 2}-ыг бөглөнө. Тооцоолно:
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-6.2-ux437ux430ux433ux432ux430ux440ux44bux43d-ux43cux44dux434ux44dux44dux43bux44dux43b-ux431ux430-ux43aux432ux430ux43dux442ux447ux438ux43bux430ux43bux44bux43d-ux430ux448ux438ux433}{%
+\subsubsection{Хүснэгт 6.2 --- Загварын мэдээлэл ба квантчилалын ашиг}\label{ux445ux4afux441ux43dux44dux433ux442-6.2-ux437ux430ux433ux432ux430ux440ux44bux43d-ux43cux44dux434ux44dux44dux43bux44dux43b-ux431ux430-ux43aux432ux430ux43dux442ux447ux438ux43bux430ux43bux44bux43d-ux430ux448ux438ux433}}
 
-\begin{verbatim}
-Хурдны ашиг    = саатал(float32) / саатал(int8)
-Санах ойн ашиг = хэмжээ(float32) / хэмжээ(int8)
-Нарийвчлалын алдагдал = acc(float32) − acc(int8)     ← Edge Impulse Studio-гоос
-\end{verbatim}
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
+\toprule
+Үзүүлэлт & float32 & int8 & Харьцаа \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Файлын хэмжээ (KiB, \texttt{model\_kib}) & & & \\
+Загварын санах ой (\texttt{mem\_\allowbreak{}model\_\allowbreak{}mib}) & & & \\
+p50 (мс) & & & \\
+\textbf{p99 (мс)} & & & \\
+Чадвар (дүгнэлт/с) & & & \\
+Нарийвчлал (Studio-гийн Model testing, \%) & & & \\
+\end{longtable}\endgroup
+
+Квантчилалын хурдны ашиг: ule{1.5cm}{0.4pt} × · Санах ойн ашиг: ule{1.5cm}{0.4pt} × · Нарийвчлалын алдагдал: ule{1.5cm}{0.4pt} \%
 
 \begin{quote}
-\textbf{Хэрэв int8 нь float32-оос хурдан БИШ бол} энэ нь буруу биш. Жижиг загварт квантчилалын нэмэлт зардал (де/квантчилал) ашгийг идэж магадгүй. Үүнийг тайлбарлах нь чухал ажиглалт.
+\textbf{int8 нь float32-оос хурдан БИШ гарвал} тайландаа шалтгааныг бич: 3 оролттой загварт де/квантчилалын зардал матрицын үржвэрээс их байж болно.
 \end{quote}
 
-\hypertarget{ux430ux43bux445ux430ux43c-3-ux443ux440ux441ux433ux430ux43bux44bux43d-ux442ux43eux43e-ux431ux430-ux437ux44dux440ux44dux433ux446ux44dux44d-ux430ux436ux438ux43bux43bux430ux433ux430ux430-30-ux43cux438ux43d}{%
-\subsection{Алхам 3 --- Урсгалын тоо ба зэрэгцээ ажиллагаа (30 мин)}\label{ux430ux43bux445ux430ux43c-3-ux443ux440ux441ux433ux430ux43bux44bux43d-ux442ux43eux43e-ux431ux430-ux437ux44dux440ux44dux433ux446ux44dux44d-ux430ux436ux438ux43bux43bux430ux433ux430ux430-30-ux43cux438ux43d}}
+\hypertarget{ux430ux43bux445ux430ux43c-3-ux443ux440ux441ux433ux430ux43bux44bux43d-ux442ux43eux43e-1-vs-2-vs-4-35-ux43cux438ux43d-pi}{%
+\subsection{Алхам 3 --- Урсгалын тоо: 1 vs 2 vs 4 (35 мин) {[}Pi{]}}\label{ux430ux43bux445ux430ux43c-3-ux443ux440ux441ux433ux430ux43bux44bux43d-ux442ux43eux43e-1-vs-2-vs-4-35-ux43cux438ux43d-pi}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \ControlFlowTok{for}\NormalTok{ T }\KeywordTok{in}\NormalTok{ 1 2 4}\KeywordTok{;} \ControlFlowTok{do}
   \ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ tflite }\DataTypeTok{\textbackslash{}}
       \AttributeTok{{-}{-}model}\NormalTok{ lab06/models/model\_int8.tflite }\AttributeTok{{-}{-}runs}\NormalTok{ 300 }\AttributeTok{{-}{-}threads} \VariableTok{$T} \DataTypeTok{\textbackslash{}}
-      \AttributeTok{{-}{-}label}\NormalTok{ int8{-}t}\VariableTok{$T} \AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+      \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ int8{-}t}\VariableTok{$T} \AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+  \FunctionTok{sleep}\NormalTok{ 60          }\CommentTok{\# хооронд нь хөргөнө — эс тэгвээс throttling гажуулна}
 \ControlFlowTok{done}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{Хүснэгт 3}-ыг бөглөнө. Дараах асуултад хариулна:
-
-\begin{itemize}
-\tightlist
-\item
-  4 урсгал 1 урсгалаас 4 дахин хурдан болов уу? Хэрэв үгүй бол яагаад?
-\item
-  \texttt{cpu\_efficiency} (ашиглагдсан цөмийн тоо) ямар байв?
-\item
-  \textbf{Ирмэгийн зангилаа дээр 4 цөмийг бүгдийг AI-д өгөх нь зөв үү?} Санамж: тэр Pi дээр EMQX, ThingsBoard, InfluxDB бас ажиллаж байгааг мартуузай.
-\end{itemize}
-
-\textbf{Ачаалалтай үеийн хэмжилт.} Стек ажиллаж, 50 төхөөрөмж өгөгдөл илгээж байхад давтана:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# зөөврийн компьютер дээр}
-\ExtensionTok{python3}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}devices}\NormalTok{ 50 }\AttributeTok{{-}{-}interval}\NormalTok{ 1 }\KeywordTok{\&}
-
-\CommentTok{\# Pi дээр}
-\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ tflite }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}model}\NormalTok{ lab06/models/model\_int8.tflite }\AttributeTok{{-}{-}runs}\NormalTok{ 300 }\AttributeTok{{-}{-}threads}\NormalTok{ 1 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}label}\NormalTok{ int8{-}t1{-}loaded }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
-\end{Highlighting}
-\end{Shaded}
-
-Чөлөөт vs ачаалалтай үеийн p99-ийн ялгаа: ule{1.5cm}{0.4pt} \%
-
-\hypertarget{ux430ux43bux445ux430ux43c-4-ux445ux443ux440ux434ux430ux441ux433ux443ux443ux440-raspberry-pi-ai-kit-40-ux43cux438ux43d}{%
-\subsection{Алхам 4 --- Хурдасгуур (Raspberry Pi AI Kit) (40 мин)}\label{ux430ux43bux445ux430ux43c-4-ux445ux443ux440ux434ux430ux441ux433ux443ux443ux440-raspberry-pi-ai-kit-40-ux43cux438ux43d}}
-
-\begin{quote}
-AI Kit тэнхимийн хамтын хэрэглээ тул ээлжээр ажиллана. Хүлээх зуураа Алхам 5-ыг эхлүүлж болно.
-\end{quote}
-
-\textbf{4.1 Тоног төхөөрөмжийг шалгах:}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\ExtensionTok{lspci} \KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}i}\NormalTok{ hailo}
-\ExtensionTok{hailortcli}\NormalTok{ fw{-}control identify}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{4.2 Edge Impulse-ийн Linux runner-ээр:}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ eim }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}model}\NormalTok{ lab06/models/anomaly.eim }\AttributeTok{{-}{-}runs}\NormalTok{ 300 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}label}\NormalTok{ eim{-}cpu }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{4.3} Хэрэв таны Edge Impulse төсөл Hailo зорилтыг дэмждэг бол хурдасгасан хувилбарыг татаж дахин хэмжинэ (\texttt{-\/-label\ eim-hailo}).
-
-\begin{quote}
-\textbf{Дэмжихгүй бол:} Энэ нь бүрэн хүлээн зөвшөөрөгдөх үр дүн. Тайландаа \textbf{яагаад дэмжихгүй байгааг} судалж бичнэ: загварын архитектур Hailo-гийн үйлдлийн жагсаалтад нийцэхгүй байж болно, эсвэл сургалтын хэлбэр (K-means anomaly) нь NPU-д хөрвүүлэгддэггүй. Энэ бол ирмэгийн AI-ийн бодит хязгаарлалт --- \textbf{хурдасгуур бүх загварыг хурдасгадаггүй}.
-\end{quote}
-
-\textbf{Хүснэгт 4}-ийг бөглөнө.
-
-\hypertarget{ux430ux43bux445ux430ux43c-5-ux43fux43bux430ux442ux444ux43eux440ux43cux434-ux43dux44dux433ux442ux433ux44dux445-40-ux43cux438ux43d}{%
-\subsection{Алхам 5 --- Платформд нэгтгэх (40 мин)}\label{ux430ux43bux445ux430ux43c-5-ux43fux43bux430ux442ux444ux43eux440ux43cux434-ux43dux44dux433ux442ux433ux44dux445-40-ux43cux438ux43d}}
-
-Дүгнэлтийг зөвхөн хэмжээд орхихгүй, \textbf{системд буцаан холбоно}.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# терминал 1 (Pi) — ирмэгийн дүгнэлт}
-\ExtensionTok{python3}\NormalTok{ lab06/anomaly\_publish.py }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\AttributeTok{{-}{-}backend}\NormalTok{ tflite }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}model}\NormalTok{ lab06/models/model\_int8.tflite }\AttributeTok{{-}{-}window}\NormalTok{ 125 }\AttributeTok{{-}{-}threshold}\NormalTok{ 0.75}
-
-\CommentTok{\# терминал 2 (зөөврийн компьютер) — гажилтай өгөгдөл}
-\ExtensionTok{python3}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host} \VariableTok{$H} \AttributeTok{{-}{-}devices}\NormalTok{ 5 }\AttributeTok{{-}{-}interval}\NormalTok{ 0.2 }\AttributeTok{{-}{-}anomaly{-}rate}\NormalTok{ 0.1}
-
-\CommentTok{\# терминал 3 — event сувгийг сонсоно}
-\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h} \VariableTok{$H} \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/+/+/+/+/event\textquotesingle{}} \AttributeTok{{-}v}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{5.1} Лаб 4-т үүсгэсэн EMQX Rule Engine дүрмийг өргөтгөж, \texttt{event} сувгийн \texttt{type=anomaly} мессежийг \texttt{cnc302/alerts/ai} руу чиглүүлнэ.
-
-\textbf{5.2} Лаб 5-ын Grafana самбарт ирмэгийн дохиоллын панель нэмнэ.
-
-\textbf{5.3 Хамгийн чухал хэмжилт --- зурвасын өргөний хэмнэлт:}
-
-\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
-\toprule
-& Түүхий өгөгдөл үүлэн рүү & Зөвхөн дүгнэлтийн үр дүн \\
-\midrule
-\endhead
-\bottomrule
-\endlastfoot
-Мессеж/секунд & 5 төх × 5 мсж/с = 25 & зөвхөн гажил үед ≈ 0.5 \\
-Байт/мессеж & \textasciitilde140 & \textasciitilde180 \\
-\textbf{Байт/секунд} & & \\
-\textbf{Өдөрт (MiB)} & & \\
-\textbf{Хэмнэлт \%} & & \\
-\end{longtable}\endgroup
-
-\hypertarget{ux430ux43bux445ux430ux43c-6-ux448ux438ux43dux436ux438ux43bux433ux44dux44d-ux431ux430-ux448ux438ux439ux434ux432ux44dux440-25-ux43cux438ux43d}{%
-\subsection{Алхам 6 --- Шинжилгээ ба шийдвэр (25 мин)}\label{ux430ux43bux445ux430ux43c-6-ux448ux438ux43dux436ux438ux43bux433ux44dux44d-ux431ux430-ux448ux438ux439ux434ux432ux44dux440-25-ux43cux438ux43d}}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\ExtensionTok{python3} \AttributeTok{{-}} \OperatorTok{\textless{}\textless{}\textquotesingle{}EOF\textquotesingle{}}
-\StringTok{import csv}
-\StringTok{rows=list(csv.DictReader(open(\textquotesingle{}lab06/out/bench.csv\textquotesingle{})))}
-\StringTok{w=max(len(r[\textquotesingle{}label\textquotesingle{}]) for r in rows)}
-\StringTok{print(f"\{\textquotesingle{}label\textquotesingle{}:\textless{}\{w\}\} \{\textquotesingle{}p50\textquotesingle{}:\textgreater{}8\} \{\textquotesingle{}p99\textquotesingle{}:\textgreater{}8\} \{\textquotesingle{}MiB\textquotesingle{}:\textgreater{}7\} \{\textquotesingle{}KiB\textquotesingle{}:\textgreater{}8\} \{\textquotesingle{}инф/с\textquotesingle{}:\textgreater{}9\}")}
-\StringTok{for r in rows:}
-\StringTok{    print(f"\{r[\textquotesingle{}label\textquotesingle{}]:\textless{}\{w\}\} \{r[\textquotesingle{}lat\_p50\_ms\textquotesingle{}]:\textgreater{}8\} \{r[\textquotesingle{}lat\_p99\_ms\textquotesingle{}]:\textgreater{}8\} "}
-\StringTok{          f"\{r[\textquotesingle{}mem\_model\_mib\textquotesingle{}]:\textgreater{}7\} \{r[\textquotesingle{}model\_kib\textquotesingle{}]:\textgreater{}8\} \{r[\textquotesingle{}throughput\_infer\_s\textquotesingle{}]:\textgreater{}9\}")}
-\OperatorTok{EOF}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{Хүснэгт 5} (байршуулалтын шийдвэр)-ийг бөглөж commit хийнэ:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{git}\NormalTok{ add }\AttributeTok{{-}A} \KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ status      }\CommentTok{\# models/, data/, out/ орохгүй!}
-\FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 6: ирмэгийн AI{-}ийн гүйцэтгэлийн хэмжилт"}
-\FunctionTok{git}\NormalTok{ tag lab06{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push origin main }\AttributeTok{{-}{-}tags}
-\end{Highlighting}
-\end{Shaded}
-
-\hypertarget{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux445ux4afux441ux43dux44dux433ux442ux4afux4afux434}{%
-\section{5. Хэмжилтийн хүснэгтүүд}\label{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux445ux4afux441ux43dux44dux433ux442ux4afux4afux434}}
-
-\hypertarget{ux445ux4afux441ux43dux44dux433ux442-1-ux437ux430ux433ux432ux430ux440ux44bux43d-ux43cux44dux434ux44dux44dux43bux44dux43b-edge-impulse-studio-ux433ux43eux43eux441}{%
-\subsection{Хүснэгт 1 --- Загварын мэдээлэл (Edge Impulse Studio-гоос)}\label{ux445ux4afux441ux43dux44dux433ux442-1-ux437ux430ux433ux432ux430ux440ux44bux43d-ux43cux44dux434ux44dux44dux43bux44dux43b-edge-impulse-studio-ux433ux43eux43eux441}}
-
-\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
-\toprule
-Үзүүлэлт & float32 & int8 \\
-\midrule
-\endhead
-\bottomrule
-\endlastfoot
-Загварын төрөл & & \\
-Оролтын цонх (мс / дээж) & & \\
-Нарийвчлал (Model testing) & & \\
-Studio-гийн таамагласан саатал & & \\
-Studio-гийн таамагласан RAM & & \\
-Файлын хэмжээ (KiB) & & \\
-\end{longtable}\endgroup
-
-\hypertarget{ux445ux4afux441ux43dux44dux433ux442-2-ux445ux44dux43cux436ux441ux44dux43d-ux433ux4afux439ux446ux44dux442ux433ux44dux43b-1-ux443ux440ux441ux433ux430ux43b}{%
-\subsection{Хүснэгт 2 --- Хэмжсэн гүйцэтгэл (1 урсгал)}\label{ux445ux4afux441ux43dux44dux433ux442-2-ux445ux44dux43cux436ux441ux44dux43d-ux433ux4afux439ux446ux44dux442ux433ux44dux43b-1-ux443ux440ux441ux433ux430ux43b}}
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-6.3-ux443ux440ux441ux433ux430ux43bux44bux43d-ux442ux43eux43eux43dux44b-ux43dux4e9ux43bux4e9ux4e9-int8}{%
+\subsubsection{Хүснэгт 6.3 --- Урсгалын тооны нөлөө (int8)}\label{ux445ux4afux441ux43dux44dux433ux442-6.3-ux443ux440ux441ux433ux430ux43bux44bux43d-ux442ux43eux43eux43dux44b-ux43dux4e9ux43bux4e9ux4e9-int8}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1250}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1250}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1250}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1250}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1250}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1250}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1250}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1250}}@{}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}@{}}
 \toprule
 \begin{minipage}[b]{\linewidth}\raggedright
-Шошго
+Урсгал
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 p50 (мс)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-p95 (мс)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 p99 (мс)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-max (мс)
+Чадвар (дүгнэлт/с)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-σ (мс)
+\texttt{cpu\_efficiency} (цөм)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Санах ой (MiB)
+Хурдны ашиг vs t1
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Чадвар (инф/с)
+Темп. өсөлт (°C)
 \end{minipage} \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
-baseline-t1 (synthetic) & & & & & & & \\
-no-warmup & & & & & & & \\
-warm-50 & & & & & & & \\
-float32-t1 & & & & & & & \\
-int8-t1 & & & & & & & \\
-int8-t1-loaded & & & & & & & \\
+1 & & & & & 1.00× & \\
+2 & & & & & & \\
+4 & & & & & & \\
 \end{longtable}\endgroup
 
-Квантчилалын хурдны ашиг: ule{1.5cm}{0.4pt} × · Санах ойн ашиг: ule{1.5cm}{0.4pt} × · Нарийвчлалын алдагдал: ule{1.5cm}{0.4pt} \%
+4 урсгал 4× хурдан болов уу: ule{1.5cm}{0.4pt} · Хамгийн сайн урсгалын тоо: ule{1.5cm}{0.4pt}
 
-\hypertarget{ux445ux4afux441ux43dux44dux433ux442-3-ux443ux440ux441ux433ux430ux43bux44bux43d-ux442ux43eux43e}{%
-\subsection{Хүснэгт 3 --- Урсгалын тоо}\label{ux445ux4afux441ux43dux44dux433ux442-3-ux443ux440ux441ux433ux430ux43bux44bux43d-ux442ux43eux43e}}
+\begin{quote}
+\textbf{Хүлээгдэх ажиглалт:} 4 урсгал ихэвчлэн 2-оос \textbf{удаан} гарна. Хоёр шалтгаан: (1) дөрвөн A53 нэг LPDDR2 сувгийг хуваадаг тул зурвасын өргөнд түгжигдэнэ, (2) дөрвөн цөм зэрэг ачаалагдахад дулаан хурдан өсч throttling эхэлнэ. \texttt{cpu\_efficiency} ба \texttt{temp\_\allowbreak{}delta\_\allowbreak{}c} баганаар үүнийг тоогоор нотол.
+\end{quote}
+
+\textbf{Нэмэлт --- ачаалалтай үеийн хэмжилт.} {[}ЗК{]} компьютерээс Pi рүү флот илгээж, дахин хэмжинэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# [ЗК] компьютер дээр}
+\ExtensionTok{python3}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host} \OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{ {-}{-}devices 50 }\AttributeTok{{-}{-}interval}\NormalTok{ 1.0}
+
+\CommentTok{\# [Pi] зэрэгцүүлэн}
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ tflite }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}model}\NormalTok{ lab06/models/model\_int8.tflite }\AttributeTok{{-}{-}runs}\NormalTok{ 300 }\AttributeTok{{-}{-}threads}\NormalTok{ 2 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ int8{-}t2{-}loaded }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+\end{Highlighting}
+\end{Shaded}
+
+Чөлөөт vs ачаалалтай p99-ийн ялгаа: ule{1.5cm}{0.4pt} \%
+
+\hypertarget{ux430ux43bux445ux430ux43c-4-ux437ux43eux440ux438ux443ux434ux430ux430ux440-ux445ux44dux442-ux445ux4afux43dux434-ux437ux430ux433ux432ux430ux440-30-ux43cux438ux43d-pi}{%
+\subsection{Алхам 4 --- Зориудаар хэт хүнд загвар (30 мин) {[}Pi{]}}\label{ux430ux43bux445ux430ux43c-4-ux437ux43eux440ux438ux443ux434ux430ux430ux440-ux445ux44dux442-ux445ux4afux43dux434-ux437ux430ux433ux432ux430ux440-30-ux43cux438ux43d-pi}}
+
+Одоо \textbf{буруу загварыг} ажиллуулж, хэр буруу болохыг хэмжинэ. \texttt{-\/-runs}-ыг багасгана --- эс тэгвээс энэ алхам ганцаараа хагас цаг иднэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ tflite }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}model}\NormalTok{ lab06/models/mobilenet\_224\_quant.tflite }\AttributeTok{{-}{-}runs}\NormalTok{ 30 }\AttributeTok{{-}{-}threads}\NormalTok{ 2 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ mnet{-}t2 }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ tflite }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}model}\NormalTok{ lab06/models/mobilenet\_224\_quant.tflite }\AttributeTok{{-}{-}runs}\NormalTok{ 30 }\AttributeTok{{-}{-}threads}\NormalTok{ 4 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ mnet{-}t4 }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-6.4-ux436ux438ux436ux438ux433-ux433ux430ux436ux438ux43b-ux438ux43bux440ux4afux4afux43bux44dux433ux447-vs-ux437ux443ux440ux433ux430ux43d-ux437ux430ux433ux432ux430ux440}{%
+\subsubsection{Хүснэгт 6.4 --- Жижиг гажил илрүүлэгч vs зурган загвар}\label{ux445ux4afux441ux43dux44dux433ux442-6.4-ux436ux438ux436ux438ux433-ux433ux430ux436ux438ux43b-ux438ux43bux440ux4afux4afux43bux44dux433ux447-vs-ux437ux443ux440ux433ux430ux43d-ux437ux430ux433ux432ux430ux440}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+int8 гажил илрүүлэгч
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+MobileNet 224 (t2)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+MobileNet 224 (t4)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Харьцаа
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Загварын хэмжээ (KiB) / оролтын хэлбэр & & & & \\
+p50 (мс) & & & & \\
+\textbf{p99 (мс)} & & & & \\
+Санах ой (MiB) & & & & \\
+Чадвар (дүгнэлт/с) & & & & \\
+100 Гц мэдрэгчид нийцэх үү & & & & \\
+Хамгийн их боломжит давтамж (Гц) & & & & \\
+\end{longtable}\endgroup
+
+\textbf{Тооцоолол:} хэрэв нэг дүгнэлт \texttt{p99} мс авдаг бол секундэд хамгийн ихдээ \texttt{1000\ /\ p99} дүгнэлт хийнэ. MobileNet-ийн хувьд энэ тоо хэд вэ?
+
+\begin{quote}
+\textbf{Энэ бол хэмжилт, алдаа биш.} MobileNet Pi 3B дээр хэдэн зуун мс-ээс секунд хүртэл авна. Яг энэ тоо нь (а) яагаад ирмэгийн загвар \textbf{жижиг} байх ёстой, (б) яагаад \textbf{хурдасгуур гэж зүйл байдаг}, (в) яагаад зурган ажлыг үүлэн рүү илгээх нь ихэвчлэн зөв гэдгийг нэг дор тайлбарлана.
+\end{quote}
+
+\hypertarget{ux430ux43bux445ux430ux43c-5-ux445ux4e9ux43dux434ux43bux4e9ux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442-ux433ux443ux440ux432ux430ux43d-ux442ux4e9ux43cux4e9ux440-25-ux43cux438ux43d-piux437ux43a}{%
+\subsection{Алхам 5 --- Хөндлөн харьцуулалт: гурван төмөр (25 мин) {[}Pi{]}{[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-5-ux445ux4e9ux43dux434ux43bux4e9ux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442-ux433ux443ux440ux432ux430ux43d-ux442ux4e9ux43cux4e9ux440-25-ux43cux438ux43d-piux437ux43a}}
+
+Ижил \texttt{-\/-label}-тай хэмжилтийг \textbf{өөр төмөр} дээр авч, нэг CSV-д цуглуулна. \texttt{-\/-device-label} нь ялгах багана.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# [Pi] Pi 3B дээр (аль хэдийн хийсэн)}
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ synthetic }\AttributeTok{{-}{-}runs}\NormalTok{ 500 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ xdev }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+
+\CommentTok{\# [ЗК] зөөврийн компьютер дээр, ЯГ ижил комманд}
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ synthetic }\AttributeTok{{-}{-}runs}\NormalTok{ 500 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}device{-}label}\NormalTok{ laptop{-}cpu }\AttributeTok{{-}{-}label}\NormalTok{ xdev }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+\end{Highlighting}
+\end{Shaded}
+
+Загвартай хувилбарыг ч давт: \texttt{-\/\allowbreak{}-backend\ tflite\ -\/\allowbreak{}-model\ lab06/\allowbreak{}models/\allowbreak{}model\_int8.\allowbreak{}tflite\ -\/\allowbreak{}-device-label\ laptop-cpu\ -\/\allowbreak{}-label\ int8-xdev}.
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-6.5-ux442ux4e9ux43cux440ux438ux439ux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442-ux438ux436ux438ux43b-ux437ux430ux433ux432ux430ux440-ux438ux436ux438ux43b---runs}{%
+\subsubsection{\texorpdfstring{Хүснэгт 6.5 --- Төмрийн харьцуулалт (ижил загвар, ижил \texttt{-\/-runs})}{Хүснэгт 6.5 --- Төмрийн харьцуулалт (ижил загвар, ижил -\/-runs)}}\label{ux445ux4afux441ux43dux44dux433ux442-6.5-ux442ux4e9ux43cux440ux438ux439ux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442-ux438ux436ux438ux43b-ux437ux430ux433ux432ux430ux440-ux438ux436ux438ux43b---runs}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
@@ -404,113 +436,200 @@ int8-t1-loaded & & & & & & & \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}@{}}
 \toprule
 \begin{minipage}[b]{\linewidth}\raggedright
-Урсгал
+Төмөр (\texttt{device\_label})
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 p50 (мс)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 p99 (мс)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Чадвар (инф/с)
+Чадвар (дүгнэлт/с)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-CPU ашиглалт (цөм)
+Хурд vs Pi 3B
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хурдны ашиг vs t1
+Эх сурвалж
 \end{minipage} \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
-1 & & & & & 1.00× \\
-2 & & & & & \\
-4 & & & & & \\
+\texttt{pi3b} (4×A53 @1.2 ГГц) & & & & 1.00× & өөрсдийн хэмжилт \\
+\texttt{laptop-cpu} & & & & & өөрсдийн хэмжилт \\
+\texttt{reference} (Pi 5 + AI Kit) & & & & & \textbf{багшийн лавлагаа} \\
 \end{longtable}\endgroup
 
-4 урсгал 4× хурдан болов уу: ule{1.5cm}{0.4pt} Шалтгаан: ule{1.5cm}{0.4pt}
+\begin{quote}
+Гурав дахь мөрийг \textbf{өөрсдөө хэмжихгүй} --- Pi 3B-д PCIe байхгүй. Багш тэнхимийн лавлагаа өгвөл \texttt{-\/\allowbreak{}-device-label\ reference} гэж нэг CSV-д нэмнэ. Өгөөгүй бол мөрийг хоосон үлдээж, тайланд "хэмжих боломжгүй, шалтгаан: PCIe байхгүй" гэж бич.
+\end{quote}
 
-\hypertarget{ux445ux4afux441ux43dux44dux433ux442-4-ux445ux443ux440ux434ux430ux441ux433ux443ux443ux440ux44bux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442}{%
-\subsection{Хүснэгт 4 --- Хурдасгуурын харьцуулалт}\label{ux445ux4afux441ux43dux44dux433ux442-4-ux445ux443ux440ux434ux430ux441ux433ux443ux443ux440ux44bux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442}}
+\hypertarget{ux430ux43bux445ux430ux43c-6-ux433ux43eux43b-ux445ux44dux43cux436ux438ux43bux442-ux438ux440ux43cux44dux433ux438ux439ux43d-ux448ux4afux4afux43bux442-60-ux43cux438ux43d-piux437ux43a}{%
+\subsection{Алхам 6 --- ГОЛ ХЭМЖИЛТ: ирмэгийн шүүлт (60 мин) {[}Pi{]}{[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-6-ux433ux43eux43b-ux445ux44dux43cux436ux438ux43bux442-ux438ux440ux43cux44dux433ux438ux439ux43d-ux448ux4afux4afux43bux442-60-ux43cux438ux43d-piux437ux43a}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}lllll@{}}
+Энэ бол лабораторийн төлбөр. Дүгнэлтийг ирмэг дээр хийснээр \textbf{уплинкээр юу явахгүй болохыг} хэмжинэ.
+
+\textbf{6.1 Уплинкийн тоолуурыг тэглэж эхлэх.} {[}Pi{]} Ethernet интерфэйсийн байтын тоолуурыг ашиглана:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{ /sys/class/net/eth0/statistics/tx\_bytes      }\CommentTok{\# эхлэлийн утга}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{6.2 ШҮҮЛТГҮЙ --- бүх мессежийг үүл рүү.} {[}Pi{]}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge}
+\VariableTok{TX0}\OperatorTok{=}\VariableTok{$(}\FunctionTok{cat}\NormalTok{ /sys/class/net/eth0/statistics/tx\_bytes}\VariableTok{)}
+\ExtensionTok{.venv/bin/python}\NormalTok{ agent/edge\_agent.py }\AttributeTok{{-}{-}detector}\NormalTok{ ../lab06/models/model\_int8.tflite }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}threads}\NormalTok{ 2 }\AttributeTok{{-}{-}interval}\NormalTok{ 0.5 }\AttributeTok{{-}{-}anomaly{-}rate}\NormalTok{ 0.05 }\AttributeTok{{-}{-}count}\NormalTok{ 600}
+\VariableTok{TX1}\OperatorTok{=}\VariableTok{$(}\FunctionTok{cat}\NormalTok{ /sys/class/net/eth0/statistics/tx\_bytes}\VariableTok{)}
+\BuiltInTok{echo} \StringTok{"шүүлтгүй tx = }\VariableTok{$((TX1}\OperatorTok{{-}}\VariableTok{TX0))}\StringTok{ байт"}
+\end{Highlighting}
+\end{Shaded}
+
+Агент төгсгөлд \texttt{илгээсэн\ N,\ дарсан\ M,\ дүгнэлт\ дундаж\ X\ мс} гэж хэвлэнэ. Тэр тоог бич.
+
+\textbf{6.3 ШҮҮЛТТЭЙ --- зөвхөн гажил + үе үе хураангуй.} {[}Pi{]}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{TX0}\OperatorTok{=}\VariableTok{$(}\FunctionTok{cat}\NormalTok{ /sys/class/net/eth0/statistics/tx\_bytes}\VariableTok{)}
+\ExtensionTok{.venv/bin/python}\NormalTok{ agent/edge\_agent.py }\AttributeTok{{-}{-}detector}\NormalTok{ ../lab06/models/model\_int8.tflite }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}threads}\NormalTok{ 2 }\AttributeTok{{-}{-}interval}\NormalTok{ 0.5 }\AttributeTok{{-}{-}anomaly{-}rate}\NormalTok{ 0.05 }\AttributeTok{{-}{-}count}\NormalTok{ 600 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}filter} \AttributeTok{{-}{-}health{-}every}\NormalTok{ 15}
+\VariableTok{TX1}\OperatorTok{=}\VariableTok{$(}\FunctionTok{cat}\NormalTok{ /sys/class/net/eth0/statistics/tx\_bytes}\VariableTok{)}
+\BuiltInTok{echo} \StringTok{"шүүлттэй tx = }\VariableTok{$((TX1}\OperatorTok{{-}}\VariableTok{TX0))}\StringTok{ байт"}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{6.4 Үүлний талаас батлах.} {[}ЗК{]} хоёр ажиллалтын үед зэрэг сонсоно:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/pi3b{-}01/\#\textquotesingle{}} \AttributeTok{{-}v} \KeywordTok{|} \FunctionTok{tee}\NormalTok{ /tmp/f.log}
+\FunctionTok{wc} \AttributeTok{{-}l}\NormalTok{ /tmp/f.log }\KeywordTok{\&\&} \FunctionTok{wc} \AttributeTok{{-}c}\NormalTok{ /tmp/f.log}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-6.6-ux438ux440ux43cux44dux433ux438ux439ux43d-ux448ux4afux4afux43bux442ux438ux439ux43d-ux4afux440-ux430ux448ux438ux433-600-ux43cux4e9ux447ux43bux4e9ux433---interval-0.5}{%
+\subsubsection{\texorpdfstring{Хүснэгт 6.6 --- Ирмэгийн шүүлтийн үр ашиг (600 мөчлөг, \texttt{-\/-interval\ 0.5})}{Хүснэгт 6.6 --- Ирмэгийн шүүлтийн үр ашиг (600 мөчлөг, -\/-interval 0.5)}}\label{ux445ux4afux441ux43dux44dux433ux442-6.6-ux438ux440ux43cux44dux433ux438ux439ux43d-ux448ux4afux4afux43bux442ux438ux439ux43d-ux4afux440-ux430ux448ux438ux433-600-ux43cux4e9ux447ux43bux4e9ux433---interval-0.5}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-Гүйцэтгэх орчин & p50 (мс) & p99 (мс) & Санах ой (MiB) & Тэмдэглэл \\
+Хэмжигдэхүүн & Шүүлтгүй & \texttt{-\/-filter}-тэй & Бууралт \% \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
-CPU, float32 & & & & \\
-CPU, int8 & & & & \\
-Edge Impulse EIM (CPU) & & & & \\
-Hailo-8L (AI Kit) & & & & дэмжигдсэн үү: \\
+Илгээсэн мессеж (агентын \texttt{илгээсэн}) & 600 & & \\
+Дарагдсан мессеж (\texttt{дарсан}) & 0 & & --- \\
+\texttt{eth0} tx\_bytes (байт) & & & \\
+Үүлэнд хүрсэн мөр (\texttt{wc\ -l}) & & & \\
+Байт/секунд & & & \\
+Дүгнэлтийн дундаж саатал (мс) & & & --- \\
+Pi-гийн CPU \% (\texttt{make\ mem}, \texttt{top}) & & & \\
 \end{longtable}\endgroup
 
-\hypertarget{ux445ux4afux441ux43dux44dux433ux442-5-ux431ux430ux439ux440ux448ux443ux443ux43bux430ux43bux442ux44bux43d-ux448ux438ux439ux434ux432ux44dux440}{%
-\subsection{Хүснэгт 5 --- Байршуулалтын шийдвэр}\label{ux445ux4afux441ux43dux44dux433ux442-5-ux431ux430ux439ux440ux448ux443ux443ux43bux430ux43bux442ux44bux43d-ux448ux438ux439ux434ux432ux44dux440}}
+\begin{quote}
+\textbf{Анхаар --- \texttt{-\/-filter} нь зөвхөн гажлыг илгээдэггүй.} \texttt{-\/-health-every\ 15} тутамд "би амьд байна" хураангуй явна. Үүнгүй бол үүл нь \textbf{чимээгүй} ирмэгийг \textbf{үхсэн} ирмэгээс ялгаж чадахгүй. Тайландаа энэ солилцоог тайлбарла: шүүлт хэдий чинээ хатуу байна, ирмэгийн ажиглагдах чанар төдий чинээ муу.
+\end{quote}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\textbf{6.5 Босгын горимтой харьцуул.} \texttt{-\/-detector}-гүй ажиллуулбал агент энгийн босго ашиглана (0.6). Ижил \texttt{-\/-count}-оор давтаж, шүүлтийн үр ашиг ML загвартай харьцуулахад ялгаатай эсэхийг хэмж. Дүгнэлтийг агентаас \textbf{тусад нь} ажиллуулж, зөвхөн \texttt{anomaly} суваг руу нийтлэх хувилбарыг ч үз: \texttt{python3\ lab06/\allowbreak{}anomaly\_\allowbreak{}publish.\allowbreak{}py\ -\/\allowbreak{}-backend\ tflite\ -\/\allowbreak{}-model\ lab06/\allowbreak{}models/\allowbreak{}model\_\allowbreak{}int8.\allowbreak{}tflite\ -\/\allowbreak{}-field\ vibration\_\allowbreak{}g\ -\/\allowbreak{}-window\ 125\ -\/\allowbreak{}-threads\ 2\ -\/\allowbreak{}-threshold\ 0.\allowbreak{}8} ({[}Pi{]} Pi дээр, ирмэгийн брокероос). Аль архитектур нь дээр вэ --- агент дотор шүүх үү, тусдаа процесс уу?
+
+\hypertarget{ux430ux43bux445ux430ux43c-7-ux443ux43fux43bux438ux43dux43aux438ux439ux43d-ux431ux430ux433ux442ux430ux430ux43cux436ux438ux439ux43d-ux442ux43eux43eux446ux43eux43e-20-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 7 --- Уплинкийн багтаамжийн тооцоо (20 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-7-ux443ux43fux43bux438ux43dux43aux438ux439ux43d-ux431ux430ux433ux442ux430ux430ux43cux436ux438ux439ux43d-ux442ux43eux43eux446ux43eux43e-20-ux43cux438ux43d-ux437ux43a}}
+
+Лаб 4-т Pi-гийн 100 Mbit уплинк (бодитоор \textasciitilde90--95 Mbit, USB 2.0-той хуваалцана) хэзээ ханахыг хэмжсэн. Одоо ирмэгийн шүүлт тэр хязгаарыг \textbf{хэдэн дахин} ухраасныг тооцно.
+
+Хүснэгт 6.6-гийн байт/секунд утгыг ашиглан нэг төхөөрөмжийн эзлэх зурвасыг гаргаад:
+
+\begin{verbatim}
+уплинкийн бодит багтаамж ≈ 90 Mbit/с = 11.25 MB/с
+дэмжих төхөөрөмжийн тоо = 11 250 000 / (байт/секунд нэг төхөөрөмжид)
+\end{verbatim}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-6.7-ux443ux43fux43bux438ux43dux43a-ux445ux44dux434ux44dux43d-ux442ux4e9ux445ux4e9ux4e9ux440ux4e9ux43cux436-ux434ux430ux430ux445-ux432ux44d}{%
+\subsubsection{Хүснэгт 6.7 --- Уплинк хэдэн төхөөрөмж даах вэ}\label{ux445ux4afux441ux43dux44dux433ux442-6.7-ux443ux43fux43bux438ux43dux43a-ux445ux44dux434ux44dux43d-ux442ux4e9ux445ux4e9ux4e9ux440ux4e9ux43cux436-ux434ux430ux430ux445-ux432ux44d}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-Асуулт & Хариулт & Тоон үндэслэл \\
+& Шүүлтгүй & \texttt{-\/-filter}-тэй & Ашиг (дахин) \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
-Сонгосон загвар ба формат & & \\
-Урсгалын тоо & & \\
-100 Гц мэдрэгчид нийцэх үү & & p99 = \_\_\_ мс \\
-Хэдэн төхөөрөмжийн урсгалыг нэг Pi дүгнэж чадах вэ & & \\
-Ирмэг эсвэл үүл --- сонголт ба шалтгаан & & \\
-Зурвасын өргөний хэмнэлт & & \_\_\_ \% \\
-Загварыг хэрхэн шинэчлэх вэ & & Лаб 2-ын OTA-тай хэрхэн холбогдох \\
+Байт/секунд нэг төхөөрөмжид (Хүснэгт 6.6) & & & \\
+Онолын дээд хязгаар (төх., 90 Mbit) & & & \\
+50\% нөөцтэй практик хязгаар (төх.) & & & \\
+Өдрийн трафик 100 төхөөрөмжөөс (MiB) & & & \\
+Сарын трафик 100 төхөөрөмжөөс (GiB) & & & \\
 \end{longtable}\endgroup
 
-\hypertarget{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442}{%
-\section{6. Хяналтын асуулт}\label{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442}}
+\begin{quote}
+\textbf{Санамж:} уплинкийн хязгаар практикт хэзээ ч эхэлж ханадаггүй --- Лаб 4-т RAM түрүүлж ханасан байх магадлалтай. Тайландаа \textbf{аль нөөц түрүүлж ханав} гэдгийг Лаб 4-ийн тоотой тулгаж хариул. Шүүлт нь тэр эрэмбийг өөрчлөв үү?
+\end{quote}
+
+\hypertarget{ux430ux43bux445ux430ux43c-8-ux434ux4afux43d-ux448ux438ux43dux436ux438ux43bux433ux44dux44d-ux431ux430-git-commit-10-ux43cux438ux43d}{%
+\subsection{Алхам 8 --- Дүн шинжилгээ ба Git commit (10 мин)}\label{ux430ux43bux445ux430ux43c-8-ux434ux4afux43d-ux448ux438ux43dux436ux438ux43bux433ux44dux44d-ux431ux430-git-commit-10-ux43cux438ux43d}}
+
+Бүх хэмжилт нэг CSV-д байгаа. Нэг харцаар:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python3} \AttributeTok{{-}} \OperatorTok{\textless{}\textless{}\textquotesingle{}EOF\textquotesingle{}}
+\StringTok{import csv}
+\StringTok{rows = list(csv.DictReader(open(\textquotesingle{}lab06/out/bench.csv\textquotesingle{})))}
+\StringTok{w = max(len(r[\textquotesingle{}label\textquotesingle{}]) for r in rows)}
+\StringTok{print(f"\{\textquotesingle{}label\textquotesingle{}:\textless{}\{w\}\} \{\textquotesingle{}төмөр\textquotesingle{}:\textgreater{}12\} \{\textquotesingle{}thr\textquotesingle{}:\textgreater{}4\} \{\textquotesingle{}p50\textquotesingle{}:\textgreater{}9\} \{\textquotesingle{}p99\textquotesingle{}:\textgreater{}9\} \{\textquotesingle{}инф/с\textquotesingle{}:\textgreater{}9\}")}
+\StringTok{for r in rows:}
+\StringTok{    print(f"\{r[\textquotesingle{}label\textquotesingle{}]:\textless{}\{w\}\} \{r[\textquotesingle{}device\_label\textquotesingle{}]:\textgreater{}12\} \{r[\textquotesingle{}threads\textquotesingle{}]:\textgreater{}4\} "}
+\StringTok{          f"\{r[\textquotesingle{}lat\_p50\_ms\textquotesingle{}]:\textgreater{}9\} \{r[\textquotesingle{}lat\_p99\_ms\textquotesingle{}]:\textgreater{}9\} \{r[\textquotesingle{}throughput\_infer\_s\textquotesingle{}]:\textgreater{}9\}")}
+\OperatorTok{EOF}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\FunctionTok{git}\NormalTok{ add lab06/README.md lab06/out/bench.csv lab06/report.md}
+\FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 6: CPU дээрх ирмэгийн дүгнэлт, шүүлтийн үр ашиг"}
+\FunctionTok{git}\NormalTok{ tag lab06{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\AttributeTok{{-}{-}tags}
+\end{Highlighting}
+\end{Shaded}
+
+⚠ Загвар, өгөгдөл, нууц файл \textbf{орохгүй} байгааг шалга:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}E} \StringTok{\textquotesingle{}\textbackslash{}.tflite$|\textbackslash{}.eim$|lab06/data/|\textbackslash{}.env$\textquotesingle{}}   \CommentTok{\# хоосон байх ЁСТОЙ}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442ux443ux443ux434}{%
+\section{5. Хяналтын асуултууд}\label{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442ux443ux443ux434}}
+
+Хариулт бүр \textbf{хүснэгтээс тоо иш татсан} байх ёстой.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
-\tightlist
 \item
-  Халаалтгүй ба халаалттай хэмжилтийн \texttt{max} утга хэр ялгаатай байв? Яагаад анхны дүгнэлтүүд удаан вэ?
+  Хүснэгт 6.1-д \texttt{-\/-cold} ба халаасан ажиллалтын \texttt{max} хэдэн дахин ялгаатай байв? Халаалтгүй тоог тайланд оруулбал ямар буруу дүгнэлтэд хүрэх байсан бэ?
 \item
-  Яагаад p50 биш p99-ээр төлөвлөх ёстой вэ? p99 хэтэрвэл бодит системд юу болох вэ?
+  Хүснэгт 6.2-т квантчилалын хурдны ашиг хэд байв? Санах ойн ашиг нь яагаад яг 4× биш вэ (загварын жингээс гадна юу санах ой иддэг вэ)?
 \item
-  int8 квантчилал таны загварт хэр их ашиг өгөв? Хэрэв бага бол яагаад?
+  Хүснэгт 6.3-д хамгийн сайн урсгалын тоо хэд байв? 4 урсгал 2-оос удаан бол \texttt{cpu\_efficiency} ба \texttt{temp\_\allowbreak{}delta\_\allowbreak{}c} баганын аль нь шалтгааныг илүү тодорхой заав? Хэрэв Pi-д идэвхтэй сэнс тавибал үр дүн өөрчлөгдөх үү?
 \item
-  Ачаалалтай үед саатал өссөн үү? Энэ нь ирмэгийн зангилааны төлөвлөлтөд ямар утгатай вэ?
+  Хүснэгт 6.4-т MobileNet-ийн p99 хэдэн мс байв? Тэр загварыг 25 Гц видеонд ашиглах гэвэл хэдэн Pi 3B хэрэгтэй болох вэ? Тэр тоо утга учиртай юу?
 \item
-  Дүгнэлтийг ирмэг дээр хийснээр хэдэн хувийн зурвасын өргөн хэмнэгдэв? 1000 төхөөрөмж дээр өдөрт хэдэн GiB вэ?
+  Хүснэгт 6.5-д зөөврийн компьютер Pi 3B-ээс хэдэн дахин хурдан байв? Энэ харьцаа нь "бүх дүгнэлтийг үүлэн дээр хий" гэсэн дүгнэлтэд хүргэх үү? Ямар нөхцөлд үгүй вэ (хоёр шалтгаан нэрлэ)?
 \item
-  Ирмэг дээрх загварыг хэрхэн шинэчлэх вэ? Лаб 2-т үзсэн OTA механизм загварт тохирох уу? Ямар онцлог шаардлага гарах вэ?
+  Хүснэгт 6.6-д мессежийн бууралт ба байтын бууралт \textbf{ижил хувь} байв уу? Ялгаатай бол яагаад? (Санамж: \texttt{-\/-health-every} хураангуй ба гажлын мессежийн хэмжээ.)
 \item
-  Загварын нарийвчлал байршуулсны дараа буурч болох уу? (Санамж: \textbf{model drift}.) Үүнийг хэрхэн илрүүлэх вэ? Лаб 5-ын Grafana дохиолол энд яаж тусалж чадах вэ?
-\item
-  Hailo хурдасгуур таны загварыг дэмжсэн үү? Дэмжээгүй бол шалтгааныг тайлбарла.
-\item
-  Холбооны сургалт (federated learning) энэ хэрэглээнд ямар давуу тал өгөх байсан бэ?
+  Хүснэгт 6.7-гийн ашгийг Лаб 4-ийн багтаамжийн хязгаартай тулга. Ирмэгийн шүүлт нь \textbf{хязгаарлагч нөөцийг өөрчилсөн үү}, эсвэл зөвхөн нэг нөөцийг л ухрааж бусад нь хэвээр үлдсэн үү?
 \end{enumerate}
 
-\hypertarget{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux448ux430ux430ux440ux434ux43bux430ux433ux430}{%
-\section{7. Тайлангийн шаардлага}\label{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux448ux430ux430ux440ux434ux43bux430ux433ux430}}
-
-\begin{itemize}
-\tightlist
-\item[$\square$]
-  Хүснэгт 1--5 бүрэн
-\item[$\square$]
-  \texttt{lab06/out/bench.csv} (бүх хэмжилт нэг файлд)
-\item[$\square$]
-  Edge Impulse төслийн холбоос эсвэл дэлгэцийн зураг (Model testing хуудас)
-\item[$\square$]
-  Ирмэгийн дохиолол Grafana дээр харагдаж буй нотолгоо
-\item[$\square$]
-  Зурвасын өргөний хэмнэлтийн тооцоо
-\item[$\square$]
-  Хяналтын 9 асуултын хариулт
-\item[$\square$]
-  Git tag \texttt{lab06-done}
-\end{itemize}
-
-\hypertarget{ux43eux43dux43eux448ux438ux43bux433ux43eux43e}{%
-\section{8. Оношилгоо}\label{ux43eux43dux43eux448ux438ux43bux433ux43eux43e}}
+\hypertarget{ux445ux4afux43bux44dux44dux43bux433ux44dux43d-ux4e9ux433ux4e9ux445-ux437ux4afux439ux43b}{%
+\section{6. Хүлээлгэн өгөх зүйл}\label{ux445ux4afux43bux44dux44dux43bux433ux44dux43d-ux4e9ux433ux4e9ux445-ux437ux4afux439ux43b}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
@@ -518,27 +637,27 @@ Hailo-8L (AI Kit) & & & & дэмжигдсэн үү: \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
 \toprule
 \begin{minipage}[b]{\linewidth}\raggedright
-Шинж тэмдэг
+\#
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шалтгаан
+Зүйл
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шийдэл
+Байрлал
 \end{minipage} \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
-\texttt{TFLite\ орчин\ олдсонгүй} & сан суулгаагүй & \texttt{pip3\ install\ -\/-break-system-packages\ ai-edge-litert} \\
-\texttt{.eim} ажиллахгүй & гүйцэтгэх эрхгүй эсвэл буруу архитектур & \texttt{chmod\ +x}; AARCH64 хувилбар татсан эсэхээ шалга \\
-int8 float32-оос удаан & загвар хэт жижиг, де/квантчилалын зардал давамгайлав & хэвийн үзэгдэл --- тайлбарла \\
-Саатал маш хэлбэлзэлтэй (σ өндөр) & Pi дээр өөр ачаалал байна & \texttt{htop}; стекийг түр зогсоож давт \\
-\texttt{lspci} Hailo харуулахгүй & AI Kit холбогдоогүй эсвэл PCIe идэвхгүй & \texttt{sudo\ raspi-config} → PCIe Gen 3 \\
-Санах ойн хэмжилт 0 & \texttt{/proc/self/status} уншигдахгүй & контейнер дотор биш, Pi дээр шууд ажиллуул \\
-\texttt{anomaly\_publish.py} дүгнэлт хийхгүй & цонх дүүрэхгүй байна & \texttt{-\/-window}-ыг багасга эсвэл \texttt{-\/-interval}-ыг хурдасга \\
+1 & Тайлан (Хүснэгт 6.1--6.7 бөглөсөн) & \texttt{lab06/report.md} → PDF \\
+2 & Бүх хэмжилтийн нэгдсэн CSV & \texttt{lab06/out/bench.csv} \\
+3 & Edge Impulse төслийн холбоос эсвэл сургалтын кодын diff & тайлангийн хавсралт \\
+4 & Шүүлттэй/шүүлтгүй агентын терминалын гаралт & \texttt{lab06/out/*.log} \\
+5 & Git tag & \texttt{lab06-done} \\
 \end{longtable}\endgroup
 
+СТОП: \texttt{.tflite}, \texttt{.eim}, \texttt{lab06/data/*.csv} Git-д \textbf{орохгүй}.
+
 \hypertarget{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}{%
-\section{9. Үнэлгээний шалгуур (10 оноо)}\label{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}}
+\section{7. Үнэлгээний шалгуур (10 оноо)}\label{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
@@ -553,11 +672,41 @@ int8 float32-оос удаан & загвар хэт жижиг, де/квант
 \endhead
 \bottomrule
 \endlastfoot
-Загвар Pi дээр байршиж ажиллаж байна & 2 \\
-float32/int8, урсгалын тоо, ачаалалтай/чөлөөт харьцуулалт хэмжигдсэн & 3 \\
-Хурдасгуурын туршилт (дэмжигдээгүй бол шалтгаан судлагдсан) & 1 \\
-Дүгнэлт платформд нэгтгэгдэж, дохиолол ажиллаж байна & 2 \\
-Зурвасын өргөний тооцоо ба байршуулалтын шийдвэр & 2 \\
+Загвар Pi дээр ачаалагдаж, дүгнэлт ажиллаж байна (амьд үзүүлнэ) & 2 \\
+Хүснэгт 6.1--6.5 бүрэн, throttling өмнө/дараа шалгагдсан & 3 \\
+\textbf{Ирмэгийн шүүлтийн үр ашиг хэмжигдэж, уплинкийн тооцоо хийгдсэн} & 3 \\
+MobileNet-ийн хэмжилт хийгдэж, шалтгаан нь тайлбарлагдсан & 1 \\
+Git цэвэр, загвар/өгөгдөл ороогүй & 1 \\
 \end{longtable}\endgroup
 
-\textbf{Загваргүйгээр (\texttt{-\/-backend\ synthetic}) гүйцэтгэсэн бол} дээд тал нь 7 оноо.
+\textbf{\texttt{-\/-backend\ synthetic}-ээр гүйцэтгэсэн бол} дээд тал нь 7 оноо.
+
+\hypertarget{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}{%
+\section{8. Түгээмэл алдаа}\label{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Шинж
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шалтгаан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шийдэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\texttt{TFLite\ орчин\ олдсонгүй} & сан суулгаагүй & {[}Pi{]} \texttt{edge/\allowbreak{}.\allowbreak{}venv/\allowbreak{}bin/\allowbreak{}pip\ install\ ai-edge-litert} \\
+Скрипт гаралтын код 4 буцаав & ажиллалтын явцад throttling эхэлсэн & 5 мин хөргөж, 5V/2.5A тэжээл шалгаад давт \\
+int8 нь float32-оос удаан & загвар хэт жижиг, де/квантчилалын зардал давамгайлав & хэвийн --- тайлбарла, алдаа биш \\
+Саатал маш хэлбэлзэлтэй (σ өндөр) & Pi дээр өөр ачаалал байна & \texttt{pkill\ -f\ vscode-server}, \texttt{docker\ compose\ ps} \\
+Санах ойн тоо 0 & \texttt{/proc/self/status} уншигдахгүй & контейнер дотор биш, Pi дээр шууд ажиллуул \\
+\texttt{-\/-detector} заасан ч босго ашиглаж байна & зам буруу эсвэл \texttt{.tflite} ачаалагдсангүй & агентын \texttt{{[}detector{]}} мөрийг унш \\
+\texttt{-\/-filter}-тэй ч мессеж багасахгүй & \texttt{-\/-anomaly-rate} хэт өндөр & 0.02--0.05 болго \\
+\texttt{eth0} олдохгүй & Wi-Fi ашиглаж байна & \texttt{ls\ /sys/class/net/}; кабельд шилжих (Лаб 1) \\
+\texttt{mobilenet} ажиллуулахад OOM & 224×224×3 буфер + загвар & \texttt{-\/-runs} 30 болго, Docker-ыг зогсоо \\
+\end{longtable}\endgroup

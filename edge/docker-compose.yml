@@ -1,0 +1,85 @@
+# CNC302 — ИРМЭГИЙН ДАВХАРГА  (RASPBERRY PI 3B дээр ажиллана)
+#
+# Pi 3B: 1 GB RAM, 4×Cortex-A53 @1.2 GHz, 100 Mbit (USB 2.0 дээр), microSD.
+# Тиймээс энд ЗӨВХӨН хөнгөн үйлчилгээ ажиллана. Бүх хүнд үйлчилгээ
+# (EMQX, InfluxDB, Grafana, Ollama) зөөврийн компьютер дээр — ../stack/.
+#
+#   make bridge      .env-ээс bridge.conf үүсгэнэ (ЭХЛЭЭД ЭНИЙГ)
+#   make up          mosquitto-г асаана
+#   make agent       ирмэгийн агентыг ажиллуулна (venv, контейнер биш)
+#
+# Санах ойн төсөв: mosquitto ~15 MiB + агент ~45 MiB + дүгнэлт ~120 MiB
+#                  = ~180 MiB / 880 MiB боломжтой
+
+name: cnc302-edge
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "5m"       # microSD-г хамгаална
+    max-file: "2"
+
+services:
+
+  # ───────────────────── Ирмэгийн MQTT брокер ─────────────────────
+  # Үүрэг:
+  #   1. Төхөөрөмжүүд Pi рүү нийтэлнэ (үүл унасан ч ажиллана)
+  #   2. Үүл рүү ГҮҮР (bridge) татаж мессежийг дамжуулна
+  #   3. Үүл унасан үед мессежийг ДИСКЭНД хадгална (store-and-forward)
+  #      → Лаб 5-д үүнийг хэмжинэ
+  mosquitto:
+    image: eclipse-mosquitto:2.0.20
+    container_name: cnc302-mosquitto
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - "1883:1883"     # локал MQTT (төхөөрөмж, агент)
+      - "9001:9001"     # WebSocket
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./mosquitto/conf.d:/mosquitto/config/conf.d:ro
+      - mosq-data:/mosquitto/data
+      - mosq-log:/mosquitto/log
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 3 mosquitto_sub -h localhost -t '$$SYS/#' -C 1 -W 2 >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 8s
+      retries: 5
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+  # ───────────── Ирмэгийн дүгнэлт (Лаб 6, СОНГОЛТОТ профайл) ─────────────
+  # Контейнерт биш, native venv-ээр ажиллуулах нь Pi 3B дээр 60–80 MiB хэмнэнэ.
+  # Гэхдээ Лаб 8-д K3s руу шилжүүлэхийн тулд дүрс хэрэгтэй болно.
+  edge-agent:
+    build:
+      context: ./agent
+    image: cnc302/edge-agent:v1
+    container_name: cnc302-edge-agent
+    profiles: [containerized]
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: "1883"
+      SITE: "${SITE:-shutis}"
+      AREA: "${AREA:-mhts}"
+      LINE: "${LINE:-lab}"
+      DEVICE_ID: "${DEVICE_ID:-pi3b-01}"
+      INTERVAL: "${INTERVAL:-2.0}"
+    volumes:
+      - /sys/class/thermal:/sys/class/thermal:ro
+    depends_on:
+      mosquitto:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 192m
+
+volumes:
+  mosq-data:
+  mosq-log:

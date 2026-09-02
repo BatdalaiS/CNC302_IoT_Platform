@@ -1,23 +1,34 @@
 """
-CNC302 Лаб 7 — GraphQL давхарга (ThingsBoard REST + InfluxDB 3 дээр)
+CNC302 Лаб 7 — GraphQL давхарга (өөрсдийн REGISTRY + InfluxDB 3 дээр)
 
-ThingsBoard CE нь GraphQL API-гүй. Тиймээс бид түүнийг өөрсдөө барина.
-Энэ нь REST ба GraphQL-ийн ялгааг ЗОХИОН БҮТЭЭХ замаар ойлгох боломж өгнө.
+Хоёр эх сурвалжийг нэг схемд нэгтгэнэ:
+  1. `registry` (Лаб 2, FastAPI, :8090) — төхөөрөмж, firmware, OTA тараалт
+  2. `influxdb` (:8181, SQL)            — цаг цувааны хэмжилт
+
+ThingsBoard энд БАЙХГҮЙ. Шалтгаан нь зөвхөн санах ой биш (Pi 3B-д 1 GB):
+худалдааны платформ нь provisioning ба API-г хар хайрцаг болгодог. Бид
+Лаб 2-т бүртгэлээ өөрсдөө бичсэн тул одоо түүн дээр GraphQL давхарга
+барихад юу ч нуугдахгүй. (ThingsBoard-ыг харьцуулах хүсвэл сонголтот
+overlay: `docker compose -f docker-compose.yml -f docker-compose.tb.yml
+--profile tb up -d`. Энэ кодод ХЭРЭГГҮЙ.)
 
 Гурван давхарга:
-  1. REST клиент      — ThingsBoard, InfluxDB рүү хандана
+  1. REST клиент      — registry, InfluxDB рүү хандана
   2. GraphQL схем     — нэг хүсэлтээр олон эх сурвалжаас өгөгдөл нэгтгэнэ
   3. Эрхийн шалгалт   — OIDC токен + RBAC үүрэг
 
-  http://<pi>:8000/graphql   — GraphiQL тоглоомын талбар
-  http://<pi>:8000/health    — эрүүл мэндийн шалгалт
+  http://<laptop>:8000/graphql   — GraphiQL тоглоомын талбар
+  http://<laptop>:8000/health    — эрүүл мэндийн шалгалт
+
+⚠ Байршил: энэ үйлчилгээ ҮҮЛНИЙ давхаргад (зөөврийн компьютер) ажиллана.
+  Pi 3B нь зөвхөн ирмэгийн үүрэгтэй.
 
 ⚠ ОЮУТНЫ ДААЛГАВАР: `# TODO(оюутан)` гэсэн хэсгүүдийг бөглөнө.
+⚠ Энэ файлд ХОЁР САНААТАЙ ЭМЗЭГ БАЙДАЛ бий. Тэмдэглэгээг нь хайж ол.
 """
 from __future__ import annotations
 
 import os
-import time
 from dataclasses import dataclass
 from typing import Optional
 
@@ -26,12 +37,16 @@ import strawberry
 from fastapi import Depends, FastAPI, Header, HTTPException
 from strawberry.fastapi import GraphQLRouter
 
-TB_URL = os.environ.get("TB_URL", "http://thingsboard:9090")
-TB_USER = os.environ.get("TB_USER", "tenant@thingsboard.org")
-TB_PASSWORD = os.environ.get("TB_PASSWORD", "tenant")
-INFLUX_URL = os.environ.get("INFLUX_URL", "http://influxdb:8181")
+# Хостоос: http://localhost:8090 / compose сүлжээн дотроос: http://registry:8090
+REGISTRY_URL = os.environ.get("REGISTRY_URL", "http://localhost:8090")
+INFLUX_URL = os.environ.get("INFLUX_URL", "http://localhost:8181")
 INFLUX_DB = os.environ.get("INFLUX_DB", "cnc302")
 OIDC_ISSUER = os.environ.get("OIDC_ISSUER", "http://dex:5556/dex")
+
+# UNS-ийн байрлал — тушаалын сэдэв үүсгэхэд хэрэгтэй (Лаб 3)
+SITE = os.environ.get("SITE", "shutis")
+AREA = os.environ.get("AREA", "mhts")
+LINE = os.environ.get("LINE", "lab")
 
 # ─────────────────────────── RBAC ───────────────────────────
 # Үүрэг → зөвшөөрөгдсөн үйлдлүүд. Лаб 7-д үүнийг өргөтгөнө.
@@ -63,17 +78,20 @@ class Principal:
                 f"'{perm}' эрх байхгүй. Таны үүрэг: {self.roles}")
 
 
-ANONYMOUS = Principal(subject="anonymous", roles=["viewer"])
+# Zero Trust: токенгүй хүсэлт НЭГ Ч үүрэггүй. `whoami` л ажиллана,
+# өгөгдлийн талбар бүр татгалзана.
+ANONYMOUS = Principal(subject="anonymous", roles=[])
 
 
 def decode_token(token: str) -> Principal:
     """
     OIDC токеныг задлан шинжилнэ.
 
-    ⚠ ЛАБОРАТОРИЙН ХУВИЛБАР: гарын үсгийг ШАЛГАХГҮЙ.
-    Энэ бол зориудын эмзэг байдал — Алхам 4-т та үүнийг халдлагаар
-    ашиглаж үзээд, дараа нь заслаа.
-
+    # ⚠ САНААТАЙ ЭМЗЭГ БАЙДАЛ (Лаб 7-д засна) #1:
+    #   гарын үсгийг ШАЛГАХГҮЙ, `exp`-ийг ч шалгахгүй. Хэн ч дурын
+    #   claims бичээд admin болно. Алхам 4-т үүнийг халдлагаар нотолж,
+    #   дараа нь заслаа.
+    #
     # TODO(оюутан): Dex-ийн JWKS-ээр гарын үсгийг шалгах
     #   from jose import jwt
     #   jwks = httpx.get(f"{OIDC_ISSUER}/keys").json()
@@ -100,34 +118,26 @@ async def get_principal(authorization: Optional[str] = Header(None)) -> Principa
         raise HTTPException(401, f"Токен буруу: {exc}") from exc
 
 
-# ─────────────────────── ThingsBoard клиент ───────────────────────
+# ─────────────────────── Registry клиент (Лаб 2) ───────────────────────
 
-class TBClient:
-    def __init__(self) -> None:
-        self._token: str | None = None
-        self._exp = 0.0
+class RegistryClient:
+    """
+    Лаб 2-ын бүртгэлийн REST клиент. Токен, session хэрэггүй — энэ бол
+    лабораторийн энгийн байдал бөгөөд Лаб 7-ын шүүмжлэлийн сэдэв:
+    дотоод үйлчилгээ хоорондын танилт БАЙХГҮЙ (Zero Trust зөрчсөн).
+    """
 
-    async def token(self, client: httpx.AsyncClient) -> str:
-        if self._token and time.time() < self._exp:
-            return self._token
-        r = await client.post(f"{TB_URL}/api/auth/login",
-                              json={"username": TB_USER, "password": TB_PASSWORD})
-        r.raise_for_status()
-        self._token = r.json()["token"]
-        self._exp = time.time() + 300
-        return self._token
+    def __init__(self, base: str) -> None:
+        self.base = base.rstrip("/")
 
     async def get(self, path: str, **params):
         async with httpx.AsyncClient(timeout=15) as c:
-            t = await self.token(c)
-            r = await c.get(f"{TB_URL}{path}",
-                            headers={"X-Authorization": f"Bearer {t}"},
-                            params=params)
+            r = await c.get(f"{self.base}{path}", params=params)
             r.raise_for_status()
             return r.json()
 
 
-tb = TBClient()
+registry = RegistryClient(REGISTRY_URL)
 
 
 async def influx_sql(q: str) -> list[dict]:
@@ -150,11 +160,22 @@ class Reading:
 
 
 @strawberry.type
+class Firmware:
+    id: str
+    version: str
+    size: int
+    sha256: str
+
+
+@strawberry.type
 class Device:
     id: str
     name: str
     type: str
     label: Optional[str] = None
+    state: Optional[str] = None          # provisioned | active | revoked
+    fw_version: Optional[str] = None
+    last_seen: Optional[int] = None
 
     @strawberry.field
     async def readings(self, info: strawberry.Info, limit: int = 20) -> list[Reading]:
@@ -174,6 +195,14 @@ class Device:
                         vibration_rms=r.get("vibration_rms")) for r in rows]
 
 
+def to_device(d: dict) -> Device:
+    """registry-ийн JSON мөрийг GraphQL төрөл рүү."""
+    return Device(id=str(d.get("id", "")), name=str(d.get("id", "")),
+                  type=str(d.get("label") or "device"),
+                  label=d.get("label"), state=d.get("state"),
+                  fw_version=d.get("fw_version"), last_seen=d.get("last_seen"))
+
+
 @strawberry.type
 class Query:
     @strawberry.field
@@ -183,23 +212,40 @@ class Query:
                 f"tenant={p.tenant} perms={','.join(sorted(p.permissions))}")
 
     @strawberry.field
-    async def devices(self, info: strawberry.Info, limit: int = 50) -> list[Device]:
+    async def devices(self, info: strawberry.Info, limit: int = 50,
+                      state: Optional[str] = None) -> list[Device]:
         p: Principal = info.context["principal"]
         p.require("device:read")
-        data = await tb.get("/api/tenant/devices", pageSize=min(limit, 200), page=0)
-        return [Device(id=d["id"]["id"], name=d["name"], type=d.get("type", ""),
-                       label=d.get("label")) for d in data.get("data", [])]
+        params = {"limit": min(limit, 200)}
+        if state:
+            params["state"] = state
+        data = await registry.get("/devices", **params)
+        return [to_device(d) for d in data.get("devices", [])]
 
     @strawberry.field
     async def device(self, info: strawberry.Info, name: str) -> Optional[Device]:
         p: Principal = info.context["principal"]
         p.require("device:read")
         try:
-            d = await tb.get("/api/tenant/devices", deviceName=name)
-        except httpx.HTTPStatusError:
+            data = await registry.get("/devices", limit=500)
+        except httpx.HTTPError:
             return None
-        return Device(id=d["id"]["id"], name=d["name"], type=d.get("type", ""),
-                      label=d.get("label"))
+        # Шүүлтийг ЭНД хийж байгаа нь санамсаргүй биш: бүртгэлийн ID-г
+        # SQL/URL-д залгахгүй тул тарилгын гадаргуу багасна.
+        for d in data.get("devices", []):
+            if str(d.get("id")) == name:
+                return to_device(d)
+        return None
+
+    @strawberry.field
+    async def firmware(self, info: strawberry.Info) -> list[Firmware]:
+        """Бүртгэлд байршуулсан firmware хувилбарууд (Лаб 2-ын OTA)."""
+        p: Principal = info.context["principal"]
+        p.require("device:read")
+        data = await registry.get("/firmware")
+        return [Firmware(id=str(f.get("id", "")), version=str(f.get("version", "")),
+                         size=int(f.get("size", 0)), sha256=str(f.get("sha256", "")))
+                for f in data.get("firmware", [])]
 
     @strawberry.field
     async def anomalies(self, info: strawberry.Info, hours: int = 24, limit: int = 100) -> list[Reading]:
@@ -226,12 +272,20 @@ class Mutation:
     async def send_command(self, info: strawberry.Info, device: str, command: str) -> str:
         p: Principal = info.context["principal"]
         p.require("device:command")     # ← viewer энд татгалзана
-        # TODO(оюутан): ThingsBoard-ын RPC API-гаар тушаал илгээх
-        #   POST /api/plugins/rpc/oneway/{deviceId}
-        return f"'{command}' тушаалыг {device}-д илгээхээр хүлээн авлаа " \
-               f"(хэрэгжүүлээгүй — оюутны даалгавар)"
+        # TODO(оюутан): тушаалыг UNS-ийн cmd сэдэв рүү нийтлэх.
+        #   Топик: cnc302/{SITE}/{AREA}/{LINE}/{device}/cmd
+        #   paho-mqtt-ээр EMQX (үүл) рүү нийтэлбэл гүүр Pi рүү дамжуулна.
+        topic = f"cnc302/{SITE}/{AREA}/{LINE}/{device}/cmd"
+        return (f"'{command}' тушаалыг {topic} руу илгээхээр хүлээн авлаа "
+                f"(хэрэгжүүлээгүй — оюутны даалгавар)")
 
 
+# ⚠ САНААТАЙ ЭМЗЭГ БАЙДАЛ (Лаб 7-д засна) #2:
+#   introspection НЭЭЛТТЭЙ, асуулгын гүн/нийлмэл байдлын ХЯЗГААР БАЙХГҮЙ.
+#   Нэг хүсэлтэд 200 давхар нэрлэсэн (alias) талбар бичээд серверийг
+#   ачаалж болно — REST-д боломжгүй DoS вектор.
+#   Засварын чиглэл: strawberry-ийн QueryDepthLimiter / cost analysis
+#   өргөтгөл нэмэх, introspection-ыг зөвхөн нэвтэрсэн хэрэглэгчид нээх.
 schema = strawberry.Schema(query=Query, mutation=Mutation)
 
 
@@ -248,7 +302,7 @@ app.include_router(GraphQLRouter(schema, context_getter=context_getter),
 async def health() -> dict:
     out = {"status": "ok", "checks": {}}
     async with httpx.AsyncClient(timeout=5) as c:
-        for name, url in (("thingsboard", f"{TB_URL}/login"),
+        for name, url in (("registry", f"{REGISTRY_URL}/health"),
                           ("influxdb", f"{INFLUX_URL}/health")):
             try:
                 r = await c.get(url)
@@ -271,7 +325,8 @@ async def rest_devices(principal: Principal = Depends(get_principal),
         principal.require("device:read")
     except PermissionError as exc:
         raise HTTPException(403, str(exc)) from exc
-    data = await tb.get("/api/tenant/devices", pageSize=min(limit, 200), page=0)
-    return {"count": len(data.get("data", [])),
-            "devices": [{"id": d["id"]["id"], "name": d["name"]}
-                        for d in data.get("data", [])]}
+    data = await registry.get("/devices", limit=min(limit, 200))
+    return {"count": len(data.get("devices", [])),
+            "devices": [{"id": d["id"], "name": d["id"],
+                         "state": d.get("state")}
+                        for d in data.get("devices", [])]}

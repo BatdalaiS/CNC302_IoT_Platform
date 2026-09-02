@@ -1,0 +1,187 @@
+% Автоматаар үүсгэсэн — эх файл: edge/README.md
+\chapter{Ирмэгийн давхарга — лавлах}
+
+\begin{quote}
+СТОП: Энэ фолдерыг \textbf{зөөврийн компьютер дээр ажиллуулахгүй}. Компьютерийн хэсэг нь \texttt{../stack/}.
+\end{quote}
+
+Pi 3B: \textbf{1 GB RAM} (\textasciitilde925 MiB харагдана, \textasciitilde720--780 MiB ашиглах боломжтой), 4×Cortex-A53 @1.2 GHz, 100 Mbit (USB 2.0-ийн зурвасыг хуваана), microSD.
+
+\hypertarget{ux445ux443ux440ux434ux430ux43d-ux44dux445ux43bux44dux445}{%
+\section{Хурдан эхлэх}\label{ux445ux443ux440ux434ux430ux43d-ux44dux445ux43bux44dux445}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cp}\NormalTok{ .env.example .env}
+\FunctionTok{nano}\NormalTok{ .env            }\CommentTok{\# CLOUD\_HOST = зөөврийн компьютерийн LAN IP (localhost БИШ)}
+\FunctionTok{make}\NormalTok{ bridge          }\CommentTok{\# .env → mosquitto/conf.d/bridge.conf}
+\FunctionTok{make}\NormalTok{ up              }\CommentTok{\# mosquitto асаана}
+\FunctionTok{make}\NormalTok{ link            }\CommentTok{\# → bridge/state 1 гарвал холбогдсон}
+\FunctionTok{make}\NormalTok{ agent           }\CommentTok{\# ирмэгийн агент (өөр терминалд)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux44eux443-ux44dux43dux434-ux430ux436ux438ux43bux43bux430ux445-ux432ux44d}{%
+\section{Юу энд ажиллах вэ}\label{ux44eux443-ux44dux43dux434-ux430ux436ux438ux43bux43bux430ux445-ux432ux44d}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Хэсэг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хэрхэн
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+RAM
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Үүрэг
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\texttt{mosquitto} & Docker & 12--25 MiB & локал брокер + үүл рүү гүүр + диск дээрх дараалал \\
+ирмэгийн агент & venv (Docker биш) & 45--70 MiB & Pi-гийн бодит хэмжүүр + процессын дохио → UNS \\
+TFLite дүгнэлт & агентын дотор & +40--90 MiB & Лаб 6: локал аномали илрүүлэлт \\
+K3s & Лаб 8 & 250--350 MiB & Docker-ийг \textbf{зогсоож} ажиллуулна \\
+\end{longtable}\endgroup
+
+Агентыг Docker-т биш \textbf{venv-д} ажиллуулж байгаа шалтгаан: контейнерийн давхарга Pi 3B дээр 60--80 MiB нэмнэ, мөн кодыг засаад шууд дахин ажиллуулах нь илүү хурдан. Лаб 8-д K3s-д оруулахын тулд \texttt{agent/Dockerfile}-ээр дүрс барина.
+
+\hypertarget{make-ux43aux43eux43cux430ux43dux434ux443ux443ux434}{%
+\section{\texorpdfstring{\texttt{make} командууд}{make командууд}}\label{make-ux43aux43eux43cux430ux43dux434ux443ux443ux434}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Комманд
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Үйлдэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\texttt{make\ bridge} & \texttt{.env}-ээс \texttt{conf.d/bridge.conf} үүсгэнэ (\textbf{эхлээд энэ}) \\
+\texttt{make\ up} & \texttt{bridge} + mosquitto асаана \\
+\texttt{make\ link} & гүүрний төлөв сонсоно (1 = холбогдсон) \\
+\texttt{make\ agent} & ирмэгийн агент (venv байхгүй бол өөрөө үүсгэнэ) \\
+\texttt{make\ mem} & санах ой, throttle, температур, ачаалал \\
+\texttt{make\ check} & бэлэн байдлын шалгалт (swap, cgroup, NTP, bridge.conf) \\
+\texttt{make\ logs} & mosquitto-гийн лог \\
+\texttt{make\ ps} & контейнер + \texttt{docker\ stats} \\
+\texttt{make\ down} & зогсоох (өгөгдөл үлдэнэ) \\
+\texttt{make\ clean} & зогсоох + volume + \texttt{bridge.conf} устгах \\
+\end{longtable}\endgroup
+
+\hypertarget{ux444ux430ux439ux43bux443ux443ux434}{%
+\section{Файлууд}\label{ux444ux430ux439ux43bux443ux443ux434}}
+
+\begin{verbatim}
+edge/
+├── docker-compose.yml            mosquitto (+ containerized профайл, Лаб 8)
+├── .env / .env.example           CLOUD_HOST, UNS байрлал, агентын тохиргоо
+├── Makefile
+├── mosquitto/
+│   ├── mosquitto.conf            persistence, дараалал, хязгаарлалт
+│   └── conf.d/
+│       ├── bridge.conf.template  ЗАГВАР (Git-д байна)
+│       └── bridge.conf           ҮҮСГЭСЭН (.gitignore-д — IP агуулна)
+└── agent/
+    ├── edge_agent.py             ирмэгийн агент
+    ├── requirements.txt
+    ├── Dockerfile                Лаб 8-д K3s-д хэрэгтэй
+    └── cnc302-edge-agent.service systemd (тэжээл тасрахад сэргэнэ)
+\end{verbatim}
+
+\hypertarget{edge_agent.py-ux433ux43eux43b-ux441ux43eux43dux433ux43eux43bux442ux443ux443ux434}{%
+\section{\texorpdfstring{\texttt{edge\_agent.py} --- гол сонголтууд}{edge\_agent.py --- гол сонголтууд}}\label{edge_agent.py-ux433ux43eux43b-ux441ux43eux43dux433ux43eux43bux442ux443ux443ux434}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{.venv/bin/python}\NormalTok{ agent/edge\_agent.py }\AttributeTok{{-}{-}help}
+\end{Highlighting}
+\end{Shaded}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Тохиргоо
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Утга
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\texttt{-\/-dry-run} & брокергүйгээр зөвхөн хэвлэнэ (SETUP-д шалгахад) \\
+\texttt{-\/-interval\ 2.0} & телеметрийн үе (сек) \\
+\texttt{-\/-qos\ 0\textbackslash{}\textbar{}1\textbackslash{}\textbar{}2} & нийтлэх QoS \\
+\texttt{-\/-anomaly-rate\ 0.02} & санамсаргүй аномали оруулах магадлал \\
+\texttt{-\/-detector\ \textless{}model\textgreater{}} & TFLite загвар (Лаб 6). Байхгүй бол босгын горим \\
+\texttt{-\/-threads\ 2} & дүгнэлтийн урсгал. 4×A53-д 4 нь ихэвчлэн 2-оос \textbf{удаан} \\
+\texttt{-\/-filter} & зөвхөн аномали + үе үе хураангуй илгээнэ (уплинк хэмнэнэ) \\
+\texttt{-\/-health-every\ 15} & хэдэн мөчлөг тутам эрүүл мэндийн мессеж \\
+\end{longtable}\endgroup
+
+Дохио нь \texttt{DEVICE\_ID}-аар seed хийгдсэн тул \textbf{давтагдана} --- нэг Pi үргэлж ижил цуваа өгнө. Лаб 6-д загвар харьцуулахад зайлшгүй.
+
+\hypertarget{ux431ux430ux439ux43dux433ux430-ux430ux436ux438ux43bux43bux443ux443ux43bux430ux445-ux441ux43eux43dux433ux43eux43bux442}{%
+\section{Байнга ажиллуулах (сонголт)}\label{ux431ux430ux439ux43dux433ux430-ux430ux436ux438ux43bux43bux443ux443ux43bux430ux445-ux441ux43eux43dux433ux43eux43bux442}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sudo}\NormalTok{ cp agent/cnc302{-}edge{-}agent.service /etc/systemd/system/}
+\FunctionTok{sudo}\NormalTok{ systemctl daemon{-}reload}
+\FunctionTok{sudo}\NormalTok{ systemctl enable }\AttributeTok{{-}{-}now}\NormalTok{ cnc302{-}edge{-}agent}
+\ExtensionTok{journalctl} \AttributeTok{{-}u}\NormalTok{ cnc302{-}edge{-}agent }\AttributeTok{{-}f}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{MemoryMax=200M} тавьсан --- агент хэтэрвэл systemd таслана. Pi-г нэг GB-тай гэдгийг мартаж болохгүй.
+
+\hypertarget{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux4e9ux43cux43dux4e9-ux437ux430ux430ux432ux430ux43b}{%
+\section{Хэмжилтийн өмнө ЗААВАЛ}\label{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux4e9ux43cux43dux4e9-ux437ux430ux430ux432ux430ux43b}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{pkill} \AttributeTok{{-}f}\NormalTok{ vscode{-}server        }\CommentTok{\# VS Code Remote сервер 150–250 MiB иднэ}
+\ExtensionTok{vcgencmd}\NormalTok{ get\_throttled        }\CommentTok{\# 0x0 байх ЁСТОЙ}
+\FunctionTok{free} \AttributeTok{{-}m} \KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}/Mem:/\{print $7 " MiB available"\}\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{get\_throttled} нь \texttt{0x0} биш бол тэр хэмжилт \textbf{хүчингүй}. Хөргөөд дахин хий.
+
+\hypertarget{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}{%
+\section{Түгээмэл алдаа}\label{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Шинж
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Шийдэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\texttt{bridge/state\ 0} & \texttt{CLOUD\_HOST} буруу, эсвэл компьютерийн галт хана (SETUP.md А.6) \\
+Гүүр холбогдсон ч мессеж алга & \texttt{SITE} нь \texttt{.env} ба \texttt{bridge.conf}-д зөрсөн → \texttt{make\ bridge\ \&\allowbreak{}\&\allowbreak{}\ make\ restart} \\
+\texttt{.env\ олдсонгүй} & \texttt{cp\ .env.example\ .env} \\
+\texttt{paho-mqtt\ суулгаагүй} & \texttt{make\ venv} \\
+Контейнер дахин дахин эхэлнэ & OOM. \texttt{docker\ inspect\ …\ OOMKilled}, \texttt{free\ -m}, swap шалга \\
+\texttt{exec\ format\ error} & 32-bit OS. \texttt{uname\ -m} → \texttt{aarch64} байх ёстой \\
+\end{longtable}\endgroup
+
+Дэлгэрэнгүйг \texttt{.\allowbreak{}.\allowbreak{}/\allowbreak{}docs/\allowbreak{}troubleshooting.\allowbreak{}md}-ээс.

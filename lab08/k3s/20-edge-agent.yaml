@@ -1,0 +1,64 @@
+# Ирмэгийн агент — edge/agent/edge_agent.py-ийн контейнер хувилбар.
+#
+# ⚠ ДҮРСИЙГ PI ДЭЭР ӨӨРӨӨ БАРИНА. Docker Hub дээр `cnc302/edge-agent`
+#   гэж байхгүй тул K3s татах гэж оролдоод ErrImagePull өгнө. Тиймээс:
+#
+#     cd ~/cnc302/edge/agent
+#     docker build -t cnc302/edge-agent:v1 .            # Pi 3B дээр 3–6 мин
+#     docker save cnc302/edge-agent:v1 | sudo k3s ctr images import -
+#     sudo k3s ctr images ls | grep edge-agent          # шалгах
+#
+#   `imagePullPolicy: IfNotPresent` нь "локал дүрс байвал ТАТАХГҮЙ" гэсэн
+#   утгатай — импортолсон дүрсийг ашиглах цорын ганц арга. `Always` бол
+#   бүх зүйл ажиллахгүй болно.
+#
+#   Зөөврийн компьютер дээр (amd64) барьсан дүрс Pi дээр АЖИЛЛАХГҮЙ
+#   (arm64/armhf). Тиймээс барилтыг Pi дээр хийнэ.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edge-agent
+  namespace: cnc302
+  labels: {app: edge-agent}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: edge-agent}
+  template:
+    metadata:
+      labels: {app: edge-agent}
+    spec:
+      # Pod бүр өөрийн DEVICE_ID-тай байх ёстой (UNS-д давхардвал хоёр
+      # агент нэг сэдэв рүү бичнэ). HPA 2 хувь болгоход энэ асуудал
+      # ГАРЧ ИРНЭ — Лаб 8-ын хяналтын асуултын нэг нь яг энэ:
+      # "Stateful ирмэгийн ажлыг Deployment-ээр хувилахад юу эвдрэх вэ?"
+      containers:
+        - name: agent
+          image: cnc302/edge-agent:v1
+          imagePullPolicy: IfNotPresent        # ← локал импорт (дээрхийг үз)
+          envFrom:
+            - configMapRef: {name: cnc302-config}
+          env:
+            # Pod бүрийн нэрийг дагасан давтагдашгүй суффикс —
+            # HPA хувилахад UNS сэдэв мөргөлдөхгүй.
+            - name: POD_NAME
+              valueFrom: {fieldRef: {fieldPath: metadata.name}}
+          # Хэмжсэн утга: paho + numpy ~55 MiB, TFLite дүгнэлттэй ~110 MiB.
+          # requests нь ТОВЛОГЧид зориулсан баталгаа, limits нь дээд хязгаар.
+          # limits хэтэрвэл контейнер OOMKilled болно (README-г үз).
+          resources:
+            requests: {memory: "96Mi", cpu: "100m"}
+            limits:   {memory: "160Mi", cpu: "800m"}
+          volumeMounts:
+            # Pi-гийн БОДИТ температурыг унших (агентын гол дохио)
+            - {name: thermal, mountPath: /sys/class/thermal, readOnly: true}
+          # Санамж: агент HTTP endpoint-гүй тул readiness/liveness probe
+          # тавиагүй. ОЮУТНЫ ДААЛГАВАР: edge_agent.py-д жижиг /healthz
+          # нэмээд энд httpGet probe тавь — pod унасныг K8s хэрхэн
+          # мэдэх вэ гэдгийг тайландаа тайлбарла.
+      volumes:
+        - name: thermal
+          hostPath: {path: /sys/class/thermal, type: Directory}
+      # Pi 3B дээр pod-ыг дахин эхлүүлэх нь удаан (microSD). Богино
+      # хугацаанд олон удаа унтраахгүйн тулд:
+      terminationGracePeriodSeconds: 20

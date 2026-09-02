@@ -1,10 +1,30 @@
+# Ирмэгийн тохиргоо. Compose дээрх edge/.env файлын K8s дахь хувилбар.
+#
+# ⚠ CLOUD_HOST-ыг ЗААВАЛ өөрийн ЗӨӨВРИЙН КОМПЬЮТЕРИЙН LAN IP болгож
+#   солино. localhost/127.0.0.1 бол Pi өөрийгөө заана — гүүр хэзээ ч
+#   холбогдохгүй.
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cnc302-config
   namespace: cnc302
 data:
-  INFLUX_DB: "cnc302"
+  # ── Unified Namespace дахь байрлал (Лаб 3) ──
+  # Сэдэв: cnc302/<SITE>/<AREA>/<LINE>/<DEVICE_ID>/<channel>
+  SITE: "shutis"
+  AREA: "mhts"
+  LINE: "lab"
+  DEVICE_ID: "pi3b-01"          # баг бүр ӨӨР байх ёстой: pi3b-team03 гэх мэт
+
+  # ── Үүлний давхарга (зөөврийн компьютер дээрх EMQX) ──
+  CLOUD_HOST: "192.168.1.100"   # ← ЗААВАЛ СОЛИНО
+  CLOUD_PORT: "1883"
+
+  # ── Ирмэгийн агентын тохиргоо ──
+  MQTT_HOST: "mosquitto"        # кластер доторх Service-ийн нэр
+  MQTT_PORT: "1883"
+  INTERVAL: "2.0"               # телеметрийн үе (сек)
+  INFER_THREADS: "2"            # Pi 3B: 4 цөм бий ч 2 нь тогтвортой
   TZ: "Asia/Ulaanbaatar"
 ---
 apiVersion: v1
@@ -14,6 +34,11 @@ metadata:
   namespace: cnc302
 type: Opaque
 stringData:
-  # ⚠ ЛАБОРАТОРИД. Үйлдвэрлэлд Sealed Secrets эсвэл External Secrets ашиглана.
-  EMQX_DASHBOARD_PASSWORD: "солино-заавал"
-  GRAFANA_PASSWORD: "солино-заавал"
+  # ⚠ ЛАБОРАТОРИД ЗӨВХӨН. Үйлдвэрлэлд Sealed Secrets эсвэл External
+  #   Secrets ашиглана — энэ файл Git-д ил очвол нууц үг задарна.
+  #
+  # Лаб 2-ын эцэст EMQX дээр нэвтрэлт асаах үед гүүр эдгээрийг ашиглана
+  # (10-mosquitto.yaml доторх bridge.conf.tpl-ийн remote_username/password
+  # мөрийн тайлбарыг арилгана).
+  CLOUD_MQTT_USERNAME: "edge-pi3b-01"
+  CLOUD_MQTT_PASSWORD: "солино-заавал"

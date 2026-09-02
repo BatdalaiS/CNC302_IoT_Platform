@@ -1,34 +1,78 @@
 % Автоматаар үүсгэсэн — эх файл: README.md
 \chapter{Гарын авлагын танилцуулга}
 
-\hypertarget{ux43bux430ux431ux43eux440ux430ux442ux43eux440ux438ux439ux43d-ux430ux436ux43bux44bux43d-ux441ux430ux43d}{%
-\section{Лабораторийн ажлын сан}\label{ux43bux430ux431ux43eux440ux430ux442ux43eux440ux438ux439ux43d-ux430ux436ux43bux44bux43d-ux441ux430ux43d}}
+\hypertarget{ux43bux430ux431ux43eux440ux430ux442ux43eux440ux438ux439ux43d-ux430ux436ux43bux44bux43d-ux441ux430ux43d-raspberry-pi-3b-ux445ux443ux432ux438ux43bux431ux430ux440}{%
+\section{Лабораторийн ажлын сан · Raspberry Pi 3B хувилбар}\label{ux43bux430ux431ux43eux440ux430ux442ux43eux440ux438ux439ux43d-ux430ux436ux43bux44bux43d-ux441ux430ux43d-raspberry-pi-3b-ux445ux443ux432ux438ux43bux431ux430ux440}}
 
-Энэ сан нь CNC302 хичээлийн \textbf{найман лабораторийн ажлыг} агуулна. Найман лаборатори нь тус тусдаа биш --- \textbf{нэг ажиллаж буй платформыг үе шаттай өргөтгөж бүтээнэ}. Лаборатори бүрийн эцэст таны стек ажиллагаатай хэвээр байх ёстой бөгөөд дараагийн лаборатори үүн дээр үргэлжилнэ.
+Энэ сан нь CNC302 хичээлийн \textbf{найман лабораторийн ажлыг} агуулна. Найман лаборатори нь тус тусдаа биш --- \textbf{нэг ажиллаж буй платформыг үе шаттай өргөтгөж бүтээнэ}. Лаборатори бүрийн эцэст таны систем ажиллагаатай хэвээр байх ёстой бөгөөд дараагийн лаборатори үүн дээр үргэлжилнэ.
 
-\hypertarget{ux430ux436ux43bux44bux43d-ux43eux440ux447ux438ux43d}{%
-\section{1. Ажлын орчин}\label{ux430ux436ux43bux44bux43d-ux43eux440ux447ux438ux43d}}
+\hypertarget{ux445ux43eux451ux440-ux434ux430ux432ux445ux430ux440ux433ux430ux442-ux430ux436ux43bux44bux43d-ux43eux440ux447ux438ux43d}{%
+\section{1. Хоёр давхаргат ажлын орчин}\label{ux445ux43eux451ux440-ux434ux430ux432ux445ux430ux440ux433ux430ux442-ux430ux436ux43bux44bux43d-ux43eux440ux447ux438ux43d}}
+
+Энэ курсын гол архитектурын шийдэл: \textbf{үүл ба ирмэгийг ХОЁР ӨӨР ТӨХӨӨРӨМЖ дээр} ажиллуулна.
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
 \toprule
 \begin{minipage}[b]{\linewidth}\raggedright
 Төхөөрөмж
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Үүрэг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Юу ажиллах
 \end{minipage} \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
-\textbf{Оюутны зөөврийн компьютер} & Хөгжүүлэлт, удирдлага, дүрслэл. VS Code Remote-SSH-ээр Pi-д холбогдоно. Хөтчөөр ThingsBoard, Grafana, Edge Impulse Studio-д ханддаг. Виртуал төхөөрөмжийн флот, ачааллын тест энд ажиллана. \\
-\textbf{Raspberry Pi 5 (8 GB)} & Платформын ажиллагааны сервер. Docker Compose, дараа нь K3s. Бүх үйлчилгээ энд ажиллана. \\
-\textbf{Raspberry Pi AI Kit} & Лаб 6-д ирмэгийн дүгнэлт хурдасгах (тэнхимийн хамтын хэрэглээ). \\
+\textbf{Оюутны зөөврийн компьютер} & \textbf{Үүлний давхарга} (IoT лавлах архитектурын 3-р давхарга) & EMQX, InfluxDB, Grafana, төхөөрөмжийн бүртгэл, Node-RED, GraphQL API, Dex, Ollama \\
+\textbf{Raspberry Pi 3B} & \textbf{Ирмэгийн давхарга} (2--3-р давхаргын зааг) & Mosquitto брокер + үүл рүү гүүр, ирмэгийн агент, TFLite дүгнэлт, Лаб 8-д K3s \\
 \end{longtable}\endgroup
 
+\hypertarget{ux44fux430ux433ux430ux430ux434-ux445ux443ux432ux430ux430ux441ux430ux43d-ux431ux44d}{%
+\subsection{Яагаад хуваасан бэ}\label{ux44fux430ux433ux430ux430ux434-ux445ux443ux432ux430ux430ux441ux430ux43d-ux431ux44d}}
+
+Raspberry Pi 3B-ийн техникийн үзүүлэлт:
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Үзүүлэлт
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Утга
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Үр дагавар
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Санах ой & \textbf{1 GB LPDDR2} (боломжтой \textasciitilde880 MiB) & ThingsBoard (1.5--2.5 GB) огт багтахгүй \\
+Процессор & 4 × Cortex-A53 @ 1.2 GHz & JVM-т суурилсан платформ хэт удаан \\
+Сүлжээ & \textbf{100 Mbit}, USB 2.0-ийн зурвасыг хуваана & Дискний ачаалалтай өрсөлдөнө \\
+Диск & \textbf{зөвхөн microSD} & InfluxDB-ийн бичилт хамгийн эхэнд ханана \\
+Өргөтгөл & \textbf{PCIe байхгүй} & Raspberry Pi AI Kit / Hailo боломжгүй \\
+\end{longtable}\endgroup
+
+Гэхдээ энэ бол зөвхөн хязгаарлалт биш. Бодит үйлдвэрлэлийн IoT систем яг \textbf{ийм} байдаг: хүчирхэг үүл, сул ирмэг, хооронд нь найдваргүй холбоос. Pi 5 дээр бүгдийг нэг дор ажиллуулах нь илүү тохилог боловч \textbf{Edge--Fog--Cloud континуумыг заахгүй}. Pi 3B үүнийг заахаас өөр аргагүй болгоно:
+
+\begin{itemize}
+\tightlist
+\item
+  Гүүр (bridge) яагаад хэрэгтэйг \textbf{холбоос тасарч үзсний дараа} ойлгоно (Лаб 5)
+\item
+  Ирмэг дээрх дүгнэлт яагаад хэрэгтэйг \textbf{100 Mbit ханаж үзсний дараа} ойлгоно (Лаб 6)
+\item
+  Санах ойн төсөв яагаад чухлыг \textbf{OOM-той тулгарсны дараа} ойлгоно (Лаб 1)
+\end{itemize}
+
 \begin{quote}
-\textbf{Зарчим:} Pi дээр \emph{ажиллуулна}, зөөврийн компьютер дээр \emph{бичнэ, хэмжинэ, харна}. Кодыг Pi дээр шууд засахгүй --- Git-ээр дамжуулна.
+\textbf{Зарчим:} Хүнд зүйл \textbf{үүл} дээр, хурдан хариу шаардсан зүйл \textbf{ирмэг} дээр. Аль ч алхмыг эхлэхийн өмнө "энэ хаана ажиллах ёстой вэ?" гэж асуу. Заавар бүрийн алхам бүрд {[}ЗК{]} (зөөврийн компьютер) эсвэл {[}Pi{]} (Pi) тэмдэглэгээ байна.
 \end{quote}
 
 \hypertarget{ux441ux430ux43dux433ux438ux439ux43d-ux431ux4afux442ux44dux446}{%
@@ -38,30 +82,46 @@
 CNC302-labs/
 ├── README.md              ← энэ файл
 ├── SETUP.md               ← Лаб 1-ээс өмнө нэг удаа хийх бэлтгэл
-├── stack/                 ← ЖИВЭЭ ФАЙЛ: багийн платформ. Лаборатори бүрт өсөж томорно
-│   ├── docker-compose.yml
-│   ├── docker-compose.influx2.yml   ← нөөц хувилбар (InfluxDB 2.7)
+│
+├── stack/                 [ЗК] ҮҮЛ — зөөврийн компьютер дээр
+│   ├── docker-compose.yml       ← ЖИВЭЭ ФАЙЛ, лаборатори бүрт өснө
+│   ├── docker-compose.tb.yml    ← ThingsBoard (сонголтот харьцуулалт)
+│   ├── docker-compose.influx2.yml  ← InfluxDB 2.7 нөөц хувилбар
 │   ├── .env.example
 │   └── Makefile
-├── tools/                 ← бүх лабораторид хэрэглэгдэх хэрэгслүүд
-│   ├── sim_device.py      ← виртуал төхөөрөмжийн флот
-│   ├── qos_latency.py     ← MQTT QoS/саатлын хэмжилт
-│   ├── measure_stack.sh   ← нөөцийн хэрэглээний хэмжилт
-│   └── requirements.txt
-├── lab01/ … lab08/        ← лаборатори бүрийн заавар ба ажлын файлууд
-│   ├── README.md          ← ЗААВАР (энд бүх алхам, хүснэгт, үнэлгээ байна)
-│   ├── *.py *.sh          ← тухайн лабын хэрэгслүүд
-│   └── out/               ← гаралт (.gitignore-д, Git-д ОРОХГҮЙ)
+│
+├── edge/                  [Pi] ИРМЭГ — Raspberry Pi 3B дээр
+│   ├── docker-compose.yml       ← mosquitto
+│   ├── mosquitto/
+│   │   ├── mosquitto.conf
+│   │   └── conf.d/bridge.conf.template   ← `make bridge` үүсгэнэ
+│   ├── agent/
+│   │   ├── edge_agent.py        ← ирмэгийн агент
+│   │   ├── Dockerfile           ← Лаб 8-д K3s-д хэрэгтэй
+│   │   └── cnc302-edge-agent.service
+│   ├── .env.example
+│   └── Makefile
+│
+├── tools/                 бүх лабораторид хэрэглэгдэх хэрэгслүүд
+│   ├── sim_device.py            ← виртуал төхөөрөмжийн флот
+│   ├── qos_latency.py           ← QoS × зам (loopback/LAN/bridge) саатал
+│   └── measure_stack.sh         ← --role edge|cloud
+│
+├── lab01/ … lab08/        лаборатори бүрийн заавар ба ажлын файлууд
+│   ├── README.md                ← ЗААВАР
+│   ├── *.py *.sh
+│   └── out/                     ← гаралт (.gitignore-д)
+│
 └── docs/
-    ├── report-template.md ← тайлангийн загвар (лаборатори бүрт хуулж ашиглана)
+    ├── report-template.md
     ├── troubleshooting.md
-    └── resource-budget.md
+    └── resource-budget.md       ← 1 GB-ын арифметик
 \end{verbatim}
 
-\hypertarget{stack-ux444ux43eux43bux434ux435ux440ux44bux43d-ux434ux4afux440ux44dux43c}{%
-\subsection{\texorpdfstring{\texttt{stack/} фолдерын дүрэм}{stack/ фолдерын дүрэм}}\label{stack-ux444ux43eux43bux434ux435ux440ux44bux43d-ux434ux4afux440ux44dux43c}}
+\hypertarget{stack-ux431ux430-edge-ux444ux43eux43bux434ux435ux440ux44bux43d-ux434ux4afux440ux44dux43c}{%
+\subsection{\texorpdfstring{\texttt{stack/} ба \texttt{edge/} фолдерын дүрэм}{stack/ ба edge/ фолдерын дүрэм}}\label{stack-ux431ux430-edge-ux444ux43eux43bux434ux435ux440ux44bux43d-ux434ux4afux440ux44dux43c}}
 
-\texttt{stack/docker-compose.yml} бол \textbf{таны багийн живээ файл}. Лаборатори бүрт та үүн рүү үйлчилгээ нэмж, тохиргоо өөрчилнө. Хэрэв та эвдэрсэн бол Git-ийн түүхээс сэргээнэ:
+\texttt{stack/docker-compose.yml} болон \texttt{edge/docker-compose.yml} бол \textbf{таны багийн живээ файлууд}. Лаборатори бүрт та тэдгээр рүү үйлчилгээ нэмж, тохиргоо өөрчилнө. Эвдэрсэн бол Git-ийн түүхээс сэргээнэ:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -72,15 +132,17 @@ CNC302-labs/
 
 Тиймээс \textbf{лаборатори бүрийн эцэст commit хийх} нь зөвхөн үнэлгээний шаардлага биш, өөрийн даатгал юм.
 
-\hypertarget{compose-ux43fux440ux43eux444ux430ux439ux43b-ux4afux439ux43bux447ux438ux43bux433ux44dux44dux433-ux441ux43eux43dux433ux43eux436-ux430ux436ux438ux43bux43bux443ux443ux43bux430ux445}{%
-\section{3. Compose профайл (үйлчилгээг сонгож ажиллуулах)}\label{compose-ux43fux440ux43eux444ux430ux439ux43b-ux4afux439ux43bux447ux438ux43bux433ux44dux44dux433-ux441ux43eux43dux433ux43eux436-ux430ux436ux438ux43bux43bux443ux443ux43bux430ux445}}
+\hypertarget{compose-ux43fux440ux43eux444ux430ux439ux43b-ux44eux443ux433-ux445ux430ux430ux43dux430-ux430ux436ux438ux43bux43bux443ux443ux43bux430ux445}{%
+\section{3. Compose профайл (юуг хаана ажиллуулах)}\label{compose-ux43fux440ux43eux444ux430ux439ux43b-ux44eux443ux433-ux445ux430ux430ux43dux430-ux430ux436ux438ux43bux43bux443ux443ux43bux430ux445}}
 
-Raspberry Pi 5-ын 8 GB санах ой бүх үйлчилгээг зэрэг ажиллуулахад хүрэлцэхгүй. Тиймээс үйлчилгээг \textbf{профайл}-аар бүлэглэсэн:
+\hypertarget{ux437ux43a-ux4afux4afux43b-stack}{%
+\subsection{\texorpdfstring{{[}ЗК{]} Үүл --- \texttt{stack/}}{{[}ЗК{]} Үүл --- stack/}}\label{ux437ux43a-ux4afux4afux43b-stack}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
 \toprule
 \begin{minipage}[b]{\linewidth}\raggedright
 Профайл
@@ -88,35 +150,79 @@ Raspberry Pi 5-ын 8 GB санах ой бүх үйлчилгээг зэрэг 
 Үйлчилгээ
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Хэзээ
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+RAM
 \end{minipage} \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
-\texttt{core} & emqx, thingsboard, influxdb, grafana & Лаб 1-ээс эхлэн үргэлж \\
-\texttt{pipeline} & nodered & Лаб 5-аас \\
-\texttt{app} & dex, graphql-api & Лаб 7-оос \\
-\texttt{ai} & ollama & Лаб 8 (бусдыг зогсоох шаардлагатай) \\
+\texttt{core} & emqx, influxdb, grafana, registry & Лаб 1-ээс эхлэн үргэлж & \textasciitilde1.2 GB \\
+\texttt{pipeline} & + nodered & Лаб 5-аас & +0.2 GB \\
+\texttt{app} & + dex, graphql-api & Лаб 7-оос & +0.2 GB \\
+\texttt{ai} & + ollama & Лаб 8 & +2--3 GB \\
+\texttt{tb} & + thingsboard & Лаб 2, зөвхөн харьцуулалт & +2 GB \\
 \end{longtable}\endgroup
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# зөвхөн core}
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core up }\AttributeTok{{-}d}
+\BuiltInTok{cd}\NormalTok{ stack}
+\FunctionTok{make}\NormalTok{ up              }\CommentTok{\# core}
+\FunctionTok{make}\NormalTok{ up{-}pipeline     }\CommentTok{\# + Node{-}RED}
+\FunctionTok{make}\NormalTok{ up{-}app          }\CommentTok{\# + Dex, GraphQL}
+\FunctionTok{make}\NormalTok{ up{-}ai           }\CommentTok{\# + Ollama}
+\end{Highlighting}
+\end{Shaded}
 
-\CommentTok{\# core + pipeline}
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core }\AttributeTok{{-}{-}profile}\NormalTok{ pipeline up }\AttributeTok{{-}d}
+\textbf{Docker Desktop-ийн санах ой:} Windows/macOS дээр Docker Desktop-д анхдагчаар 2--4 GB л өгдөг. Settings → Resources → Memory-г \textbf{6 GB болго}. Лаб 8-д Ollama-д үүнээс бага бол ажиллахгүй.
 
-\CommentTok{\# Лаб 8: хүнд үйлчилгээг зогсоож ollama{-}г асаах}
-\ExtensionTok{docker}\NormalTok{ compose stop nodered grafana}
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ ai up }\AttributeTok{{-}d}\NormalTok{ ollama}
+\hypertarget{pi-ux438ux440ux43cux44dux433-edge}{%
+\subsection{\texorpdfstring{{[}Pi{]} Ирмэг --- \texttt{edge/}}{{[}Pi{]} Ирмэг --- edge/}}\label{pi-ux438ux440ux43cux44dux433-edge}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ edge}
+\FunctionTok{cp}\NormalTok{ .env.example .env}
+\FunctionTok{nano}\NormalTok{ .env            }\CommentTok{\# CLOUD\_HOST = зөөврийн компьютерийн IP}
+\FunctionTok{make}\NormalTok{ bridge          }\CommentTok{\# bridge.conf үүсгэнэ}
+\FunctionTok{make}\NormalTok{ up              }\CommentTok{\# mosquitto}
+\FunctionTok{make}\NormalTok{ agent           }\CommentTok{\# ирмэгийн агент (өөр терминалд)}
+\FunctionTok{make}\NormalTok{ link            }\CommentTok{\# гүүр холбогдсон эсэх: 1 = тийм}
 \end{Highlighting}
 \end{Shaded}
 
 Санах ойн нарийвчилсан төсвийг \texttt{docs/resource-budget.md}-ээс үзнэ үү.
 
+\hypertarget{unified-namespace-ux441ux44dux434ux432ux438ux439ux43d-ux431ux4afux442ux44dux446}{%
+\section{4. Unified Namespace --- сэдвийн бүтэц}\label{unified-namespace-ux441ux44dux434ux432ux438ux439ux43d-ux431ux4afux442ux44dux446}}
+
+Бүх лаборатори нэг сэдвийн бүтэц ашиглана. Энэ нь ISA-95 шатлалыг дагана:
+
+\begin{verbatim}
+cnc302/<site>/<area>/<line>/<device>/<channel>
+       shutis  mhts   lab    pi3b-01  telemetry
+\end{verbatim}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+Суваг & Чиглэл & Агуулга \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\texttt{telemetry} & ирмэг → үүл & хэмжилтийн өгөгдөл \\
+\texttt{health} & ирмэг → үүл & Pi-гийн температур, RAM, throttle \\
+\texttt{status} & ирмэг → үүл & retained: онлайн/офлайн (LWT) \\
+\texttt{anomaly} & ирмэг → үүл & зөвхөн онцгой тохиолдол \\
+\texttt{bridge/state} & ирмэг → үүл & 1 = гүүр холбогдсон, 0 = тасарсан \\
+\texttt{cmd}, \texttt{config} & үүл → ирмэг & команд, тохиргоо \\
+\texttt{ota/…} & хоёр тал & firmware шинэчлэлт (Лаб 2) \\
+\end{longtable}\endgroup
+
+Гүүр нь \texttt{cnc302/\textless{}site\textgreater{}/\#} сэдвийг үүл рүү дамжуулна. \textbf{Тиймээс сэдвийн угтвар буруу бол мессеж үүлэнд хэзээ ч хүрэхгүй} --- Лаб 1-ийн хамгийн түгээмэл алдаа.
+
 \hypertarget{ux431ux430ux433ux438ux439ux43d-git-ux441ux430ux43dux433-ux44dux445ux43bux4afux4afux43bux44dux445}{%
-\section{4. Багийн Git санг эхлүүлэх}\label{ux431ux430ux433ux438ux439ux43d-git-ux441ux430ux43dux433-ux44dux445ux43bux4afux4afux43bux44dux445}}
+\section{5. Багийн Git санг эхлүүлэх}\label{ux431ux430ux433ux438ux439ux43d-git-ux441ux430ux43dux433-ux44dux445ux43bux4afux4afux43bux44dux445}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -126,7 +232,7 @@ Raspberry Pi 5-ын 8 GB санах ой бүх үйлчилгээг зэрэг 
 \BuiltInTok{cd} \OperatorTok{\textless{}}\NormalTok{багийн{-}нэр}\OperatorTok{\textgreater{}}\NormalTok{{-}cnc302}
 \FunctionTok{rm} \AttributeTok{{-}rf}\NormalTok{ .git }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ init }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ add . }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 1: эхлэл"}
 
-\CommentTok{\# 2. Өөрийн алсын санг холбох (GitHub/GitLab, хувийн сан)}
+\CommentTok{\# 2. Өөрийн алсын санг холбох (GitHub/GitLab, ХУВИЙН сан)}
 \FunctionTok{git}\NormalTok{ remote add origin }\OperatorTok{\textless{}}\NormalTok{таны{-}сангийн{-}хаяг}\OperatorTok{\textgreater{}}
 \FunctionTok{git}\NormalTok{ push }\AttributeTok{{-}u}\NormalTok{ origin main}
 
@@ -136,10 +242,14 @@ Raspberry Pi 5-ын 8 GB санах ой бүх үйлчилгээг зэрэг 
 
 \textbf{Commit хийх дүрэм:} лаборатори бүрийн эцэст \texttt{git\ tag\ lab01-done} мэтээр тэмдэглэнэ. Багш үнэлгээг эдгээр тэмдэглэгээгээр шалгана.
 
-\textbf{Хэзээ ч commit хийхгүй:} \texttt{.env}, нууц үг, хувийн түлхүүр, \texttt{*.pem}, сертификат, том лог файл. \texttt{.gitignore} бэлэн байгаа.
+\textbf{Хэзээ ч commit хийхгүй:} \texttt{.env}, \texttt{bridge.conf} (IP агуулна), нууц үг, хувийн түлхүүр, \texttt{*.pem}, сертификат, \texttt{devices.csv}, том лог файл. \texttt{.gitignore} бэлэн байгаа.
+
+\begin{quote}
+Pi дээр Git санг \textbf{клонлож} ажиллуулна. Кодыг Pi дээр шууд засаж, зөөврийн компьютер дээр мартах нь энэ курсын хамгийн түгээмэл алдагдсан ажил. VS Code Remote-SSH ашиглавал энэ асуудал байхгүй.
+\end{quote}
 
 \hypertarget{ux43bux430ux431ux43eux440ux430ux442ux43eux440ux438ux439ux43d-ux436ux430ux433ux441ux430ux430ux43bux442}{%
-\section{5. Лабораторийн жагсаалт}\label{ux43bux430ux431ux43eux440ux430ux442ux43eux440ux438ux439ux43d-ux436ux430ux433ux441ux430ux430ux43bux442}}
+\section{6. Лабораторийн жагсаалт}\label{ux43bux430ux431ux43eux440ux430ux442ux43eux440ux438ux439ux43d-ux436ux430ux433ux441ux430ux430ux43bux442}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
@@ -160,18 +270,18 @@ Raspberry Pi 5-ын 8 GB санах ой бүх үйлчилгээг зэрэг 
 \endhead
 \bottomrule
 \endlastfoot
-1 & III & Платформын стек ба ажиглалт & Контейнер эхлэх хугацаа, RAM/CPU, үлдэгдэл нөөц \\
-2 & V & Төхөөрөмжийн бүрэн амьдралын мөчлөг & Provisioning хугацаа, OTA тараалтын амжилтын хувь \\
-3 & VII & MQTT 5.0 ба Unified Namespace & QoS 0/1/2-ийн саатал, дамжуулах чадвар \\
-4 & IX & Rule Engine ба ачааллын тест & Багтаамжийн хязгаар (холболт, мессеж/сек) \\
-5 & XI & Өгөгдлийн шугам ба эвдрэлийн туршилт & Өгөгдлийн алдагдал, сэргэх хугацаа \\
-6 & XII & Ирмэгийн хиймэл оюун & Дүгнэлтийн саатал, санах ой, нарийвчлал \\
-7 & XIV & Хэрэглээний давхарга ба аюулгүй байдал & Хандалтын шалгалтын үр дүн \\
-8 & XV & Дижитал ихэр, GenAI ба K3s & Шилжүүлэлтийн дараах ажиллагаа \\
+1 & III & Хоёр давхаргат платформ ба гүүр & Гүүрний RTT, Pi-гийн үлдэгдэл RAM, эхлэх хугацаа \\
+2 & V & Төхөөрөмжийн амьдралын мөчлөг ба OTA & Бүртгэлийн хурд, OTA-гийн хугацаа ба амжилтын хувь \\
+3 & VII & MQTT 5.0, UNS ба гурван зам & QoS × зам: p50/p95/\textbf{p99} \\
+4 & IX & Багтаамжийн хязгаар: ирмэг ба үүл & Аль нөөц ХАМГИЙН ТҮРҮҮНД ханав \\
+5 & XI & Өгөгдлийн шугам ба холбоос тасрах & Store-and-forward-ийн алдагдал, RPO ба MTTR \\
+6 & XII & Ирмэгийн хиймэл оюун (CPU дээр) & Дүгнэлтийн саатал, RAM, шүүлтийн үр ашиг \\
+7 & XIV & Хэрэглээний давхарга ба Zero Trust & Аюулгүй байдлын 9 шалгалт \\
+8 & XV & Дижитал ихэр, GenAI, ирмэгийн K3s & K3s-ийн санах ойн зардал, шилжүүлэлтийн үр дүн \\
 \end{longtable}\endgroup
 
 \hypertarget{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux435ux440ux4e9ux43dux445ux438ux439-ux448ux430ux430ux440ux434ux43bux430ux433ux430}{%
-\section{6. Тайлангийн ерөнхий шаардлага}\label{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux435ux440ux4e9ux43dux445ux438ux439-ux448ux430ux430ux440ux434ux43bux430ux433ux430}}
+\section{7. Тайлангийн ерөнхий шаардлага}\label{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux435ux440ux4e9ux43dux445ux438ux439-ux448ux430ux430ux440ux434ux43bux430ux433ux430}}
 
 Тайлангийн загвар: \texttt{docs/report-template.md} → \texttt{labNN/report.md} болгон хуулж бөглөнө (PDF болгон хөрвүүлж өгнө):
 
@@ -199,7 +309,7 @@ Raspberry Pi 5-ын 8 GB санах ой бүх үйлчилгээг зэрэг 
 Лаб 4 ба Лаб 8-ыг бичгийн тайлангийн оронд \textbf{10 минутын багийн үзүүлэн}-ээр үнэлнэ.
 
 \hypertarget{ux4afux43dux44dux43bux433ux44dux44d}{%
-\section{7. Үнэлгээ}\label{ux4afux43dux44dux43bux433ux44dux44d}}
+\section{8. Үнэлгээ}\label{ux4afux43dux44dux43bux433ux44dux44d}}
 
 Лабораторийн ажил нийт дүнгийн \textbf{25\%} эзэлнэ (6 тайлан + 2 үзүүлэн). Лаборатори бүр 10 оноо:
 
@@ -210,7 +320,7 @@ Raspberry Pi 5-ын 8 GB санах ой бүх үйлчилгээг зэрэг 
 \endhead
 \bottomrule
 \endlastfoot
-Ажиллагаатай үр дүн (стек ажиллаж байна) & 3 \\
+Ажиллагаатай үр дүн (систем ажиллаж байна) & 3 \\
 Хэмжилт бүрэн, зөв аргачлалаар хийгдсэн & 3 \\
 Дүгнэлт үндэслэлтэй, тоон баримтад тулгуурласан & 2 \\
 Git сан цэвэр, түүх ойлгомжтой & 1 \\
@@ -219,13 +329,46 @@ Git сан цэвэр, түүх ойлгомжтой & 1 \\
 
 Хугацаа хэтэрсэн тайлан өдөр тутам 10\% хасагдана.
 
+\hypertarget{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux4afux43dux44dux43d-ux437ux4e9ux432-ux431ux430ux439ux434ux430ux43b-pi-3b-ux438ux439ux43d-ux442ux443ux441ux433ux430ux439-ux441ux430ux43dux430ux43cux436}{%
+\section{9. Хэмжилтийн үнэн зөв байдал --- Pi 3B-ийн тусгай санамж}\label{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux4afux43dux44dux43d-ux437ux4e9ux432-ux431ux430ux439ux434ux430ux43b-pi-3b-ux438ux439ux43d-ux442ux443ux441ux433ux430ux439-ux441ux430ux43dux430ux43cux436}}
+
+Энэ курс \textbf{тоо хэмжилт} дээр тулгуурладаг. Pi 3B дээр гурван зүйл бүх хэмжилтийг гажуудуулна:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Дулааны хязгаарлалт (throttling).} Pi 3B 80 °C давбал давтамжаа бууруулна. Идэвхтэй хөргөлт, эсвэл ядаж наалдац бүхий хөргөгч заавал хэрэгтэй. Хэмжилт бүрийн өмнө ба дараа:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{vcgencmd}\NormalTok{ get\_throttled     }\CommentTok{\# 0x0 байх ЁСТОЙ}
+\end{Highlighting}
+\end{Shaded}
+
+  \texttt{0x0} биш бол тэр хэмжилтийг \textbf{хаяж, хөргөөд дахин хий}.
+\item
+  \textbf{Тэжээл.} 5 V / 2.5 A-аас сул тэжээл бол ачаалал дор хүчдэл унаж, throttling эхэлнэ (\texttt{get\_throttled}-ийн 0-р бит). Утасны цэнэглэгч ихэвчлэн хангалтгүй.
+\item
+  \textbf{microSD.} Хямд карт дээр InfluxDB, mosquitto-гийн persistence бичилт хэдэн зуун миллисекунд саатана. A1/A2 ангиллын карт хэрэглэ. Лаб 5-д үүнийг бодитоор хэмжинэ.
+\end{enumerate}
+
+\texttt{tools/\allowbreak{}measure\_stack.\allowbreak{}sh\ -\/\allowbreak{}-role\ edge} эдгээрийг автоматаар шалгаж анхааруулна. \textbf{Лаборатори бүрийн эхэнд эхлээд үүнийг ажиллуул.}
+
 \hypertarget{ux430ux43dux445ux430ux430ux440ux443ux443ux43bux433ux430-ux445ux443ux432ux438ux43bux431ux430ux440ux44bux43d-ux44dux440ux441ux434ux44dux43b}{%
-\section{8. Анхааруулга --- хувилбарын эрсдэл}\label{ux430ux43dux445ux430ux430ux440ux443ux443ux43bux433ux430-ux445ux443ux432ux438ux43bux431ux430ux440ux44bux43d-ux44dux440ux441ux434ux44dux43b}}
+\section{10. Анхааруулга --- хувилбарын эрсдэл}\label{ux430ux43dux445ux430ux430ux440ux443ux443ux43bux433ux430-ux445ux443ux432ux438ux43bux431ux430ux440ux44bux43d-ux44dux440ux441ux434ux44dux43b}}
 
 Энэ сан дахь бүх дүрс (image) тодорхой хувилбарт \textbf{бэхлэгдсэн} (pinned). Нээлттэй эхийн төслүүд, ялангуяа \textbf{InfluxDB 3 Core} болон \textbf{Edge Impulse}-ийн CLI, тохиргоо түргэн өөрчлөгддөг.
 
-\textbf{Багшид:} хичээлийн улирал эхлэхээс өмнө нэг Raspberry Pi дээр бүх найман лабыг эхнээс нь дуустал ажиллуулж шалгана уу. Хувилбар зөрчилдвөл:
-- InfluxDB 3-тэй асуудал гарвал: \texttt{docker\ compose\ -f\ docker-compose.yml\ -f\ docker-compose.influx2.yml\ up\ -d} (InfluxDB 2.7 нөөц хувилбар)
-- Дүрсийн arm64 дэмжлэгийг шалгах: \texttt{docker\ manifest\ inspect\ \textless{}image\textgreater{}\ \textbar{}\ grep\ arm64}
+\textbf{Багшид:} хичээлийн улирал эхлэхээс өмнө нэг Raspberry Pi 3B \textbf{ба} нэг зөөврийн компьютер дээр бүх найман лабыг эхнээс нь дуустал ажиллуулж шалгана уу. Хувилбар зөрчилдвөл:
+
+\begin{itemize}
+\tightlist
+\item
+  InfluxDB 3-тэй асуудал гарвал: \texttt{docker\ compose\ -f\ docker-compose.\allowbreak{}yml\ -f\ docker-compose.\allowbreak{}influx2.\allowbreak{}yml\ up\ -d} (InfluxDB 2.7 нөөц хувилбар)
+\item
+  Дүрсийн arm64 дэмжлэгийг шалгах: \texttt{docker\ manifest\ inspect\ \textless{}image\textgreater{}\ \textbar{}\ grep\ arm64}
+\item
+  Pi 3B бол \textbf{arm64 (aarch64)}. 64-bit OS суулгах ёстой --- 32-bit дээр зарим дүрс огт байхгүй.
+\end{itemize}
 
 \texttt{docs/troubleshooting.md}-д түгээмэл алдаа, шийдлийг цуглуулсан.

@@ -4,12 +4,12 @@
   "type": "tab",
   "label": "CNC302 Лаб 5 — өгөгдлийн шугам",
   "disabled": false,
-  "info": "MQTT → задлан шинжлэх → цонхны нэгтгэл → InfluxDB 3\nЛаб 5-д импортлоно. mqtt-broker зангилааны хаягийг шалгана уу."
+  "info": "MQTT → задлан шинжлэх → цонхны нэгтгэл → InfluxDB 3\n\nБАЙРЛАЛ: Node-RED нь ЗӨӨВРИЙН КОМПЬЮТЕР дээр, үүлний давхаргад ажиллана\n(stack/docker-compose.yml, `pipeline` профайл). Raspberry Pi 3B дээр БИШ —\nPi-д 1 GB санах ой байгаа тул Node-RED тэнд багтахгүй.\n\nӨГӨГДӨЛ ХААНААС ИРДЭГ ВЭ:\n  төхөөрөмж → Pi 3B дээрх mosquitto → ГҮҮР (bridge) → энэ EMQX → Node-RED\nТиймээс брокерын зангилаа нь compose сүлжээн доторх `emqx:1883` рүү заана\n(localhost ч биш, Pi-гийн хаяг ч биш). Pi-гээс ирсэн мессеж энэ EMQX дээр\nаль хэдийн байх тул Node-RED Pi рүү шууд холбогдох ШААРДЛАГАГҮЙ.\n\nЛаб 5-д импортлоод, mqtt-broker зангилааны хаягийг шалгана уу."
  },
  {
   "id": "broker",
   "type": "mqtt-broker",
-  "name": "EMQX (local)",
+  "name": "EMQX — үүл (зөөврийн компьютер, compose сүлжээ)",
   "broker": "emqx",
   "port": "1883",
   "clientid": "nodered-cnc302",
@@ -17,7 +17,8 @@
   "usetls": false,
   "protocolVersion": "5",
   "keepalive": "60",
-  "cleansession": true,
+  "cleansession": false,
+  "sessionExpiry": "3600",
   "birthTopic": "",
   "closeTopic": "",
   "willTopic": ""
@@ -26,7 +27,7 @@
   "id": "mqttin",
   "type": "mqtt in",
   "z": "cnc302tab",
-  "name": "UNS telemetry",
+  "name": "UNS telemetry (Pi-гээс гүүрээр ирсэн)",
   "topic": "cnc302/+/+/+/+/telemetry",
   "qos": "1",
   "datatype": "auto-detect",

@@ -1,0 +1,47 @@
+# CNC302 — ThingsBoard (СОНГОЛТОТ, зөвхөн зөөврийн компьютер дээр)
+#
+# Яагаад сонголтот вэ:
+#   ThingsBoard + Postgres нь 1.5–2.5 GB санах ой шаарддаг. Raspberry Pi 3B-д
+#   огт багтахгүй. Гол лабораториуд үүнээс хамаарахгүй болгосон — оронд нь
+#   өөрсдийн `registry` үйлчилгээг ашиглана (../lab02/registry).
+#
+# Хэзээ хэрэглэх вэ:
+#   • Лаб 2-ын сонголтот В хэсэг: худалдааны платформтой харьцуулах
+#   • Зөөврийн компьютерт 16 GB RAM байгаа тохиолдолд
+#
+# Ажиллуулах:
+#   docker compose -f docker-compose.yml -f docker-compose.tb.yml \
+#     --profile core --profile tb up -d
+#
+# Вэб: http://localhost:8080   (sysadmin@thingsboard.org / sysadmin)
+
+services:
+  thingsboard:
+    image: thingsboard/tb-postgres:3.9.1
+    container_name: cnc302-thingsboard
+    profiles: [tb]
+    restart: unless-stopped
+    environment:
+      TB_QUEUE_TYPE: in-memory
+      JAVA_OPTS: "-Xms512m -Xmx1500m -XX:MaxDirectMemorySize=256m"
+    ports:
+      - "8080:9090"     # веб интерфейс
+      - "1884:1883"     # ThingsBoard-ын MQTT (EMQX-тэй зөрчилдөхгүйн тулд 1884)
+      - "5683:5683/udp" # CoAP
+    volumes:
+      - tb-data:/data
+      - tb-logs:/var/log/thingsboard
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:9090/login"]
+      interval: 20s
+      timeout: 10s
+      retries: 20
+      start_period: 120s
+    deploy:
+      resources:
+        limits:
+          memory: 2500m
+
+volumes:
+  tb-data:
+  tb-logs:

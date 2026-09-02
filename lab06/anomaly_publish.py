@@ -1,17 +1,27 @@
 #!/usr/bin/env python3
 """
-CNC302 Лаб 6 — Ирмэгийн дүгнэлтийг платформд буцаан нэгтгэх
+CNC302 Лаб 6 — Ирмэгийн дүгнэлтийг UNS рүү буцаан нэгтгэх
 
-Мэдрэгчийн урсгалыг сонсож, гулсах цонхонд загвар ажиллуулж, гажил илэрвэл
-UNS-ийн `event` суваг руу нийтэлнэ. Ингэснээр Лаб 5-ын Rule Engine, Grafana
+Ирмэгийн брокерын телеметрийг сонсож, гулсах цонхонд загвар ажиллуулж,
+гажил илэрвэл UNS-ийн `anomaly` суваг руу нийтэлнэ. Гүүр (bridge) тэр
+мессежийг үүл рүү дамжуулах тул Лаб 5-ын Node-RED шугам, Grafana
 дохиолол ирмэгийн AI-тай холбогдоно.
 
-  python3 anomaly_publish.py --host pi-team03.local --backend synthetic
-  python3 anomaly_publish.py --host pi-team03.local --backend tflite \
+Хаана ажиллах вэ:
+  Raspberry Pi 3B дээр, ИРМЭГИЙН mosquitto-той (localhost:1883). Ингэснээр
+  үүл унасан ч гажил илрүүлэлт үргэлжилнэ — ирмэгийн тооцооллын гол утга
+  учир нь яг энэ.
+
+  # Pi дээр (агент ажиллаж байх ёстой)
+  python3 anomaly_publish.py --backend synthetic
+  python3 anomaly_publish.py --backend tflite \
       --model lab06/models/model_int8.tflite --threshold 0.7
+
+  # Зөөврийн компьютерээс Pi-гийн брокер руу
+  python3 anomaly_publish.py --host <pi-ийн-IP> --backend synthetic
 """
 from __future__ import annotations
-import argparse, json, sys, time
+import argparse, json, os, sys, time
 from collections import defaultdict, deque
 
 import numpy as np
@@ -23,18 +33,31 @@ from benchmark_inference import BACKENDS  # noqa: E402
 
 
 def main() -> int:
-    p = argparse.ArgumentParser()
-    p.add_argument("--host", default="localhost")
-    p.add_argument("--port", type=int, default=1883)
+    p = argparse.ArgumentParser(
+        description="Ирмэгийн гажил илрүүлэлт → UNS anomaly суваг")
+    # Анхдагч нь Pi дээрх ИРМЭГИЙН брокер
+    p.add_argument("--host", default=os.getenv("MQTT_HOST", "localhost"))
+    p.add_argument("--port", type=int, default=int(os.getenv("MQTT_PORT", "1883")))
+    p.add_argument("--site", default=os.getenv("SITE", "shutis"))
+    p.add_argument("--area", default=os.getenv("AREA", "mhts"))
+    p.add_argument("--line", default=os.getenv("LINE", "lab"))
+    p.add_argument("--device", help="зөвхөн энэ төхөөрөмжийг сонсох (ж: pi3b-01)")
+    p.add_argument("--field", default="vibration_g",
+                   help="цонхонд хуримтлуулах талбар "
+                        "(агент: vibration_g | proc_temp_c | rpm)")
     p.add_argument("--backend", choices=list(BACKENDS), default="synthetic")
     p.add_argument("--model")
     p.add_argument("--window", type=int, default=125)
-    p.add_argument("--threads", type=int, default=1)
+    # Pi 3B: 4 цөм бий ч 2 урсгал ихэвчлэн илүү тогтвортой (санах ойн зурвас)
+    p.add_argument("--threads", type=int, default=2)
     p.add_argument("--threshold", type=float, default=0.8)
     p.add_argument("--seconds", type=float, default=0, help="0 = хязгааргүй")
     a = p.parse_args()
 
     be = BACKENDS[a.backend](a)
+    # UNS: cnc302/<site>/<area>/<line>/<device>/<channel>
+    sub_topic = (f"cnc302/{a.site}/{a.area}/{a.line}/"
+                 f"{a.device or '+'}/telemetry")
     buffers: dict[str, deque] = defaultdict(lambda: deque(maxlen=a.window))
     stats = {"in": 0, "infer": 0, "alerts": 0, "lat_sum": 0.0}
 
@@ -51,7 +74,7 @@ def main() -> int:
         if len(parts) != 6:
             return
         dev = parts[4]
-        buffers[dev].append(float(d.get("vibration_rms", 0)))
+        buffers[dev].append(float(d.get(a.field, 0)))
         if len(buffers[dev]) < a.window:
             return
 
@@ -66,20 +89,23 @@ def main() -> int:
         score = 1 / (1 + np.exp(-score / 10))     # 0..1 руу шахна
         if score >= a.threshold:
             stats["alerts"] += 1
-            evt = {"ts": int(time.time() * 1000), "device_id": dev,
+            evt = {"ts": int(time.time() * 1000), "device": dev,
                    "type": "anomaly", "score": round(score, 4),
+                   "field": a.field, "window": a.window,
                    "inference_ms": round(lat, 3), "source": "edge-ai",
                    "backend": be.name}
-            cl.publish("/".join(parts[:5] + ["event"]),
+            # UNS-ийн anomaly суваг → гүүрээр үүл рүү (out чиглэл)
+            cl.publish("/".join(parts[:5] + ["anomaly"]),
                        json.dumps(evt), qos=1)
             print(f"  ⚠ {dev} гажил score={score:.3f} ({lat:.2f} мс)")
 
     c.on_message = on_message
     c.connect(a.host, a.port, 30)
-    c.subscribe("cnc302/+/+/+/+/telemetry", qos=1)
+    c.subscribe(sub_topic, qos=1)
     c.loop_start()
-    print(f"→ Ирмэгийн дүгнэлт ажиллаж байна ({be.name}, "
-          f"цонх={a.window}, босго={a.threshold})…")
+    print(f"→ брокер {a.host}:{a.port},  сэдэв {sub_topic}")
+    print(f"→ Ирмэгийн дүгнэлт ажиллаж байна ({be.name}, талбар={a.field}, "
+          f"цонх={a.window}, урсгал={a.threads}, босго={a.threshold})…")
 
     t_end = time.time() + a.seconds if a.seconds else float("inf")
     try:

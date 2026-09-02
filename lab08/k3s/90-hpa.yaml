@@ -1,20 +1,56 @@
-# Хэвтээ автомат өргөтгөл. Лаб 4-ийн ачааллын тестийг K3s дээр давтаж
-# pod-ын тоо хэрхэн өөрчлөгдөхийг ажигла.
+# Хэвтээ автомат өргөтгөл (HPA) — edge-agent дээр.
 #
-# ШААРДЛАГА: metrics-server. K3s-д анхнаасаа суусан байдаг:
-#   kubectl top nodes
+# ⚠ ҮНЭНИЙГ ХЭЛЬЕ: Raspberry Pi 3B-ийн ГАНЦ зангилаа дээр энэ HPA
+#   бодит байдал дээр зөвхөн 1 → 2 болж чадна. Тэгээд зогсоно. Учир нь:
+#
+#   1. САНАХ ОЙ. Нийт ~880 MiB боломжтойгоос k3s server өөрөө ~400 MiB
+#      иднэ. Үлдсэн ~400 MiB-ийг coredns + metrics-server + local-path +
+#      mosquitto хуваана. edge-agent-ийн request нь 96 MiB тул 3 дахь
+#      хувь нь Pending эсвэл OOMKilled болох магадлалтай.
+#      (Тооцоог lab08/k3s/README.md-д бүтнээр нь бичсэн.)
+#
+#   2. ГАНЦ ЗАНГИЛАА. Хувь нэмэгдэх бүрт тэдгээр нь ИЖИЛ 4×A53 цөмийг
+#      хуваана. Өөр зангилаа байхгүй тул нийт тооцоолох чадвар
+#      НЭМЭГДЭХГҮЙ — зөвхөн нэг ажлыг хоёр процесс болгож хуваана.
+#      Хэвтээ өргөтгөлийн утга нь НЭМЭЛТ ТӨМӨР дээр л гарна.
+#
+#   3. ИРМЭГИЙН АЖИЛ STATEFUL. Агент бүр өөрийн UNS ID-тай байх ёстой.
+#      Хоёр ижил агент нэг сэдэв рүү бичвэл өгөгдөл давхардана —
+#      Deployment биш, StatefulSet эсвэл DaemonSet илүү тохирно.
+#
+#   ЭНЭ ГУРВЫГ ХЭМЖИЖ НОТЛОХ нь даалгаврын гол хэсэг. "HPA ажиллаагүй"
+#   гэж бичих биш, ЯАГААД өргөжиж чадахгүйг тоогоор харуул:
+#     kubectl -n cnc302 get hpa edge-agent -w
+#     kubectl -n cnc302 describe hpa edge-agent      # events → шалтгаан
+#     kubectl -n cnc302 get pods -o wide             # Pending үү?
+#     kubectl -n cnc302 describe pod <pending-pod>   # Insufficient memory
+#     kubectl top pods -n cnc302
+#     kubectl get events -n cnc302 --field-selector reason=OOMKilling
+#
+# ШААРДЛАГА: metrics-server. K3s-д анхнаасаа суусан байдаг тул
+#   `--disable metrics-server` гэж БҮҮ бич:
+#     kubectl top nodes        # утга гарч ирвэл бэлэн
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
-metadata: {name: emqx, namespace: cnc302}
+metadata:
+  name: edge-agent
+  namespace: cnc302
 spec:
-  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: emqx}
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: edge-agent}
   minReplicas: 1
-  maxReplicas: 3
+  maxReplicas: 2          # ⚠ 3+ нь 1 GB-д бодитоор багтахгүй (дээрхийг үз)
   metrics:
     - type: Resource
       resource:
         name: cpu
+        # requests.cpu = 100m тул 70% гэдэг нь ~70m. Агент амралтад
+        # ~20–40m иддэг; ачаалал үүсгэхийн тулд `stress-ng --cpu 2`
+        # эсвэл --interval 0.2 болгож туршина.
         target: {type: Utilization, averageUtilization: 70}
   behavior:
+    scaleUp:
+      # microSD дээр pod эхлэх нь удаан — хэт хурдан томруулбал
+      # эхлэх ачаалал өөрөө CPU-г цохиж, хиймэл давалгаа үүснэ.
+      stabilizationWindowSeconds: 60
     scaleDown:
-      stabilizationWindowSeconds: 120
+      stabilizationWindowSeconds: 180

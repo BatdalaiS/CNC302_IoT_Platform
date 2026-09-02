@@ -1,0 +1,56 @@
+# CNC302 — ирмэг → үүл гүүр (bridge)
+#
+# ⚠ ЭНЭ БОЛ ЗАГВАР. Шууд ажиллахгүй.
+#   `make bridge` комманд .env файлаас утгыг орлуулж
+#   conf.d/bridge.conf файлыг үүсгэнэ. Тэр файл .gitignore-д байна.
+
+connection cloud
+address __CLOUD_HOST__:__CLOUD_PORT__
+
+# Гүүрний клиентийн ID давхардвал EMQX холболтыг тасалдаг тул
+# баг бүр өөрийн нэртэй байх ёстой.
+remote_clientid edge-__DEVICE_ID__
+
+# ── Чиглэл ба сэдэв ─────────────────────────────────────────────────────────
+# topic <хэв> <чиглэл> <QoS> <локал угтвар> <алсын угтвар>
+#
+#   out = ирмэгээс үүл рүү   (телеметр)
+#   in  = үүлээс ирмэг рүү   (команд, тохиргоо, OTA)
+#
+# UNS: cnc302/<site>/<area>/<line>/<device>/<channel>
+topic cnc302/__SITE__/# out 1
+topic cnc302/__SITE__/__AREA__/__LINE__/+/cmd    in 1
+topic cnc302/__SITE__/__AREA__/__LINE__/+/config in 1
+topic cnc302/__SITE__/__AREA__/__LINE__/+/ota/#  in 1
+
+# ── Тогтвортой байдал (store-and-forward-ийн гол хэсэг) ────────────────────
+# false = үүл унаад дахин холбогдоход хуучин session, дараалал ХАДГАЛАГДАНА.
+# true  болговол дараалал устана — Лаб 5-д хоёуланг нь туршиж харьцуулна.
+cleansession false
+
+# Гүүрний ЛОКАЛ талын session. Анхны утга нь cleansession-той адил боловч
+# store-and-forward нь энэ талаас шалтгаалдаг тул ил бичив.
+local_cleansession false
+
+# Санамж: QoS 0 мессежийг дараалалд оруулах тохиргоо (queue_qos0_messages)
+# нь ГЛОБАЛ бөгөөд mosquitto.conf-д байна — энд бичвэл mosquitto эхлэхгүй.
+
+# Дахин холбогдох завсарлага: 5 сек-ээс эхэлж 60 сек хүртэл өснө
+restart_timeout 5 60
+
+# Гүүрний төлөвийг $SYS-д нийтэлнэ → Лаб 5-д хянана:
+#   mosquitto_sub -h localhost -t '$SYS/broker/connection/cloud/state'
+#   1 = холбогдсон, 0 = тасарсан
+notifications true
+notification_topic cnc302/__SITE__/__AREA__/__LINE__/__DEVICE_ID__/bridge/state
+
+# ── Нэвтрэлт ────────────────────────────────────────────────────────────────
+# Лаб 2 хүртэл EMQX нээлттэй тул шаардлагагүй. Лаб 2-т тайлбарыг арилгана.
+#remote_username __CLOUD_USER__
+#remote_password __CLOUD_PASS__
+
+# ── TLS (Лаб 2-т идэвхжинэ) ────────────────────────────────────────────────
+#bridge_cafile   /mosquitto/config/conf.d/ca.crt
+#bridge_certfile /mosquitto/config/conf.d/edge.crt
+#bridge_keyfile  /mosquitto/config/conf.d/edge.key
+#bridge_insecure false

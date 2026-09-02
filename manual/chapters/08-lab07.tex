@@ -1,15 +1,18 @@
 % Автоматаар үүсгэсэн — эх файл: lab07/README.md
-\chapter{Лаб 7 — Хэрэглээний давхарга ба аюулгүй байдлын шалгалт}
+\chapter{Лаб 7 — Хэрэглээний давхарга ба Zero Trust}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
 \toprule
 \endhead
 \bottomrule
 \endlastfoot
 \textbf{7 хоног} & XIV \\
 \textbf{Хугацаа} & 4 цаг \\
-\textbf{Суралцахуйн үр дүн} & ҮД3 (үнэлэх), ҮД4 (зохиох), ҮД6 \\
+\textbf{Суралцахуйн үр дүн} & ҮД3 (үнэлэх), ҮД4 (аюулгүй зохиох), ҮД6 \\
 \textbf{Үнэлгээ} & Бичгийн тайлан, 10 оноо \\
+\textbf{Гол хэмжилт} & REST vs GraphQL, аюулгүй байдлын 9 шалгалт (засварын өмнө/дараа) \\
 \end{longtable}\endgroup
 
 \hypertarget{ux437ux43eux440ux438ux43bux433ux43e}{%
@@ -17,20 +20,20 @@
 
 Платформын дээр \textbf{хэрэглэгчийн давхаргыг} барьж, дараа нь түүнийг \textbf{эвдэхийг оролдоно}.
 
-Хоёр хэсэг:
-
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  \textbf{Барих} --- REST ба GraphQL-ийн ялгааг зохион бүтээх замаар ойлгох, WebSocket-оор бодит хугацааны шинэчлэл, Dex-ээр OIDC нэвтрэлт, RBAC үүрэг
+  \textbf{Барих} --- REST ба GraphQL-ийн ялгааг зохион бүтээх замаар ойлгох, Dex-ээр OIDC нэвтрэлт, RBAC үүрэг, бодит хугацааны шинэчлэл
 \item
-  \textbf{Эвдэх} --- \texttt{security\_tests.py}-г ажиллуулж эмзэг байдлыг олох, засах, дахин шалгах
+  \textbf{Эвдэх} --- \texttt{security\_tests.py}-г ажиллуулж эмзэг байдлыг олох, гараар батлах, \textbf{засах}, дахин ажиллуулж засварыг нотлох
 \end{enumerate}
 
 \begin{quote}
-\textbf{Чухал:} \texttt{graphql-api/main.py} дотор \textbf{зориудын эмзэг байдал} байгаа. Таны ажил бол түүнийг олж засах явдал. Лабораторийн эцэст \texttt{security\_tests.py} бүх шалгалтад тэнцэх ёстой.
+\textbf{Чухал:} \texttt{lab07/\allowbreak{}graphql-api/\allowbreak{}main.\allowbreak{}py} дотор \textbf{ЯГ ХОЁР санаатай эмзэг байдал} бий. Тэдгээрийг олж засах нь энэ лабораторийн гол ажил. Лабораторийн эцэст \texttt{security\_tests.py} нь "Санаатай эмзэг байдал илрээгүй" гэж хэвлэх ёстой.
 \end{quote}
+
+\textbf{{[}ЗК{]} Энэ лаборатори бүхэлдээ үүлний давхаргад.} GraphQL API (:8000), Dex (:5556), бүртгэл (:8090), InfluxDB (:8181) --- бүгд зөөврийн компьютер дээр. {[}Pi{]} Pi 3B нь зөвхөн ирмэгийн үүргээ гүйцэтгэнэ (mosquitto + агент). Pi дээр энэ лабораторид ажиллуулах комманд \textbf{байхгүй} --- гэхдээ агент нь ажиллаж байх ёстой, эс бөгөөс InfluxDB-д унших өгөгдөл байхгүй.
 
 \hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}{%
 \section{2. Урьдчилсан нөхцөл}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}}
@@ -38,326 +41,188 @@
 \begin{itemize}
 \tightlist
 \item
-  Лаб 1--6 дууссан
+  Лаб 1--6 дууссан, \texttt{lab06-done} tag тавигдсан
 \item
-  Бие даалт XIV: OAuth2/OIDC-ийн урсгалыг уншсан (authorization code flow)
+  Бие даалт XIV: OAuth2 / OIDC-ийн authorization code урсгалыг уншсан
 \end{itemize}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack}
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core }\AttributeTok{{-}{-}profile}\NormalTok{ pipeline }\AttributeTok{{-}{-}profile}\NormalTok{ app up }\AttributeTok{{-}d} \AttributeTok{{-}{-}build}
-\FunctionTok{make}\NormalTok{ health}
-\ExtensionTok{docker}\NormalTok{ compose logs }\AttributeTok{{-}{-}tail}\OperatorTok{=}\NormalTok{30 graphql{-}api dex}
+\CommentTok{\# [ЗК] үүлний давхаргыг app профайлтай асаана}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack }\KeywordTok{\&\&} \ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core }\AttributeTok{{-}{-}profile}\NormalTok{ pipeline }\AttributeTok{{-}{-}profile}\NormalTok{ app up }\AttributeTok{{-}d} \AttributeTok{{-}{-}build}
+\FunctionTok{make}\NormalTok{ health                                          }\CommentTok{\# бүх мөр 200}
+\ExtensionTok{curl} \AttributeTok{{-}s}\NormalTok{ localhost:8000/health }\KeywordTok{|} \ExtensionTok{jq}                   \CommentTok{\# \{"status":"ok","checks":\{...200\}\}}
+\ExtensionTok{curl} \AttributeTok{{-}s}\NormalTok{ localhost:5556/dex/.well{-}known/openid{-}configuration }\KeywordTok{|} \ExtensionTok{jq}\NormalTok{ .issuer}
+
+\CommentTok{\# [Pi] Pi дээр агент ажиллаж, өгөгдөл урсаж байх ёстой}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ up }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ link             }\CommentTok{\# bridge/state 1}
 \end{Highlighting}
 \end{Shaded}
 
-Шалгах:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\ExtensionTok{curl} \AttributeTok{{-}s}\NormalTok{ http://localhost:8000/health }\KeywordTok{|} \ExtensionTok{jq}
-\ExtensionTok{curl} \AttributeTok{{-}s}\NormalTok{ http://localhost:5556/dex/.well{-}known/openid{-}configuration }\KeywordTok{|} \ExtensionTok{jq}\NormalTok{ .issuer}
-\end{Highlighting}
-\end{Shaded}
+Бүртгэлд төхөөрөмж байхгүй бол Лаб 2-ын bulk бүртгэлийг {[}ЗК{]} дээр дахин ажиллуул:
+\texttt{python3\ lab02/\allowbreak{}provision.\allowbreak{}py\ bulk\ -\/\allowbreak{}-count\ 50\ -\/\allowbreak{}-prefix\ dev\ -\/\allowbreak{}-out\ lab02/\allowbreak{}out/\allowbreak{}devices.\allowbreak{}csv}
 
 \hypertarget{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}{%
 \section{3. Онолын сануулга}\label{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}}
 
-\textbf{REST-ийн 1+N асуудал.} 50 төхөөрөмж бүрийн сүүлийн 20 хэмжилтийг авахад REST-д \textbf{51 хүсэлт} хэрэгтэй (1 жагсаалт + 50 хэмжилт). GraphQL-д \textbf{1 хүсэлт}. IoT-д энэ нь жижиг зүйл биш: гар утасны апп сул сүлжээгээр 51 удаа тойрч гүйхэд хэдэн секунд алдана.
+\hypertarget{rest-ux438ux439ux43d-1n-ux430ux441ux443ux443ux434ux430ux43b-graphql-ux438ux439ux43d-ux448ux438ux43dux44d-ux44dux440ux441ux434ux44dux43b}{%
+\subsection{REST-ийн 1+N асуудал, GraphQL-ийн шинэ эрсдэл}\label{rest-ux438ux439ux43d-1n-ux430ux441ux443ux443ux434ux430ux43b-graphql-ux438ux439ux43d-ux448ux438ux43dux44d-ux44dux440ux441ux434ux44dux43b}}
 
-\textbf{Гэхдээ GraphQL шинэ эрсдэл авчирна.} Клиент асуулгын хэлбэрийг өөрөө тодорхойлдог тул нэг хүсэлтээр серверийг унагаах боломжтой (гүн үүрлэсэн эсвэл олон давхар нэрлэсэн асуулга). REST-д ийм зүйл байхгүй, учир нь төгсгөлийн цэг бүр тогтмол өртөгтэй.
+50 төхөөрөмж бүрийн сүүлийн 20 хэмжилтийг авахад REST-д \textbf{51 хүсэлт} хэрэгтэй (1 жагсаалт + 50 хэмжилт). GraphQL-д \textbf{1 хүсэлт}. IoT-д энэ нь жижиг зүйл биш: гар утасны апп сул сүлжээгээр 51 удаа тойрч гүйхэд хэдэн секунд алдана.
 
-\textbf{Танилт (authentication) ≠ Эрх (authorization).}
-- Танилт: \emph{чи хэн бэ?} → OIDC токен
-- Эрх: \emph{чи юу хийж болох вэ?} → RBAC үүрэг
+Гэхдээ клиент асуулгын \textbf{хэлбэрийг өөрөө} тодорхойлдог тул нэг хүсэлтээр серверийг ачаалж болно (гүн үүрлэсэн эсвэл олон давхар нэрлэсэн \texttt{alias} асуулга). REST-д ийм зүйл байхгүй --- төгсгөлийн цэг бүр тогтмол өртөгтэй. Мөн \texttt{\_\allowbreak{}\_\allowbreak{}schema} introspection нь довтолгооны газрын зургийг халдагчид үнэгүй өгнө.
 
-Хамгийн түгээмэл эмзэг байдал бол эхнийхийг хийгээд хоёр дахийг мартах, эсвэл \textbf{токеныг шалгалгүй итгэх}.
+\hypertarget{ux442ux430ux43dux438ux43bux442-authentication-ux44dux440ux445-authorization}{%
+\subsection{Танилт (authentication) ≠ Эрх (authorization)}\label{ux442ux430ux43dux438ux43bux442-authentication-ux44dux440ux445-authorization}}
 
-\textbf{Zero Trust.} "Дотоод сүлжээ тул аюулгүй" гэсэн таамаг байхгүй. Хүсэлт бүрийг шалгана --- эх сурвалж хаанаас ирсэн нь хамаагүй. Энэ лабораторид InfluxDB \texttt{-\/-without-auth} горимд ажиллаж байгаа нь яг энэ зарчмыг зөрчиж байгаа жишээ.
+Танилт: \emph{чи хэн бэ?} → OIDC токен (Dex) → \texttt{decode\_token()}.
+Эрх: \emph{чи юу хийж болох вэ?} → RBAC үүрэг → \texttt{Principal.require()}.
+
+Хамгийн түгээмэл эмзэг байдал бол эхнийхийг хийгээд хоёр дахийг мартах, эсвэл \textbf{токеныг шалгалгүй итгэх}. Манай \texttt{main.py} яг сүүлийнхийг хийж байна.
+
+\hypertarget{ux445ux43eux451ux440-ux44dux445-ux441ux443ux440ux432ux430ux43bux436-ux43dux44dux433-ux441ux445ux435ux43c-zero-trust}{%
+\subsection{Хоёр эх сурвалж, нэг схем; Zero Trust}\label{ux445ux43eux451ux440-ux44dux445-ux441ux443ux440ux432ux430ux43bux436-ux43dux44dux433-ux441ux445ux435ux43c-zero-trust}}
+
+\begin{verbatim}
+GraphQL :8000 ──┬──► registry :8090   төхөөрөмж, firmware, OTA (Лаб 2)
+                └──► influxdb :8181   цаг цуваа (SQL, /api/v3/query_sql)
+\end{verbatim}
+
+\textbf{ThingsBoard энд байхгүй.} Лаб 2-т бид бүртгэлээ өөрсдөө бичсэн тул түүн дээр GraphQL давхарга барихад юу ч нуугдахгүй.
+
+\textbf{Zero Trust:} "дотоод сүлжээ тул аюулгүй" гэсэн таамаг \textbf{байхгүй}. Хүсэлт бүрийг шалгана --- эх сурвалж хаанаас ирсэн нь хамаагүй. InfluxDB-г \texttt{-\/-without-auth} горимд ажиллуулж байгаа нь тэр зарчмыг илт зөрчсөн жишээ (Алхам 8).
 
 \hypertarget{ux430ux43bux445ux43cux443ux443ux434}{%
 \section{4. Алхмууд}\label{ux430ux43bux445ux43cux443ux443ux434}}
 
-\hypertarget{ux430ux43bux445ux430ux43c-1-graphql-ux431ux430-rest-ux438ux439ux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442-55-ux43cux438ux43d}{%
-\subsection{Алхам 1 --- GraphQL ба REST-ийн харьцуулалт (55 мин)}\label{ux430ux43bux445ux430ux43c-1-graphql-ux431ux430-rest-ux438ux439ux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442-55-ux43cux438ux43d}}
+\hypertarget{ux430ux43bux445ux430ux43c-1-ux431ux44dux43bux442ux433ux44dux43b-ux431ux430-ux441ux445ux435ux43cux438ux439ux433-ux441ux443ux434ux43bux430ux445-15-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 1 --- Бэлтгэл ба схемийг судлах (15 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-1-ux431ux44dux43bux442ux433ux44dux43b-ux431ux430-ux441ux445ux435ux43cux438ux439ux433-ux441ux443ux434ux43bux430ux445-15-ux43cux438ux43d-ux437ux43a}}
 
-\textbf{1.1} GraphiQL-ийг хөтчөөр нээнэ: \texttt{http://localhost:8000/graphql}
+Хөтчөөр \texttt{http:\allowbreak{}/\allowbreak{}/\allowbreak{}localhost:\allowbreak{}8000/\allowbreak{}graphql} нээж GraphiQL-ийг үзнэ. Токенгүйгээр зөвхөн \texttt{\{\ whoami\ \}} ажиллана. \texttt{\{\ devices(limit:\allowbreak{}\ 5)\ \{\ id\ name\ \}\ \}} бичвэл \textbf{алдаа} гарна: \texttt{\textquotesingle{}device:read\textquotesingle{}\ эрх\ байхгүй.\ Таны\ үүрэг:\ {[}{]}}. Энэ бол зөв зан төлөв --- Zero Trust-ын анхдагч: \textbf{токенгүй хүсэлт нэг ч үүрэггүй}. Тиймээс эхлээд токен авах хэрэгтэй → Алхам 2.
 
-Туршиж үзнэ:
+Схемийг GraphiQL-ийн Docs самбараас судал: \texttt{devices}, \texttt{device}, \texttt{firmware}, \texttt{anomalies}, \texttt{deviceStats} (хараахан байхгүй), \texttt{sendCommand}.
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\{ whoami \}}
+\hypertarget{ux430ux43bux445ux430ux43c-2-oidc-ux442ux43eux43aux435ux43d-ux431ux430-ux4afux4afux440ux433ux438ux439ux43d-ux44dux445-ux441ux443ux440ux432ux430ux43bux436-35-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 2 --- OIDC токен ба үүргийн эх сурвалж (35 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-2-oidc-ux442ux43eux43aux435ux43d-ux431ux430-ux4afux4afux440ux433ux438ux439ux43d-ux44dux445-ux441ux443ux440ux432ux430ux43bux436-35-ux43cux438ux43d-ux437ux43a}}
 
-\NormalTok{\{ devices(limit: }\DecValTok{5}\NormalTok{) \{ id name }\KeywordTok{type}\NormalTok{ \} \}}
-
-\NormalTok{\{}
-\NormalTok{  devices(limit: }\DecValTok{5}\NormalTok{) \{}
-\NormalTok{    name}
-\NormalTok{    readings(limit: }\DecValTok{10}\NormalTok{) \{ time temperature vibrationRms \}}
-\NormalTok{  \}}
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{1.2 Хүсэлтийн тоог хэмжинэ.} REST-ээр ижил өгөгдөл авах:
+\textbf{2.1 Токен авах.} Dex-д гурван статик хэрэглэгч бий: \texttt{viewer@}, \texttt{operator@}, \texttt{admin@cnc302.mn}, бүгд нууц үг \texttt{cnc302}. Энэ туслах функцийг лабораторийн турш ашиглана:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# 1{-}р хүсэлт: жагсаалт}
-\ExtensionTok{curl} \AttributeTok{{-}s}\NormalTok{ localhost:8000/rest/devices}\PreprocessorTok{?}\NormalTok{limit=5 }\KeywordTok{|} \ExtensionTok{jq} \AttributeTok{{-}r} \StringTok{\textquotesingle{}.devices[].name\textquotesingle{}} \OperatorTok{\textgreater{}}\NormalTok{ /tmp/devs.txt}
-
-\CommentTok{\# дараагийн N хүсэлт: тус бүрийн хэмжилт}
-\BuiltInTok{time} \ErrorTok{(}\ControlFlowTok{while} \BuiltInTok{read} \VariableTok{d}\KeywordTok{;} \ControlFlowTok{do}
-  \ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST localhost:8181/api/v3/query\_sql }\AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}d} \StringTok{"\{}\DataTypeTok{\textbackslash{}"}\StringTok{db}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{cnc302}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{q}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{SELECT * FROM telemetry WHERE device=\textquotesingle{}}\VariableTok{$d}\StringTok{\textquotesingle{} ORDER BY time DESC LIMIT 10}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{format}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{json}\DataTypeTok{\textbackslash{}"}\StringTok{\}"} \OperatorTok{\textgreater{}}\NormalTok{ /dev/null}
-\ControlFlowTok{done} \OperatorTok{\textless{}}\NormalTok{ /tmp/devs.txt}\KeywordTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-GraphQL-ээр:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\BuiltInTok{time}\NormalTok{ curl }\AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST localhost:8000/graphql }\AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}d} \StringTok{\textquotesingle{}\{"query":"\{ devices(limit:5)\{ name readings(limit:10)\{ time temperature \} \} \}"\}\textquotesingle{}} \OperatorTok{\textgreater{}}\NormalTok{ /dev/null}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{Хүснэгт 1}-ийг бөглөнө: хүсэлтийн тоо, нийт хугацаа, дамжуулсан байт.
-
-\textbf{1.3 50 төхөөрөмж дээр давтана.} Ялгаа өсөв үү? Шугаман уу?
-
-\textbf{1.4 ОЮУТНЫ ДААЛГАВАР.} \texttt{main.py} дотор \texttt{\#\ TODO(оюутан)} гэсэн \texttt{deviceStats} талбарыг хэрэгжүүлнэ:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\{ deviceStats(device: }\StringTok{"dev0001"}\NormalTok{, hours: }\DecValTok{24}\NormalTok{) \{ avg min max samples \} \}}
-\end{Highlighting}
-\end{Shaded}
-
-Нэгтгэлийг \textbf{InfluxDB-д хийлгэнэ} (SQL-ийн \texttt{avg/min/max}), Python дээр биш. Яагаад? Хүснэгт 1-д хоёуланг нь хэмжиж хариулна.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ app up }\AttributeTok{{-}d} \AttributeTok{{-}{-}build}\NormalTok{ graphql{-}api}
-\end{Highlighting}
-\end{Shaded}
-
-\hypertarget{ux430ux43bux445ux430ux43c-2-websocket-ux431ux43eux434ux438ux442-ux445ux443ux433ux430ux446ux430ux430ux43dux44b-ux448ux438ux43dux44dux447ux43bux44dux43b-30-ux43cux438ux43d}{%
-\subsection{Алхам 2 --- WebSocket бодит хугацааны шинэчлэл (30 мин)}\label{ux430ux43bux445ux430ux43c-2-websocket-ux431ux43eux434ux438ux442-ux445ux443ux433ux430ux446ux430ux430ux43dux44b-ux448ux438ux43dux44dux447ux43bux44dux43b-30-ux43cux438ux43d}}
-
-ThingsBoard нь WebSocket API-тай. Дэлгэц шинэчлэхийн тулд байнга асуух (polling) шаардлагагүй.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\ExtensionTok{python3} \AttributeTok{{-}} \OperatorTok{\textless{}\textless{}\textquotesingle{}EOF\textquotesingle{}}
-\StringTok{import json, websocket    \# pip install websocket{-}client}
-\StringTok{TOKEN = "\textless{}ThingsBoard{-}ийн JWT — /api/auth/login{-}ээс\textgreater{}"}
-\StringTok{DEVICE\_ID = "\textless{}төхөөрөмжийн UUID\textgreater{}"}
-\StringTok{ws = websocket.create\_connection(}
-\StringTok{    f"ws://localhost:8080/api/ws/plugins/telemetry?token=\{TOKEN\}")}
-\StringTok{ws.send(json.dumps(\{"tsSubCmds":[\{"entityType":"DEVICE","entityId":DEVICE\_ID,}
-\StringTok{        "scope":"LATEST\_TELEMETRY","cmdId":1\}],"historyCmds":[],"attrSubCmds":[]\}))}
-\StringTok{for \_ in range(20):}
-\StringTok{    print(ws.recv()[:160])}
-\StringTok{ws.close()}
-\OperatorTok{EOF}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{Хүснэгт 2}-ыг бөглөнө: 1 секундын polling ба WebSocket-ийн харьцуулалт (хүсэлтийн тоо, дамжуулсан байт, шинэчлэлийн саатал).
-
-\hypertarget{ux430ux43bux445ux430ux43c-3-oidc-ux43dux44dux432ux442ux440ux44dux43bux442-dex-45-ux43cux438ux43d}{%
-\subsection{Алхам 3 --- OIDC нэвтрэлт (Dex) (45 мин)}\label{ux430ux43bux445ux430ux43c-3-oidc-ux43dux44dux432ux442ux440ux44dux43bux442-dex-45-ux43cux438ux43d}}
-
-\textbf{3.1 Токен авах.} Dex-ийн нууц үгийн урсгалаар (лабораторид хялбар):
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST http://localhost:5556/dex/token }\DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}d}\NormalTok{ grant\_type=password }\AttributeTok{{-}d}\NormalTok{ scope=}\StringTok{\textquotesingle{}openid email profile groups\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}d}\NormalTok{ client\_id=cnc302 }\AttributeTok{{-}d}\NormalTok{ client\_secret=cnc302{-}lab{-}secret }\DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}d}\NormalTok{ username=viewer@cnc302.mn }\AttributeTok{{-}d}\NormalTok{ password=cnc302 }\KeywordTok{|} \ExtensionTok{jq}
+\FunctionTok{tok()} \KeywordTok{\{} \ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST http://localhost:5556/dex/token }\AttributeTok{{-}d}\NormalTok{ grant\_type=password }\DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}d}\NormalTok{ scope=}\StringTok{\textquotesingle{}openid email profile groups\textquotesingle{}} \AttributeTok{{-}d}\NormalTok{ client\_id=cnc302 }\DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}d}\NormalTok{ client\_secret=cnc302{-}lab{-}secret }\AttributeTok{{-}d}\NormalTok{ username=}\StringTok{"}\VariableTok{$1}\StringTok{@cnc302.mn"} \AttributeTok{{-}d}\NormalTok{ password=cnc302 }\DataTypeTok{\textbackslash{}}
+  \KeywordTok{|} \ExtensionTok{jq} \AttributeTok{{-}r}\NormalTok{ .id\_token}\KeywordTok{;} \KeywordTok{\}}
+\VariableTok{TOKEN}\OperatorTok{=}\VariableTok{$(}\ExtensionTok{tok}\NormalTok{ admin}\VariableTok{)} \KeywordTok{\&\&} \BuiltInTok{echo} \StringTok{"}\VariableTok{$\{TOKEN}\OperatorTok{:}\DecValTok{0}\OperatorTok{:}\DecValTok{40}\VariableTok{\}}\StringTok{…"}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{quote}
-\texttt{password} grant ажиллахгүй бол Dex-ийн \texttt{staticClients} дотор \texttt{public:\ true} нэмэх, эсвэл authorization code урсгалыг ашиглана. Аль нь болсныг тайландаа тэмдэглэ --- \textbf{энэ өөрөө сургамжтай}: OAuth2-ын урсгал бүр өөр аюулгүй байдлын шинжтэй.
+\texttt{password} grant татгалзвал \texttt{stack/dex/config.yaml}-д \texttt{oauth2.\allowbreak{}passwordConnector:\allowbreak{}\ local} байгаа эсэхийг шалга, эсвэл authorization code урсгал руу шилж. Аль нь болсныг тайланд бич --- OAuth2-ын урсгал бүр өөр аюулгүй байдлын шинжтэй.
 \end{quote}
 
-\textbf{3.2 Токеныг API-д ашиглах:}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\VariableTok{TOKEN}\OperatorTok{=}\VariableTok{$(}\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST http://localhost:5556/dex/token }\DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}d}\NormalTok{ grant\_type=password }\AttributeTok{{-}d}\NormalTok{ scope=}\StringTok{\textquotesingle{}openid email profile groups\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}d}\NormalTok{ client\_id=cnc302 }\AttributeTok{{-}d}\NormalTok{ client\_secret=cnc302{-}lab{-}secret }\DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}d}\NormalTok{ username=admin@cnc302.mn }\AttributeTok{{-}d}\NormalTok{ password=cnc302 }\KeywordTok{|} \ExtensionTok{jq} \AttributeTok{{-}r}\NormalTok{ .id\_token}\VariableTok{)}
-
-\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST localhost:8000/graphql }\AttributeTok{{-}H} \StringTok{"Authorization: Bearer }\VariableTok{$TOKEN}\StringTok{"} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \AttributeTok{{-}d} \StringTok{\textquotesingle{}\{"query":"\{ whoami \}"\}\textquotesingle{}} \KeywordTok{|} \ExtensionTok{jq}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{3.3 Асуудлыг олох.} \texttt{whoami} ямар үүрэг харуулж байна вэ? Dex-ийн статик хэрэглэгчид \texttt{groups} талбар \textbf{байхгүй}. Тиймээс бүгд \texttt{viewer} болно.
-
-\textbf{Хоёр шийдлийг харьцуул (Хүснэгт 3):}
-- (а) Dex-ийг LDAP/GitHub холбогчтой болгох → бодит бүлэг ирнэ
-- (б) GraphQL API дээр имэйлээс үүрэг зурвасжуулах (\texttt{admin@} → \texttt{admin})
-
-Аль нь илүү зөв вэ? Аль нь илүү хурдан вэ? Аль нь үйлдвэрлэлд тохирох вэ?
-
-\textbf{3.4} Сонгосон шийдлээ хэрэгжүүлнэ.
-
-\hypertarget{ux430ux43bux445ux430ux43c-4-ux430ux44eux443ux43bux433ux4afux439-ux431ux430ux439ux434ux43bux44bux43d-ux448ux430ux43bux433ux430ux43bux442-35-ux43cux438ux43d}{%
-\subsection{Алхам 4 --- АЮУЛГҮЙ БАЙДЛЫН ШАЛГАЛТ (35 мин)}\label{ux430ux43bux445ux430ux43c-4-ux430ux44eux443ux43bux433ux4afux439-ux431ux430ux439ux434ux43bux44bux43d-ux448ux430ux43bux433ux430ux43bux442-35-ux43cux438ux43d}}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ lab07/security\_tests.py }\AttributeTok{{-}{-}api}\NormalTok{ http://localhost:8000 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}influx}\NormalTok{ http://localhost:8181 }\AttributeTok{{-}{-}tb}\NormalTok{ http://localhost:8080 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}json}\NormalTok{ lab07/out/security{-}before.json}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{Хоёр ноцтой асуудал гарах ёстой.} Гарахгүй бол шалгалт буруу ажиллаж байна.
-
-Гарсан бүр асуудлыг \textbf{гараар давтаж} батална. Жишээ нь гарын үсгийн шалгалт:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\ExtensionTok{python3} \AttributeTok{{-}} \OperatorTok{\textless{}\textless{}\textquotesingle{}EOF\textquotesingle{}}
-\StringTok{import base64, json, httpx}
-\StringTok{b = lambda d: base64.urlsafe\_b64encode(json.dumps(d).encode()).rstrip(b\textquotesingle{}=\textquotesingle{}).decode()}
-\StringTok{sig = base64.urlsafe\_b64encode(b\textquotesingle{}garbage\textquotesingle{}).rstrip(b\textquotesingle{}=\textquotesingle{}).decode()}
-\StringTok{evil = f"\{b(\{\textquotesingle{}alg\textquotesingle{}:\textquotesingle{}RS256\textquotesingle{},\textquotesingle{}typ\textquotesingle{}:\textquotesingle{}JWT\textquotesingle{}\})\}.\{b(\{\textquotesingle{}sub\textquotesingle{}:\textquotesingle{}attacker\textquotesingle{},\textquotesingle{}groups\textquotesingle{}:[\textquotesingle{}admin\textquotesingle{}]\})\}.\{sig\}"}
-\StringTok{r = httpx.post("http://localhost:8000/graphql",}
-\StringTok{               json=\{"query":"\{ whoami \}"\},}
-\StringTok{               headers=\{"Authorization": f"Bearer \{evil\}"\})}
-\StringTok{print(r.json())}
-\OperatorTok{EOF}
-\end{Highlighting}
-\end{Shaded}
-
-Хэрэв \texttt{roles=admin} гэж гарвал --- \textbf{та ямар ч нууц үггүйгээр админ боллоо}.
-
-\textbf{Хүснэгт 4} (эмзэг байдлын бүртгэл)-ийг бөглөнө.
-
-\hypertarget{ux430ux43bux445ux430ux43c-5-ux437ux430ux441ux430ux445-45-ux43cux438ux43d}{%
-\subsection{Алхам 5 --- ЗАСАХ (45 мин)}\label{ux430ux43bux445ux430ux43c-5-ux437ux430ux441ux430ux445-45-ux43cux438ux43d}}
-
-\textbf{5.1 Гарын үсгийн шалгалт.} \texttt{main.py}-ийн \texttt{decode\_token}-ыг засна:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\ImportTok{import}\NormalTok{ httpx}
-\ImportTok{from}\NormalTok{ jose }\ImportTok{import}\NormalTok{ jwt}
-
-\NormalTok{\_JWKS }\OperatorTok{=} \VariableTok{None}
-
-\KeywordTok{def}\NormalTok{ \_jwks():}
-    \KeywordTok{global}\NormalTok{ \_JWKS}
-    \ControlFlowTok{if}\NormalTok{ \_JWKS }\KeywordTok{is} \VariableTok{None}\NormalTok{:}
-\NormalTok{        \_JWKS }\OperatorTok{=}\NormalTok{ httpx.get(}\SpecialStringTok{f"}\SpecialCharTok{\{}\NormalTok{OIDC\_ISSUER}\SpecialCharTok{\}}\SpecialStringTok{/keys"}\NormalTok{, timeout}\OperatorTok{=}\DecValTok{10}\NormalTok{).json()}
-    \ControlFlowTok{return}\NormalTok{ \_JWKS}
-
-\KeywordTok{def}\NormalTok{ decode\_token(token: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Principal:}
-\NormalTok{    claims }\OperatorTok{=}\NormalTok{ jwt.decode(}
-\NormalTok{        token, \_jwks(),}
-\NormalTok{        algorithms}\OperatorTok{=}\NormalTok{[}\StringTok{"RS256"}\NormalTok{],}
-\NormalTok{        audience}\OperatorTok{=}\StringTok{"cnc302"}\NormalTok{,}
-\NormalTok{        issuer}\OperatorTok{=}\NormalTok{OIDC\_ISSUER,}
-\NormalTok{        options}\OperatorTok{=}\NormalTok{\{}\StringTok{"verify\_exp"}\NormalTok{: }\VariableTok{True}\NormalTok{, }\StringTok{"verify\_aud"}\NormalTok{: }\VariableTok{True}\NormalTok{\},}
-\NormalTok{    )}
-\NormalTok{    ...}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{quote}
-\textbf{Анхаар:} \texttt{algorithms={[}"RS256"{]}}-ийг заавал заана. Заахгүй бол халдагч \texttt{alg:\ none} эсвэл \texttt{alg:\ HS256} (нийтийн түлхүүрийг нууц болгон ашиглах) халдлага хийж болно. Энэ бол JWT-ийн сонгодог эмзэг байдал.
-\end{quote}
-
-\textbf{5.2 Хугацааны шалгалт} --- \texttt{verify\_exp:\ True}-аар шийдэгдэнэ.
-
-\textbf{5.3 Introspection хаах} (үйлдвэрлэлийн горимд):
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\ImportTok{from}\NormalTok{ strawberry.extensions }\ImportTok{import}\NormalTok{ AddValidationRules}
-\ImportTok{from}\NormalTok{ graphql.validation }\ImportTok{import}\NormalTok{ NoSchemaIntrospectionCustomRule}
-\NormalTok{schema }\OperatorTok{=}\NormalTok{ strawberry.Schema(query}\OperatorTok{=}\NormalTok{Query, mutation}\OperatorTok{=}\NormalTok{Mutation,}
-\NormalTok{    extensions}\OperatorTok{=}\NormalTok{[AddValidationRules([NoSchemaIntrospectionCustomRule])]}
-                \ControlFlowTok{if}\NormalTok{ os.environ.get(}\StringTok{"ENV"}\NormalTok{) }\OperatorTok{==} \StringTok{"production"} \ControlFlowTok{else}\NormalTok{ [])}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{5.4 Асуулгын нийлмэл байдлыг хязгаарлах:}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\ImportTok{from}\NormalTok{ strawberry.extensions }\ImportTok{import}\NormalTok{ QueryDepthLimiter}
-\CommentTok{\# extensions=[QueryDepthLimiter(max\_depth=6), ...]}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{5.5 Мөр залгалтаас параметржүүлсэн асуулга руу.} \texttt{influx\_sql}-д хэрэглэгчийн оруулсан утгыг шууд SQL-д залгаж байна. Хамгийн багадаа \texttt{device} нэрийг шалгах:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\ImportTok{import}\NormalTok{ re}
-\ControlFlowTok{if} \KeywordTok{not}\NormalTok{ re.fullmatch(}\VerbatimStringTok{r"[a{-}zA{-}Z0{-}9\_{-}]\{1,64\}"}\NormalTok{, name):}
-    \ControlFlowTok{raise} \PreprocessorTok{ValueError}\NormalTok{(}\StringTok{"төхөөрөмжийн нэр буруу"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{5.6 InfluxDB-д танилт нэмэх} (сонголтоор, цаг байвал): \texttt{-\/-without-auth} тугийг хасаж админ токен үүсгэнэ.
-
-\textbf{5.7 Дахин шалгана:}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ app up }\AttributeTok{{-}d} \AttributeTok{{-}{-}build}\NormalTok{ graphql{-}api}
-\ExtensionTok{python3}\NormalTok{ lab07/security\_tests.py }\AttributeTok{{-}{-}api}\NormalTok{ http://localhost:8000 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}json}\NormalTok{ lab07/out/security{-}after.json}
-\end{Highlighting}
-\end{Shaded}
-
-\textbf{Бүх ноцтой шалгалт ТЭНЦСЭН байх ёстой.}
-
-\hypertarget{ux430ux43bux445ux430ux43c-6-rbac-ux43cux430ux442ux440ux438ux446-ux431ux430-ux442ux430ux439ux43bux430ux43d-30-ux43cux438ux43d}{%
-\subsection{Алхам 6 --- RBAC матриц ба тайлан (30 мин)}\label{ux430ux43bux445ux430ux43c-6-rbac-ux43cux430ux442ux440ux438ux446-ux431ux430-ux442ux430ux439ux43bux430ux43d-30-ux43cux438ux43d}}
-
-\textbf{Хүснэгт 5}-ыг бөглөнө. Дараа нь гурван үүргээр бодитоор туршина:
+\textbf{2.2 Токеныг API-д ашиглах. 2.3 Гурван хэрэглэгчээр давтах:}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \ControlFlowTok{for}\NormalTok{ U }\KeywordTok{in}\NormalTok{ viewer operator admin}\KeywordTok{;} \ControlFlowTok{do}
-  \VariableTok{T}\OperatorTok{=}\VariableTok{$(}\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST http://localhost:5556/dex/token }\AttributeTok{{-}d}\NormalTok{ grant\_type=password }\DataTypeTok{\textbackslash{}}
-      \AttributeTok{{-}d}\NormalTok{ scope=}\StringTok{\textquotesingle{}openid email profile groups\textquotesingle{}} \AttributeTok{{-}d}\NormalTok{ client\_id=cnc302 }\DataTypeTok{\textbackslash{}}
-      \AttributeTok{{-}d}\NormalTok{ client\_secret=cnc302{-}lab{-}secret }\AttributeTok{{-}d}\NormalTok{ username=}\VariableTok{$U}\NormalTok{@cnc302.mn }\DataTypeTok{\textbackslash{}}
-      \AttributeTok{{-}d}\NormalTok{ password=cnc302 }\KeywordTok{|} \ExtensionTok{jq} \AttributeTok{{-}r}\NormalTok{ .id\_token}\VariableTok{)}
-  \BuiltInTok{echo} \StringTok{"── }\VariableTok{$U}\StringTok{ ──"}
-  \ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST localhost:8000/graphql }\AttributeTok{{-}H} \StringTok{"Authorization: Bearer }\VariableTok{$T}\StringTok{"} \DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}d} \StringTok{\textquotesingle{}\{"query":"mutation \{ sendCommand(device:\textbackslash{}"dev0001\textbackslash{}", command:\textbackslash{}"reboot\textbackslash{}") \}"\}\textquotesingle{}} \KeywordTok{|} \ExtensionTok{jq} \AttributeTok{{-}c}
+  \BuiltInTok{printf} \StringTok{\textquotesingle{}\%{-}9s \textquotesingle{}} \StringTok{"}\VariableTok{$U}\StringTok{"}
+  \ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST localhost:8000/graphql }\AttributeTok{{-}H} \StringTok{"Authorization: Bearer }\VariableTok{$(}\ExtensionTok{tok} \VariableTok{$U)}\StringTok{"} \DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \AttributeTok{{-}d} \StringTok{\textquotesingle{}\{"query":"\{ whoami \}"\}\textquotesingle{}} \KeywordTok{|} \ExtensionTok{jq} \AttributeTok{{-}r}\NormalTok{ .data.whoami}
 \ControlFlowTok{done}
 \end{Highlighting}
 \end{Shaded}
 
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-7.1-ux442ux43eux43aux435ux43dux43eux43eux441-ux4afux4afux440ux44dux433-ux445ux4afux440ux442ux44dux43b}{%
+\subsubsection{Хүснэгт 7.1 --- Токеноос үүрэг хүртэл}\label{ux445ux4afux441ux43dux44dux433ux442-7.1-ux442ux43eux43aux435ux43dux43eux43eux441-ux4afux4afux440ux44dux433-ux445ux4afux440ux442ux44dux43b}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Хэрэглэгч
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\texttt{id\_token}-ы \texttt{groups} талбар байна уу
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\texttt{whoami}-гийн \texttt{roles=}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\texttt{perms=} тоо
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+viewer@cnc302.mn & & & \\
+operator@cnc302.mn & & & \\
+admin@cnc302.mn & & & \\
+\end{longtable}\endgroup
+
+Токеныг задлан үзэх: \texttt{echo\ "\$TOKEN"\ \textbar{}\ cut\ -d.\ -f2\ \textbar{}\ base64\ -d\ 2\textgreater{}/dev/null\ \textbar{}\ jq}
+
+\textbf{Ажиглалт:} Dex-ийн статик хэрэглэгчид \texttt{groups} талбар \textbf{агуулдаггүй}. \texttt{decode\_token} нь \texttt{groups} олдохгүй бол \texttt{{[}"viewer"{]}}-д унана --- тиймээс \textbf{гурвуулаа viewer} болно. \textbf{2.4:} хоёр шийдлийг харьцуулж, нэгийг нь хэрэгжүүл.
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-7.2-ux4afux4afux440ux433ux438ux439ux43d-ux44dux445-ux441ux443ux440ux432ux430ux43bux436ux438ux439ux43d-ux441ux43eux43dux433ux43eux43bux442}{%
+\subsubsection{Хүснэгт 7.2 --- Үүргийн эх сурвалжийн сонголт}\label{ux445ux4afux441ux43dux44dux433ux442-7.2-ux4afux4afux440ux433ux438ux439ux43d-ux44dux445-ux441ux443ux440ux432ux430ux43bux436ux438ux439ux43d-ux441ux43eux43dux433ux43eux43bux442}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+(а) Dex-д LDAP/GitHub холбогч
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+(б) API дээр имэйлээс үүрэг зурвасжуулах
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Хэрэгжүүлэх хугацаа (мин) & & \\
+Үүргийг хаана удирдах вэ & & \\
+Токен хуурамч бол ажиллах уу & & \\
+Үйлдвэрлэлд тохирох уу & & \\
+\textbf{Бидний сонголт ба шалтгаан} & & \\
+\end{longtable}\endgroup
+
+Лабораторийн цагт (б)-г хэрэгжүүлэх нь бодитой: \texttt{decode\_token}-д \texttt{claims.get("email")}-ээс \texttt{admin@} → \texttt{admin}, \texttt{operator@} → \texttt{operator} зурвасжуулна. Гэхдээ тайландаа \textbf{(а) яагаад илүү зөв болохыг} заавал бич.
+
+\hypertarget{ux430ux43bux445ux430ux43c-3-rest-ux431ux430-graphql-ux438ux439ux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442-45-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 3 --- REST ба GraphQL-ийн харьцуулалт (45 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-3-rest-ux431ux430-graphql-ux438ux439ux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442-45-ux43cux438ux43d-ux437ux43a}}
+
+\textbf{3.1 GraphQL --- нэг хүсэлт:}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{git}\NormalTok{ add }\AttributeTok{{-}A} \KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 7: GraphQL давхарга, OIDC, аюулгүй байдлын засвар"}
-\FunctionTok{git}\NormalTok{ tag lab07{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push origin main }\AttributeTok{{-}{-}tags}
+\BuiltInTok{time}\NormalTok{ curl }\AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST localhost:8000/graphql }\AttributeTok{{-}H} \StringTok{"Authorization: Bearer }\VariableTok{$TOKEN}\StringTok{"} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \AttributeTok{{-}o}\NormalTok{ /tmp/gql5.json }\DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}d} \StringTok{\textquotesingle{}\{"query":"\{ devices(limit:5)\{ name state readings(limit:10)\{ time temperature vibrationRms \} \} \}"\}\textquotesingle{}}
+\FunctionTok{wc} \AttributeTok{{-}c}\NormalTok{ /tmp/gql5.json}
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux445ux4afux441ux43dux44dux433ux442ux4afux4afux434}{%
-\section{5. Хэмжилтийн хүснэгтүүд}\label{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux445ux4afux441ux43dux44dux433ux442ux4afux4afux434}}
+\textbf{3.2 REST --- 1 + N хүсэлт.} Эхлээд жагсаалт (\texttt{/rest/devices} нь ЗӨВХӨН жагсаалт буцаана), дараа нь төхөөрөмж тус бүрийн хэмжилт:
 
-\hypertarget{ux445ux4afux441ux43dux44dux433ux442-1-rest-ux431ux430-graphql}{%
-\subsection{Хүснэгт 1 --- REST ба GraphQL}\label{ux445ux4afux441ux43dux44dux433ux442-1-rest-ux431ux430-graphql}}
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}H} \StringTok{"Authorization: Bearer }\VariableTok{$TOKEN}\StringTok{"} \DataTypeTok{\textbackslash{}}
+  \StringTok{\textquotesingle{}localhost:8000/rest/devices?limit=5\textquotesingle{}} \KeywordTok{|} \ExtensionTok{jq} \AttributeTok{{-}r} \StringTok{\textquotesingle{}.devices[].name\textquotesingle{}} \OperatorTok{\textgreater{}}\NormalTok{ /tmp/devs.txt}
+\BuiltInTok{time} \ErrorTok{(}\ControlFlowTok{while} \BuiltInTok{read} \VariableTok{d}\KeywordTok{;} \ControlFlowTok{do}
+  \ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST localhost:8181/api/v3/query\_sql }\AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}d} \StringTok{"\{}\DataTypeTok{\textbackslash{}"}\StringTok{db}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{cnc302}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{q}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{SELECT time, temperature, vibration\_rms FROM telemetry WHERE device=\textquotesingle{}}\VariableTok{$d}\StringTok{\textquotesingle{} ORDER BY time DESC LIMIT 10}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{format}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{json}\DataTypeTok{\textbackslash{}"}\StringTok{\}"}
+\ControlFlowTok{done} \OperatorTok{\textless{}}\NormalTok{ /tmp/devs.txt}\KeywordTok{)} \OperatorTok{\textgreater{}}\NormalTok{ /tmp/rest5.json}
+\FunctionTok{wc} \AttributeTok{{-}l}\NormalTok{ /tmp/devs.txt }\KeywordTok{\&\&} \FunctionTok{wc} \AttributeTok{{-}c}\NormalTok{ /tmp/rest5.json}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{3.3 50 төхөөрөмж дээр давт} (\texttt{limit:5} → \texttt{limit:50}). Ялгаа шугаман өсөв үү?
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-7.3-rest-ux431ux430-graphql}{%
+\subsubsection{Хүснэгт 7.3 --- REST ба GraphQL}\label{ux445ux4afux441ux43dux44dux433ux442-7.3-rest-ux431ux430-graphql}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
@@ -366,90 +231,285 @@ ThingsBoard нь WebSocket API-тай. Дэлгэц шинэчлэхийн ту�
 \endhead
 \bottomrule
 \endlastfoot
-5 төхөөрөмж + хэмжилт: хүсэлтийн тоо & & 1 \\
+5 төхөөрөмж: хүсэлтийн тоо & & 1 \\
 5 төхөөрөмж: нийт хугацаа (мс) & & \\
 50 төхөөрөмж: хүсэлтийн тоо & & 1 \\
 50 төхөөрөмж: нийт хугацаа (мс) & & \\
-Дамжуулсан байт (5 төхөөрөмж) & & \\
+50 төхөөрөмж: хариуны байт & & \\
 Илүүдэл өгөгдөл (over-fetching) байна уу & & \\
 \end{longtable}\endgroup
 
-\texttt{deviceStats} нэгтгэл: InfluxDB дээр ule{1.5cm}{0.4pt} мс, Python дээр ule{1.5cm}{0.4pt} мс. Яагаад ялгаатай: ule{1.5cm}{0.4pt}
+\begin{quote}
+\textbf{Санамз:} REST-ийн хугацаа нь \texttt{localhost} дээр хамгийн таатай нөхцөлд хэмжигдэж байна. Сүлжээний саатал (RTT) 200 мс байсан бол 51 хүсэлт \textbf{дор хаяж 10 секунд} болно. Хяналтын асуулт 1-д үүнийг тоогоор гарга.
+\end{quote}
 
-\hypertarget{ux445ux4afux441ux43dux44dux433ux442-2-polling-ux431ux430-websocket}{%
-\subsection{Хүснэгт 2 --- Polling ба WebSocket}\label{ux445ux4afux441ux43dux44dux433ux442-2-polling-ux431ux430-websocket}}
+\hypertarget{ux430ux43bux445ux430ux43c-4-devicestats-ux431ux430-ux43dux44dux433ux442ux433ux44dux43bux438ux439ux43d-ux431ux430ux439ux440ux43bux430ux43b-30-ux43cux438ux43d-ux437ux43a}{%
+\subsection{\texorpdfstring{Алхам 4 --- \texttt{deviceStats} ба нэгтгэлийн байрлал (30 мин) {[}ЗК{]}}{Алхам 4 --- deviceStats ба нэгтгэлийн байрлал (30 мин) {[}ЗК{]}}}\label{ux430ux43bux445ux430ux43c-4-devicestats-ux431ux430-ux43dux44dux433ux442ux433ux44dux43bux438ux439ux43d-ux431ux430ux439ux440ux43bux430ux43b-30-ux43cux438ux43d-ux437ux43a}}
+
+\texttt{main.py} дотор \texttt{\#\ TODO(оюутан)} гэсэн тэмдэглэгээ бий. Дараах талбарыг нэмнэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\{ deviceStats(device: }\StringTok{"dev0001"}\NormalTok{, hours: }\DecValTok{24}\NormalTok{) \{ avg min max samples \} \}}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Дүрэм:} нэгтгэлийг \textbf{InfluxDB-д хийлгэнэ} (SQL-ийн \texttt{avg/min/max/count}), Python дээр биш:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \FunctionTok{avg}\NormalTok{(temperature) }\KeywordTok{AS} \FunctionTok{avg}\NormalTok{, }\FunctionTok{min}\NormalTok{(temperature) }\KeywordTok{AS} \FunctionTok{min}\NormalTok{, }\FunctionTok{max}\NormalTok{(temperature) }\KeywordTok{AS} \FunctionTok{max}\NormalTok{,}
+       \FunctionTok{count}\NormalTok{(temperature) }\KeywordTok{AS}\NormalTok{ samples}
+\KeywordTok{FROM}\NormalTok{ telemetry }\KeywordTok{WHERE}\NormalTok{ device }\OperatorTok{=} \StringTok{\textquotesingle{}\textless{}...\textgreater{}\textquotesingle{}} \KeywordTok{AND} \DataTypeTok{time} \OperatorTok{\textgreater{}}\NormalTok{ now() }\OperatorTok{{-}} \DataTypeTok{INTERVAL} \StringTok{\textquotesingle{}24 hours\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+Дараа нь дахин барина: \texttt{docker\ compose\ -\/\allowbreak{}-profile\ app\ up\ -d\ -\/\allowbreak{}-build\ graphql-api}
+
+\textbf{Хоёр хувилбарыг хэмж:} (а) SQL-д нэгтгэх, (б) бүх мөрийг татаад Python дээр нэгтгэх.
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-7.4-ux43dux44dux433ux442ux433ux44dux43bux438ux439ux433-ux445ux430ux430ux43dux430-ux445ux438ux439ux445-ux432ux44d}{%
+\subsubsection{Хүснэгт 7.4 --- Нэгтгэлийг хаана хийх вэ}\label{ux445ux4afux441ux43dux44dux433ux442-7.4-ux43dux44dux433ux442ux433ux44dux43bux438ux439ux433-ux445ux430ux430ux43dux430-ux445ux438ux439ux445-ux432ux44d}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-& 1с polling & WebSocket \\
+& InfluxDB дээр (SQL) & Python дээр (API) \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
-Хүсэлт/минут & 60 & \\
-Байт/минут & & \\
-Шинэчлэлийн саатал (дундаж) & & \\
-Сервер талын ачаалал & & \\
+Хариу ирэх хугацаа (мс), 24 цаг & & \\
+InfluxDB-ээс татсан мөрийн тоо & & \\
+Хариуны байт & & \\
+30 хоногийн өгөгдөл дээр (мс) & & \\
 \end{longtable}\endgroup
 
-\hypertarget{ux445ux4afux441ux43dux44dux433ux442-3-ux4afux4afux440ux433ux438ux439ux43d-ux44dux445-ux441ux443ux440ux432ux430ux43bux436ux438ux439ux43d-ux441ux43eux43dux433ux43eux43bux442}{%
-\subsection{Хүснэгт 3 --- Үүргийн эх сурвалжийн сонголт}\label{ux445ux4afux441ux43dux44dux433ux442-3-ux4afux4afux440ux433ux438ux439ux43d-ux44dux445-ux441ux443ux440ux432ux430ux43bux436ux438ux439ux43d-ux441ux43eux43dux433ux43eux43bux442}}
+\textbf{Дүгнэлт:} нэгтгэлийг өгөгдөлд ойр хийх зарчим яагаад чухал вэ: ule{1.5cm}{0.4pt}
+
+\hypertarget{ux430ux43bux445ux430ux43c-5-ux431ux43eux434ux438ux442-ux445ux443ux433ux430ux446ux430ux430ux43dux44b-ux448ux438ux43dux44dux447ux43bux44dux43b-polling-ux431ux430-websocket-25-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 5 --- Бодит хугацааны шинэчлэл: polling ба WebSocket (25 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-5-ux431ux43eux434ux438ux442-ux445ux443ux433ux430ux446ux430ux430ux43dux44b-ux448ux438ux43dux44dux447ux43bux44dux43b-polling-ux431ux430-websocket-25-ux43cux438ux43d-ux437ux43a}}
+
+\textbf{5.1 Одоогийн байдал --- polling.} 1 секунд тутам асуух:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{timeout}\NormalTok{ 60 bash }\AttributeTok{{-}c} \StringTok{\textquotesingle{}while true; do}
+\StringTok{  curl {-}s {-}o /dev/null {-}w "\%\{size\_download\} " {-}X POST localhost:8000/graphql \textbackslash{}}
+\StringTok{    {-}H "Authorization: Bearer \textquotesingle{}"}\VariableTok{$TOKEN}\StringTok{"\textquotesingle{}" {-}H "Content{-}Type: application/json" \textbackslash{}}
+\StringTok{    {-}d "\{\textbackslash{}"query\textbackslash{}":\textbackslash{}"\{ devices(limit:5)\{ name \} \}\textbackslash{}"\}"; sleep 1}
+\StringTok{done\textquotesingle{}} \KeywordTok{|} \FunctionTok{tr} \StringTok{\textquotesingle{} \textquotesingle{}} \StringTok{\textquotesingle{}\textbackslash{}n\textquotesingle{}} \KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}\{s+=$1; n++\} END \{print n " хүсэлт, " s " байт"\}\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{5.2 ОЮУТНЫ ДААЛГАВАР --- WebSocket.} \texttt{main.py} дотор одоо WebSocket \textbf{байхгүй}. Хоёр замын аль нэгийг сонгож нэмнэ:
+
+\begin{itemize}
+\tightlist
+\item
+  (а) Strawberry-гийн \texttt{@strawberry.subscription} + \texttt{GraphQLRouter}-ын \texttt{graphql-ws} протокол
+\item
+  (б) FastAPI-гийн \texttt{@app.\allowbreak{}websocket("/\allowbreak{}ws/\allowbreak{}telemetry")} --- EMQX-д paho-mqtt-ээр захиалж, ирсэн мессежийг клиент рүү түлхэх
+\end{itemize}
+
+(б) нь энэ архитектурт илүү шууд: {[}Pi{]} Pi-гийн агент → гүүр → EMQX → API → хөтөч. Дараа нь хэмжинэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python3} \AttributeTok{{-}} \OperatorTok{\textless{}\textless{}\textquotesingle{}EOF\textquotesingle{}}
+\StringTok{import json, time, websocket        \# pip install websocket{-}client}
+\StringTok{ws = websocket.create\_connection("ws://localhost:8000/ws/telemetry")}
+\StringTok{t0, n, b = time.time(), 0, 0}
+\StringTok{while time.time() {-} t0 \textless{} 60:}
+\StringTok{    m = ws.recv(); n += 1; b += len(m)}
+\StringTok{ws.close()}
+\StringTok{print(f"\{n\} мессеж, \{b\} байт, 60 сек")}
+\OperatorTok{EOF}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-7.5-polling-ux431ux430-websocket-60-ux441ux435ux43aux443ux43dux434-5-ux442ux4e9ux445ux4e9ux4e9ux440ux4e9ux43cux436}{%
+\subsubsection{Хүснэгт 7.5 --- Polling ба WebSocket (60 секунд, 5 төхөөрөмж)}\label{ux445ux4afux441ux43dux44dux433ux442-7.5-polling-ux431ux430-websocket-60-ux441ux435ux43aux443ux43dux434-5-ux442ux4e9ux445ux4e9ux4e9ux440ux4e9ux43cux436}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-& (а) Dex холбогч (LDAP/GitHub) & (б) API дээр имэйлээс зурвасжуулах \\
+& 1 сек polling & WebSocket \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
-Хэрэгжүүлэх хугацаа & & \\
-Үүргийг хаана удирдах вэ & & \\
-Шинэ хэрэглэгч нэмэхэд & & \\
-Үйлдвэрлэлд тохирох уу & & \\
-\textbf{Бидний сонголт ба шалтгаан} & & \\
+Хүсэлт / холболтын тоо & & 1 \\
+Нийт байт & & \\
+Шинэчлэлийн дундаж саатал (мс) & & \\
 \end{longtable}\endgroup
 
-\hypertarget{ux445ux4afux441ux43dux44dux433ux442-4-ux44dux43cux437ux44dux433-ux431ux430ux439ux434ux43bux44bux43d-ux431ux4afux440ux442ux433ux44dux43b-ux433ux43eux43b-ux445ux4afux441ux43dux44dux433ux442}{%
-\subsection{Хүснэгт 4 --- Эмзэг байдлын бүртгэл (ГОЛ ХҮСНЭГТ)}\label{ux445ux4afux441ux43dux44dux433ux442-4-ux44dux43cux437ux44dux433-ux431ux430ux439ux434ux43bux44bux43d-ux431ux4afux440ux442ux433ux44dux43b-ux433ux43eux43b-ux445ux4afux441ux43dux44dux433ux442}}
+\hypertarget{ux430ux43bux445ux430ux43c-6-ux430ux44eux443ux43bux433ux4afux439-ux431ux430ux439ux434ux43bux44bux43d-ux448ux430ux43bux433ux430ux43bux442-30-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 6 --- АЮУЛГҮЙ БАЙДЛЫН ШАЛГАЛТ (30 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-6-ux430ux44eux443ux43bux433ux4afux439-ux431ux430ux439ux434ux43bux44bux43d-ux448ux430ux43bux433ux430ux43bux442-30-ux43cux438ux43d-ux437ux43a}}
+
+\texttt{security\_tests.py} нь \textbf{9 шалгалт} ажиллуулна. Анхаар: \texttt{-\/-tb} тугийг \texttt{-\/-registry} \textbf{орлосон} --- ThingsBoard энэ архитектурт байхгүй.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mkdir} \AttributeTok{{-}p}\NormalTok{ lab07/out}
+\ExtensionTok{python3}\NormalTok{ lab07/security\_tests.py }\AttributeTok{{-}{-}api}\NormalTok{ http://localhost:8000 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}influx}\NormalTok{ http://localhost:8181 }\AttributeTok{{-}{-}registry}\NormalTok{ http://localhost:8090 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}json}\NormalTok{ lab07/out/security{-}before.json}
+\end{Highlighting}
+\end{Shaded}
+
+Гаралт \textbf{хоёр бүлэгт} тусгаарлагдана:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{САНААТАЙ ЭМЗЭГ БАЙДАЛ} --- \texttt{main.py}-ийн \texttt{decode\_token}-д зориудаар үлдээсэн. \textbf{ЯГ 2} байх ёстой; өөр тоо гарвал шалгалт эсвэл API буруу ажиллаж байна.
+\item
+  \textbf{Дэд бүтцийн ноцтой олдвор} --- код биш, тохиргоо. Танилтгүй InfluxDB бол \textbf{бодит} асуудал, гэхдээ "тэр хоёрын" нэг \textbf{биш}. Энэ ялгааг тайланд заавал хадгал.
+\end{itemize}
+
+\textbf{Гараар давтаж батал} --- гарын үсгийн шалгалт:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python3} \AttributeTok{{-}} \OperatorTok{\textless{}\textless{}\textquotesingle{}EOF\textquotesingle{}}
+\StringTok{import base64, json, time, httpx}
+\StringTok{b = lambda d: base64.urlsafe\_b64encode(json.dumps(d).encode()).rstrip(b\textquotesingle{}=\textquotesingle{}).decode()}
+\StringTok{sig = base64.urlsafe\_b64encode(b\textquotesingle{}not{-}a{-}real{-}signature\textquotesingle{}).rstrip(b\textquotesingle{}=\textquotesingle{}).decode()}
+\StringTok{evil = f"\{b(\{\textquotesingle{}alg\textquotesingle{}:\textquotesingle{}RS256\textquotesingle{},\textquotesingle{}typ\textquotesingle{}:\textquotesingle{}JWT\textquotesingle{}\})\}.\{b(\{\textquotesingle{}sub\textquotesingle{}:\textquotesingle{}attacker\textquotesingle{},\textquotesingle{}groups\textquotesingle{}:[\textquotesingle{}admin\textquotesingle{}],\textquotesingle{}exp\textquotesingle{}:time.time()+3600\})\}.\{sig\}"}
+\StringTok{r = httpx.post("http://localhost:8000/graphql", json=\{"query": "\{ whoami \}"\},}
+\StringTok{               headers=\{"Authorization": f"Bearer \{evil\}"\})}
+\StringTok{print(r.json())}
+\OperatorTok{EOF}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{roles=admin} гэж гарвал --- \textbf{та ямар ч нууц үггүйгээр админ боллоо}.
+
+Хугацаа дууссан токеныг ч давт (\texttt{\textquotesingle{}exp\textquotesingle{}:\ time.time()\ -\ 7200}) --- мөн адил \texttt{admin} гарах ёстой. Гурав дахь халдлага: 200 давхар нэрлэсэн (\texttt{a0:\allowbreak{}\ devices(limit:\allowbreak{}50)\{name\}\ a1:\ …\ a199:\ …}) талбартай нэг асуулга --- \texttt{security\_tests.py} үүнийг өөрөө үүсгэж илгээдэг, гаралтын хугацааг тэмдэглэ.
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-7.6-ux430ux44eux443ux43bux433ux4afux439-ux431ux430ux439ux434ux43bux44bux43d-9-ux448ux430ux43bux433ux430ux43bux442ux44bux43d-ux431ux4afux440ux442ux433ux44dux43b}{%
+\subsubsection{Хүснэгт 7.6 --- Аюулгүй байдлын 9 шалгалтын бүртгэл}\label{ux445ux4afux441ux43dux44dux433ux442-7.6-ux430ux44eux443ux43bux433ux4afux439-ux431ux430ux439ux434ux43bux44bux43d-9-ux448ux430ux43bux433ux430ux43bux442ux44bux43d-ux431ux4afux440ux442ux433ux44dux43b}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}@{}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1250}}@{}}
 \toprule
 \begin{minipage}[b]{\linewidth}\raggedright
 \#
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Эмзэг байдал
+Шалгалт
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Ноцтой байдал
+Зэрэглэл
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хэрхэн батлав
+Санаатай уу
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Үр дагавар
+Өмнө
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хэрхэн гараар батлав
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Засвар
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Дахин шалгалт
+Дараа
 \end{minipage} \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
-1 & Токены гарын үсэг шалгагдаагүй & critical & & & & \\
-2 & Хугацаа дууссан токен хүлээн авагдана & high & & & & \\
-3 & Introspection нээлттэй & low & & & & \\
-4 & Асуулгын нийлмэл байдал хязгааргүй & medium & & & & \\
-5 & SQL мөр залгалтаар үүсгэгддэг & high & & & & \\
-6 & InfluxDB танилтгүй & high & & & & \\
+1 & Анонимоор төхөөрөмж жагсаах татгалзсан & high & ✗ & & & & \\
+2 & Хуурамч гарын үсэгтэй токен татгалзсан & \textbf{critical} & \textbf{✓} & & & & \\
+3 & viewer тушаал илгээхийг татгалзсан & high & ✗ & & & & \\
+4 & Хугацаа дууссан токен татгалзсан & \textbf{high} & \textbf{✓} & & & & \\
+5 & Introspection хаагдсан & low & ✓ & & & & \\
+6 & Асуулгын нийлмэл байдлын хязгаар & medium & ✓ & & & & \\
+7 & Тарилгын оролдлого аюулгүй боловсруулагдсан & high & ✗ & & & & \\
+8 & InfluxDB танилтгүй уншигдана & high & ✗ (дэд бүтэц) & & & & \\
+9 & Бүртгэл танилтгүй уншигдана & medium & ✗ (дэд бүтэц) & & & & \\
 \end{longtable}\endgroup
 
-\hypertarget{ux445ux4afux441ux43dux44dux433ux442-5-rbac-ux43cux430ux442ux440ux438ux446}{%
-\subsection{Хүснэгт 5 --- RBAC матриц}\label{ux445ux4afux441ux43dux44dux433ux442-5-rbac-ux43cux430ux442ux440ux438ux446}}
+\hypertarget{ux430ux43bux445ux430ux43c-7-ux437ux430ux441ux430ux445-ux431ux430-ux434ux430ux445ux438ux43d-ux448ux430ux43bux433ux430ux445-45-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 7 --- ЗАСАХ ба дахин шалгах (45 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-7-ux437ux430ux441ux430ux445-ux431ux430-ux434ux430ux445ux438ux43d-ux448ux430ux43bux433ux430ux445-45-ux43cux438ux43d-ux437ux43a}}
+
+\textbf{7.1 Гарын үсэг ба хугацааны шалгалт} (санаатай эмзэг байдал \#1). \texttt{jwt.\allowbreak{}get\_\allowbreak{}unverified\_\allowbreak{}claims(token)} мөрийг солино:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\_JWKS }\OperatorTok{=} \VariableTok{None}
+\KeywordTok{def}\NormalTok{ \_jwks():}
+    \KeywordTok{global}\NormalTok{ \_JWKS}
+    \ControlFlowTok{if}\NormalTok{ \_JWKS }\KeywordTok{is} \VariableTok{None}\NormalTok{:}
+\NormalTok{        \_JWKS }\OperatorTok{=}\NormalTok{ httpx.get(}\SpecialStringTok{f"}\SpecialCharTok{\{}\NormalTok{OIDC\_ISSUER}\SpecialCharTok{\}}\SpecialStringTok{/keys"}\NormalTok{, timeout}\OperatorTok{=}\DecValTok{10}\NormalTok{).json()}
+    \ControlFlowTok{return}\NormalTok{ \_JWKS}
+
+\KeywordTok{def}\NormalTok{ decode\_token(token: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Principal:}
+    \ImportTok{from}\NormalTok{ jose }\ImportTok{import}\NormalTok{ jwt}
+\NormalTok{    claims }\OperatorTok{=}\NormalTok{ jwt.decode(token, \_jwks(),}
+\NormalTok{        algorithms}\OperatorTok{=}\NormalTok{[}\StringTok{"RS256"}\NormalTok{],                 }\CommentTok{\# ← ЗААВАЛ заана}
+\NormalTok{        audience}\OperatorTok{=}\StringTok{"cnc302"}\NormalTok{, issuer}\OperatorTok{=}\NormalTok{OIDC\_ISSUER,}
+\NormalTok{        options}\OperatorTok{=}\NormalTok{\{}\StringTok{"verify\_exp"}\NormalTok{: }\VariableTok{True}\NormalTok{, }\StringTok{"verify\_aud"}\NormalTok{: }\VariableTok{True}\NormalTok{\})}
+\NormalTok{    roles }\OperatorTok{=}\NormalTok{ claims.get(}\StringTok{"groups"}\NormalTok{) }\KeywordTok{or}\NormalTok{ claims.get(}\StringTok{"roles"}\NormalTok{) }\KeywordTok{or}\NormalTok{ [}\StringTok{"viewer"}\NormalTok{]}
+\NormalTok{    ...}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+\textbf{\texttt{algorithms={[}"RS256"{]}}-ийг заавал заа.} Заахгүй бол халдагч \texttt{alg:\ none} (гарын үсэггүй) эсвэл \texttt{alg:\ HS256} (нийтийн түлхүүрийг нууц болгон ашиглах) халдлага хийж болно. Энэ бол JWT-ийн сонгодог эмзэг байдал. \texttt{verify\_exp} нь \#2-р шалгалтыг (хугацаа) нэг зэрэг хаана.
+\end{quote}
+
+\textbf{7.2 Introspection ба нийлмэл байдал} (санаатай эмзэг байдал \#2):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ os}
+\ImportTok{from}\NormalTok{ strawberry.extensions }\ImportTok{import}\NormalTok{ AddValidationRules, QueryDepthLimiter}
+\ImportTok{from}\NormalTok{ graphql.validation }\ImportTok{import}\NormalTok{ NoSchemaIntrospectionCustomRule}
+
+\NormalTok{exts }\OperatorTok{=}\NormalTok{ [QueryDepthLimiter(max\_depth}\OperatorTok{=}\DecValTok{6}\NormalTok{)]}
+\ControlFlowTok{if}\NormalTok{ os.environ.get(}\StringTok{"ENV"}\NormalTok{) }\OperatorTok{==} \StringTok{"production"}\NormalTok{:}
+\NormalTok{    exts.append(AddValidationRules([NoSchemaIntrospectionCustomRule]))}
+\NormalTok{schema }\OperatorTok{=}\NormalTok{ strawberry.Schema(query}\OperatorTok{=}\NormalTok{Query, mutation}\OperatorTok{=}\NormalTok{Mutation, extensions}\OperatorTok{=}\NormalTok{exts)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+\texttt{QueryDepthLimiter} нь \textbf{гүнийг} хязгаарлана, харин шалгалт №6 нь \textbf{өргөнийг} (200 alias) шалгаж байгааг анзаар. Гүнээс гадна талбарын тоог хязгаарлах хэрэгтэй --- тайландаа энэ ялгааг бич.
+\end{quote}
+
+\textbf{7.3 SQL мөр залгалт.} \texttt{Device.readings} дотор \texttt{self.name} шууд SQL-д залгагдаж байна. Хамгийн багадаа шалга: \texttt{if\ not\ re.fullmatch(r"{[}A-Za-z0-9\_-{]}\{1,64\}",\ self.name):\ raise\ ValueError(...)}. (\texttt{Query.device} нь харин Python дээр шүүдэг тул тарилгын гадаргуугүй --- яагаад болохыг тайланд бич.)
+
+\textbf{7.4 Дахин барьж, дахин шалгана:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ app up }\AttributeTok{{-}d} \AttributeTok{{-}{-}build}\NormalTok{ graphql{-}api}
+\FunctionTok{sleep}\NormalTok{ 10}
+\ExtensionTok{python3}\NormalTok{ lab07/security\_tests.py }\AttributeTok{{-}{-}api}\NormalTok{ http://localhost:8000 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}influx}\NormalTok{ http://localhost:8181 }\AttributeTok{{-}{-}registry}\NormalTok{ http://localhost:8090 }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}json}\NormalTok{ lab07/out/security{-}after.json}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Хүлээгдэх:} \texttt{✓\ Санаатай\ эмзэг\ байдал\ илрээгүй\ —\ засвар\ ажиллаж\ байна.\allowbreak{}} Хуучин токен ажиллахаа болино --- \texttt{tok}-оор шинийг ав. Бүх токен татгалзвал \texttt{aud}/\texttt{iss} таарахгүй байна: issuer нь \texttt{http://dex:5556/dex} (контейнер доторх нэр) тул \texttt{OIDC\_ISSUER} мөн тэр утгатай байх ёстой.
+
+\textbf{7.5 RBAC-ыг бодитоор турш:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ U }\KeywordTok{in}\NormalTok{ viewer operator admin}\KeywordTok{;} \ControlFlowTok{do}
+  \BuiltInTok{echo} \StringTok{"── }\VariableTok{$U}\StringTok{ ──"}
+  \ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST localhost:8000/graphql }\AttributeTok{{-}H} \StringTok{"Authorization: Bearer }\VariableTok{$(}\ExtensionTok{tok} \VariableTok{$U)}\StringTok{"} \DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}d} \StringTok{\textquotesingle{}\{"query":"mutation \{ sendCommand(device:\textbackslash{}"dev0001\textbackslash{}", command:\textbackslash{}"reboot\textbackslash{}") \}"\}\textquotesingle{}} \KeywordTok{|} \ExtensionTok{jq} \AttributeTok{{-}c}
+\ControlFlowTok{done}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-7.7-rbac-ux43cux430ux442ux440ux438ux446}{%
+\subsubsection{Хүснэгт 7.7 --- RBAC матриц}\label{ux445ux4afux441ux43dux44dux433ux442-7.7-rbac-ux43cux430ux442ux440ux438ux446}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}lllll@{}}
 \toprule
@@ -458,61 +518,86 @@ ThingsBoard нь WebSocket API-тай. Дэлгэц шинэчлэхийн ту�
 \endhead
 \bottomrule
 \endlastfoot
-Төхөөрөмж жагсаах & ✓ & ✓ & ✓ & \\
-Телеметр унших & ✓ & ✓ & ✓ & \\
-Тушаал илгээх & ✗ & ✓ & ✓ & \\
-Төхөөрөмж үүсгэх & ✗ & ✗ & ✓ & \\
-Төхөөрөмж устгах & ✗ & ✗ & ✓ & \\
-OTA тараах (Лаб 2) & ✗ & ? & ✓ & \\
+\texttt{devices} жагсаах & ✓ & ✓ & ✓ & \\
+\texttt{readings} унших & ✓ & ✓ & ✓ & \\
+\texttt{sendCommand} & ✗ & ✓ & ✓ & \\
+Төхөөрөмж үүсгэх / устгах & ✗ & ✗ & ✓ & \\
+Бүртгэлд шууд хандах (:8090) & ? & ? & ? & \\
 \end{longtable}\endgroup
 
-\hypertarget{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442}{%
-\section{6. Хяналтын асуулт}\label{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442}}
+Сүүлийн мөр нь \textbf{defence in depth}-ийн асуулт: RBAC зөвхөн GraphQL давхаргад л байгаа бол хэн ч :8090 руу шууд хандаж чадна.
+
+\hypertarget{ux430ux43bux445ux430ux43c-8-influxdb---without-auth-ux431ux430-zero-trust-10-ux43cux438ux43d-ux437ux43a}{%
+\subsection{\texorpdfstring{Алхам 8 --- InfluxDB \texttt{-\/-without-auth} ба Zero Trust (10 мин) {[}ЗК{]}}{Алхам 8 --- InfluxDB -\/-without-auth ба Zero Trust (10 мин) {[}ЗК{]}}}\label{ux430ux43bux445ux430ux43c-8-influxdb---without-auth-ux431ux430-zero-trust-10-ux43cux438ux43d-ux437ux43a}}
+
+Энэ курс эхнээс нь InfluxDB-г танилтгүй ажиллуулж ирсэн. Яагаад, ямар үнээр:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST localhost:8181/api/v3/query\_sql }\AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}d} \StringTok{\textquotesingle{}\{"db":"cnc302","q":"SELECT count(*) FROM telemetry","format":"json"\}\textquotesingle{}} \KeywordTok{|} \ExtensionTok{jq}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-7.8-ux437ux430ux441ux432ux430ux440ux44bux43d-ux4e9ux43cux43dux4e9ux445ux434ux430ux440ux430ux430ux445-ux434ux4afux43d}{%
+\subsubsection{Хүснэгт 7.8 --- Засварын өмнөх/дараах дүн}\label{ux445ux4afux441ux43dux44dux433ux442-7.8-ux437ux430ux441ux432ux430ux440ux44bux43d-ux4e9ux43cux43dux4e9ux445ux434ux430ux440ux430ux430ux445-ux434ux4afux43d}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+& Өмнө (\texttt{security-before.json}) & Дараа (\texttt{security-after.json}) \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+ТЭНЦСЭН & & \\
+АНХААР & & \\
+УНАСАН & & \\
+\texttt{deliberate\_criticals} & \textbf{2} & \textbf{0} \\
+\texttt{infra\_criticals} & & \\
+\end{longtable}\endgroup
+
+\textbf{Тайландаа заавал хариул:} яагаад \texttt{-\/-without-auth} нь лабораторид зөвшөөрөгдөх, гэхдээ үйлдвэрлэлд болохгүй вэ? Zero Trust бол юуг шаардах байсан бэ --- гурав нэрлэ (жишээ: үйлчилгээ бүрт өөрийн таних тэмдэг, mTLS эсвэл токен, хамгийн бага эрхийн зарчим, хандалтын аудит лог).
+
+\hypertarget{ux430ux43bux445ux430ux43c-9-git-commit-5-ux43cux438ux43d}{%
+\subsection{Алхам 9 --- Git commit (5 мин)}\label{ux430ux43bux445ux430ux43c-9-git-commit-5-ux43cux438ux43d}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ add lab07/ stack/dex/}
+\FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 7: GraphQL давхарга, OIDC, хоёр эмзэг байдал засагдсан"}
+\FunctionTok{git}\NormalTok{ tag lab07{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\AttributeTok{{-}{-}tags}
+
+\CommentTok{\# ⚠ Нууц ороогүйг ЗААВАЛ шалга — хоёулаа хоосон байх ЁСТОЙ}
+\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}E} \StringTok{\textquotesingle{}\textbackslash{}.env$|\textbackslash{}.key$|devices\textbackslash{}.csv\textquotesingle{}}
+\FunctionTok{grep} \AttributeTok{{-}rn} \StringTok{\textquotesingle{}eyJ\textquotesingle{}}\NormalTok{ lab07/out/ }\KeywordTok{|} \FunctionTok{head}          \CommentTok{\# JWT{-}г тайланд бүү үлдээ}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442ux443ux443ux434}{%
+\section{5. Хяналтын асуултууд}\label{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442ux443ux443ux434}}
+
+Хариулт бүр \textbf{хүснэгтээс тоо иш татсан} байх ёстой.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
-\tightlist
 \item
-  50 төхөөрөмж дээр REST ба GraphQL-ийн хугацааны ялгаа хэд байв? Сүлжээний саатал 200 мс байсан бол ялгаа хэрхэн өөрчлөгдөх вэ?
+  Хүснэгт 7.3-д 50 төхөөрөмж дээр REST ба GraphQL-ийн хугацааны ялгаа хэдэн мс байв? Сүлжээний RTT 200 мс байсан бол REST хэдэн секунд болох вэ (51 × RTT)? GraphQL хэд вэ?
 \item
-  GraphQL ямар шинэ довтолгооны гадаргуу нэмэв? REST-д яагаад тэр асуудал байхгүй вэ?
+  Хүснэгт 7.4-т нэгтгэлийг InfluxDB дээр хийхэд хэдэн дахин хурдан байв, татсан мөрийн тоо хэдэн дахин багассан бэ? 30 хоногийн өгөгдөл дээр энэ харьцаа хэрхэн өөрчлөгдсөн бэ?
 \item
-  \texttt{algorithms={[}"RS256"{]}}-ийг заахгүй бол ямар халдлага боломжтой болох вэ? (\texttt{alg:\ none}, \texttt{alg:\ HS256} халдлагыг тайлбарла.)
+  Хүснэгт 7.5-д polling ба WebSocket-ийн байтын ялгаа хэд байв? 1000 хэрэглэгчтэй үед polling серверт хэдэн хүсэлт/секунд өгөх вэ?
 \item
-  Танилт ба эрхийн ялгааг өөрийн жишээгээр тайлбарла. Аль нэгийг нь мартвал юу болох вэ?
+  Хүснэгт 7.6-д \textbf{санаатай} эмзэг байдал хэд байв, \textbf{дэд бүтцийн} олдвор хэд байв? Эдгээрийг яагаад ялгаж дүгнэх шаардлагатай вэ? (Санамж: аль нь код засаж, аль нь тохиргоо засаж шийдэгддэг вэ.)
 \item
-  Токеныг цуцлах (revoke) хэрхэн ажилладаг вэ? JWT нь \textbf{төлөвгүй} тул энэ яагаад хэцүү вэ? Лаб 2-ын сертификат цуцлалттай ямар төстэй вэ?
+  \texttt{algorithms={[}"RS256"{]}}-ийг заахгүй бол ямар хоёр халдлага боломжтой болох вэ? \texttt{alg:\ none} ба \texttt{alg:\ HS256} халдлагыг тус тус тайлбарла.
 \item
-  InfluxDB \texttt{-\/-without-auth} горимд ажиллаж байгаа нь Zero Trust-ын аль зарчмыг зөрчиж байна вэ?
+  Токеныг цуцлах (revoke) хэрхэн ажилладаг вэ? JWT нь \textbf{төлөвгүй} тул энэ яагаад хэцүү вэ? Лаб 2-ын сертификат цуцлалт (Хүснэгт 2.7) болон MQTT session цуцлалттай ямар төстэй вэ?
 \item
-  Хэрэглэгч \texttt{viewer} эрхтэй боловч InfluxDB-д шууд хандаж чадвал RBAC ямар утгатай вэ? (Санамж: \textbf{defence in depth}.)
-\item
-  Асуулгын нийлмэл байдлын хязгаарыг хэрхэн тогтоох вэ? Хэт бага бол юу болох вэ?
+  Хүснэгт 7.7-гийн сүүлийн мөр: \texttt{viewer} эрхтэй хэрэглэгч :8090 эсвэл :8181 руу шууд хандаж чадвал RBAC ямар утгатай вэ? Zero Trust-д үүнийг хэрхэн хаах вэ (Хүснэгт 7.8-ын гурван шаардлагыг иш тат)?
 \end{enumerate}
 
-\hypertarget{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux448ux430ux430ux440ux434ux43bux430ux433ux430}{%
-\section{7. Тайлангийн шаардлага}\label{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux448ux430ux430ux440ux434ux43bux430ux433ux430}}
-
-\begin{itemize}
-\tightlist
-\item[$\square$]
-  Хүснэгт 1--5 бүрэн
-\item[$\square$]
-  \texttt{security-before.json} ба \texttt{security-after.json} --- өмнөх/дараах харьцуулалт
-\item[$\square$]
-  \texttt{decode\_token}-ийн засварласан код (diff хэлбэрээр)
-\item[$\square$]
-  \texttt{deviceStats} талбарын хэрэгжүүлэлт
-\item[$\square$]
-  Гурван үүргээр туршсан гаралт
-\item[$\square$]
-  Хяналтын 8 асуултын хариулт
-\item[$\square$]
-  Git tag \texttt{lab07-done}
-\end{itemize}
-
-\hypertarget{ux43eux43dux43eux448ux438ux43bux433ux43eux43e}{%
-\section{8. Оношилгоо}\label{ux43eux43dux43eux448ux438ux43bux433ux43eux43e}}
+\hypertarget{ux445ux4afux43bux44dux44dux43bux433ux44dux43d-ux4e9ux433ux4e9ux445-ux437ux4afux439ux43b}{%
+\section{6. Хүлээлгэн өгөх зүйл}\label{ux445ux4afux43bux44dux44dux43bux433ux44dux43d-ux4e9ux433ux4e9ux445-ux437ux4afux439ux43b}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
@@ -520,7 +605,59 @@ OTA тараах (Лаб 2) & ✗ & ? & ✓ & \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
 \toprule
 \begin{minipage}[b]{\linewidth}\raggedright
-Шинж тэмдэг
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Зүйл
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Байрлал
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & Тайлан (Хүснэгт 7.1--7.8 бөглөсөн) & \texttt{lab07/report.md} → PDF \\
+2 & Шалгалтын өмнөх/дараах JSON & \texttt{lab07/\allowbreak{}out/\allowbreak{}security-before.\allowbreak{}json}, \texttt{security-after.json} \\
+3 & \texttt{decode\_token} ба схемийн засвар (diff хэлбэрээр) & тайлангийн хавсралт \\
+4 & \texttt{deviceStats} ба WebSocket/subscription хэрэгжүүлэлт & \texttt{lab07/\allowbreak{}graphql-api/\allowbreak{}main.\allowbreak{}py} \\
+5 & Git tag & \texttt{lab07-done} \\
+\end{longtable}\endgroup
+
+\hypertarget{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}{%
+\section{7. Үнэлгээний шалгуур (10 оноо)}\label{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Шалгуур
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Оноо
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+REST/GraphQL харьцуулалт хэмжигдэж, \texttt{deviceStats} хэрэгжсэн & 2 \\
+OIDC нэвтрэлт ажиллаж, үүргийн эх сурвалж шийдэгдсэн & 1 \\
+Хоёр санаатай эмзэг байдал олдож, \textbf{гараар} батлагдсан & 2 \\
+Засвар кодод хэрэгжиж, \texttt{security-after} дээр \texttt{deliberate\_criticals\ =\allowbreak{}\ 0} & 3 \\
+WebSocket / subscription ажиллаж, Хүснэгт 7.5 бөглөгдсөн & 1 \\
+RBAC матриц бодитоор туршсан, Zero Trust дүгнэлт үндэслэлтэй & 1 \\
+\end{longtable}\endgroup
+
+\textbf{Автомат 0 оноо:} засварыг зөвхөн тайланд бичээд кодод хэрэгжүүлээгүй бол.
+
+\hypertarget{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}{%
+\section{8. Түгээмэл алдаа}\label{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Шинж
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Шалтгаан
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -531,29 +668,10 @@ OTA тараах (Лаб 2) & ✗ & ? & ✓ & \\
 \bottomrule
 \endlastfoot
 \texttt{graphql-api} эхлэхгүй & build алдаа & \texttt{docker\ compose\ logs\ graphql-api} \\
-\texttt{/health} degraded & ThingsBoard/InfluxDB унтарсан & \texttt{make\ health} \\
-Dex \texttt{password} grant татгалзана & grant идэвхгүй & \texttt{staticClients}-д \texttt{public:\ true} эсвэл code flow \\
-\texttt{whoami} үргэлж viewer & Dex статик хэрэглэгчид groups байхгүй & Алхам 3.3 \\
-Засварын дараа бүх токен татгалзана & \texttt{audience}/\texttt{issuer} таарахгүй & токенийг задлан \texttt{aud}, \texttt{iss}-ийг хар \\
-\texttt{security\_tests.py} холбогдохгүй & буруу \texttt{-\/-api} & \texttt{curl\ localhost:8000/health} \\
-JWKS татахгүй & \texttt{OIDC\_ISSUER} контейнер дотроос \texttt{dex:5556} байх ёстой & орчны хувьсагчийг шалга \\
+\texttt{\{\ devices\ \}} → эрх байхгүй & токенгүй хүсэлт & Алхам 2-оор токен ав \\
+Dex \texttt{password} grant татгалзана & grant идэвхгүй & \texttt{passwordConnector:\allowbreak{}\ local}, эсвэл code flow \\
+\texttt{whoami} үргэлж \texttt{viewer} & Dex статик хэрэглэгчид \texttt{groups} байхгүй & Алхам 2.3--2.4 \\
+JWKS татагдахгүй & \texttt{OIDC\_ISSUER} буруу & контейнер дотроос \texttt{http://dex:5556/dex} байх ёстой \\
+\texttt{readings} хоосон & {[}Pi{]} агент зогссон / гүүр тасарсан & {[}Pi{]} \texttt{make\ link} → \texttt{bridge/state\ 1} \\
+Шалгалт "санаатай 0" гэнэ (засварын өмнө) & API дахин баригдаагүй & \texttt{up\ -d\ -\/\allowbreak{}-build\ graphql-api} \\
 \end{longtable}\endgroup
-
-\hypertarget{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}{%
-\section{9. Үнэлгээний шалгуур (10 оноо)}\label{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}}
-
-\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
-\toprule
-Шалгуур & Оноо \\
-\midrule
-\endhead
-\bottomrule
-\endlastfoot
-GraphQL ба REST харьцуулалт хэмжигдсэн, \texttt{deviceStats} хэрэгжсэн & 2 \\
-OIDC нэвтрэлт ажиллаж, үүргийн эх сурвалж шийдэгдсэн & 2 \\
-Эмзэг байдал олдож, гараар батлагдсан & 2 \\
-Гарын үсэг ба хугацааны шалгалт засагдаж, \texttt{security-after} цэвэр & 3 \\
-RBAC матриц бодитоор туршсан үр дүнтэй & 1 \\
-\end{longtable}\endgroup
-
-\textbf{Автомат 0 оноо:} засварыг зөвхөн тайланд бичээд кодод хэрэгжүүлээгүй бол.

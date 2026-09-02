@@ -11,17 +11,37 @@ CNC302 Лаб 5 — Өгөгдлийн бүрэн бүтэн байдлыг ХЭ
   2. verify  — цаг цувааны сангаас тэр дугааруудыг асууж, аль нь
      хүрээгүйг олно → алдагдлын хувь, тасалдлын урт, сэргэх хугацаа
 
+── ХОЁР ЗАМ (--via) ────────────────────────────────────────────────────────
+Стек хоёр хостод хуваагдсан тул мессеж хоёр өөр замаар InfluxDB хүрч болно:
+
+  --via direct  зөөврийн компьютерийн EMQX рүү ШУУД. Ирмэгийн гүүр оролцохгүй.
+  --via edge    Pi 3B дээрх mosquitto руу. Тэндээс ГҮҮР (bridge) нь үүл рүү
+                дамжуулна. Уплинк тасрахад гүүр мессежийг ДИСКЭНД дараалуулж
+                (store-and-forward) дараа нь дамжуулна — ЭНЭ БОЛ ЛАБ 5-ын
+                гол хэмжилт. `--via` нь JSONL болон meta-д бичигдэнэ.
+
+── ГҮҮР УНАСАН ҮЕИЙН АЛДАГДЛЫГ ТУСАД НЬ (--bridge-log) ─────────────────────
+Гүүрний төлөв `cnc302/<site>/<area>/<line>/<device>/bridge/state` сэдэвт
+нийтлэгддэг (1 = холбогдсон, 0 = тасарсан). Түүнийг зэрэг бичиж авбал verify
+нь алдагдлыг ГҮҮР УНАСАН ба АЖИЛЛАЖ БАЙСАН үе гэж ХУВААЖ тайлагнана:
+
+  mosquitto_sub -h localhost -F '{"ts":%U,"state":%p}' \\
+      -t 'cnc302/shutis/mhts/lab/pi3b-01/bridge/state' > lab05/out/bridge.jsonl
+
+Store-and-forward зөв ажиллаж байвал гүүр унасан үеийн алдагдал ч 0 байх
+ёстой — ЯГ ЭНЭ ЗӨРҮҮГ хэмжинэ.
+
 Жишээ:
-  # 1-р терминал: 5 минут, секундэд 10 мессеж
-  python data_integrity.py publish --host pi-team03.local \\
+  # 1-р терминал (Pi дээр): 5 минут, секундэд 10 мессеж, ирмэгээр дамжина
+  python data_integrity.py publish --via edge --host localhost \\
       --rate 10 --seconds 300 --run-id run1
 
-  # 2-р терминал: энэ хооронд эвдрэл үүсгэнэ
-  bash failure_inject.sh broker 30
+  # 2-р терминал (Pi дээр): энэ хооронд уплинкийг таслана
+  bash failure_inject.sh uplink-down 30
 
-  # Дараа нь шалгана
-  python data_integrity.py verify --influx http://pi-team03.local:8181 \\
-      --run-id run1
+  # Дараа нь шалгана (InfluxDB нь зөөврийн компьютер дээр)
+  python data_integrity.py verify --influx http://192.168.1.100:8181 \\
+      --run-id run1 --bridge-log lab05/out/bridge.jsonl
 """
 from __future__ import annotations
 
@@ -35,8 +55,16 @@ import paho.mqtt.client as mqtt
 import requests
 from paho.mqtt.enums import CallbackAPIVersion
 
-TOPIC = "cnc302/ulaanbaatar/campus/line01/integrity/telemetry"
+# UNS: cnc302/<site>/<area>/<line>/<device>/<channel>
+# Ирмэгийн гүүр нь cnc302/<site>/# сэдвийг л үүл рүү дамжуулдаг тул site нь
+# edge/.env-ийн SITE-тэй ЗААВАЛ таарна (анхдагч: shutis/mhts/lab).
+TOPIC = "cnc302/shutis/mhts/lab/integrity/telemetry"
 MEASUREMENT = "integrity"
+
+VIA_LABEL = {
+    "edge": "Pi 3B → ирмэгийн mosquitto → гүүр → EMQX (store-and-forward)",
+    "direct": "EMQX рүү шууд (гүүр оролцохгүй)",
+}
 
 
 # ────────────────────────────── PUBLISH ──────────────────────────────
@@ -44,6 +72,13 @@ MEASUREMENT = "integrity"
 def cmd_publish(a) -> int:
     os.makedirs(a.outdir, exist_ok=True)
     logpath = os.path.join(a.outdir, f"{a.run_id}-sent.jsonl")
+
+    print(f"→ Зам (--via): {a.via} — {VIA_LABEL[a.via]}", file=sys.stderr)
+    print(f"→ Брокер: {a.host}:{a.port}   сэдэв: {TOPIC}", file=sys.stderr)
+    if a.via == "edge":
+        print("→ Санамж: гүүрний төлөвийг зэрэг бичиж авбал verify нь алдагдлыг "
+              "гүүр унасан/ажилласан үеэр нь хуваана (--bridge-log).",
+              file=sys.stderr)
 
     sent = 0
     failed = 0
@@ -100,7 +135,9 @@ def cmd_publish(a) -> int:
                 sent += 1
             else:
                 failed += 1
-            log.write(json.dumps({**payload, "published": ok}) + "\n")
+            # `via` мөр бүрт бичигдэнэ: нэг фолдерт хоёр замын лог хамт байхад
+            # хожим ялгах боломжтой байх ёстой.
+            log.write(json.dumps({**payload, "published": ok, "via": a.via}) + "\n")
 
             if sent % (a.rate * 10) == 0 and sent:
                 print(f"  [{time.strftime('%H:%M:%S')}] илгээв={sent} "
@@ -111,7 +148,8 @@ def cmd_publish(a) -> int:
     c.loop_stop()
     c.disconnect()
 
-    meta = {"run_id": a.run_id, "topic": TOPIC, "qos": a.qos,
+    meta = {"run_id": a.run_id, "via": a.via, "broker": f"{a.host}:{a.port}",
+            "topic": TOPIC, "qos": a.qos,
             "rate": a.rate, "seconds": a.seconds,
             "attempted": sent + failed, "published_ok": sent,
             "publish_failed": failed,
@@ -184,6 +222,120 @@ def find_gaps(sent: list[int], got: set[int]) -> list[tuple[int, int]]:
     return gaps
 
 
+# ───────────────── ГҮҮРНИЙ ТӨЛӨВ (bridge/state) — цэвэр функцууд ─────────────────
+# Эдгээр функц нь сүлжээ, файл, цаг ашиглахгүй — зөвхөн өгөгдөл хувиргана.
+# Тиймээс find_gaps-ийн адил нэгж тестээр шалгахад хялбар.
+
+def _to_ms(v: float) -> int:
+    """Секунд эсвэл миллисекундыг миллисекунд болгож жигдрүүлнэ."""
+    v = float(v)
+    return int(v) if v > 1e12 else int(v * 1000)
+
+
+def parse_bridge_events(lines) -> list[tuple[int, int]]:
+    """
+    JSONL мөрүүдээс (ts_ms, state) хосуудыг эрэмбэлж гаргана. state: 1|0.
+    Танигдах түлхүүрүүд: ts/time/timestamp ба state/value/payload.
+    Танихгүй, хоосон, эвдэрсэн мөрийг чимээгүй алгасна.
+    """
+    out: list[tuple[int, int]] = []
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            d = json.loads(line)
+        except (ValueError, TypeError):
+            continue
+        if not isinstance(d, dict):
+            continue
+        ts = d.get("ts", d.get("time", d.get("timestamp")))
+        st = d.get("state", d.get("value", d.get("payload")))
+        if ts is None or st is None:
+            continue
+        try:
+            out.append((_to_ms(ts), 1 if int(str(st).strip()) else 0))
+        except (ValueError, TypeError):
+            continue
+    out.sort(key=lambda e: e[0])
+    return out
+
+
+def bridge_down_intervals(events: list[tuple[int, int]],
+                          end_ms: int | None = None) -> list[tuple[int, int]]:
+    """
+    (ts, state) цувааг ГҮҮР УНАСАН завсруудын жагсаалт болгоно.
+    Төлөв 0 болсноос 1 болтол = нэг завсар. Эцэст нь 0-оор дуусвал `end_ms`
+    хүртэл (эсвэл дуусаагүй гэж үзэж хамгийн том утга хүртэл) үргэлжилнэ.
+    """
+    intervals: list[tuple[int, int]] = []
+    down_from: int | None = None
+    for ts, st in events:
+        if st == 0 and down_from is None:
+            down_from = ts
+        elif st == 1 and down_from is not None:
+            intervals.append((down_from, ts))
+            down_from = None
+    if down_from is not None:
+        intervals.append((down_from, end_ms if end_ms is not None else 2**62))
+    return intervals
+
+
+def in_any_interval(ts: int, intervals: list[tuple[int, int]]) -> bool:
+    return any(lo <= ts < hi for lo, hi in intervals)
+
+
+def split_by_bridge(seqs: list[int], ts_by_seq: dict[int, int],
+                    down: list[tuple[int, int]]) -> tuple[list[int], list[int]]:
+    """seq-үүдийг (гүүр УНАСАН үед илгээсэн, ГҮҮР АЖИЛЛАЖ байхад илгээсэн)."""
+    while_down, while_up = [], []
+    for s in seqs:
+        ts = ts_by_seq.get(s)
+        if ts is not None and in_any_interval(ts, down):
+            while_down.append(s)
+        else:
+            while_up.append(s)
+    return while_down, while_up
+
+
+def report_bridge_split(sent_ok, lost, ts_by_seq, down) -> dict:
+    """Гүүр унасан/ажилласан үеийн алдагдлыг тусад нь хэвлэж, дүнг буцаана."""
+    sent_down, sent_up = split_by_bridge(sent_ok, ts_by_seq, down)
+    lost_down, lost_up = split_by_bridge(lost, ts_by_seq, down)
+
+    total_down_s = sum(
+        (min(hi, 2**62) - lo) / 1000.0 for lo, hi in down if hi < 2**62)
+    print("\n  ── ГҮҮРНИЙ ТӨЛӨВӨӨР ХУВААСАН АЛДАГДАЛ ──")
+    print(f"  Гүүр унасан удаа      : {len(down)}  "
+          f"(нийт ~{total_down_s:.1f} сек)")
+    print(f"  {'':<22} {'илгээсэн':>10} {'алдагдсан':>10} {'алдалт%':>9}")
+    for name, s_list, l_list in (("гүүр УНАСАН үед", sent_down, lost_down),
+                                 ("гүүр АЖИЛЛАЖ байхад", sent_up, lost_up)):
+        pct = 100.0 * len(l_list) / max(len(s_list), 1)
+        print(f"  {name:<22} {len(s_list):>10} {len(l_list):>10} {pct:>8.2f}%")
+
+    if sent_down and not lost_down:
+        print("  ✓ Гүүр унасан үеийн мессеж БҮГД хүрсэн — store-and-forward "
+              "ажиллаж байна.")
+    elif lost_down:
+        print("  ⚠ Гүүр унасан үед мессеж алдагдсан. Шалтгаан нь ихэвчлэн: "
+              "cleansession true,\n    max_queued_messages дүүрсэн, эсвэл "
+              "QoS 0 (queue_qos0_messages унтраалттай).")
+
+    return {
+        "bridge_down_events": len(down),
+        "bridge_down_seconds": round(total_down_s, 1),
+        "sent_while_bridge_down": len(sent_down),
+        "lost_while_bridge_down": len(lost_down),
+        "loss_pct_while_bridge_down": round(
+            100.0 * len(lost_down) / max(len(sent_down), 1), 3),
+        "sent_while_bridge_up": len(sent_up),
+        "lost_while_bridge_up": len(lost_up),
+        "loss_pct_while_bridge_up": round(
+            100.0 * len(lost_up) / max(len(sent_up), 1), 3),
+    }
+
+
 def cmd_verify(a) -> int:
     meta_path = os.path.join(a.outdir, f"{a.run_id}-meta.json")
     log_path = os.path.join(a.outdir, f"{a.run_id}-sent.jsonl")
@@ -207,7 +359,11 @@ def cmd_verify(a) -> int:
     lost = [s for s in sent_ok if s not in got]
     gaps = find_gaps(sent_ok, got)
 
+    via = meta.get("via", sent_rows[0].get("via", "тодорхойгүй") if sent_rows else "тодорхойгүй")
+
     print(f"\n{'═'*66}\n  ӨГӨГДЛИЙН БҮРЭН БҮТЭН БАЙДАЛ — {a.run_id}\n{'═'*66}")
+    print(f"  Зам (--via)           : {via}"
+          + (f" — {VIA_LABEL[via]}" if via in VIA_LABEL else ""))
     print(f"  Илгээсэн (амжилттай)  : {len(sent_ok)}")
     print(f"  Сан дотор олдсон      : {len(got & set(sent_ok))}")
     print(f"  АЛДАГДСАН             : {len(lost)}  "
@@ -230,13 +386,34 @@ def cmd_verify(a) -> int:
     else:
         print("\n  ✓ Тасалдал илрээгүй — бүх мессеж хүрсэн.")
 
-    result = {"run_id": a.run_id, "sent_ok": len(sent_ok),
+    # ── Гүүрний төлөвөөр хуваасан тайлан (--bridge-log өгөгдсөн бол) ──
+    bridge_result: dict = {}
+    if a.bridge_log:
+        if not os.path.exists(a.bridge_log):
+            print(f"\n  ⚠ --bridge-log олдсонгүй: {a.bridge_log} — алгаслаа",
+                  file=sys.stderr)
+        else:
+            with open(a.bridge_log, encoding="utf-8") as bf:
+                events = parse_bridge_events(bf)
+            if not events:
+                print(f"\n  ⚠ {a.bridge_log} дотор танигдах bridge/state мөр алга "
+                      f"— алгаслаа", file=sys.stderr)
+            else:
+                last_ts = max(ts_by_seq.values()) if ts_by_seq else None
+                down = bridge_down_intervals(events, end_ms=last_ts)
+                bridge_result = report_bridge_split(sent_ok, lost, ts_by_seq, down)
+    elif via == "edge":
+        print("\n  Санамж: --bridge-log өгвөл алдагдлыг гүүр унасан/ажилласан "
+              "үеэр нь ХУВААЖ харуулна.")
+
+    result = {"run_id": a.run_id, "via": via, "sent_ok": len(sent_ok),
               "stored": len(got & set(sent_ok)), "lost": len(lost),
               "loss_pct": round(100*len(lost)/max(len(sent_ok), 1), 3),
               "gaps": [{"from": s, "to": e, "count": e-s+1,
                         "seconds": round((ts_by_seq.get(e, 0)
                                           - ts_by_seq.get(s, 0))/1000, 1)}
                        for s, e in gaps],
+              **bridge_result,
               **{k: meta[k] for k in ("disconnects", "reconnects",
                                       "publish_failed", "qos")}}
     outp = os.path.join(a.outdir, f"{a.run_id}-result.json")
@@ -251,6 +428,11 @@ def main() -> int:
     sub = p.add_subparsers(dest="cmd", required=True)
 
     pub = sub.add_parser("publish")
+    pub.add_argument("--via", choices=["edge", "direct"], default="direct",
+                     help=("аль замаар илгээж байгааг тэмдэглэнэ (JSONL болон "
+                           "meta-д бичигдэнэ). edge = Pi-гийн mosquitto → гүүр "
+                           "→ EMQX (store-and-forward-ыг хэмжинэ); "
+                           "direct = EMQX рүү шууд. Анхдагч: direct"))
     pub.add_argument("--host", default="localhost")
     pub.add_argument("--port", type=int, default=1883)
     pub.add_argument("--rate", type=float, default=10, help="мессеж/сек")
@@ -264,6 +446,14 @@ def main() -> int:
     ver.add_argument("--db", default="cnc302")
     ver.add_argument("--run-id", required=True)
     ver.add_argument("--outdir", default="lab05/out")
+    ver.add_argument("--bridge-log", default=None,
+                     help=("гүүрний төлөвийн JSONL файл ({\"ts\":…,\"state\":0|1}). "
+                           "Өгвөл алдагдлыг гүүр УНАСАН ба АЖИЛЛАЖ байсан үеэр "
+                           "нь тусад нь тайлагнана. Бичиж авах нь:  "
+                           "mosquitto_sub -h localhost "
+                           "-F '{\"ts\":%%U,\"state\":%%p}' "
+                           "-t 'cnc302/shutis/mhts/lab/pi3b-01/bridge/state' "
+                           "> lab05/out/bridge.jsonl"))
     ver.add_argument("--influx2", action="store_true",
                      help="InfluxDB 2.7 нөөц хувилбар ашиглаж байгаа бол")
     ver.add_argument("--org", default="cnc302")

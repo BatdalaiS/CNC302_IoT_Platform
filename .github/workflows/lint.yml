@@ -15,7 +15,7 @@ jobs:
 
       - name: Python синтакс
         run: |
-          python -m compileall -q tools lab02 lab03 lab04 lab05 lab06 lab07 lab08 manual
+          python -m compileall -q tools edge lab02 lab03 lab04 lab05 lab06 lab07 lab08 manual
           echo "✓ бүх .py хөрвүүлэгдэв"
 
       - name: Shell синтакс
@@ -42,13 +42,13 @@ jobs:
         working-directory: stack
         run: |
           cp .env.example .env
-          sed -i 's/солино[^ ]*/ci-test-value/g' .env
+          sed -i 's/^\(EMQX_API_KEY\|EMQX_API_SECRET\)=$/\1=ci-test-value/' .env
           docker compose --profile core --profile pipeline --profile app --profile ai config > /dev/null
           echo "✓ compose схем зөв"
 
       - name: Нууц файл ороогүй эсэх
         run: |
-          if git ls-files | grep -E '(^|/)\.env$|\.key$|\.pem$|\.crt$'; then
+          if git ls-files | grep -E '(^|/)\.env$|\.key$|\.pem$|\.crt$|conf\.d/bridge\.conf$|devices\.csv$'; then
             echo "✗ Нууц файл санд орсон байна!"; exit 1
           fi
           echo "✓ нууц файл ороогүй"

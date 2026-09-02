@@ -4,26 +4,43 @@ CNC302 Лаб 8 — GenAI аналитик: байгалийн хэлээр ца
 
 Урсгал:
   асуулт (монгол/англи)
-      ↓ Ollama (локал LLM, Pi дээр)
+      ↓ Ollama (ЗӨӨВРИЙН КОМПЬЮТЕР дээрх локал LLM, :11434)
   SQL асуулга
       ↓ ХАМГААЛАЛТЫН ШҮҮЛТ  ← энэ хэсэг хамгийн чухал
-  InfluxDB 3
+  InfluxDB 3 (ЗӨӨВРИЙН КОМПЬЮТЕР, :8181)
       ↓ мөрүүд
       ↓ Ollama (хариу боловсруулах)
   байгалийн хэлээр хариулт
+
+⚠ ЯАГААД LLM НЬ PI ДЭЭР БИШ ВЭ:
+  Raspberry Pi 3B-д НИЙТ 1 GB санах ой (практикт ~880 MiB сул) байна.
+  Хамгийн жижиг ашигтай загвар болох qwen2.5:1.5b нь q4 квантчилалтай ч
+  ~1.1–1.5 GiB жинтэй, дээрээс нь KV кэш, Ollama-гийн ажиллах орчин
+  нэмэгдэнэ. Өөрөөр хэлбэл Ollama Pi 3B дээр ЗҮГЭЭР Л АЖИЛЛАХГҮЙ —
+  OOM болж унана (ARMv8 дээр GPU/NPU дэмжлэг ч байхгүй, зөвхөн
+  4×A53 CPU). Тиймээс LLM нь ҮҮЛНИЙ давхаргад (зөөврийн компьютер)
+  амьдарч, Pi нь ИРМЭГИЙН үүргээ хадгална: мэдрэгч, шүүлт, жижиг
+  TFLite дүгнэлт, store-and-forward. Энэ бол архитектурын шийдвэр —
+  "юуг хаана тооцоолох вэ" гэсэн лабораторийн гол асуултын хариу.
 
 ⚠ ГОЛ СУРГАМЖ: LLM бол ИТГЭМЖЛЭГДЭХГҮЙ оролт үүсгэгч. Түүний гаргасан
 SQL-ийг шууд ажиллуулах нь хэрэглэгчийн оруулсан SQL-ийг шууд ажиллуулахтай
 адил. Тиймээс `guard_sql()` функц заавал шаардлагатай.
 
+  # Зөөврийн компьютер дээр (энгийн тохиолдол)
   python3 ask.py "сүүлийн 6 цагт хамгийн их чичиргээтэй 5 төхөөрөмж аль нь вэ"
   python3 ask.py --show-sql "dev0001-ийн өнөөдрийн дундаж температур"
   python3 ask.py --dry-run "ямар нэг зүйл"        # LLM-гүй, шүүлтийг турших
+
+  # Pi 3B дээрээс асуух бол зөөврийн компьютерийн IP-г заана
+  python3 ask.py --ollama http://192.168.1.100:11434 \\
+      --influx http://192.168.1.100:8181 "сүүлийн цагийн дундаж хэм"
 """
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 import time
@@ -33,10 +50,10 @@ import httpx
 SCHEMA_DOC = """
 Хүснэгт: telemetry
   time            TIMESTAMP   — хэмжилтийн агшин
-  site            VARCHAR     — байршил (ж: ulaanbaatar)
-  area            VARCHAR     — талбай (ж: campus)
-  line            VARCHAR     — шугам (ж: line01)
-  device          VARCHAR     — төхөөрөмжийн ID (ж: dev0001)
+  site            VARCHAR     — байршил (ж: shutis)
+  area            VARCHAR     — талбай (ж: mhts)
+  line            VARCHAR     — шугам (ж: lab)
+  device          VARCHAR     — төхөөрөмжийн ID (ж: pi3b-01, dev0001)
   temperature     DOUBLE      — хэм, °C
   humidity        DOUBLE      — чийг, %
   vibration_rms   DOUBLE      — чичиргээний RMS
@@ -139,11 +156,16 @@ def influx_sql(base: str, db: str, q: str) -> list[dict]:
 def main() -> int:
     p = argparse.ArgumentParser(description="GenAI аналитик (Ollama + InfluxDB)")
     p.add_argument("question", nargs="+")
-    p.add_argument("--ollama", default="http://localhost:11434")
-    p.add_argument("--model", default="qwen2.5:1.5b",
-                   help="Pi дээр 3B-ээс дээш загвар хэт удаан")
-    p.add_argument("--influx", default="http://localhost:8181")
-    p.add_argument("--db", default="cnc302")
+    # Ollama ба InfluxDB хоёул ҮҮЛНИЙ давхаргад (зөөврийн компьютер).
+    # Pi 3B дээрээс ажиллуулбал localhost биш, компьютерийн LAN IP-г заа.
+    p.add_argument("--ollama", default=os.getenv("OLLAMA_URL",
+                                                 "http://localhost:11434"))
+    p.add_argument("--model", default=os.getenv("OLLAMA_MODEL", "qwen2.5:1.5b"),
+                   help="зөөврийн компьютер дээр ажиллана; 7B-ээс дээш "
+                        "загвар CPU дээр хэт удаан")
+    p.add_argument("--influx", default=os.getenv("INFLUX_URL",
+                                                 "http://localhost:8181"))
+    p.add_argument("--db", default=os.getenv("INFLUX_DB", "cnc302"))
     p.add_argument("--show-sql", action="store_true")
     p.add_argument("--no-answer", action="store_true",
                    help="зөвхөн SQL ба мөрүүдийг харуулна")

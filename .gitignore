@@ -1,9 +1,18 @@
 # Нууц ба орчны файлууд — ХЭЗЭЭ Ч commit хийхгүй
 stack/.env
+edge/.env
 **/*.key
 **/*.pem
 **/*_key
 secrets/
+
+# Ирмэгийн гүүрний тохиргоо — LAN IP ба нэвтрэлт агуулна.
+# Загвар нь (.template) Git-д байна; үүсгэсэн файл нь ОРОХГҮЙ.
+edge/mosquitto/conf.d/bridge.conf
+
+# Бүртгэлийн үйлчилгээний өгөгдөл (SQLite, firmware дүрс)
+lab02/registry/*.db
+lab02/registry/firmware/
 
 # Сертификатууд (Лаб 2-т үүсгэнэ)
 stack/emqx/certs/*
@@ -56,14 +65,3 @@ lab07/out/*
 !lab07/out/.gitkeep
 lab08/out/*
 !lab08/out/.gitkeep
-
-# LaTeX-ийн түр файлууд
-manual/*.aux
-manual/*.log
-manual/*.out
-manual/*.toc
-manual/*.fls
-manual/*.fdb_latexmk
-manual/*.synctex.gz
-manual/chapters/*.aux
-manual/p-*.jpg
