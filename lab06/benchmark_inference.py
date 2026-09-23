@@ -7,8 +7,8 @@ CNC302 Лаб 6 — Ирмэгийн дүгнэлтийн гүйцэтгэлий
 
 ⚠ ХУРДАСГУУР БАЙХГҮЙ. Pi 3B-д PCIe байхгүй тул Raspberry Pi AI Kit
   (Hailo-8L) ФИЗИКИЙН ХУВЬД холбогдох боломжгүй. Тиймээс энэ хэрэгсэлд
-  hailo backend БАЙХГҮЙ. Бүх хэмжилт 4×Cortex-A53 @1.2 ГГц CPU дээр
-  (NEON бий, крипто өргөтгөл байхгүй) хийгдэнэ.
+  hailo backend БАЙХГҮЙ (AI Kit нь Raspberry Pi 5-ын PCIe-д зориулагдсан).
+  Бүх хэмжилт BCM2837, 4 цөмт 1.2 ГГц CPU дээр хийгдэнэ.
 
 ⚠ MobileNet-ийн зэрэглэлийн зурган загвар Pi 3B дээр ЗОРИУДААР хэт удаан.
   Хэдэн зуун мс, бүр секунд гарна — энэ нь алдаа биш, ХЭМЖИХ ЁСТОЙ БАРИМТ.
@@ -17,14 +17,19 @@ CNC302 Лаб 6 — Ирмэгийн дүгнэлтийн гүйцэтгэлий
   (3–5 оролт, хэдэн KiB) — edge/agent/edge_agent.py яг түүнийг ачаална.
 
 Дэмжигдэх backend:
-  tflite      TensorFlow Lite / LiteRT (.tflite)     — CPU
-  eim         Edge Impulse Linux runner (.eim)       — CPU
-  onnx        ONNX Runtime (.onnx)                   — CPU
+  tflite      LiteRT (хуучин нэр TensorFlow Lite) (.tflite) — CPU
+              pip: ai-edge-litert  (шинэ; cp311 aarch64 wheel бий)
+                   tflite-runtime  (хуучин; сүүлийн хувилбар 2.14, 2023)
+  eim         Edge Impulse Linux runner (.eim)       — CPU. Edge Impulse нь
+              Pi 3-ыг албан ёсоор дэмждэг самбарын жагсаалтад ОРУУЛААГҮЙ
+              (Pi 4/5 бий) — СОНГОЛТОТ, өөрийн эрсдэлээр.
+  onnx        ONNX Runtime (.onnx)                   — CPU (pip: onnxruntime,
+              Python ≥3.11, aarch64 wheel бий)
   synthetic   загваргүй суурь (аргачлалыг турших)    — хаана ч ажиллана
 
 Хэмжилтийн үнэн зөвийн ГУРВАН НӨХЦӨЛ (Pi 3B дээр):
-  1. ЗААВАЛ халаана. A53-ын давтамж 600 МГц-ээс 1.2 ГГц рүү өгсөх, кэш
-     дүүрэх хүртэл эхний дүгнэлтүүд удаан. --cold нь халаалтыг алгасна
+  1. ЗААВАЛ халаана. CPU-гийн давтамж сул үеийн доод утгаасаа 1.2 ГГц
+     рүү өсөх, кэш дүүрэх хүртэл эхний дүгнэлтүүд удаан. --cold нь халаалтыг алгасна
      (зөвхөн "халаалт яагаад хэрэгтэй вэ" гэсэн туршилтад).
   2. `vcgencmd get_throttled`-ыг ӨМНӨ ба ДАРАА нь уншина. Өөрчлөгдвөл
      тухайн ажиллалт ХҮЧИНГҮЙ — throttling эхэлмэгц бүх саатал гажина.
@@ -104,8 +109,11 @@ def model_size_kib(path: str | None) -> float:
 
 
 # ────────────────── Pi 3B: throttling-ийн хяналт ──────────────────
-# Хэмжилтийн үнэн зөвд ХАМГИЙН чухал шалгалт. Хүчдэл дутах эсвэл 80 °C
-# давахад SoC давтамжаа бууруулна — тэр мөчөөс хойшхи бүх саатал гажина.
+# Хэмжилтийн үнэн зөвд ХАМГИЙН чухал шалгалт. Хүчдэл дутах, эсвэл цөмийн
+# температур 80–85 °C-д хүрэхэд Arm цөмүүд аажмаар, 85 °C-д Arm ба GPU
+# хоёулаа удаашруулагдана (raspberrypi.com/documentation). Тэр мөчөөс хойшхи
+# бүх саатал гажина. Битүүд: `vcgencmd get_throttled`-ийн албан ёсны хүснэгт.
+# 3-р бит (зөөлөн дулааны хязгаар) нь Pi 3B+-ийн онцлог — Pi 3B дээр 0 байна.
 THROTTLE_BITS = {
     0: "яг одоо хүчдэл дутуу байна",
     1: "яг одоо давтамж хязгаарлагдсан (arm_freq capped)",
@@ -212,18 +220,26 @@ class TFLite(Backend):
         self.it.allocate_tensors()
         self.inp = self.it.get_input_details()[0]
         self.out = self.it.get_output_details()[0]
-        self.input_shape = tuple(self.inp["shape"])
+        self.input_shape = tuple(int(d) for d in self.inp["shape"])
 
     def infer(self, x: np.ndarray):
+        # Бүрэн int8 загварт оролтыг квантчилна: q = round(x / scale) + zero_point
+        # (scale, zero_point нь get_input_details()[0]["quantization"]-д).
         d = self.inp["dtype"]
         if d in (np.int8, np.uint8):
             scale, zp = self.inp["quantization"]
-            x = (x / (scale or 1.0) + zp).astype(d)
+            info = np.iinfo(d)
+            x = np.clip(np.round(x / (scale or 1.0)) + zp, info.min, info.max).astype(d)
         else:
             x = x.astype(d)
         self.it.set_tensor(self.inp["index"], x.reshape(self.inp["shape"]))
         self.it.invoke()
-        return self.it.get_tensor(self.out["index"])
+        y = self.it.get_tensor(self.out["index"])
+        # Гаралтыг буцааж бодит тоо болгоно: y = (q - zero_point) * scale
+        if self.out["dtype"] in (np.int8, np.uint8):
+            scale, zp = self.out["quantization"]
+            y = (y.astype(np.float32) - zp) * (scale or 1.0)
+        return y
 
     def describe(self) -> dict:
         return {"backend": self.name, "lib": self.lib,
@@ -246,6 +262,8 @@ class EdgeImpulse(Backend):
                 "  pip install edge_impulse_linux") from exc
         self.runner = ImpulseRunner(args.model)
         self.info = self.runner.init()
+        import atexit
+        atexit.register(self.runner.stop)      # .eim дэд процессыг хаана
         self.window = self.info["model_parameters"].get("input_features_count",
                                                         args.window)
         self.input_shape = (1, self.window)

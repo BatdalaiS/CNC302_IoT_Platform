@@ -14,6 +14,18 @@
 #     --profile core --profile tb up -d
 #
 # Вэб: http://localhost:8080   (sysadmin@thingsboard.org / sysadmin)
+#
+# ⚠ ХУУЧИН (pinned-legacy) ЗАГВАР — зориуд хадгалсан.
+#   ThingsBoard-ын одоогийн албан ёсны Docker заавар (2026-09) нь ХОЁР
+#   контейнер ашигладаг: `postgres:18` + `thingsboard/tb-node:4.3.x`, контейнерийн
+#   порт 8080, мөн эхлүүлэхээс өмнө `docker compose run --rm -e INSTALL_TB=true
+#   -e LOAD_DEMO=true thingsboard-ce` гэж өгөгдлийн санг нэг удаа үүсгэнэ.
+#   https://thingsboard.io/docs/installation/docker/
+#   Энд харин нэг контейнерт Postgres-ийг багтаасан `tb-postgres:3.9.1`-ийг
+#   үлдээв: анх асахдаа өгөгдлийн сангаа өөрөө үүсгэдэг тул Лаб 1–2-ын
+#   ганц `up -d` командаар ажиллана. Энэ зургийн HTTP порт нь 9090
+#   (зургийн ENV HTTP_BIND_PORT=9090), curl агуулдаггүй (wget бий).
+#   Албан ёсны заавар хөгжүүлэлт/PoC-д ч 1 цөм, 4 GB RAM-ыг доод шаардлага гэнэ.
 
 services:
   thingsboard:
@@ -32,7 +44,8 @@ services:
       - tb-data:/data
       - tb-logs:/var/log/thingsboard
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:9090/login"]
+      # tb-postgres зурагт curl байхгүй — wget ашиглана
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:9090/login || exit 1"]
       interval: 20s
       timeout: 10s
       retries: 20

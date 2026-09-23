@@ -12,6 +12,13 @@ CNC302 Лаб 6 — Ирмэгийн дүгнэлтийг UNS рүү буцаа�
   үүл унасан ч гажил илрүүлэлт үргэлжилнэ — ирмэгийн тооцооллын гол утга
   учир нь яг энэ.
 
+Хоёр горим (загварын оролтын хэмжээгээр АВТОМАТААР сонгоно):
+  • ВЕКТОР — загварын оролт = --fields-ийн тоо (train_tiny_model.py-ийн
+    [1,3] загвар): мессеж бүрээс proc_temp_c, vibration_g, rpm-ийг авч
+    ШУУД дүгнэнэ. Гаралт = гажлын магадлал 0..1.
+  • ЦОНХ — бусад тохиолдолд: --field талбарын сүүлийн N утгыг (N = загварын
+    оролтын хэмжээ, synthetic үед --window) цонх болгож дүгнэнэ.
+
   # Pi дээр (агент ажиллаж байх ёстой)
   python3 anomaly_publish.py --backend synthetic
   python3 anomaly_publish.py --backend tflite \
@@ -43,8 +50,11 @@ def main() -> int:
     p.add_argument("--line", default=os.getenv("LINE", "lab"))
     p.add_argument("--device", help="зөвхөн энэ төхөөрөмжийг сонсох (ж: pi3b-01)")
     p.add_argument("--field", default="vibration_g",
-                   help="цонхонд хуримтлуулах талбар "
+                   help="ЦОНХ горимд хуримтлуулах талбар "
                         "(агент: vibration_g | proc_temp_c | rpm)")
+    p.add_argument("--fields", default="proc_temp_c,vibration_g,rpm",
+                   help="ВЕКТОР горимын оролтын талбарууд (дараалал нь "
+                        "сургалтынхтай ИЖИЛ байх ёстой)")
     p.add_argument("--backend", choices=list(BACKENDS), default="synthetic")
     p.add_argument("--model")
     p.add_argument("--window", type=int, default=125)
@@ -55,10 +65,14 @@ def main() -> int:
     a = p.parse_args()
 
     be = BACKENDS[a.backend](a)
+    fields = [f.strip() for f in a.fields.split(",") if f.strip()]
+    n_in = int(np.prod(be.input_shape))
+    vector_mode = a.backend != "synthetic" and n_in == len(fields)
+    window = 1 if vector_mode else n_in
     # UNS: cnc302/<site>/<area>/<line>/<device>/<channel>
     sub_topic = (f"cnc302/{a.site}/{a.area}/{a.line}/"
                  f"{a.device or '+'}/telemetry")
-    buffers: dict[str, deque] = defaultdict(lambda: deque(maxlen=a.window))
+    buffers: dict[str, deque] = defaultdict(lambda: deque(maxlen=window))
     stats = {"in": 0, "infer": 0, "alerts": 0, "lat_sum": 0.0}
 
     c = mqtt.Client(CallbackAPIVersion.VERSION2, client_id="edge-ai",
@@ -74,24 +88,36 @@ def main() -> int:
         if len(parts) != 6:
             return
         dev = parts[4]
-        buffers[dev].append(float(d.get(a.field, 0)))
-        if len(buffers[dev]) < a.window:
-            return
-
-        x = np.array(buffers[dev], dtype=np.float32).reshape(be.input_shape)
+        if vector_mode:
+            if any(not isinstance(d.get(k), (int, float)) for k in fields):
+                return                      # шаардлагатай талбар дутуу
+            x = np.array([d[k] for k in fields], dtype=np.float32)
+        else:
+            buffers[dev].append(float(d.get(a.field, 0)))
+            if len(buffers[dev]) < window:
+                return
+            x = np.array(buffers[dev], dtype=np.float32)
+        x = x.reshape(be.input_shape)
         t0 = time.perf_counter()
         out = be.infer(x)
         lat = (time.perf_counter() - t0) * 1000
         stats["infer"] += 1
         stats["lat_sum"] += lat
 
-        score = float(np.max(np.asarray(out, dtype=np.float32)))
-        score = 1 / (1 + np.exp(-score / 10))     # 0..1 руу шахна
+        raw = float(np.max(np.asarray(out, dtype=np.float32)))
+        if be.name == "synthetic":
+            # санамсаргүй жинтэй сүлжээ — зөвхөн аргачлалыг турших зорилготой
+            score = float(1 / (1 + np.exp(-raw / 10)))
+        else:
+            # сигмоид гаралттай загвар: аль хэдийн 0..1 (int8 бол benchmark_
+            # inference.TFLite.infer() буцааж бодит тоо болгосон)
+            score = min(1.0, max(0.0, raw))
         if score >= a.threshold:
             stats["alerts"] += 1
             evt = {"ts": int(time.time() * 1000), "device": dev,
                    "type": "anomaly", "score": round(score, 4),
-                   "field": a.field, "window": a.window,
+                   "input": ",".join(fields) if vector_mode else a.field,
+                   "window": window,
                    "inference_ms": round(lat, 3), "source": "edge-ai",
                    "backend": be.name}
             # UNS-ийн anomaly суваг → гүүрээр үүл рүү (out чиглэл)
@@ -104,8 +130,10 @@ def main() -> int:
     c.subscribe(sub_topic, qos=1)
     c.loop_start()
     print(f"→ брокер {a.host}:{a.port},  сэдэв {sub_topic}")
-    print(f"→ Ирмэгийн дүгнэлт ажиллаж байна ({be.name}, талбар={a.field}, "
-          f"цонх={a.window}, урсгал={a.threads}, босго={a.threshold})…")
+    mode = (f"ВЕКТОР {fields}" if vector_mode
+            else f"ЦОНХ талбар={a.field}, урт={window}")
+    print(f"→ Ирмэгийн дүгнэлт ажиллаж байна ({be.name}, {mode}, "
+          f"урсгал={a.threads}, босго={a.threshold})…")
 
     t_end = time.time() + a.seconds if a.seconds else float("inf")
     try:

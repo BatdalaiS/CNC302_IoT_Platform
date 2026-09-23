@@ -4,7 +4,7 @@
   "type": "tab",
   "label": "CNC302 Лаб 5 — өгөгдлийн шугам",
   "disabled": false,
-  "info": "MQTT → задлан шинжлэх → цонхны нэгтгэл → InfluxDB 3\n\nБАЙРЛАЛ: Node-RED нь ЗӨӨВРИЙН КОМПЬЮТЕР дээр, үүлний давхаргад ажиллана\n(stack/docker-compose.yml, `pipeline` профайл). Raspberry Pi 3B дээр БИШ —\nPi-д 1 GB санах ой байгаа тул Node-RED тэнд багтахгүй.\n\nӨГӨГДӨЛ ХААНААС ИРДЭГ ВЭ:\n  төхөөрөмж → Pi 3B дээрх mosquitto → ГҮҮР (bridge) → энэ EMQX → Node-RED\nТиймээс брокерын зангилаа нь compose сүлжээн доторх `emqx:1883` рүү заана\n(localhost ч биш, Pi-гийн хаяг ч биш). Pi-гээс ирсэн мессеж энэ EMQX дээр\nаль хэдийн байх тул Node-RED Pi рүү шууд холбогдох ШААРДЛАГАГҮЙ.\n\nЛаб 5-д импортлоод, mqtt-broker зангилааны хаягийг шалгана уу."
+  "info": "MQTT → задлан шинжлэх → цонхны нэгтгэл → InfluxDB 3\n\nБАЙРЛАЛ: Node-RED нь ЗӨӨВРИЙН КОМПЬЮТЕР дээр, үүлний давхаргад ажиллана\n(stack/docker-compose.yml, `pipeline` профайл). Raspberry Pi 3B дээр БИШ —\nPi-д 1 GB санах ой байгаа тул Node-RED тэнд багтахгүй.\n\nӨГӨГДӨЛ ХААНААС ИРДЭГ ВЭ:\n  төхөөрөмж → Pi 3B дээрх mosquitto → ГҮҮР (bridge) → энэ EMQX → Node-RED\nТиймээс брокерын зангилаа нь compose сүлжээн доторх `emqx:1883` рүү заана\n(localhost ч биш, Pi-гийн хаяг ч биш). Pi-гээс ирсэн мессеж энэ EMQX дээр\nаль хэдийн байх тул Node-RED Pi рүү шууд холбогдох ШААРДЛАГАГҮЙ.\n\nГурван салаа:\n  1) телеметр → line protocol (`telemetry`) → InfluxDB\n  2) data_integrity.py-ийн мессеж (run_id+seq) → `integrity` хүснэгт (rx_ms-тэй) → InfluxDB\n  3) задлах боломжгүй / хүрээнээс гарсан / бичигдээгүй мессеж → /data/deadletter.jsonl\n\nЛаб 5-д импортлоод, mqtt-broker зангилааны хаягийг шалгана уу."
  },
  {
   "id": "broker",
@@ -49,8 +49,8 @@
   "type": "function",
   "z": "cnc302tab",
   "name": "задлан шинжлэх + шошго",
-  "func": "// UNS сэдвээс шатлалыг гаргаж авна\n// cnc302/<site>/<area>/<line>/<device>/telemetry\nconst p = msg.topic.split('/');\nif (p.length !== 6) { node.warn('UNS схем зөрчсөн: ' + msg.topic); return null; }\nconst d = (typeof msg.payload === 'object') ? msg.payload : JSON.parse(msg.payload);\n\n// Өгөгдлийн чанарын шалгуур — хүрээнээс гарсныг хаяна\nif (d.temperature < -60 || d.temperature > 150) {\n    node.warn('temperature хүрээнээс гарсан: ' + d.temperature);\n    return null;\n}\n\nmsg.tags = { site: p[1], area: p[2], line: p[3], device: p[4] };\nmsg.payload = d;\nreturn msg;",
-  "outputs": 1,
+  "func": "// UNS сэдвээс шатлалыг гаргаж авна\n// cnc302/<site>/<area>/<line>/<device>/telemetry\n// Гаралт: 1 = телеметр, 2 = data_integrity.py-ийн мессеж, 3 = dead-letter\nconst dead = (reason) => [null, null, { payload: JSON.stringify({\n    ts: Date.now(), stage: 'parse', reason, topic: msg.topic,\n    raw: (typeof msg.payload === 'string') ? msg.payload : JSON.stringify(msg.payload) }) }];\n\nconst p = msg.topic.split('/');\nif (p.length !== 6) { node.warn('UNS схем зөрчсөн: ' + msg.topic); return dead('uns'); }\nlet d = msg.payload;\nif (typeof d !== 'object' || d === null) {\n    try { d = JSON.parse(d); } catch (e) { return dead('json'); }\n}\nmsg.tags = { site: p[1], area: p[2], line: p[3], device: p[4] };\nmsg.rx_ms = Date.now();          // Node-RED хүлээн авсан цаг (MTTR-д)\nmsg.payload = d;\n\n// Лаб 5-ын бүрэн бүтэн байдлын мессеж: {run_id, seq, ts, value}\nif (d.run_id !== undefined && Number.isInteger(d.seq)) {\n    return [null, msg, null];\n}\n\n// Өгөгдлийн чанарын шалгуур — хүрээнээс гарсныг санд оруулахгүй\n// (симулятор: temperature, ирмэгийн агент: proc_temp_c)\nfor (const k of ['temperature', 'proc_temp_c']) {\n    if (typeof d[k] === 'number' && (d[k] < -60 || d[k] > 150)) {\n        node.warn(k + ' хүрээнээс гарсан: ' + d[k]);\n        return dead('range:' + k);\n    }\n}\nreturn [msg, null, null];",
+  "outputs": 3,
   "noerr": 0,
   "x": 330,
   "y": 120,
@@ -58,6 +58,12 @@
    [
     "batch",
     "window"
+   ],
+   [
+    "lp_integrity"
+   ],
+   [
+    "deadletter"
    ]
   ]
  },
@@ -66,7 +72,7 @@
   "type": "function",
   "z": "cnc302tab",
   "name": "60с цонхны нэгтгэл",
-  "func": "// Төхөөрөмж тус бүрээр 60 секундын гулсах цонх\nconst key = msg.tags.device;\nconst now = Date.now();\nlet w = flow.get('win_' + key) || [];\nw.push({ t: now, v: msg.payload.temperature });\nw = w.filter(x => now - x.t <= 60000);\nflow.set('win_' + key, w);\n\nif (w.length < 5) return null;   // хангалттай дээж цуглах хүртэл\n\nconst vals = w.map(x => x.v);\nconst avg = vals.reduce((a,b)=>a+b,0) / vals.length;\nreturn {\n    topic: 'agg',\n    tags: msg.tags,\n    payload: {\n        avg_temperature: Number(avg.toFixed(3)),\n        min_temperature: Math.min(...vals),\n        max_temperature: Math.max(...vals),\n        samples: vals.length\n    }\n};",
+  "func": "// Төхөөрөмж тус бүрээр 60 секундын гулсах цонх\nconst key = msg.tags.device;\nconst now = Date.now();\n// Төхөөрөмжийн нэрийг context-ийн түлхүүр болгож болохгүй (зай, цэг)\n// тул бүх цонхыг нэг объектод хадгална.\nconst all = flow.get('windows') || {};\nlet w = all[key] || [];\nconst v = (typeof msg.payload.temperature === 'number') ? msg.payload.temperature : msg.payload.proc_temp_c;\nif (typeof v !== 'number') return null;   // температургүй мессеж\nw.push({ t: now, v });\nw = w.filter(x => now - x.t <= 60000);\nall[key] = w;\nflow.set('windows', all);\n\nif (w.length < 5) return null;   // хангалттай дээж цуглах хүртэл\n\nconst vals = w.map(x => x.v);\nconst avg = vals.reduce((a,b)=>a+b,0) / vals.length;\nreturn {\n    topic: 'agg',\n    tags: msg.tags,\n    payload: {\n        avg_temperature: Number(avg.toFixed(3)),\n        min_temperature: Math.min(...vals),\n        max_temperature: Math.max(...vals),\n        samples: vals.length\n    }\n};",
   "outputs": 1,
   "noerr": 0,
   "x": 560,
@@ -82,7 +88,7 @@
   "type": "function",
   "z": "cnc302tab",
   "name": "line protocol (түүхий)",
-  "func": "// InfluxDB line protocol болгож хөрвүүлнэ\nconst t = msg.tags, d = msg.payload;\nconst esc = s => String(s).replace(/[ ,=]/g, '\\\\$&');\nconst tags = `site=${esc(t.site)},area=${esc(t.area)},line=${esc(t.line)},device=${esc(t.device)}`;\nconst fields = `temperature=${d.temperature},humidity=${d.humidity},vibration_rms=${d.vibration_rms}`;\nconst ts = d.ts || Date.now();\nmsg.payload = `telemetry,${tags} ${fields} ${ts}`;\nmsg.headers = { 'Content-Type': 'text/plain' };\nreturn msg;",
+  "func": "// InfluxDB line protocol болгож хөрвүүлнэ.\n// Tag утгад таслал, тэнцүү, зай → \\ -ээр escape (line protocol-ын дүрэм).\n// Талбар: тоо → float, boolean → true/false. ts, seq, текст талбарыг алгасна.\nconst t = msg.tags, d = msg.payload;\nconst esc = s => String(s).replace(/[ ,=]/g, '\\\\$&');\nconst tags = `site=${esc(t.site)},area=${esc(t.area)},line=${esc(t.line)},device=${esc(t.device)}`;\nconst f = [];\nfor (const [k, v] of Object.entries(d)) {\n    if (k === 'ts' || k === 'seq') continue;\n    if (typeof v === 'number' && Number.isFinite(v)) f.push(`${esc(k)}=${v}`);\n    else if (typeof v === 'boolean') f.push(`${esc(k)}=${v}`);\n}\nif (f.length === 0) return null;               // бичих талбаргүй\nconst ts = Number.isInteger(d.ts) ? d.ts : Date.now();   // мс (precision=millisecond)\nmsg.payload = `telemetry,${tags} ${f.join(',')} ${ts}`;\nmsg.lp = msg.payload;                          // dead-letter-т хадгалахад\nmsg.headers = { 'Content-Type': 'text/plain; charset=utf-8' };\nreturn msg;",
   "outputs": 1,
   "noerr": 0,
   "x": 560,
@@ -94,11 +100,27 @@
   ]
  },
  {
+  "id": "lp_integrity",
+  "type": "function",
+  "z": "cnc302tab",
+  "name": "line protocol (integrity)",
+  "func": "// data_integrity.py-ийн мессежийг `integrity` хүснэгтэд бичнэ.\n// Нэг цэг = хүснэгт + tag set + цаг. QoS 1-ийн давхар хүргэлт ижил\n// (run_id, device, ts)-тэй тул НЭГ цэг болж нийлнэ.\nconst t = msg.tags, d = msg.payload;\nconst esc = s => String(s).replace(/[ ,=]/g, '\\\\$&');\nconst ts = Number.isInteger(d.ts) ? d.ts : msg.rx_ms;\nconst value = (typeof d.value === 'number') ? `,value=${d.value}` : '';\nmsg.payload = `integrity,run_id=${esc(d.run_id)},device=${esc(t.device)} seq=${d.seq}i${value},rx_ms=${msg.rx_ms}i ${ts}`;\nmsg.lp = msg.payload;\nmsg.headers = { 'Content-Type': 'text/plain; charset=utf-8' };\nreturn msg;",
+  "outputs": 1,
+  "noerr": 0,
+  "x": 560,
+  "y": 60,
+  "wires": [
+   [
+    "influxwrite"
+   ]
+  ]
+ },
+ {
   "id": "lp_agg",
   "type": "function",
   "z": "cnc302tab",
   "name": "line protocol (нэгтгэл)",
-  "func": "const t = msg.tags, d = msg.payload;\nconst esc = s => String(s).replace(/[ ,=]/g, '\\\\$&');\nconst tags = `site=${esc(t.site)},area=${esc(t.area)},line=${esc(t.line)},device=${esc(t.device)}`;\nconst fields = `avg_temperature=${d.avg_temperature},min_temperature=${d.min_temperature},max_temperature=${d.max_temperature},samples=${d.samples}i`;\nmsg.payload = `telemetry_1m,${tags} ${fields} ${Date.now()}`;\nmsg.headers = { 'Content-Type': 'text/plain' };\nreturn msg;",
+  "func": "const t = msg.tags, d = msg.payload;\nconst esc = s => String(s).replace(/[ ,=]/g, '\\\\$&');\nconst tags = `site=${esc(t.site)},area=${esc(t.area)},line=${esc(t.line)},device=${esc(t.device)}`;\nconst fields = `avg_temperature=${d.avg_temperature},min_temperature=${d.min_temperature},max_temperature=${d.max_temperature},samples=${d.samples}i`;\nmsg.payload = `telemetry_1m,${tags} ${fields} ${Date.now()}`;\nmsg.lp = msg.payload;\nmsg.headers = { 'Content-Type': 'text/plain; charset=utf-8' };\nreturn msg;",
   "outputs": 1,
   "noerr": 0,
   "x": 790,
@@ -122,7 +144,7 @@
   "proxy": "",
   "insecureHTTPParser": false,
   "authType": "",
-  "senderr": true,
+  "senderr": false,
   "headers": [],
   "x": 1010,
   "y": 140,
@@ -137,7 +159,7 @@
   "type": "function",
   "z": "cnc302tab",
   "name": "бичилтийг шалгах",
-  "func": "// InfluxDB 204 буцаана. Өөр код бол алдаа — тоолж хадгална.\nconst code = msg.statusCode;\nif (code !== 204 && code !== 200) {\n    const n = (flow.get('write_errors') || 0) + 1;\n    flow.set('write_errors', n);\n    node.status({fill:'red', shape:'ring', text: `алдаа ${n}: ${code}`});\n    node.error(`InfluxDB бичилт амжилтгүй ${code}: ${msg.payload}`, msg);\n    return [null, msg];\n}\nconst ok = (flow.get('write_ok') || 0) + 1;\nflow.set('write_ok', ok);\nnode.status({fill:'green', shape:'dot', text: `бичсэн ${ok}`});\nreturn [msg, null];",
+  "func": "// InfluxDB 3 амжилттай бичилтэд 204 буцаана. Бусад нь алдаа:\n// 400 = line protocol/төрлийн зөрчил, 401/403 = токен, эсвэл холболтын\n// алдааны код (ECONNREFUSED, ENOTFOUND …) — InfluxDB унтарсан үед.\nconst code = msg.statusCode;\nif (code !== 204) {\n    const n = (flow.get('write_errors') || 0) + 1;\n    flow.set('write_errors', n);\n    node.status({fill:'red', shape:'ring', text: `алдаа ${n}: ${code}`});\n    node.warn(`InfluxDB бичилт амжилтгүй ${code}: ${String(msg.payload).slice(0, 200)}`);\n    return [null, { payload: JSON.stringify({ ts: Date.now(), stage: 'write',\n        statusCode: code, error: String(msg.payload).slice(0, 500), lp: msg.lp }) }];\n}\nconst ok = (flow.get('write_ok') || 0) + 1;\nflow.set('write_ok', ok);\nnode.status({fill:'green', shape:'dot', text: `бичсэн ${ok}`});\nreturn [msg, null];",
   "outputs": 2,
   "noerr": 0,
   "x": 1230,

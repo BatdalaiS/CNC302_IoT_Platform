@@ -132,10 +132,12 @@ def main() -> int:
     # ── 5. GraphQL-ийн өөрийн эрсдэлүүд ──
     print("\n5. GraphQL-ийн онцлог эрсдэлүүд")
     r = gql(a.api, "{ __schema { types { name fields { name } } } }")
-    if r.status_code == 200 and "data" in r.json():
+    # Анхаар: хаагдсан үед ч хариунд `"data": null` + `errors` ирнэ —
+    # тиймээс түлхүүр байгаа эсэхийг биш, СХЕМ ирсэн эсэхийг шалгана.
+    if r.status_code == 200 and (r.json().get("data") or {}).get("__schema"):
         record("Introspection хаагдсан", WARN,
                "Схем бүрэн уншигдаж байна. Үйлдвэрлэлд хаах ёстой "
-               "(strawberry.Schema(..., config=StrawberryConfig(...)) эсвэл "
+               "(strawberry.extensions.DisableIntrospection эсвэл "
                "нэвтэрсэн хэрэглэгчид л зөвшөөрөх).", "low", deliberate=True)
     else:
         record("Introspection хаагдсан", PASS, "")
@@ -143,18 +145,21 @@ def main() -> int:
     # Асуулгын нийлмэл байдал: нэг хүсэлтэд 200 давхар нэрлэсэн (alias) талбар.
     # Энэ бол GraphQL-ийн бодит DoS вектор — REST-д ийм зүйл боломжгүй.
     #
-    # Анхаар: ЗААВАЛ хүчинтэй үүрэгтэй токентой явуулна. Токенгүй бол RBAC
-    # татгалзаж, шалгалт "тэнцсэн" гэж БУРУУ дүгнэнэ (гарын үсгийн тестийн
-    # base64url-тай яг адил урхи).
-    dt = forge_jwt({"sub": "dos", "groups": ["viewer"]})
-    aliases = " ".join(f"a{i}: devices(limit: 50) {{ name }}" for i in range(200))
+    # Анхаар: RBAC-д татгалзагдах талбар (devices) ашиглавал шалгалт "тэнцсэн"
+    # гэж БУРУУ дүгнэнэ — `decode_token` засагдсаны дараа хуурамч токен 401
+    # авч, хязгаар байхгүй ч PASS гарна. Тиймээс эрх шаарддаггүй `whoami`-г
+    # 200 удаа нэрлэнэ: энэ нь зөвхөн GraphQL-ийн ВАЛИДАЦИЙН хязгаарыг
+    # (MaxAliasesLimiter / MaxTokensLimiter) шалгана, токен ба registry-ээс
+    # хамаарахгүй. Бодит DoS-д `whoami`-ийн оронд `devices(limit:50)` байна.
+    aliases = " ".join(f"a{i}: whoami" for i in range(200))
     try:
-        r = gql(a.api, "{ " + aliases + " }", dt, timeout=25)
+        r = gql(a.api, "{ " + aliases + " }", None, timeout=25)
         if r.status_code == 200 and "errors" not in r.json():
             record("Асуулгын нийлмэл байдлын хязгаар", WARN,
                    "200 давхар нэрлэсэн талбартай асуулга хүлээн авагдав — "
-                   "DoS эрсдэл. strawberry-д QueryDepthLimiter / "
-                   "cost analysis нэмэх ёстой.", "medium", deliberate=True)
+                   "DoS эрсдэл. strawberry.extensions-ийн MaxAliasesLimiter / "
+                   "MaxTokensLimiter (+ QueryDepthLimiter) нэмэх ёстой.",
+                   "medium", deliberate=True)
         else:
             record("Асуулгын нийлмэл байдлын хязгаар", PASS, "")
     except Exception:

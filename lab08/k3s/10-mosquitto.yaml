@@ -1,5 +1,11 @@
 # Ирмэгийн MQTT брокер: локал брокер + үүл рүү ГҮҮР (bridge).
 #
+# ⚠ Энэ pod ЗААВАЛ Raspberry Pi (agent) дээр ажиллана — nodeSelector-ыг үз.
+#   Шалтгаан: (1) store-and-forward-ийн дараалал нь ИРМЭГИЙН дискэнд (Pi-гийн
+#   microSD дээрх local-path PVC) байх ёстой — VM дээр байвал Pi ↔ VM холбоо
+#   тасрахад ирмэг "санах ойгүй" болно; (2) LAN дээрх бодит төхөөрөмжүүд
+#   Pi рүү нийтэлдэг.
+#
 # Compose дээрх edge/mosquitto/* файлуудын K8s дахь хувилбар:
 #   mosquitto.conf      → ConfigMap
 #   conf.d/bridge.conf  → initContainer нь загвараас (ConfigMap) ConfigMap-ийн
@@ -74,8 +80,9 @@ metadata:
   name: mosquitto-data
   namespace: cnc302
 spec:
-  # K3s-ийн анхны StorageClass. Өгөгдөл нь Pi-гийн microSD дээр
-  # /var/lib/rancher/k3s/storage/… зам дор хадгалагдана.
+  # K3s-ийн анхны StorageClass (local-path). Эзлэхүүн нь pod ажиллах
+  # ЗАНГИЛААНЫ файлын системд, анхдагчаар /var/lib/rancher/k3s/storage
+  # дор үүснэ (https://docs.k3s.io/add-ons/storage) — энд Pi-гийн microSD.
   storageClassName: local-path
   accessModes: [ReadWriteOnce]
   resources:
@@ -99,6 +106,17 @@ spec:
     metadata:
       labels: {app: mosquitto}
     spec:
+      # Pi руу хадах: хоёр шошго ХОЁУЛАА таарах ёстой.
+      #   kubernetes.io/arch — kubelet өөрөө бөглөдөг (runtime.GOARCH):
+      #     VM = amd64, Pi 3B (64-bit OS) = arm64.
+      #     https://kubernetes.io/docs/reference/labels-annotations-taints/
+      #   cnc302/layer=edge — бид гараар тавина (README §3.4):
+      #     kubectl label nodes <pi-зангилаа> cnc302/layer=edge
+      # Шошго тавиагүй бол pod Pending болж, Events-д
+      # "didn't match Pod's node affinity/selector" гэж гарна.
+      nodeSelector:
+        kubernetes.io/arch: arm64
+        cnc302/layer: edge
       initContainers:
         - name: render-bridge
           image: busybox:1.36
@@ -112,11 +130,14 @@ spec:
                   -e "s|__AREA__|$AREA|g" \
                   -e "s|__LINE__|$LINE|g" \
                   -e "s|__DEVICE_ID__|$DEVICE_ID|g" \
+                  -e "s|__CLOUD_USER__|$CLOUD_MQTT_USERNAME|g" \
+                  -e "s|__CLOUD_PASS__|$CLOUD_MQTT_PASSWORD|g" \
                   /tpl/bridge.conf.tpl > /conf.d/bridge.conf
-              echo "── үүсгэсэн bridge.conf ──"
-              cat /conf.d/bridge.conf
+              echo "── үүсгэсэн bridge.conf (нууц үггүй) ──"
+              grep -v remote_password /conf.d/bridge.conf
           envFrom:
             - configMapRef: {name: cnc302-config}
+            - secretRef: {name: cnc302-secrets}
           resources:
             requests: {memory: "8Mi", cpu: "10m"}
             limits:   {memory: "32Mi", cpu: "200m"}
@@ -125,7 +146,7 @@ spec:
             - {name: bridge, mountPath: /conf.d}
       containers:
         - name: mosquitto
-          image: eclipse-mosquitto:2.0.20
+          image: eclipse-mosquitto:2.0.22
           imagePullPolicy: IfNotPresent
           ports:
             - {containerPort: 1883, name: mqtt}
@@ -164,7 +185,10 @@ metadata:
   namespace: cnc302
 spec:
   # NodePort — LAN дээрх бодит төхөөрөмж, багшийн симулятор Pi рүү
-  # шууд нийтэлж чадна:  mosquitto_pub -h <pi> -p 31883 …
+  # шууд нийтэлж чадна:  mosquitto_pub -h <pi-IP> -p 31883 …
+  # NodePort нь кластерын БҮХ зангилаа дээр нээгддэг тул <VM-IP>:31883 ч
+  # ажиллана, гэхдээ тэр үед урсгал VXLAN-аар Pi рүү дамжина — ирмэгийн
+  # төхөөрөмж Pi-гийн IP-г л ашиглах ёстой.
   # (Кластер дотроос энгийн `mosquitto:1883` нэрээр хандана.)
   type: NodePort
   selector: {app: mosquitto}

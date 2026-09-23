@@ -3,7 +3,7 @@
 [![Код шалгах](https://github.com/BatdalaiS/CNC302_IoT_Platform/actions/workflows/lint.yml/badge.svg)](https://github.com/BatdalaiS/CNC302_IoT_Platform/actions/workflows/lint.yml)
 [![Лиценз: MIT + CC BY-SA 4.0](https://img.shields.io/badge/лиценз-MIT%20%2B%20CC%20BY--SA%204.0-informational)](LICENSE)
 
-> **Хэвлэмэл гарын авлага (95 хуудас):** Actions → *Гарын авлага хөрвүүлэх* →
+> **Хэвлэмэл гарын авлага (139 хуудас):** Actions → *Гарын авлага хөрвүүлэх* →
 > сүүлийн ажиллуулалт → **Artifacts → cnc302-manual**.
 > Эсвэл өөрөө хөрвүүлэх: `cd manual && make`.
 
@@ -18,27 +18,29 @@
 
 Энэ курсын гол архитектурын шийдэл: **үүл ба ирмэгийг ХОЁР ӨӨР ТӨХӨӨРӨМЖ дээр** ажиллуулна.
 
+![Зураг 0.1 — Хоёр давхаргат архитектур: зөөврийн компьютер (үүл) ба Raspberry Pi 3B (ирмэг), хооронд нь MQTT гүүр](docs/img/fig-architecture.svg)
+
 | Төхөөрөмж | Үүрэг | Юу ажиллах |
 |---|---|---|
 | **Оюутны зөөврийн компьютер** | **Үүлний давхарга** (IoT лавлах архитектурын 3-р давхарга) | EMQX, InfluxDB, Grafana, төхөөрөмжийн бүртгэл, Node-RED, GraphQL API, Dex, Ollama |
-| **Raspberry Pi 3B** | **Ирмэгийн давхарга** (2–3-р давхаргын зааг) | Mosquitto брокер + үүл рүү гүүр, ирмэгийн агент, TFLite дүгнэлт, Лаб 8-д K3s |
+| **Raspberry Pi 3B** | **Ирмэгийн давхарга** (2–3-р давхаргын зааг) | Mosquitto брокер + үүл рүү гүүр, ирмэгийн агент, LiteRT (TFLite) дүгнэлт, Лаб 8-д K3s agent (server нь зөөврийн компьютер дээрх VM) |
 
 ### Яагаад хуваасан бэ
 
-Raspberry Pi 3B-ийн техникийн үзүүлэлт:
+Raspberry Pi 3B-ийн албан ёсны техникийн үзүүлэлт ба үр дагавар:
 
 | Үзүүлэлт | Утга | Үр дагавар |
 |---|---|---|
-| Санах ой | **1 GB LPDDR2** (боломжтой ~880 MiB) | ThingsBoard (1.5–2.5 GB) огт багтахгүй |
-| Процессор | 4 × Cortex-A53 @ 1.2 GHz | JVM-т суурилсан платформ хэт удаан |
-| Сүлжээ | **100 Mbit**, USB 2.0-ийн зурвасыг хуваана | Дискний ачаалалтай өрсөлдөнө |
-| Диск | **зөвхөн microSD** | InfluxDB-ийн бичилт хамгийн эхэнд ханана |
-| Өргөтгөл | **PCIe байхгүй** | Raspberry Pi AI Kit / Hailo боломжгүй |
+| Санах ой | **1 GB** (OS-д харагдах `MemTotal`-ийг Лаб 1-д хэмжинэ) | ThingsBoard-ын албан ёсны заавар хөгжүүлэлтэд ч 4 GB RAM шаарддаг — огт багтахгүй |
+| Процессор | BCM2837, 4 × Cortex-A53 (Armv8) @ 1.2 GHz | JVM-т суурилсан платформ хэт удаан |
+| Сүлжээ | **100 Mb/s** Ethernet; 4 × USB 2.0 | Өгсөх урсгал (uplink) 100 Mb/s-ээр хязгаарлагдана |
+| Диск | **зөвхөн microSD** | persistence, swap бичилт удаан (Лаб 5-д хэмжинэ) |
+| Өргөтгөл | **PCIe байхгүй** | Raspberry Pi AI Kit (Hailo) нь Raspberry Pi 5-д зориулагдсан — боломжгүй |
 
 Гэхдээ энэ бол зөвхөн хязгаарлалт биш. Бодит үйлдвэрлэлийн IoT систем яг **ийм** байдаг: хүчирхэг үүл, сул ирмэг, хооронд нь найдваргүй холбоос. Pi 5 дээр бүгдийг нэг дор ажиллуулах нь илүү тохилог боловч **Edge–Fog–Cloud континуумыг заахгүй**. Pi 3B үүнийг заахаас өөр аргагүй болгоно:
 
 - Гүүр (bridge) яагаад хэрэгтэйг **холбоос тасарч үзсний дараа** ойлгоно (Лаб 5)
-- Ирмэг дээрх дүгнэлт яагаад хэрэгтэйг **100 Mbit ханаж үзсний дараа** ойлгоно (Лаб 6)
+- Ирмэг дээрх дүгнэлт яагаад хэрэгтэйг **өгсөх урсгалыг (uplink) хэмнэж үзсний дараа** ойлгоно (Лаб 6)
 - Санах ойн төсөв яагаад чухлыг **OOM-той тулгарсны дараа** ойлгоно (Лаб 1)
 
 > **Зарчим:** Хүнд зүйл **үүл** дээр, хурдан хариу шаардсан зүйл **ирмэг** дээр. Аль ч алхмыг эхлэхийн өмнө "энэ хаана ажиллах ёстой вэ?" гэж асуу. Заавар бүрийн алхам бүрд 💻 (зөөврийн компьютер) эсвэл 🥧 (Pi) тэмдэглэгээ байна.
@@ -66,7 +68,7 @@ CNC302-labs/
 │   │   └── conf.d/bridge.conf.template   ← `make bridge` үүсгэнэ
 │   ├── agent/
 │   │   ├── edge_agent.py        ← ирмэгийн агент
-│   │   ├── Dockerfile           ← Лаб 8-д K3s-д хэрэгтэй
+│   │   ├── Dockerfile           ← Лаб 8-д K3s agent-д (компьютер дээр arm64-д барина)
 │   │   └── cnc302-edge-agent.service
 │   ├── .env.example
 │   └── Makefile
@@ -110,7 +112,7 @@ git checkout <commit> -- stack/docker-compose.yml
 | `pipeline` | + nodered | Лаб 5-аас | +0.2 GB |
 | `app` | + dex, graphql-api | Лаб 7-оос | +0.2 GB |
 | `ai` | + ollama | Лаб 8 | +2–3 GB |
-| `tb` | + thingsboard | Лаб 2, зөвхөн харьцуулалт | +2 GB |
+| `tb` | + thingsboard (хуучин `tb-postgres` загвар) | Лаб 2, зөвхөн харьцуулалт | +2 GB (албан ёсоор ≥ 4 GB) |
 
 ```bash
 cd stack
@@ -120,7 +122,7 @@ make up-app          # + Dex, GraphQL
 make up-ai           # + Ollama
 ```
 
-**Docker Desktop-ийн санах ой:** Windows/macOS дээр Docker Desktop-д анхдагчаар 2–4 GB л өгдөг. Settings → Resources → Memory-г **6 GB болго**. Лаб 8-д Ollama-д үүнээс бага бол ажиллахгүй.
+**Docker Desktop-ийн санах ой:** анхдагчаар хостын санах ойн 50%. **6 GB** өгнө: Windows-ийн WSL 2 backend дээр `%UserProfile%\.wslconfig`-ийн `[wsl2] memory=6GB`-ээр, macOS/Linux дээр Settings → Resources → Advanced → Memory limit-ээр (SETUP.md А.2). Лаб 8-д Ollama-д үүнээс бага бол ажиллахгүй. Лаб 8-д нэмээд K3s server VM (4 GB) хэрэгтэй тул зөөврийн компьютерт **16 GB RAM** тав тухтай.
 
 ### 🥧 Ирмэг — `edge/`
 
@@ -237,15 +239,15 @@ git push -u origin main
 
 Энэ курс **тоо хэмжилт** дээр тулгуурладаг. Pi 3B дээр гурван зүйл бүх хэмжилтийг гажуудуулна:
 
-1. **Дулааны хязгаарлалт (throttling).** Pi 3B 80 °C давбал давтамжаа бууруулна. Идэвхтэй хөргөлт, эсвэл ядаж наалдац бүхий хөргөгч заавал хэрэгтэй. Хэмжилт бүрийн өмнө ба дараа:
+1. **Дулааны хязгаарлалт (throttling).** Албан ёсны баримтаар 80–85 °C-д Arm цөмийн давтамж аажмаар буурч, 85 °C-д GPU ч мөн буурна. Идэвхтэй хөргөлт, эсвэл ядаж наалдац бүхий хөргөгч заавал хэрэгтэй. Хэмжилт бүрийн өмнө ба дараа:
    ```bash
    vcgencmd get_throttled     # 0x0 байх ЁСТОЙ
    ```
    `0x0` биш бол тэр хэмжилтийг **хаяж, хөргөөд дахин хий**.
 
-2. **Тэжээл.** 5 V / 2.5 A-аас сул тэжээл бол ачаалал дор хүчдэл унаж, throttling эхэлнэ (`get_throttled`-ийн 0-р бит). Утасны цэнэглэгч ихэвчлэн хангалтгүй.
+2. **Тэжээл.** Pi 3B-д албан ёсоор 5 V / 2.5 A шаардлагатай. Сул тэжээл бол ачаалал дор хүчдэл унаж (`get_throttled`-ийн бит 0 = undervoltage), throttling эхэлнэ. Утасны цэнэглэгч ихэвчлэн хангалтгүй.
 
-3. **microSD.** Хямд карт дээр InfluxDB, mosquitto-гийн persistence бичилт хэдэн зуун миллисекунд саатана. A1/A2 ангиллын карт хэрэглэ. Лаб 5-д үүнийг бодитоор хэмжинэ.
+3. **microSD.** Хямд карт дээр mosquitto-гийн persistence ба swap-ын бичилт удаан. A1/A2 ангиллын карт хэрэглэ. Лаб 5-д үүнийг бодитоор хэмжинэ.
 
 `tools/measure_stack.sh --role edge` эдгээрийг автоматаар шалгаж анхааруулна. **Лаборатори бүрийн эхэнд эхлээд үүнийг ажиллуул.**
 
@@ -253,7 +255,17 @@ git push -u origin main
 
 ## 10. Анхааруулга — хувилбарын эрсдэл
 
-Энэ сан дахь бүх дүрс (image) тодорхой хувилбарт **бэхлэгдсэн** (pinned). Нээлттэй эхийн төслүүд, ялангуяа **InfluxDB 3 Core** болон **Edge Impulse**-ийн CLI, тохиргоо түргэн өөрчлөгддөг.
+Энэ сан дахь бүх дүрс (image) тодорхой хувилбарт **бэхлэгдсэн** (pinned). Нээлттэй эхийн төслүүд, ялангуяа **InfluxDB 3 Core** болон **Edge Impulse**-ийн CLI, тохиргоо түргэн өөрчлөгддөг. Лабораториудыг доорх хувилбараар шалгасан (2026-09):
+
+| Дүрс | Хувилбар | Яагаад энэ хувилбар |
+|---|---|---|
+| `emqx/emqx` | **5.8.6** | Лаб 1–2-т бодитоор туршсан. 5.8 бол LTS салбар (EOL 2027-08-27) бөгөөд **Apache 2.0** лицензтэй. EMQX **5.9.0-ээс эхлэн Business Source License (BSL) 1.1**-д шилжсэн: нэг зангилааг үнэгүй ажиллуулж болох ч кластерт арилжааны лиценз хэрэгтэй (магадлан итгэмжлэгдсэн их сургууль арилжааны бус хэрэглээнд үл хамаарна). Лицензийн файл, нөхцөлийг оюутнуудад тайлбарлах шаардлагагүй байлгахын тулд 5.8.x-д үлдээв. |
+| `influxdb` | 3.2-core | Лаб 5, 7-ийн команд энэ хувилбараар шалгагдсан (одоогийн Core 3.11) |
+| `grafana/grafana` | 11.6.16 | 11.6.0-ийн аюулгүй байдлын засвар (CVE-2025-4123, CVE-2026-27876) бүхий 11.6 салбар |
+| `nodered/node-red` | 4.0.9 | Лаб 5 |
+| `dexidp/dex` | v2.41.1 | Лаб 7 |
+| `eclipse-mosquitto` | 2.0.22 | 2.0 салбарын сүүлийн дүрс (2.0.21-ийн аюулгүй байдлын засвартай); 2.1 нь зан төлөвийн өөрчлөлттэй |
+| `ollama/ollama` | 0.5.13 | Лаб 8 |
 
 **Багшид:** хичээлийн улирал эхлэхээс өмнө нэг Raspberry Pi 3B **ба** нэг зөөврийн компьютер дээр бүх найман лабыг эхнээс нь дуустал ажиллуулж шалгана уу. Хувилбар зөрчилдвөл:
 
@@ -262,3 +274,23 @@ git push -u origin main
 - Pi 3B бол **arm64 (aarch64)**. 64-bit OS суулгах ёстой — 32-bit дээр зарим дүрс огт байхгүй.
 
 `docs/troubleshooting.md`-д түгээмэл алдаа, шийдлийг цуглуулсан.
+
+---
+
+## Эх сурвалж
+
+| # | Эх сурвалж | Юуг баталгаажуулсан | Хандсан |
+|---|---|---|---|
+| 1 | [Raspberry Pi hardware](https://www.raspberrypi.com/documentation/computers/raspberry-pi.html) ([эх: GitHub](https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/raspberry-pi/introduction.adoc)), [BCM2837](https://www.raspberrypi.com/documentation/computers/processors.html#bcm2837) ([эх](https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/processors/bcm2837.adoc)) | Pi 3B: BCM2837, 4×Cortex-A53 @1.2 GHz, 1 GB, 100 Mb/s Ethernet, 4×USB 2.0 | 2026-09 |
+| 2 | [Frequency management and thermal control](https://www.raspberrypi.com/documentation/computers/raspberry-pi.html#frequency-management-and-thermal-control) ([эх](https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/raspberry-pi/frequency-management.adoc)) | 80–85 °C-д Arm цөм, 85 °C-д GPU throttle | 2026-09 |
+| 3 | [vcgencmd get_throttled](https://www.raspberrypi.com/documentation/computers/os.html#vcgencmd) ([эх](https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/os/graphics-utilities.adoc)) | бит 0 = undervoltage | 2026-09 |
+| 4 | [Getting started — power supply](https://www.raspberrypi.com/documentation/computers/getting-started.html) ([эх](https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/getting-started/setting-up.adoc)) | Pi 3: 5 V / 2.5 A | 2026-09 |
+| 5 | [AI Kit](https://www.raspberrypi.com/documentation/accessories/ai-kit.html) ([эх](https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/accessories/ai-kit/about.adoc)) | M.2 HAT+ + Hailo, Raspberry Pi 5-д | 2026-09 |
+| 6 | [EMQX Licensing FAQ](https://www.emqx.com/en/content/license-faq), [EMQX — License](https://docs.emqx.com/en/emqx/latest/deploy/license.html) | 5.9.0+ нь BSL 1.1, өмнөх нь Apache 2.0; нэг зангилаа үнэгүй; академийн арилжааны бус хэрэглээ | 2026-09 |
+| 7 | [EMQX Version Lifecycle (EOL)](https://docs.emqx.com/en/emqx/latest/changes/eol-ee.html) | 5.8 LTS, EOL 2027-08-27 | 2026-09 |
+| 8 | [Grafana security release (CVE-2026-27876, CVE-2026-27880)](https://grafana.com/blog/grafana-security-release-critical-and-high-severity-security-fixes-for-cve-2026-27876-and-cve-2026-27880/), [CVE-2025-4123](https://grafana.com/blog/grafana-security-release-high-severity-security-fix-for-cve-2025-4123/) | 11.6.0 нөлөөлөлд өртсөн; 11.6.14 ба 11.6.1+security-01 засвартай | 2026-09 |
+| 9 | [Mosquitto ChangeLog](https://mosquitto.org/ChangeLog.txt) | 2.0.21 аюулгүй байдлын засвар; 2.1.0 зан төлөвийн өөрчлөлт | 2026-09 |
+| 10 | [ThingsBoard CE — Docker](https://thingsboard.io/docs/installation/docker/) | Хөгжүүлэлт/PoC-д 1 цөм, 4 GB RAM | 2026-09 |
+| 11 | [Docker Desktop — Settings](https://docs.docker.com/desktop/settings-and-maintenance/settings/), [WSL config](https://learn.microsoft.com/en-us/windows/wsl/wsl-config) | Анхдагч 50%; WSL 2-т `.wslconfig` | 2026-09 |
+| 12 | [K3s — Requirements](https://docs.k3s.io/installation/requirements) | server 2 GB — Pi 3B-д багтахгүй; agent 512 MB | 2026-09 |
+| 13 | Docker Hub (`hub.docker.com/v2/repositories/…/tags`) | Бүх бэхэлсэн tag байгаа ба arm64 хувилбартай | 2026-09 |

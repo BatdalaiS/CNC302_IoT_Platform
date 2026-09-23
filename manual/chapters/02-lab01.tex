@@ -45,7 +45,7 @@
 \item
   {[}Pi{]} \texttt{free\ -h} → Swap 2.0Gi, Mem \textasciitilde925Mi
 \item
-  {[}Pi{]} \texttt{vcgencmd\ get\_throttled} → \texttt{0x0}
+  {[}Pi{]} \texttt{vcgencmd\ get\_\allowbreak{}throttled} → \texttt{0x0}
 \item
   {[}ЗК{]} Docker Desktop-д ≥ 6 GB
 \item
@@ -84,6 +84,12 @@ IoT лавлах архитектурт өгөгдөл нэг чиглэлд у�
 
 Энэ курсын байрлуулалт яг үүнийг дагана: \textbf{хурдан, локал, тасалдалд тэсвэртэй зүйл Pi дээр; хүнд, түүхэн, харьцуулсан зүйл компьютер дээр.}
 
+\begin{figure}
+\centering
+\includegraphics{figures/fig-architecture.pdf}
+\caption{Зураг 1.1 --- Хоёр давхаргат архитектур: зөөврийн компьютер (үүл) ба Raspberry Pi 3B (ирмэг), хооронд нь MQTT гүүр}
+\end{figure}
+
 \hypertarget{ux433ux4afux4afux440-bridge-ux433ux44dux436-ux44eux443-ux432ux44d}{%
 \subsection{Гүүр (bridge) гэж юу вэ}\label{ux433ux4afux4afux440-bridge-ux433ux44dux436-ux44eux443-ux432ux44d}}
 
@@ -115,13 +121,13 @@ MQTT гүүр бол \textbf{брокер хоорондын клиент хол
 \endlastfoot
 \texttt{topic\ cnc302/\allowbreak{}shutis/\allowbreak{}\#\ out\ 1} & юуг, хаашаа, QoS хэдээр & угтвар зөрвөл мессеж \textbf{хэзээ ч} үүлэнд хүрэхгүй \\
 \texttt{cleansession\ false} & session хадгална & тасрахад дараалал үлдэнэ \\
-\texttt{restart\_timeout\ 5\ 60} & дахин холбогдох завсарлага & 5→60 сек өсөх backoff \\
+\texttt{restart\_\allowbreak{}timeout\ 5\ 60} & дахин холбогдох завсарлага & 5→60 сек өсөх backoff \\
 \end{longtable}\endgroup
 
 \hypertarget{ux441ux430ux43dux430ux445-ux43eux439ux43d-ux445ux44fux437ux433ux430ux430ux440-ux431ux43eux43b-ux430ux440ux445ux438ux442ux435ux43aux442ux443ux440ux44bux43d-ux445ux44fux437ux433ux430ux430ux440}{%
 \subsection{Санах ойн хязгаар бол архитектурын хязгаар}\label{ux441ux430ux43dux430ux445-ux43eux439ux43d-ux445ux44fux437ux433ux430ux430ux440-ux431ux43eux43b-ux430ux440ux445ux438ux442ux435ux43aux442ux443ux440ux44bux43d-ux445ux44fux437ux433ux430ux430ux440}}
 
-ThingsBoard-ын JVM ганцаараа \texttt{-Xmx1500m} шаарддаг. Pi 3B-д \textbf{нийт} 925 MiB. Энэ бол тохиргооны асуудал биш --- \textbf{физик хязгаар}. Тиймээс платформын давхарга компьютер дээр байх нь тохиромж биш, зайлшгүй шаардлага.
+ThingsBoard-ын албан ёсны суулгах зааварт хөгжүүлэлт/PoC-д хүртэл \textbf{4 GB RAM}-ыг доод шаардлага гэж заасан; манай \texttt{stack/\allowbreak{}docker-compose.\allowbreak{}tb.\allowbreak{}yml}-д зөвхөн JVM-д \texttt{-Xmx1500m} өгсөн. Raspberry Pi 3B-д \textbf{нийт} 1 GB RAM бий (албан ёсны үзүүлэлт), үйлдлийн системд \textasciitilde925 MiB харагдана. Энэ бол тохиргооны асуудал биш --- \textbf{физик хязгаар}. Тиймээс платформын давхарга компьютер дээр байх нь тохиромжийн асуудал биш, зайлшгүй шаардлага.
 
 \hypertarget{ux430ux43bux445ux43cux443ux443ux434}{%
 \section{4. Алхмууд}\label{ux430ux43bux445ux43cux443ux443ux434}}
@@ -163,7 +169,9 @@ microSD чөлөөтэй (GB) & & \\
 \end{longtable}\endgroup
 
 \begin{quote}
-\textbf{\texttt{gpu\_mem} шалгалт:} \texttt{vcgencmd\ get\_mem\ gpu} → \texttt{16M} байх ёстой. \texttt{64M} бол SETUP.md Б.3 хийгээгүй. 48 MiB алдаж байна.
+\textbf{\texttt{gpu\_mem} шалгалт:} \texttt{vcgencmd\ get\_\allowbreak{}mem\ gpu}-ийн утгыг (GPU-д хуваарилсан санах ой) хүснэгтэд бич. SETUP.md Б.3 хийсэн бол \texttt{16M} гарна. Албан ёсны баримтаар 1 GB-тай загварт \texttt{gpu\_mem}-ийн анхдагч утга нь \texttt{76}. Гэхдээ Raspberry Pi-гийн баримт \texttt{gpu\_mem}-ийг «legacy» тохиргоонд ангилж, \emph{Bookworm болон түүнээс хойшхи Raspberry Pi OS дээр албан ёсоор дэмжигдэхгүй} гэж тэмдэглэсэн. Тиймээс хэдэн MiB «хэмнэснийг» таамаглах биш, \texttt{MemTotal}-ийг өөрчлөхийн өмнөх ба дараах утгатай харьцуулж \textbf{хэмжинэ}.
+
+Албан ёсны баримт: \href{https://www.raspberrypi.com/documentation/computers/os.html\#vcgencmd}{vcgencmd --- get\_\allowbreak{}mem, get\_\allowbreak{}throttled} · \href{https://www.raspberrypi.com/documentation/computers/legacy_config_txt.html\#gpu_mem}{Legacy config.\allowbreak{}txt --- gpu\_\allowbreak{}mem}
 \end{quote}
 
 \hypertarget{ux430ux43bux445ux430ux43c-2-ux4afux4afux43bux43dux438ux439-ux434ux430ux432ux445ux430ux440ux433ux44bux433-ux430ux441ux430ux430ux445-ux431ux430-ux445ux44dux43cux436ux438ux445-35-ux43cux438ux43d-ux437ux43a}{%
@@ -171,13 +179,17 @@ microSD чөлөөтэй (GB) & & \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\BuiltInTok{cd}\NormalTok{ stack}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack}
 \ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core down }\DecValTok{2}\OperatorTok{\textgreater{}}\NormalTok{/dev/null}
-\ExtensionTok{./../tools/measure\_stack.sh} \AttributeTok{{-}{-}role}\NormalTok{ cloud }\AttributeTok{{-}{-}startup}
+\ExtensionTok{../tools/measure\_stack.sh} \AttributeTok{{-}{-}role}\NormalTok{ cloud }\AttributeTok{{-}{-}startup}
 \end{Highlighting}
 \end{Shaded}
 
-\texttt{-\/-startup} нь \texttt{docker\ compose\ -\/\allowbreak{}-profile\ core\ up\ -d} ажиллуулж, үйлчилгээ бүрийн \textbf{эрүүл болох хүртэлх} хугацааг хэмжинэ.
+\texttt{-\/-startup} нь \texttt{docker\ compose\ -\/\allowbreak{}-profile\ core\ up\ -d} ажиллуулж, үйлчилгээ бүрийн \textbf{эрүүл болох хүртэлх} хугацааг хэмжинэ. \texttt{profiles} шинж өгсөн үйлчилгээ зөвхөн тухайн профайлыг \texttt{-\/-profile}-оор идэвхжүүлсэн үед асна.
+
+\begin{quote}
+Албан ёсны баримт: \href{https://docs.docker.com/compose/how-tos/profiles/}{Using profiles with Compose}
+\end{quote}
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-1.2-ux4afux4afux43bux43dux438ux439-ux4afux439ux43bux447ux438ux43bux433ux44dux44dux43dux438ux439-ux44dux445ux43bux44dux445-ux445ux443ux433ux430ux446ux430ux430}{%
 \subsubsection{Хүснэгт 1.2 --- Үүлний үйлчилгээний эхлэх хугацаа}\label{ux445ux4afux441ux43dux44dux433ux442-1.2-ux4afux4afux43bux43dux438ux439-ux4afux439ux43bux447ux438ux43bux433ux44dux44dux43dux438ux439-ux44dux445ux43bux44dux445-ux445ux443ux433ux430ux446ux430ux430}}
@@ -207,14 +219,23 @@ registry & & & & \\
 
 Хөтчөөр нээ:
 
-\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
 \toprule
-Үйлчилгээ & Хаяг & Нэвтрэх \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Үйлчилгээ
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хаяг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Нэвтрэх
+\end{minipage} \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
-EMQX самбар & http://localhost:18083 & admin / \texttt{.env}-ийн нууц үг \\
+EMQX самбар (dashboard) & http://localhost:18083 & admin / \texttt{.env}-ийн \texttt{EMQX\_\allowbreak{}DASHBOARD\_\allowbreak{}PASSWORD} \\
 Grafana & http://localhost:3000 & admin / \texttt{.env}-ийн нууц үг \\
 InfluxDB & http://localhost:8181/health & --- \\
 Бүртгэл & http://localhost:8090/health & --- \\
@@ -249,7 +270,7 @@ InfluxDB & http://localhost:8181/health & --- \\
 \end{Highlighting}
 \end{Shaded}
 
-\texttt{1} гарахгүй бол \texttt{docs/troubleshooting.md} §1.
+\texttt{1} гарахгүй бол \texttt{docs/\allowbreak{}troubleshooting.\allowbreak{}md} §1.
 
 Одоо ирмэгийн агентыг ажиллуул ({[}Pi{]} өөр терминал):
 
@@ -259,7 +280,7 @@ InfluxDB & http://localhost:8181/health & --- \\
 \end{Highlighting}
 \end{Shaded}
 
-Компьютер дээрх \texttt{mosquitto\_sub} цонхонд телеметр урсаж эхлэх ёстой. \textbf{Хэрэв урсахгүй бол §2 троублшүүтинг --- сэдвийн угтвар.}
+Компьютер дээрх \texttt{mosquitto\_sub} цонхонд телеметр урсаж эхлэх ёстой. \textbf{Хэрэв урсахгүй бол \texttt{docs/\allowbreak{}troubleshooting.\allowbreak{}md} §2 --- сэдвийн угтвар.}
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-1.3-ux438ux440ux43cux44dux433ux438ux439ux43d-ux4afux439ux43bux447ux438ux43bux433ux44dux44dux43dux438ux439-ux43dux4e9ux4e9ux446}{%
 \subsubsection{Хүснэгт 1.3 --- Ирмэгийн үйлчилгээний нөөц}\label{ux445ux4afux441ux43dux44dux433ux442-1.3-ux438ux440ux43cux44dux433ux438ux439ux43d-ux4afux439ux43bux447ux438ux43bux433ux44dux44dux43dux438ux439-ux43dux4e9ux4e9ux446}}
@@ -283,11 +304,20 @@ Docker демон & & & \\
 
 Гурван замын саатлыг харьцуулна. Энэ бол Лаб 3-ын бүрэн хэмжилтийн \textbf{урьдчилсан хувилбар}.
 
+\begin{figure}
+\centering
+\includegraphics{figures/fig-three-paths.pdf}
+\caption{Зураг 1.2 --- Саатлын гурван зам: loopback, LAN, гүүр}
+\end{figure}
+
+\texttt{qos\_latency.py} нь нийтлэгч ба захиалагчийг \textbf{нэг процесс} дотор ажиллуулдаг тул хоёр машины цагийн зөрүү (clock skew) хэмжилтэд орохгүй.
+
 \textbf{А. Loopback (сүлжээгүй)} --- {[}Pi{]} Pi дээр, Pi-гийн өөрийн брокер руу:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\BuiltInTok{export} \VariableTok{CLOUD\_HOST}\OperatorTok{=}\VariableTok{$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}CLOUD\_HOST=\textquotesingle{}}\NormalTok{ edge/.env }\KeywordTok{|} \FunctionTok{cut} \AttributeTok{{-}d}\OperatorTok{=} \AttributeTok{{-}f2}\VariableTok{)}   \CommentTok{\# Б, В{-}д хэрэгтэй}
 \ExtensionTok{python3}\NormalTok{ tools/qos\_latency.py }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\AttributeTok{{-}{-}port}\NormalTok{ 1883 }\DataTypeTok{\textbackslash{}}
         \AttributeTok{{-}{-}path}\NormalTok{ loopback }\AttributeTok{{-}{-}qos}\NormalTok{ 1 }\AttributeTok{{-}{-}count}\NormalTok{ 300 }\AttributeTok{{-}{-}interval}\NormalTok{ 0.05}
 \end{Highlighting}
@@ -302,17 +332,20 @@ Docker демон & & & \\
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{В. Гүүрээр} --- {[}Pi{]} нийтэлж, {[}ЗК{]} хүлээн авна. Хамгийн энгийн хэмжих арга:
+\textbf{В. Гүүрээр} --- {[}Pi{]} Pi дээр. Нийтлэгч Pi-гийн mosquitto руу бичнэ, мессеж гүүрээр EMQX-д очно, захиалагч EMQX-ээс уншина. Сэдэв нь гүүрийн \texttt{topic\ cnc302/\allowbreak{}shutis/\allowbreak{}\#\ out\ 1} дүрэмд \textbf{заавал} багтах ёстой --- эс бөгөөс мессеж Pi-гаас гарахгүй:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [Pi] Pi дээр — цуурай хийх (echo) хэрэгсэл}
-\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/pi3b{-}01/cmd\textquotesingle{}} \AttributeTok{{-}v} \KeywordTok{\&}
-\CommentTok{\# [ЗК] компьютер дээр — цагийн тэмдэгтэй мессеж илгээж, буцаж ирэхийг хүлээх}
 \ExtensionTok{python3}\NormalTok{ tools/qos\_latency.py }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\AttributeTok{{-}{-}port}\NormalTok{ 1883 }\DataTypeTok{\textbackslash{}}
+        \AttributeTok{{-}{-}sub{-}host} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}{-}sub{-}port}\NormalTok{ 1883 }\DataTypeTok{\textbackslash{}}
+        \AttributeTok{{-}{-}topic}\NormalTok{ cnc302/shutis/mhts/lab/pi3b{-}01/bench }\DataTypeTok{\textbackslash{}}
         \AttributeTok{{-}{-}path}\NormalTok{ bridge }\AttributeTok{{-}{-}qos}\NormalTok{ 1 }\AttributeTok{{-}{-}count}\NormalTok{ 300 }\AttributeTok{{-}{-}interval}\NormalTok{ 0.05}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{quote}
+Санамж: \texttt{-\/-sub-host}-гүйгээр \texttt{-\/\allowbreak{}-host\ localhost} гэж ажиллуулбал нийтлэгч, захиалагч хоёулаа Pi-гийн брокерт холбогдоно --- энэ нь гүүр биш, loopback-ийг дахин хэмжинэ.
+\end{quote}
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-1.4-ux433ux443ux440ux432ux430ux43d-ux437ux430ux43cux44bux43d-ux441ux430ux430ux442ux430ux43b-qos-1-300-ux43cux435ux441ux441ux435ux436}{%
 \subsubsection{Хүснэгт 1.4 --- Гурван замын саатал (QoS 1, 300 мессеж)}\label{ux445ux4afux441ux43dux44dux433ux442-1.4-ux433ux443ux440ux432ux430ux43d-ux437ux430ux43cux44bux43d-ux441ux430ux430ux442ux430ux43b-qos-1-300-ux43cux435ux441ux441ux435ux436}}
@@ -330,7 +363,7 @@ LAN (Pi → EMQX) & & & & & \\
 \end{longtable}\endgroup
 
 \begin{quote}
-\textbf{p99 нь гол тоо, дундаж биш.} Pi 3B-гийн 100 Mbit холбоос USB 2.0-ийн зурвасыг хуваадаг тул p50 сайхан харагдаж байхад p99 хэд дахин том гарч болно. Хэрэглэгчийн мэдэрдэг зүйл нь p99.
+\textbf{p99 нь гол тоо, дундаж биш.} Pi 3B-гийн Ethernet нь 100 Mb/s (албан ёсны үзүүлэлт), CPU нь 1.2 GHz-ийн 4 цөмт Cortex-A53. Ийм хязгаартай төхөөрөмж дээр p50 сайхан харагдаж байхад саатлын сүүл (p99) хэд дахин том гарч болно. Хэрэглэгчийн мэдэрдэг зүйл нь p99.
 \end{quote}
 
 \hypertarget{ux430ux43bux445ux430ux43c-5-ux43dux4e9ux4e9ux446ux438ux439ux43d-ux445ux44fux437ux433ux430ux430ux440ux44bux433-ux438ux43b-ux433ux430ux440ux433ux430ux445-30-ux43cux438ux43d-pi}{%
@@ -400,6 +433,10 @@ Swap \texttt{si/so}
 \end{Highlighting}
 \end{Shaded}
 
+\begin{quote}
+Албан ёсны баримт: \href{https://docs.docker.com/reference/cli/docker/container/stats/}{docker container stats} --- \texttt{-\/-no-stream} нь нэг удаагийн хэмжилт авна; Linux дээр \texttt{MemUsage}-ээс кэшийг хасч тооцдог.
+\end{quote}
+
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-1.6-ux445ux44dux440ux44dux432-ux431ux4afux433ux434ux438ux439ux433-pi-ux434ux44dux44dux440-ux430ux436ux438ux43bux43bux443ux443ux43bux430ux445-ux433ux44dux432ux44dux43b}{%
 \subsubsection{Хүснэгт 1.6 --- Хэрэв бүгдийг Pi дээр ажиллуулах гэвэл}\label{ux445ux4afux441ux43dux44dux433ux442-1.6-ux445ux44dux440ux44dux432-ux431ux4afux433ux434ux438ux439ux433-pi-ux434ux44dux44dux440-ux430ux436ux438ux43bux43bux443ux443ux43bux430ux445-ux433ux44dux432ux44dux43b}}
 
@@ -435,26 +472,60 @@ Pi-д боломжтой (Хүснэгт 1.1) & & \\
 \hypertarget{ux430ux43bux445ux430ux43c-7-grafana-ux434-ux430ux43cux44cux434-ux441ux430ux43cux431ux430ux440-25-ux43cux438ux43d-ux437ux43a}{%
 \subsection{Алхам 7 --- Grafana-д амьд самбар (25 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-7-grafana-ux434-ux430ux43cux44cux434-ux441ux430ux43cux431ux430ux440-25-ux43cux438ux43d-ux437ux43a}}
 
+\textbf{Анхаар:} Лаб 1-д MQTT-ээс InfluxDB руу бичих шугам хараахан \textbf{байхгүй} (Лаб 5-д Node-RED-ээр хийнэ). Тиймээс самбар хоосон байх болно. Доорх түр шугам нь \texttt{health} ба \texttt{bridge/state} мессежийг InfluxDB 3 Core-ын \texttt{/\allowbreak{}api/\allowbreak{}v3/\allowbreak{}write\_\allowbreak{}lp} руу line protocol болгон бичнэ ({[}ЗК{]} тусдаа терминал, \texttt{jq} шаардлагатай):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack}
+\ExtensionTok{docker}\NormalTok{ compose exec influxdb influxdb3 create database cnc302   }\CommentTok{\# аль хэдийн байвал алдаа өгнө — зүгээр}
+
+\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}v} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/+/+/+/health\textquotesingle{}} \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/+/+/+/bridge/state\textquotesingle{}} \KeywordTok{|}
+\ControlFlowTok{while} \BuiltInTok{read} \AttributeTok{{-}r} \VariableTok{topic} \VariableTok{payload}\KeywordTok{;} \ControlFlowTok{do}
+  \VariableTok{dev}\OperatorTok{=}\VariableTok{$(}\BuiltInTok{echo} \StringTok{"}\VariableTok{$topic}\StringTok{"} \KeywordTok{|} \FunctionTok{cut} \AttributeTok{{-}d}\NormalTok{/ }\AttributeTok{{-}f5}\VariableTok{)}\KeywordTok{;} \VariableTok{ch}\OperatorTok{=}\VariableTok{$(}\BuiltInTok{echo} \StringTok{"}\VariableTok{$topic}\StringTok{"} \KeywordTok{|} \FunctionTok{cut} \AttributeTok{{-}d}\NormalTok{/ }\AttributeTok{{-}f6}\VariableTok{)}
+  \ControlFlowTok{if} \BuiltInTok{[} \StringTok{"}\VariableTok{$ch}\StringTok{"} \OtherTok{=}\NormalTok{ health }\BuiltInTok{]}\KeywordTok{;} \ControlFlowTok{then}
+    \VariableTok{line}\OperatorTok{=}\VariableTok{$(}\BuiltInTok{echo} \StringTok{"}\VariableTok{$payload}\StringTok{"} \KeywordTok{|} \ExtensionTok{jq} \AttributeTok{{-}r} \AttributeTok{{-}{-}arg}\NormalTok{ d }\StringTok{"}\VariableTok{$dev}\StringTok{"} \StringTok{\textquotesingle{}"health,device=\textbackslash{}($d) " + ([to\_entries[]}
+\StringTok{      | select(.key | IN("cpu\_temp\_c","cpu\_pct","load1","mem\_available\_mb","swap\_used\_mb"))}
+\StringTok{      | select(.value != null) | "\textbackslash{}(.key)=\textbackslash{}(.value)"] | join(","))\textquotesingle{}}\VariableTok{)}
+  \ControlFlowTok{else}
+    \VariableTok{line}\OperatorTok{=}\StringTok{"bridge,device=}\VariableTok{$\{dev\}}\StringTok{ state=}\VariableTok{$\{payload\}}\StringTok{i"}
+  \ControlFlowTok{fi}
+  \ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST }\StringTok{"http://localhost:8181/api/v3/write\_lp?db=cnc302"} \AttributeTok{{-}{-}data{-}binary} \StringTok{"}\VariableTok{$line}\StringTok{"}
+\ControlFlowTok{done}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+Албан ёсны баримт: \href{https://docs.influxdata.com/influxdb3/core/write-data/http-api/v3-write-lp/}{InfluxDB 3 Core --- v3 write\_\allowbreak{}lp API}. Line protocol-д \texttt{i} дагаваргүй тоо нь float, \texttt{1i} нь integer.
+\end{quote}
+
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  http://localhost:3000 → Connections → Data sources → InfluxDB аль хэдийн бүртгэгдсэн (provisioning)
+  http://localhost:3000 → \textbf{Connections → Data sources} → \texttt{InfluxDB3} аль хэдийн бүртгэгдсэн (provisioning, хэл нь SQL, өгөгдлийн сан \texttt{cnc302}). \textbf{Save \& test} дарж шалга.
 \item
-  New dashboard → 3 панел:
+  \textbf{Dashboards → New → New dashboard} → 3 панел (SQL горим):
 
   \begin{itemize}
   \tightlist
   \item
-    Pi-гийн CPU температур (\texttt{health} сувгаас)
+    Pi-гийн CPU температур --- Time series:
+    \texttt{SELECT\ time,\ cpu\_temp\_c\ FROM\ health\ WHERE\ device\ =\ \textquotesingle{}pi3b-01\textquotesingle{}\ AND\ \$\_\_timeFilter(time)\ ORDER\ BY\ time}
   \item
-    \texttt{MemAvailable} (\texttt{health} сувгаас)
+    \texttt{MemAvailable} --- Time series:
+    \texttt{SELECT\ time,\ mem\_available\_mb\ FROM\ health\ WHERE\ device\ =\ \textquotesingle{}pi3b-01\textquotesingle{}\ AND\ \$\_\_timeFilter(time)\ ORDER\ BY\ time}
   \item
-    Гүүрний төлөв (\texttt{bridge/state}) --- Stat панел
+    Гүүрний төлөв --- Stat панел:
+    \texttt{SELECT\ time,\ state\ FROM\ bridge\ WHERE\ device\ =\ \textquotesingle{}pi3b-01\textquotesingle{}\ ORDER\ BY\ time\ DESC\ LIMIT\ 1}
   \end{itemize}
 \item
-  Хадгалж, JSON-ыг экспортлон \texttt{lab01/dashboard.json} болгож commit хийнэ
+  Хадгална. Дараа нь \textbf{Export → Export as JSON} → \textbf{Download file}, файлыг \texttt{lab01/\allowbreak{}dashboard.\allowbreak{}json} нэрээр хадгалж commit хийнэ.
 \end{enumerate}
+
+\begin{quote}
+Албан ёсны баримт: \href{https://grafana.com/docs/grafana/v11.6/dashboards/share-dashboards-panels/}{Grafana 11.\allowbreak{}6 --- Export a dashboard as JSON} · \href{https://grafana.com/docs/grafana/v11.6/datasources/influxdb/query-editor/}{InfluxDB query editor --- SQL macros}
+\end{quote}
 
 \begin{quote}
 Энэ самбар Лаб 5-д гүүр тасрахыг \textbf{нүдээр харах} гол хэрэгсэл болно.
@@ -492,7 +563,7 @@ Pi-д боломжтой (Хүснэгт 1.1) & & \\
 \item
   Хүснэгт 1.4-д гурван замын p99 хэд дахин ялгаатай вэ? Ялгааны \textbf{гол шалтгаан} юу вэ --- сүлжээ, брокерын боловсруулалт, эсвэл дараалал? Хэрхэн ялгаж тогтоох вэ?
 \item
-  Хүснэгт 1.5-д хязгаарлагч нөөц юу байв --- RAM, CPU, эсвэл сүлжээ? Хариултаа тоогоор нотол. (Санамж: \texttt{docker\ stats}-ын CPU \% нь 4 цөм дээр 400\% хүртэл гарна.)
+  Хүснэгт 1.5-д хязгаарлагч нөөц юу байв --- RAM, CPU, эсвэл сүлжээ? Хариултаа тоогоор нотол. (Санамж: \texttt{docker\ stats}-ын CPU \% нь олон цөм ашиглавал 100\%-иас давж болно --- 4 цөмт машин дээр 400\% хүртэл.)
 \item
   Хүснэгт 1.6-гийн дутагдал хэдэн MiB вэ? Хэрэв Pi 3B-д 2 GB RAM байсан бол платформыг түүн дээр ажиллуулах уу? Яагаад тийм / үгүй?
 \item
@@ -500,7 +571,7 @@ Pi-д боломжтой (Хүснэгт 1.1) & & \\
 \item
   Гүүр нь \texttt{cnc302/shutis/\#} сэдвийг дамжуулдаг. Хэрэв өөр баг \texttt{SITE=shutis} ашиглаад нэг брокерт холбогдвол юу болох вэ? Үүнээс хэрхэн сэргийлэх вэ (хоёр өөр арга нэрлэ)?
 \item
-  Pi дээр \texttt{vcgencmd\ get\_throttled} нь \texttt{0x50000} буцаав. Энэ юу гэсэн үг вэ, өмнөх хэмжилтүүд хүчинтэй юу?
+  Pi дээр \texttt{vcgencmd\ get\_\allowbreak{}throttled} нь \texttt{0x50000} буцаав. Энэ юу гэсэн үг вэ, өмнөх хэмжилтүүд хүчинтэй юу?
 \end{enumerate}
 
 \hypertarget{ux445ux4afux43bux44dux44dux43bux433ux44dux43d-ux4e9ux433ux4e9ux445-ux437ux4afux439ux43b}{%
@@ -514,8 +585,8 @@ Pi-д боломжтой (Хүснэгт 1.1) & & \\
 \bottomrule
 \endlastfoot
 1 & Тайлан (Хүснэгт 1.1--1.6 бөглөсөн) & \texttt{lab01/report.md} → PDF \\
-2 & Grafana самбарын JSON & \texttt{lab01/dashboard.json} \\
-3 & \texttt{measure\_stack.sh}-ийн түүхий гаралт & \texttt{lab01/out/} \\
+2 & Grafana самбарын JSON & \texttt{lab01/\allowbreak{}dashboard.\allowbreak{}json} \\
+3 & \texttt{measure\_\allowbreak{}stack.\allowbreak{}sh}-ийн түүхий гаралт & \texttt{lab01/out/} \\
 4 & Git tag & \texttt{lab01-done} \\
 \end{longtable}\endgroup
 
@@ -561,4 +632,40 @@ Grafana самбар ажиллаж байна & 1 \\
 \texttt{docker\ stats} санах ой хоосон & cgroup идэвхгүй & SETUP.md Б.5 \\
 Саатал 10 дахин хэлбэлзэнэ & throttling эсвэл Wi-Fi & \texttt{get\_throttled}, кабельд шилжих \\
 \texttt{exec\ format\ error} & 32-bit OS & \texttt{uname\ -m} → aarch64 байх ёстой \\
+\end{longtable}\endgroup
+
+\hypertarget{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}{%
+\section{9. Эх сурвалж}\label{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Эх сурвалж
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Юуг баталгаажуулсан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хандсан
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & \href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html}{Raspberry Pi hardware --- Raspberry Pi 3 Model B} (эх: \href{https://github.com/raspberrypi/documentation/blob/master/documentation/asciidoc/computers/raspberry-pi/introduction.adoc}{github.\allowbreak{}com/\allowbreak{}raspberrypi/\allowbreak{}documentation}) & 1 GB RAM, 100 Mb/s Ethernet, 4 × USB 2.0 & 2026-09 \\
+2 & \href{https://www.raspberrypi.com/documentation/computers/processors.html\#bcm2837}{Processors --- BCM2837} (эх: \href{https://github.com/raspberrypi/documentation/blob/master/documentation/asciidoc/computers/processors/bcm2837.adoc}{bcm2837.adoc}) & 4 цөмт Cortex-A53 (Armv8), 1.2 GHz & 2026-09 \\
+3 & \href{https://www.raspberrypi.com/documentation/computers/os.html\#vcgencmd}{vcgencmd} (эх: \href{https://github.com/raspberrypi/documentation/blob/master/documentation/asciidoc/computers/os/graphics-utilities.adoc}{graphics-utilities.\allowbreak{}adoc}) & \texttt{get\_throttled} битүүд (0x1, 0x2, 0x4, 0x8, 0x10000\ldots0x80000), \texttt{get\_mem\ gpu} & 2026-09 \\
+4 & \href{https://www.raspberrypi.com/documentation/computers/legacy_config_txt.html}{Legacy config.\allowbreak{}txt options --- gpu\_\allowbreak{}mem} (эх: \href{https://github.com/raspberrypi/documentation/blob/master/documentation/asciidoc/computers/legacy_config_txt/memory.adoc}{legacy\_\allowbreak{}config\_\allowbreak{}txt/\allowbreak{}memory.\allowbreak{}adoc}) & 1 GB загварт анхдагч 76, доод утга 16; Bookworm+ дээр албан ёсоор дэмжигдэхгүй & 2026-09 \\
+5 & \href{https://docs.docker.com/compose/how-tos/profiles/}{Using profiles with Compose} & \texttt{-\/-profile}, \texttt{profiles:} шинж & 2026-09 \\
+6 & \href{https://docs.docker.com/reference/cli/docker/container/stats/}{docker container stats} & \texttt{-\/-no-stream}, \texttt{-\/-format\ \textquotesingle{}table\ \{\{.Name\}\}\textbackslash{}t\{\{.MemUsage\}\}\textquotesingle{}} & 2026-09 \\
+7 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/dashboard/introduction.html}{EMQX 5.\allowbreak{}8 --- Dashboard} & самбарын анхдагч порт 18083 & 2026-09 \\
+8 & \href{https://docs.influxdata.com/influxdb3/core/write-data/http-api/v3-write-lp/}{InfluxDB 3 Core --- v3 write\_\allowbreak{}lp API} & \texttt{/\allowbreak{}api/\allowbreak{}v3/\allowbreak{}write\_\allowbreak{}lp?\allowbreak{}db=\allowbreak{}}, line protocol & 2026-09 \\
+9 & \href{https://docs.influxdata.com/influxdb3/core/reference/cli/influxdb3/create/database/}{influxdb3 create database} & CLI синтакс, анхдагч host \texttt{http:\allowbreak{}/\allowbreak{}/\allowbreak{}127.\allowbreak{}0.\allowbreak{}0.\allowbreak{}1:\allowbreak{}8181} & 2026-09 \\
+10 & \href{https://grafana.com/docs/grafana/v11.6/dashboards/share-dashboards-panels/}{Grafana 11.\allowbreak{}6 --- Share dashboards and panels} & Export → Export as JSON & 2026-09 \\
+11 & \href{https://grafana.com/docs/grafana/v11.6/datasources/influxdb/query-editor/}{Grafana 11.\allowbreak{}6 --- InfluxDB query editor} & SQL макро \texttt{\$\_\allowbreak{}\_\allowbreak{}timeFilter(time)} & 2026-09 \\
+12 & \href{https://thingsboard.io/docs/installation/docker/}{ThingsBoard --- Install using Docker} & Dev/PoC-д доод тал нь 4 GB RAM & 2026-09 \\
 \end{longtable}\endgroup

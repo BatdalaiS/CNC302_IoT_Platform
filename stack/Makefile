@@ -75,7 +75,8 @@ health:
 # Windows дээр ажиллахгүй бол:  ipconfig | findstr IPv4
 ip:
 	@echo "Pi-гийн edge/.env файлд бичих утга:"
-	@ip -4 addr show scope global 2>/dev/null \
-	   | awk '/inet /{split($$2,a,"/"); print "  CLOUD_HOST=" a[1]}' \
-	 || ipconfig 2>/dev/null | grep -i 'IPv4' \
-	 || echo "  (гараар олно уу: ipconfig / ifconfig)"
+	@if command -v ip >/dev/null 2>&1; then \
+	   ip -4 addr show scope global | awk '/inet /{split($$2,a,"/"); print "  CLOUD_HOST=" a[1]}'; \
+	 elif command -v ipconfig >/dev/null 2>&1; then \
+	   ipconfig | grep -i 'IPv4' || ipconfig getifaddr en0; \
+	 else echo "  (гараар олно уу: ipconfig / ifconfig)"; fi

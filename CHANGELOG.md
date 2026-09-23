@@ -1,5 +1,53 @@
 # Өөрчлөлтийн түүх
 
+## 2.1 — Албан ёсны баримт бичигтэй тулгаж шалгасан (2026 оны 9 дүгээр сар)
+
+Найман лаборатори, дундын бүх файлыг технология бүрийн **албан ёсны баримт бичигтэй** (kubernetes.io, docs.k3s.io, docs.docker.com, mosquitto.org, docs.emqx.com, MQTT 5.0 / Sparkplug 3.0 спецификаци, docs.influxdata.com, grafana.com, nodered.org, ai.google.dev/edge/litert, raspberrypi.com, dexidp.io, strawberry.rocks, docs.ollama.com …) тулгаж, олдсон зөрүүг засав. Лаборатори бүрийн төгсгөлд **«9. Эх сурвалж»** хүснэгт, гол алхмуудад албан ёсны холбоос нэмэв. Боломжтой бүх зүйлийг бодит программ дээр (EMQX 5.8.6, mosquitto 2.0, Node-RED 4.0.9, LiteRT 2.2) ажиллуулж шалгасан.
+
+### Систем ажиллахгүй байсан ноцтой алдаа
+
+| Хаана | Юу буруу байв | Засвар |
+|---|---|---|
+| `stack/docker-compose.yml` — EMQX | `./emqx/certs`-ийг `/opt/emqx/etc/certs` дээр холбосноор EMQX-ийн өөрийн сертификат дарагдаж, EMQX **эхлэхгүй** байв (wss:8084 `no_cert`). mTLS нь клиентийн сертификат шаарддаггүй байв. | `/opt/emqx/etc/cnc302-certs`-д холбож, `verify_peer` + `fail_if_no_peer_cert` |
+| `stack/docker-compose.yml` — InfluxDB | Өгөгдлийн хавтас root-ынх, процесс uid 1500 → **бичих эрхгүй** | `/home/influxdb3/.influxdb3` |
+| `stack/dex/config.yaml` | Нууц үгийн hash нь `cnc302` биш, Dex-ийн жишээний `password` байв | Зөв bcrypt hash + `grantTypes` |
+| `tools/qos_latency.py` | Лаб 1, 2-т ашигласан `--sub-host`, `--tls` туг **байгаагүй** | Нэмэв; гүүрийн замыг жинхэнэ хэмжинэ |
+| `lab05/flows/nodered-pipeline.json` | `integrity` хүснэгтэд юу ч бичдэггүй → Лаб 5-ын store-and-forward хэмжилт **хэзээ ч** ажиллахгүй байв | Задлагч 3 гаралттай, integrity салбар |
+| `lab08` K3s | Server 1 GB Pi дээр — албан ёсны доод шаардлага **2 GB** | Server → зөөврийн компьютер дээрх VM, Pi → agent |
+| `edge/.env.example` | Мөрийн дундах тайлбар systemd-д утгын хэсэг болдог | Тайлбарыг тусдаа мөрөнд |
+
+### Буруу мэдээлэл засав (гол жишээ)
+
+- Mosquitto-гийн дараалал **дискэнд биш RAM-д** байна; диск рүү зөвхөн autosave / зөв зогсоох / SIGUSR1 үед бичигдэнэ (SIGKILL-ээр 198 мессеж алдагдсаныг хэмжсэн). Гүүр тасралтыг `keepalive_interval`-ээр л анзаардаг → 15 с болгов.
+- `kill -9` хийхэд Sparkplug NDEATH ~2 мс-д ирдэг (OS сокетыг хаадаг), 30–45 с биш; 45 с нь зөвхөн `kill -STOP` үед.
+- 100 Mb/s-ийн тааз: MQTT + TCP/IP + Ethernet-ийн толгойг тооцвол 200 B ачаанд ~36.9k мессеж/с (62.5k биш).
+- EMQX REST API самбарын нууц үгийг хүлээн авдаггүй (5.0-оос) — API key эсвэл Bearer токен.
+- Pi 3B-ийн «Ethernet нь USB-тэй зурвас хуваадаг», «Cortex-A53-д крипто өргөтгөл байхгүй» гэдгийг албан ёсоор батлах эх олдсонгүй → оюутан өөрөө шалгах таамаглал болгов.
+- `gpu_mem` нь Bookworm-оос хойш албан ёсоор дэмжигдэхгүй legacy тохиргоо; хэмнэлтийг таамаглах биш хэмжинэ.
+- Raspberry Pi OS: swap `rpi-swap` (хуучин дүрсэнд `dphys-swapfile`), Docker-ийг албан ёсны apt repository-оор суулгана.
+- Pi 3B нь Edge Impulse-ийн албан ёсоор дэмжигдсэн самбарын жагсаалтад байхгүй → гол зам нь Keras + LiteRT converter (`lab06/train_tiny_model.py`, шинэ).
+
+### Хувилбарын өөрчлөлт
+
+| Дүрс | Өмнө | Одоо | Шалтгаан |
+|---|---|---|---|
+| grafana/grafana | 11.6.0 | 11.6.16 | CVE-2025-4123, CVE-2026-27876 |
+| eclipse-mosquitto | 2.0.20 | 2.0.22 | санах ой алдагдах ба `mosquitto_sub -W` засвар |
+| nodered/node-red | 4.0 (хөвөгч) | 4.0.9 | хувилбарыг бэхлэв |
+| emqx/emqtt-bench | 0.4.20 | 0.6.3 | одоогийн, arm64-тэй |
+| emqx/emqx | 5.8.6 | **5.8.6 (хэвээр)** | 5.9-өөс BSL 1.1 лиценз; 5.8 нь Apache 2.0, LTS 2027-08 хүртэл |
+
+### Зураг
+
+Гарын авлагад 12 схем нэмэв (`docs/img/`): архитектур, хэмжилтийн гурван зам, OTA төлөвийн машин, QoS 0/1/2, UNS шатлал, ачааллын туршилт, өгөгдлийн шугам, store-and-forward, ирмэгийн шүүлт, OIDC/RBAC, дижитал ихэр, K3s кластер. Бүгд `docs/img/make_figures.py`-аас үүснэ — SVG-г гараар засахгүй.
+
+### Хараахан шалгаагүй
+
+- Бодит Raspberry Pi 3B дээр бүх найман лаборатори (контейнер дүрсүүд arm64-тэй гэдгийг Docker Hub-аас л шалгасан)
+- Docker daemon энд байхгүй тул `registry`, `graphql-api`, `edge-agent` дүрсийг барьж шалгаагүй
+- K3s кластерыг бодитоор байгуулаагүй (манифест, санах ойн тооцоо, портуудыг баримттай тулгасан)
+- docs.emqx.com, raspberrypi.com автомат хандалтыг хаадаг тул EMQX-ийг бодит 5.8.6 дээр туршиж, Raspberry Pi-г github.com/raspberrypi/documentation эх кодоос уншсан
+
 ## 2.0 — Raspberry Pi 3B хувилбар (2026 оны 9 дүгээр сар)
 
 Тоног төхөөрөмж **Raspberry Pi 5 (8 GB) → Raspberry Pi 3B (1 GB)** болсонтой холбоотой бүрэн дахин зохиомж.

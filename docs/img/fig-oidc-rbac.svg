@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="490" viewBox="0 0 900 490" font-family="DejaVu Sans, Arial, sans-serif">
+<title>OIDC ба RBAC</title>
+<defs><marker id="a374151" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#374151"/></marker></defs>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<rect x="10" y="20" width="160" height="38" rx="6" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.4"/>
+<text x="90.0" y="43.0625" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="bold">Клиент</text>
+<line x1="90" y1="58" x2="90" y2="410" stroke="#D1D5DB" stroke-width="1.3" stroke-dasharray="4 4"/>
+<rect x="220" y="20" width="160" height="38" rx="6" fill="#EAF0FA" stroke="#2E5496" stroke-width="1.4"/>
+<text x="300.0" y="43.0625" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="bold">Dex (OIDC)</text>
+<line x1="300" y1="58" x2="300" y2="410" stroke="#D1D5DB" stroke-width="1.3" stroke-dasharray="4 4"/>
+<rect x="460" y="20" width="160" height="38" rx="6" fill="#EAF0FA" stroke="#2E5496" stroke-width="1.4"/>
+<text x="540.0" y="43.0625" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="bold">GraphQL API</text>
+<line x1="540" y1="58" x2="540" y2="410" stroke="#D1D5DB" stroke-width="1.3" stroke-dasharray="4 4"/>
+<rect x="710" y="20" width="160" height="38" rx="6" fill="#EAF0FA" stroke="#2E5496" stroke-width="1.4"/>
+<text x="790.0" y="43.0625" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="bold">registry / InfluxDB</text>
+<line x1="790" y1="58" x2="790" y2="410" stroke="#D1D5DB" stroke-width="1.3" stroke-dasharray="4 4"/>
+<line x1="90" y1="92" x2="300" y2="92" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<text x="195.0" y="85.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#1F2937" text-anchor="middle" font-weight="normal">POST /dex/token  (password grant, Basic client auth)</text>
+<line x1="300" y1="136" x2="90" y2="136" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<text x="195.0" y="129.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#1F2937" text-anchor="middle" font-weight="normal">id_token (JWT · RS256 · kid · iss · aud · exp)</text>
+<line x1="90" y1="180" x2="540" y2="180" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<text x="315.0" y="173.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#1F2937" text-anchor="middle" font-weight="normal">Authorization: Bearer &lt;JWT&gt;</text>
+<line x1="540" y1="224" x2="300" y2="224" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<text x="420.0" y="217.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">GET jwks_uri (discovery) — нийтийн түлхүүр</text>
+<rect x="455" y="252" width="170" height="104" rx="6" fill="#FFFFFF" stroke="#2E5496" stroke-width="1.4"/>
+<text x="540" y="270.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#1F2937" text-anchor="middle" font-weight="normal">1. гарын үсэг (kid)</text>
+<text x="540" y="284.85" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#1F2937" text-anchor="middle" font-weight="normal">2. alg ∈ {RS256}</text>
+<text x="540" y="299.7" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#1F2937" text-anchor="middle" font-weight="normal">3. iss · aud · exp</text>
+<text x="540" y="314.55" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#1F2937" text-anchor="middle" font-weight="normal">4. үүрэг → эрх</text>
+<text x="540" y="348" font-family="DejaVu Sans, Arial, sans-serif" font-size="10" fill="#5B6474" text-anchor="middle" font-weight="normal">viewer · operator · admin</text>
+<line x1="625" y1="290" x2="790" y2="290" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<text x="707.5" y="283.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.5" fill="#1F2937" text-anchor="middle" font-weight="normal">device:read / telemetry:read</text>
+<line x1="790" y1="330" x2="625" y2="330" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<text x="707.5" y="346.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.5" fill="#5B6474" text-anchor="middle" font-weight="normal">өгөгдөл</text>
+<line x1="540" y1="388" x2="90" y2="388" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<text x="315.0" y="381.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#1F2937" text-anchor="middle" font-weight="normal">хариу эсвэл 401 / 403</text>
+<rect x="30" y="415" width="840" height="64" rx="8" fill="#FDECEC" stroke="#B91C1C" stroke-width="1.4"/>
+<text x="46" y="437" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" fill="#B91C1C" text-anchor="start" font-weight="bold">Санаатай 2 эмзэг байдал (Лаб 7-д олж засна):</text>
+<text x="46" y="456" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" fill="#B91C1C" text-anchor="start" font-weight="normal">① jwt.get_unverified_claims — гарын үсгийг шалгадаггүй</text>
+<text x="46" y="472" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" fill="#B91C1C" text-anchor="start" font-weight="normal">② introspection ба query-гийн нарийвчлал (alias, гүн) хязгааргүй</text>
+</svg>

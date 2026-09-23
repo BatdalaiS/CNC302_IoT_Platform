@@ -10,6 +10,7 @@ on:
       - 'SETUP.md'
       - 'docs/**'
       - 'manual/**'
+      - 'docs/img/**'
       - '.github/workflows/build-manual.yml'
   pull_request:
   workflow_dispatch:
@@ -19,6 +20,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Зургийн хөрвүүлэгч (SVG → PDF)
+        run: pip install cairosvg
 
       - name: LaTeX ба pandoc суулгах
         run: |

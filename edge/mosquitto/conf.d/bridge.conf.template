@@ -35,17 +35,28 @@ local_cleansession false
 # Санамж: QoS 0 мессежийг дараалалд оруулах тохиргоо (queue_qos0_messages)
 # нь ГЛОБАЛ бөгөөд mosquitto.conf-д байна — энд бичвэл mosquitto эхлэхгүй.
 
-# Дахин холбогдох завсарлага: 5 сек-ээс эхэлж 60 сек хүртэл өснө
+# Дахин холбогдох завсарлага: "restart_timeout base cap" хэлбэр —
+# 5 сек-ээс эхэлж санамсаргүй (decorrelated jitter) байдлаар 60 сек хүртэл өснө.
 restart_timeout 5 60
 
-# Гүүрний төлөвийг $SYS-д нийтэлнэ → Лаб 5-д хянана:
-#   mosquitto_sub -h localhost -t '$SYS/broker/connection/cloud/state'
-#   1 = холбогдсон, 0 = тасарсан
+# Холболт тасарснаа илрүүлэх хугацаа. Гүүр ийм хугацаанд урсгалгүй бол PINGREQ
+# илгээнэ (анхдагч 60, доод тал нь 5). Анхдагч 60 сек-тэй үед Лаб 5-ын 60 сек
+# өгсөх урсгалын (uplink) тасалдал огт илрээгүй (state 0 ирээгүй) — тиймээс 15.
+keepalive_interval 15
+
+# Гүүрний төлөвийг (retained) нийтэлнэ: 1 = холбогдсон, 0 = тасарсан.
+# Анхдагч сэдэв нь $SYS/broker/connection/<remote_clientid>/state
+# (энд: $SYS/broker/connection/edge-__DEVICE_ID__/state). Бид notification_topic-оор
+# UNS дотор шилжүүлэв → Лаб 5-д хянана:
+#   mosquitto_sub -h localhost -v -t 'cnc302/__SITE__/__AREA__/__LINE__/__DEVICE_ID__/bridge/state'
 notifications true
 notification_topic cnc302/__SITE__/__AREA__/__LINE__/__DEVICE_ID__/bridge/state
 
-# ── Нэвтрэлт ────────────────────────────────────────────────────────────────
-# Лаб 2 хүртэл EMQX нээлттэй тул шаардлагагүй. Лаб 2-т тайлбарыг арилгана.
+# ── Нэвтрэлт (сонголттой) ──────────────────────────────────────────────────
+# EMQX-ийн authenticator Лаб 2-оос хойш ИДЭВХГҮЙ (зөвхөн Лаб 2-ын Алхам 7-д
+# түр асаана) тул анхдагчаар шаардлагагүй. Нэвтрэлтийг БАЙНГА асаах бол
+# .env-д CLOUD_MQTT_USERNAME/CLOUD_MQTT_PASSWORD-ийг бичээд доорх хоёр
+# мөрийн # тэмдгийг арилгана (`make bridge` орлуулна).
 #remote_username __CLOUD_USER__
 #remote_password __CLOUD_PASS__
 

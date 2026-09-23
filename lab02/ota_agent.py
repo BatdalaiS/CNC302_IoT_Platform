@@ -28,6 +28,9 @@ CNC302 — OTA КЛИЕНТ (төхөөрөмжийн тал).
     python3 ota_agent.py --device dev0001 --fail-verify     # эвдрэл дуурайх
     python3 ota_agent.py --device dev0001 --fail-apply      # rollback дуурайх
     python3 ota_agent.py --device dev0001 --drop-rate 0.2   # сүлжээний алдагдал
+    python3 ota_agent.py --device dev0001 --username dev0001 --password …   # EMQX authn
+    python3 ota_agent.py --device pi3b-01 --port 8883 \
+        --cafile certs/ca.crt --cert certs/pi3b-01.crt --key certs/pi3b-01.key  # mTLS
 
 Pi 3B-ийн санамж:
     Нэг хэсэг = 4 KiB. 1 MiB firmware = 256 хэсэг. 100 Mbit сүлжээ, QoS 1
@@ -70,6 +73,12 @@ class OtaAgent:
         self.c = mqtt.Client(CallbackAPIVersion.VERSION2,
                              client_id=f"ota-{args.device}-{os.getpid()}",
                              protocol=mqtt.MQTTv5)
+        if args.username:
+            self.c.username_pw_set(args.username, args.password)
+        if args.cafile:
+            # --cert/--key өгвөл mTLS (клиентийн сертификат), үгүй бол нэг талын TLS
+            self.c.tls_set(ca_certs=args.cafile, certfile=args.cert,
+                           keyfile=args.key)
         self.c.on_connect = self._on_connect
         self.c.on_message = self._on_message
 
@@ -84,6 +93,8 @@ class OtaAgent:
         print(f"  [{state}] {prog}")
 
     # ── MQTT ──────────────────────────────────────────────────────────────
+    # paho-mqtt 2.x, CallbackAPIVersion.VERSION2:
+    #   on_connect(client, userdata, flags, reason_code, properties)
     def _on_connect(self, c, u, f, rc, p=None):
         if rc != 0:
             print(f"холбогдож чадсангүй rc={rc}")
@@ -172,16 +183,24 @@ class OtaAgent:
         outdir.mkdir(parents=True, exist_ok=True)
         backup = outdir / "previous.bin"
         current = outdir / "current.bin"
+        vfile = outdir / "version.txt"
+        old_version = vfile.read_text() if vfile.exists() else None
         if current.exists():
             backup.write_bytes(current.read_bytes())
         current.write_bytes(data)
-        (outdir / "version.txt").write_text(self.fw["version"])
+        vfile.write_text(self.fw["version"])
         time.sleep(self.a.apply_seconds)
 
         if self.a.fail_apply:
-            # Буцаалт: нөөцлөсөн хувилбарыг сэргээнэ
+            # Буцаалт: нөөцлөсөн хувилбар ба хувилбарын дугаарыг сэргээнэ
             if backup.exists():
                 current.write_bytes(backup.read_bytes())
+            else:
+                current.unlink()                    # өмнө нь юу ч суугаагүй байсан
+            if old_version is not None:
+                vfile.write_text(old_version)
+            else:
+                vfile.unlink()
             self.report("ROLLED_BACK", error="суулгасны дараа ачаалж чадсангүй")
             print("  ↩ БУЦААЛАА — хуучин хувилбар сэргээгдлээ.")
         else:
@@ -224,6 +243,11 @@ def main() -> int:
     p.add_argument("--area", default=os.getenv("AREA", "mhts"))
     p.add_argument("--line", default=os.getenv("LINE", "lab"))
     p.add_argument("--device", required=True)
+    p.add_argument("--username", help="EMQX authn идэвхтэй үед (devices.csv-ээс)")
+    p.add_argument("--password")
+    p.add_argument("--cafile", help="TLS: CA сертификат (8883 порттой хамт)")
+    p.add_argument("--cert", help="mTLS: төхөөрөмжийн сертификат")
+    p.add_argument("--key", help="mTLS: төхөөрөмжийн хувийн түлхүүр")
     p.add_argument("--out", default="out/fw")
     p.add_argument("--timeout", type=float, default=180.0)
     p.add_argument("--retry-after", type=float, default=4.0)

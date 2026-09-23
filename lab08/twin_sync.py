@@ -29,7 +29,8 @@ CNC302 Лаб 8 — Дижитал ихрийн загварчлал ба төл
   python3 twin_sync.py simulate --minutes 20
 """
 from __future__ import annotations
-import argparse, json, os, statistics, sys, time
+import argparse, json, os, re, statistics, sys, time
+from datetime import datetime, timezone
 import requests
 
 TIMEOUT = 20
@@ -45,9 +46,18 @@ def registry_get(base: str, path: str, **params) -> dict:
     return r.json()
 
 
-def influx(base: str, db: str, q: str) -> list[dict]:
+def influx(base: str, db: str, q: str, params: dict | None = None) -> list[dict]:
+    """
+    InfluxDB 3 SQL. Төхөөрөмжийн ID-г SQL мөрөнд ЗАЛГАХГҮЙ — `$device`
+    параметрээр дамжуулна (InfluxDB 3 Core: parameterized queries, зөвхөн
+    WHERE-д). Бүртгэлийн ID-г хэн ч `claim`-ээр бүртгүүлж болох тул
+    `x' OR '1'='1` гэх мэт нэр ирж болно — ask.py-ийн сургамжтай ижил.
+    """
+    body = {"db": db, "q": q, "format": "json"}
+    if params:
+        body["params"] = params
     r = requests.post(f"{base.rstrip('/')}/api/v3/query_sql",
-                      json={"db": db, "q": q, "format": "json"}, timeout=60)
+                      json=body, timeout=60)
     r.raise_for_status()
     return r.json()
 
@@ -114,6 +124,22 @@ def live_state(host: str, port: int, site: str, area: str, line: str,
     time.sleep(seconds)
     c.loop_stop(); c.disconnect()
     return out
+
+
+def to_minutes(ts) -> float | None:
+    """InfluxDB-ийн `time` (ISO 8601, наносекунд хүртэл) → epoch минут."""
+    if ts is None:
+        return None
+    s = str(ts).replace("Z", "+00:00")
+    # Python-ы fromisoformat 6-аас олон бутархай оронтой утгыг уншихгүй
+    s = re.sub(r"(\.\d{6})\d+", r"\1", s)
+    try:
+        dt = datetime.fromisoformat(s)
+    except ValueError:
+        return None
+    if dt.tzinfo is None:   # зөвхөн ЗӨРҮҮ хэрэгтэй тул бүсийг UTC гэж үзнэ
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.timestamp() / 60.0
 
 
 # ───────────────────────── build (БҮТЭЦ) ─────────────────────────
@@ -210,9 +236,10 @@ def cmd_sync(a) -> int:
                     rows.extend(influx(
                         a.influx, a.db,
                         f"SELECT {a.temp_field}, {a.vib_field} FROM telemetry "
-                        f"WHERE device = '{d}' "
+                        f"WHERE device = $device "
                         f"AND time > now() - INTERVAL '5 minutes' "
-                        f"ORDER BY time DESC LIMIT 20"))
+                        f"ORDER BY time DESC LIMIT 20",
+                        params={"device": d}))
                 except requests.RequestException as e:
                     print(f"  ! InfluxDB: {e}")
                     break
@@ -319,29 +346,36 @@ def cmd_simulate(a) -> int:
     devs = twin["nodes"].get(node, {}).get("devices", [])[:4]
     for dev in devs:
         try:
+            # DESC + LIMIT: ХАМГИЙН СҮҮЛИЙН 200 дээж (ASC байвал 30 минутын
+            # хамгийн ХУУЧИН 200 дээж ирж, "одоо"-гийн утга хуучирна).
             rows = influx(a.influx, a.db,
                           f"SELECT time, {a.temp_field} FROM telemetry "
-                          f"WHERE device = '{dev}' "
+                          f"WHERE device = $device "
                           f"AND time > now() - INTERVAL '30 minutes' "
-                          f"ORDER BY time ASC LIMIT 200")
+                          f"ORDER BY time DESC LIMIT 200",
+                          params={"device": dev})
         except requests.RequestException as e:
             print(f"! InfluxDB: {e}")
             return 2
-        temps = [r[a.temp_field] for r in rows if r.get(a.temp_field) is not None]
-        if len(temps) < 10:
-            print(f"{dev}: өгөгдөл хангалтгүй ({len(temps)} дээж)")
+        pts = [(to_minutes(r.get("time")), r[a.temp_field]) for r in reversed(rows)
+               if r.get(a.temp_field) is not None]
+        pts = [(x, y) for x, y in pts if x is not None]
+        if len(pts) < 10:
+            print(f"{dev}: өгөгдөл хангалтгүй ({len(pts)} дээж)")
             continue
-        n = len(temps)
-        xs = list(range(n))
+        # x = БОДИТ цаг (минут) — дээжийн давтамж жигд биш байж болно
+        t0 = pts[0][0]
+        xs = [x - t0 for x, _ in pts]
+        temps = [y for _, y in pts]
         mx, my = statistics.fmean(xs), statistics.fmean(temps)
         num = sum((x - mx) * (y - my) for x, y in zip(xs, temps))
         den = sum((x - mx) ** 2 for x in xs) or 1
-        slope = num / den
-        step_min = 30 / n
-        pred = temps[-1] + slope * (a.minutes / step_min)
+        slope = num / den                      # °C / минут
+        pred = temps[-1] + slope * a.minutes
         print(f"{dev}: одоо {temps[-1]:.2f}°C, "
-              f"{a.minutes} мин дараа {pred:.2f}°C "
-              f"(хандлага {slope/step_min:+.3f} °C/мин)")
+              f"{a.minutes:g} мин дараа {pred:.2f}°C "
+              f"(хандлага {slope:+.3f} °C/мин, {len(pts)} дээж, "
+              f"{xs[-1]:.1f} мин цонх)")
         if pred > a.temp_alarm:
             print(f"  ⚠ {a.minutes} минутын дараа {a.temp_alarm}°C давна "
                   f"— урьдчилсан дохиолол")
@@ -382,6 +416,11 @@ def main() -> int:
     p.add_argument("--interval", type=float, default=15)
     p.add_argument("--minutes", type=float, default=20)
     a = p.parse_args()
+    # Талбарын нэр SQL-д шууд орно (параметрээр дамжуулж болохгүй) —
+    # тиймээс зөвхөн энгийн танигч зөвшөөрнө.
+    for f in (a.temp_field, a.vib_field):
+        if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", f):
+            p.error(f"талбарын нэр буруу: {f!r}")
     return {"build": cmd_build, "sync": cmd_sync,
             "show": cmd_show, "simulate": cmd_simulate}[a.cmd](a)
 

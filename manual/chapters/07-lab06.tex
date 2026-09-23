@@ -24,7 +24,7 @@
   нарийвчлал  ←→  саатал  ←→  санах ой  ←→  зурвасын өргөн
 \end{verbatim}
 
-Хамгийн чухал нь: \textbf{энэ курсын ирмэг бол хурдасгуургүй CPU.} Raspberry Pi 3B-д PCIe байхгүй тул Raspberry Pi AI Kit (Hailo-8L) \textbf{физикийн хувьд} холбогдох боломжгүй. Энэ бол дутагдал биш, \textbf{заах нөхцөл}: бодит үйлдвэрийн ирмэгийн зангилааны олонх нь яг ийм байдаг --- хэдэн зуун МГц-ийн ARM, хэдэн зуун MiB RAM, хурдасгуургүй.
+Хамгийн чухал нь: \textbf{энэ курсын ирмэг бол хурдасгуургүй CPU.} Raspberry Pi AI Kit нь M.2 HAT+-аар Raspberry Pi \textbf{5}-ын PCIe 2.0 интерфэйст холбогддог; Raspberry Pi 3B-д PCIe холбогч байхгүй тул AI Kit \textbf{физикийн хувьд} холбогдох боломжгүй. Энэ бол дутагдал биш, \textbf{заах нөхцөл}: бодит үйлдвэрийн ирмэгийн зангилааны олонх нь яг ийм байдаг --- хэдэн зуун МГц-ийн ARM, хэдэн зуун MiB RAM, хурдасгуургүй.
 
 Дөрвөн асуултад тоон хариулт өгнө:
 
@@ -38,7 +38,7 @@
 \item
   MobileNet зэрэглэлийн зурган загвар Pi 3B дээр \textbf{хэр удаан} вэ? Тэр тоо юуг хэлж байна вэ?
 \item
-  Ирмэг дээр шүүлт хийснээр 100 Mbit уплинкээр явах мессеж, байт \textbf{хэдэн хувиар} буурав?
+  Ирмэг дээр шүүлт хийснээр 100 Mbit өгсөх урсгалаар явах мессеж, байт \textbf{хэдэн хувиар} буурав?
 \end{enumerate}
 
 \begin{quote}
@@ -53,7 +53,7 @@
 \hypertarget{x-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-ux4e9ux433ux4e9ux433ux434ux4e9ux43b-ux446ux443ux433ux43bux443ux443ux43bux430ux445-pi}{%
 \subsection{X долоо хоног --- өгөгдөл цуглуулах {[}Pi{]}}\label{x-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-ux4e9ux433ux4e9ux433ux434ux4e9ux43b-ux446ux443ux433ux43bux443ux443ux43bux430ux445-pi}}
 
-Ирмэгийн агент нь \texttt{telemetry} суваг руу \texttt{proc\_\allowbreak{}temp\_\allowbreak{}c}, \texttt{vibration\_g}, \texttt{rpm} гурван талбар нийтэлдэг. Загвар яг эдгээр дээр сурна.
+Ирмэгийн агент нь \texttt{telemetry} суваг руу \texttt{proc\_\allowbreak{}temp\_\allowbreak{}c}, \texttt{vibration\_g}, \texttt{rpm} гурван талбар нийтэлдэг. Загвар яг эдгээр дээр сурна. Агентын \texttt{-\/-detector} нь \textbf{оролт \texttt{{[}1,\ 3{]}}} (энэ гурван утга, энэ дарааллаар), \textbf{гаралт нь 0..1 гажлын оноо} бүхий \texttt{.tflite} загвар хүлээдэг --- сургалтын аль ч зам энэ гэрээг хангах ёстой.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -67,57 +67,68 @@
 \end{Highlighting}
 \end{Shaded}
 
-Гаралт: \texttt{lab06/data/normal-*.csv}, \texttt{lab06/data/anomaly-*.csv}.
+Гаралт: \texttt{lab06/\allowbreak{}data/\allowbreak{}normal-*.\allowbreak{}csv}, \texttt{lab06/\allowbreak{}data/\allowbreak{}anomaly-*.\allowbreak{}csv}.
 
 \hypertarget{xi-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-ux441ux443ux440ux433ux430ux43bux442-ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux434ux44dux44dux440}{%
 \subsection{XI долоо хоног --- сургалт {[}ЗК{]} зөөврийн компьютер дээр}\label{xi-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-ux441ux443ux440ux433ux430ux43bux442-ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux434ux44dux44dux440}}
 
 Сургалт \textbf{үүлний давхаргад} явагдана. Pi 3B дээр сургах гэж бүү оролд.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  https://studio.edgeimpulse.com дээр төсөл үүсгэнэ (эсвэл Keras → TFLite converter локалаар)
-\item
-  \textbf{Data acquisition → Upload data} → \texttt{lab06/data/*.csv}, шошготой нь
-\item
-  \textbf{Impulse design} → Time series (цонх 1000 мс, алхам 500 мс) → Spectral Analysis → \textbf{Anomaly Detection (K-means)} эсвэл жижиг Dense classifier
-\item
-  \textbf{EON Tuner} --- хамгийн жижиг, хамгийн хурдан хувилбарыг сонгоно
-\item
-  \textbf{Deployment} → дараахыг татаж \texttt{lab06/models/} руу хийнэ:
-
-  \begin{itemize}
-  \tightlist
-  \item
-    \texttt{TensorFlow\ Lite\ (float32)} → \texttt{model\_float32.tflite}
-  \item
-    \texttt{TensorFlow\ Lite\ (int8\ quantized)} → \texttt{model\_int8.tflite}
-  \item
-    (сонголт) \texttt{Linux\ (AARCH64)} → \texttt{anomaly.eim}
-  \end{itemize}
-\item
-  \textbf{Model testing} хуудсын нарийвчлалыг тэмдэглэ --- Хүснэгт 6.1-д хэрэгтэй
-\end{enumerate}
-
-\hypertarget{xi-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-ux441ux4e9ux440ux4e9ux433-ux436ux438ux448ux44dux44dux43dux438ux439-ux437ux430ux433ux432ux430ux440ux44bux433-ux442ux430ux442ux430ux445-ux437ux43a}{%
-\subsection{XI долоо хоног --- сөрөг жишээний загварыг татах {[}ЗК{]}}\label{xi-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-ux441ux4e9ux440ux4e9ux433-ux436ux438ux448ux44dux44dux43dux438ux439-ux437ux430ux433ux432ux430ux440ux44bux433-ux442ux430ux442ux430ux445-ux437ux43a}}
-
-Зурган загварыг \textbf{компьютер дээр} татаж, Pi рүү хуулна (Pi дээр татах нь удаан):
+\textbf{А зам (үндсэн) --- Keras + LiteRT converter.} \texttt{lab06/\allowbreak{}train\_\allowbreak{}tiny\_\allowbreak{}model.\allowbreak{}py} нь CSV-г уншиж \texttt{Normalization\ →\ Dense(16)\ →\ Dense(8)\ →\ Dense(1,\ sigmoid)} загварыг сургаад LiteRT-ийн албан ёсны post-training quantization-оор хоёр файл гаргана:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [ЗК] MobileNet зэрэглэлийн квантчилсан .tflite (жишээ эх сурвалж)}
-\ExtensionTok{curl} \AttributeTok{{-}L} \AttributeTok{{-}o}\NormalTok{ /tmp/mnet.tgz }\DataTypeTok{\textbackslash{}}
-\NormalTok{  https://storage.googleapis.com/download.tensorflow.org/models/tflite\_11\_05\_08/mobilenet\_v1\_1.0\_224\_quant.tgz}
-\FunctionTok{tar} \AttributeTok{{-}xzf}\NormalTok{ /tmp/mnet.tgz }\AttributeTok{{-}C}\NormalTok{ /tmp}
-\FunctionTok{scp}\NormalTok{ /tmp/mobilenet\_v1\_1.0\_224\_quant.tflite pi@}\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{:\textasciitilde{}/cnc302/lab06/models/mobilenet\_224\_quant.tflite}
+\CommentTok{\# [ЗК] зөөврийн компьютер дээр (TensorFlow \textasciitilde{} хэдэн зуун MB)}
+\ExtensionTok{python3} \AttributeTok{{-}m}\NormalTok{ venv \textasciitilde{}/tf }\KeywordTok{\&\&} \ExtensionTok{\textasciitilde{}/tf/bin/pip}\NormalTok{ install tensorflow}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \ExtensionTok{\textasciitilde{}/tf/bin/python}\NormalTok{ lab06/train\_tiny\_model.py }\AttributeTok{{-}{-}data}\NormalTok{ lab06/data }\AttributeTok{{-}{-}out}\NormalTok{ lab06/models}
+\CommentTok{\#   → lab06/models/model\_float32.tflite, lab06/models/model\_int8.tflite}
+\CommentTok{\#   float32 ба int8 validation нарийвчлалыг хэвлэнэ — Хүснэгт 6.2{-}т бич}
+\end{Highlighting}
+\end{Shaded}
+
+Бүрэн бүхэл тоон (full integer) квантчлалын гол мөрүүд (скрипт дотор):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{converter.optimizations }\OperatorTok{=}\NormalTok{ [tf.lite.Optimize.DEFAULT]}
+\NormalTok{converter.representative\_dataset }\OperatorTok{=}\NormalTok{ representative\_dataset   }\CommentTok{\# \textasciitilde{}300 бодит дээж}
+\NormalTok{converter.target\_spec.supported\_ops }\OperatorTok{=}\NormalTok{ [tf.lite.OpsSet.TFLITE\_BUILTINS\_INT8]}
+\NormalTok{converter.inference\_input\_type }\OperatorTok{=}\NormalTok{ tf.int8}
+\NormalTok{converter.inference\_output\_type }\OperatorTok{=}\NormalTok{ tf.int8}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{quote}
-Холбоос ажиллахгүй бол Kaggle Models / TF Hub-аас дурын \textbf{MobileNet зэрэглэлийн 224×224 .tflite} загварыг ав. Аль загвар байх нь чухал биш --- \textbf{зурган загвар ямар зэрэглэлийн удаан болохыг} хэмжих нь чухал.
+Албан ёсны баримт: \href{https://ai.google.dev/edge/litert/conversion/tensorflow/quantization/post_training_quantization}{LiteRT --- Post-training quantization}, \href{https://ai.google.dev/edge/litert/conversion/tensorflow/quantization/post_training_integer_quant}{Post-training integer quantization}
+\end{quote}
+
+\textbf{Б зам (сонголтот) --- Edge Impulse Studio.} https://studio.edgeimpulse.com дээр CSV-г (\textbf{Data acquisition → Upload data}) байршуулж, EON Tuner, Model testing-ийг судалж болно. Гэхдээ:
+
+\begin{itemize}
+\tightlist
+\item
+  Edge Impulse-ийн албан ёсоор дэмждэг самбарын жагсаалтад Raspberry Pi \textbf{4} ба \textbf{5} байгаа, \textbf{Pi 3 байхгүй}. Linux CLI (\texttt{edge-impulse-linux}) нь Node.js \textbf{20+} ба 64-бит OS (\texttt{aarch64}) шаарддаг. Тиймээс \texttt{.eim} + \texttt{edge-impulse-linux-runner}-ийг Pi 3B дээр ажиллуулах нь \textbf{албан ёсны дэмжлэггүй} --- хийвэл өөрийн эрсдэлээр.
+\item
+  Агентад ашиглах бол impulse нь дээрх \texttt{{[}1,\ 3{]}} гэрээг хангах ёстой: TFLite экспортын оролтын хэлбэрийг \texttt{benchmark\_\allowbreak{}inference.\allowbreak{}py\ -\/\allowbreak{}-backend\ tflite} хэвлэдэг \texttt{оролт=(…)}-оор шалга. Хэрэв \texttt{(1,\ 3)} биш бол (жишээ нь Spectral Analysis блокийн шинж чанар хүлээж байвал) агент ачаалахгүй --- А замыг ашигла.
+\item
+  Studio-гийн \textbf{Model testing} нарийвчлалыг Хүснэгт 6.2-т бичиж болно.
+\end{itemize}
+
+\hypertarget{xi-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-ux441ux4e9ux440ux4e9ux433-ux436ux438ux448ux44dux44dux43dux438ux439-ux437ux430ux433ux432ux430ux440-mobilenet-ux437ux43a}{%
+\subsection{XI долоо хоног --- сөрөг жишээний загвар (MobileNet) {[}ЗК{]}}\label{xi-ux434ux43eux43bux43eux43e-ux445ux43eux43dux43eux433-ux441ux4e9ux440ux4e9ux433-ux436ux438ux448ux44dux44dux43dux438ux439-ux437ux430ux433ux432ux430ux440-mobilenet-ux437ux43a}}
+
+Өмнө нь хэрэглэж байсан \texttt{download.\allowbreak{}tensorflow.\allowbreak{}org/\allowbreak{}models/\allowbreak{}tflite\_\allowbreak{}11\_\allowbreak{}05\_\allowbreak{}08/\allowbreak{}mobilenet\_\allowbreak{}v1\_\allowbreak{}1.\allowbreak{}0\_\allowbreak{}224\_\allowbreak{}quant.\allowbreak{}tgz} холбоос \textbf{ажиллахаа больсон} (2026-09-д HTTP 403). Оронд нь Keras-ын албан ёсны \texttt{MobileNetV2}-ийг (224×224×3, ImageNet жин) ижил converter-ээр бүрэн int8 болгоно:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# [ЗК] компьютер дээр (ImageNet жинг анх удаа \textasciitilde{}14 MB татна)}
+\ExtensionTok{\textasciitilde{}/tf/bin/python}\NormalTok{ lab06/train\_tiny\_model.py }\AttributeTok{{-}{-}skip{-}tiny} \AttributeTok{{-}{-}mobilenet} \AttributeTok{{-}{-}out}\NormalTok{ lab06/models}
+\FunctionTok{scp}\NormalTok{ lab06/models/}\PreprocessorTok{*}\NormalTok{.tflite }\OperatorTok{\textless{}}\NormalTok{хэрэглэгч}\OperatorTok{\textgreater{}}\NormalTok{@}\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{:\textasciitilde{}/cnc302/lab06/models/}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+Representative dataset нь санамсаргүй зураг тул энэ загварын \textbf{нарийвчлал утгагүй} --- бидэнд зөвхөн \textbf{саатал ба санах ой} хэрэгтэй. Албан ёсны баримт: \href{https://www.tensorflow.org/api_docs/python/tf/keras/applications/MobileNetV2}{tf.\allowbreak{}keras.\allowbreak{}applications.\allowbreak{}MobileNetV2}
 \end{quote}
 
 \hypertarget{pi-ux434ux44dux44dux440-ux43eux440ux447ux438ux43d-ux431ux44dux43bux434ux44dux445-pi}{%
@@ -131,8 +142,14 @@
 \end{Highlighting}
 \end{Shaded}
 
+LiteRT бол TensorFlow Lite-ийн шинэ нэр; Python-ы interpreter багц нь \texttt{tflite-runtime}-аас \texttt{ai-edge-litert} болж солигдсон (\texttt{from\ ai\_\allowbreak{}edge\_\allowbreak{}litert.\allowbreak{}interpreter\ import\ Interpreter}). PyPI дээр \texttt{ai-edge-litert} нь Python 3.11-д зориулсан \texttt{manylinux\_\allowbreak{}2\_\allowbreak{}27\_\allowbreak{}aarch64} wheel-тэй тул Raspberry Pi OS Bookworm (64-бит, Python 3.11) болон Trixie (Python 3.13) дээр шууд суулгана (PyPI-д cp311, cp313 aarch64 wheel бий). \textbf{32-бит OS дээр суухгүй} (\texttt{uname\ -m} → \texttt{aarch64} байх ёстой). Хуучин \texttt{tflite-runtime}-ийн сүүлийн хувилбар 2.14 (2023) --- нөөц хувилбар болгон л ашигла; скриптүүд аль алиныг нь танина.
+
 \begin{quote}
-\textbf{Загвар бэлэн болоогүй бол} бүх алхмыг \texttt{-\/-backend\ synthetic}-ээр гүйцэтгэж болно. Аргачлал бүрэн хадгалагдана, гэхдээ дээд оноо \textbf{7} болно.
+Албан ёсны баримт: \href{https://ai.google.dev/edge/litert/migration}{LiteRT --- Migrate (tflite-runtime → ai-edge-litert)}, \href{https://pypi.org/project/ai-edge-litert/}{pypi: ai-edge-litert}
+\end{quote}
+
+\begin{quote}
+\textbf{Загвар бэлэн болоогүй бол} бүх алхмыг \texttt{-\/\allowbreak{}-backend\ synthetic}-ээр гүйцэтгэж болно. Аргачлал бүрэн хадгалагдана, гэхдээ дээд оноо \textbf{7} болно.
 \end{quote}
 
 \hypertarget{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}{%
@@ -149,7 +166,7 @@
 \begin{minipage}[b]{\linewidth}\raggedright
 Үзүүлэлт
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Pi 3B
+Pi 3B (албан ёсны үзүүлэлт)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Үр дагавар
 \end{minipage} \\
@@ -157,10 +174,11 @@ Pi 3B
 \endhead
 \bottomrule
 \endlastfoot
-Өргөтгөлийн шугам & \textbf{PCIe байхгүй} & Hailo-8L / AI Kit \textbf{боломжгүй} \\
-CPU & 4 × Cortex-A53 @ 1.2 ГГц & NEON бий, ARMv8 крипто өргөтгөл \textbf{байхгүй} \\
-Санах ойн зурвас & LPDDR2, \textasciitilde1.6 GB/с, \textbf{нэг суваг} & 4 урсгал зурвасанд түгжигдэнэ \\
-NPU / GPU тооцоолол & байхгүй & бүх дүгнэлт CPU дээр \\
+Өргөтгөлийн шугам & \textbf{PCIe холбогчгүй} (AI Kit нь Pi 5-ын PCIe 2.0-д зориулагдсан) & AI Kit \textbf{боломжгүй} \\
+CPU & Broadcom BCM2837, 4 цөм, 64-бит, 1.2 ГГц & бүх дүгнэлт эдгээр 4 цөм дээр \\
+RAM & 1 GB & загвар + буфер + бусад үйлчилгээ багтах ёстой \\
+Сүлжээ & 100 Base Ethernet & Алхам 7-гийн өгсөх урсгалын дээд хязгаар \\
+Тэжээл & micro USB, 2.5 A хүртэл & тэжээл сул бол хүчдэл дутаж throttling болно \\
 \end{longtable}\endgroup
 
 Тиймээс энэ лабораторид Hailo-гийн мөр байх боловч зөвхөн \textbf{багшийн лавлагааны мөр} (тэнхимд Pi 5 + AI Kit байвал) --- өөрсдийн төмөр дээр ажиллуулах боломжгүй.
@@ -168,7 +186,7 @@ NPU / GPU тооцоолол & байхгүй & бүх дүгнэлт CPU дээ
 \hypertarget{ux43aux432ux430ux43dux442ux447ux438ux43bux430ux43b}{%
 \subsection{Квантчилал}\label{ux43aux432ux430ux43dux442ux447ux438ux43bux430ux43b}}
 
-float32 жинг int8 болгоно: 4 дахин бага санах ой, бүхэл тоон арифметик тул CPU дээр 2--4 дахин хурдан. Үнэ нь нарийвчлалын бага зэргийн алдагдал (ихэвчлэн \textless{} 1\%). \textbf{Жижиг загварт} де/квантчилалын нэмэлт зардал ашгийг идэж, int8 нь float32-оос удаан гарч болно --- энэ нь алдаа биш, тайлбарлах ёстой ажиглалт.
+float32 жинг int8 болгоно. LiteRT-ийн баримтад бүрэн бүхэл тоон (full integer) квантчлалын ашгийг "\textasciitilde4 дахин бага, 3+ дахин хурдан" гэж заасан --- энэ нь ердийн том сүлжээнд хамаарах ерөнхий тоо. Үнэ нь нарийвчлалын бага зэргийн алдагдал; хэр их болохыг Хүснэгт 6.2-т өөрсдөө хэмжинэ. \textbf{Жижиг загварт} де/квантчилалын нэмэлт зардал ашгийг идэж, int8 нь float32-оос удаан гарч болно --- энэ нь алдаа биш, тайлбарлах ёстой ажиглалт.
 
 \hypertarget{ux445ux430ux43bux430ux430ux43bux442-warm-up-p99-throttling-ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux433ux443ux440ux432ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}{%
 \subsection{Халаалт (warm-up), p99, throttling --- хэмжилтийн гурван нөхцөл}\label{ux445ux430ux43bux430ux430ux43bux442-warm-up-p99-throttling-ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux433ux443ux440ux432ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}}
@@ -177,12 +195,16 @@ float32 жинг int8 болгоно: 4 дахин бага санах ой, б�
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  \textbf{Халаалт.} Pi 3B-гийн \texttt{ondemand} governor давтамжийг 600 МГц-ээс 1.2 ГГц рүү өсгөх, кэш дүүрэх хүртэл эхний дүгнэлтүүд удаан. Халаалтгүй p99 нь \textbf{загварын биш, эхлэлийн өртгийг} хэмжинэ. Скрипт доод тал нь 20 дүгнэлт + 2 секунд халаана; \texttt{-\/-cold} нь халаалтыг бүрэн алгасна (зөвхөн харьцуулалтад).
+  \textbf{Халаалт.} CPU-гийн давтамж сул үеийн доод утгаасаа 1.2 ГГц рүү өсөх, кэш дүүрэх хүртэл эхний дүгнэлтүүд удаан. Халаалтгүй p99 нь \textbf{загварын биш, эхлэлийн өртгийг} хэмжинэ. Скрипт доод тал нь 20 дүгнэлт + 2 секунд халаана; \texttt{-\/-cold} нь халаалтыг бүрэн алгасна (зөвхөн харьцуулалтад).
 \item
   \textbf{p50 биш p99.} Бодит цагийн систем дунджаар биш, \textbf{хамгийн муу тохиолдлоор} төлөвлөгддөг. 100 Гц мэдрэгчид p99 \textless{} 10 мс байх ёстой --- скрипт төгсгөлд үүнийг өөрөө шалгаж хэвлэнэ.
 \item
-  \textbf{Throttling.} \texttt{vcgencmd\ get\_throttled} ажиллалтын \textbf{өмнө ба дараа} уншигдана. Өөрчлөгдвөл скрипт чанга анхааруулж, гаралтын код \textbf{4} буцаана. Тэр тоог тайланд оруулж болохгүй.
+  \textbf{Throttling.} Цөмийн температур 80--85 °C-ийн хооронд байхад Arm цөмүүд аажмаар удаашруулагдаж, 85 °C-д Arm ба GPU хоёулаа удаашруулагдана. Хүчдэл дутах нь мөн адил. \texttt{vcgencmd\ get\_\allowbreak{}throttled} ажиллалтын \textbf{өмнө ба дараа} уншигдана: бит 0/1/2/3 = \emph{яг одоо} хүчдэл дутуу / давтамж хязгаарлагдсан / throttling / зөөлөн дулааны хязгаар; бит 16--19 = ачаалснаас хойш \emph{тохиолдсон}. (Зөөлөн хязгаар нь Pi 3B+-ийн онцлог.) Өөрчлөгдвөл скрипт чанга анхааруулж, гаралтын код \textbf{4} буцаана. Тэр тоог тайланд оруулж болохгүй.
 \end{enumerate}
+
+\begin{quote}
+Албан ёсны баримт: \href{https://www.raspberrypi.com/documentation/computers/os.html}{Raspberry Pi --- vcgencmd get\_\allowbreak{}throttled}, \href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html}{Frequency management and thermal control}
+\end{quote}
 
 \hypertarget{ux430ux43bux445ux43cux443ux443ux434}{%
 \section{4. Алхмууд}\label{ux430ux43bux445ux43cux443ux443ux434}}
@@ -256,9 +278,21 @@ float32 жинг int8 болгоно: 4 дахин бага санах ой, б�
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-6.2-ux437ux430ux433ux432ux430ux440ux44bux43d-ux43cux44dux434ux44dux44dux43bux44dux43b-ux431ux430-ux43aux432ux430ux43dux442ux447ux438ux43bux430ux43bux44bux43d-ux430ux448ux438ux433}{%
 \subsubsection{Хүснэгт 6.2 --- Загварын мэдээлэл ба квантчилалын ашиг}\label{ux445ux4afux441ux43dux44dux433ux442-6.2-ux437ux430ux433ux432ux430ux440ux44bux43d-ux43cux44dux434ux44dux44dux43bux44dux43b-ux431ux430-ux43aux432ux430ux43dux442ux447ux438ux43bux430ux43bux44bux43d-ux430ux448ux438ux433}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
 \toprule
-Үзүүлэлт & float32 & int8 & Харьцаа \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Үзүүлэлт
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+float32
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+int8
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Харьцаа
+\end{minipage} \\
 \midrule
 \endhead
 \bottomrule
@@ -268,7 +302,7 @@ float32 жинг int8 болгоно: 4 дахин бага санах ой, б�
 p50 (мс) & & & \\
 \textbf{p99 (мс)} & & & \\
 Чадвар (дүгнэлт/с) & & & \\
-Нарийвчлал (Studio-гийн Model testing, \%) & & & \\
+Нарийвчлал (validation, \%: \texttt{train\_\allowbreak{}tiny\_\allowbreak{}model.\allowbreak{}py} эсвэл Studio-гийн Model testing) & & & \\
 \end{longtable}\endgroup
 
 Квантчилалын хурдны ашиг: ule{1.5cm}{0.4pt} × · Санах ойн ашиг: ule{1.5cm}{0.4pt} × · Нарийвчлалын алдагдал: ule{1.5cm}{0.4pt} \%
@@ -330,7 +364,7 @@ p99 (мс)
 4 урсгал 4× хурдан болов уу: ule{1.5cm}{0.4pt} · Хамгийн сайн урсгалын тоо: ule{1.5cm}{0.4pt}
 
 \begin{quote}
-\textbf{Хүлээгдэх ажиглалт:} 4 урсгал ихэвчлэн 2-оос \textbf{удаан} гарна. Хоёр шалтгаан: (1) дөрвөн A53 нэг LPDDR2 сувгийг хуваадаг тул зурвасын өргөнд түгжигдэнэ, (2) дөрвөн цөм зэрэг ачаалагдахад дулаан хурдан өсч throttling эхэлнэ. \texttt{cpu\_efficiency} ба \texttt{temp\_\allowbreak{}delta\_\allowbreak{}c} баганаар үүнийг тоогоор нотол.
+\textbf{Хүлээгдэх ажиглалт (таамаглал --- өөрөө батал):} жижиг загварт 4 урсгал 2-оос \textbf{хурдан биш}, бүр удаан гарч болно. Боломжит шалтгаанууд: (1) маш жижиг загварт урсгалуудыг зохицуулах зардал тооцооллоос их, (2) 4 цөм нэг санах ойг хуваалцана, (3) дөрвөн цөм зэрэг ачаалагдахад дулаан хурдан өсч throttling эхэлнэ. Аль нь давамгайлж байгааг \texttt{cpu\_efficiency} ба \texttt{temp\_\allowbreak{}delta\_\allowbreak{}c} баганаар тоогоор нотол.
 \end{quote}
 
 \textbf{Нэмэлт --- ачаалалтай үеийн хэмжилт.} {[}ЗК{]} компьютерээс Pi рүү флот илгээж, дахин хэмжинэ:
@@ -422,7 +456,7 @@ p50 (мс) & & & & \\
 \end{Highlighting}
 \end{Shaded}
 
-Загвартай хувилбарыг ч давт: \texttt{-\/\allowbreak{}-backend\ tflite\ -\/\allowbreak{}-model\ lab06/\allowbreak{}models/\allowbreak{}model\_int8.\allowbreak{}tflite\ -\/\allowbreak{}-device-label\ laptop-cpu\ -\/\allowbreak{}-label\ int8-xdev}.
+Загвартай хувилбарыг ч давт: \texttt{-\/\allowbreak{}-backend\ tflite\ -\/\allowbreak{}-model\ lab06/\allowbreak{}models/\allowbreak{}model\_\allowbreak{}int8.\allowbreak{}tflite\ -\/\allowbreak{}-device-label\ laptop-cpu\ -\/\allowbreak{}-label\ int8-xdev}.
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-6.5-ux442ux4e9ux43cux440ux438ux439ux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442-ux438ux436ux438ux43b-ux437ux430ux433ux432ux430ux440-ux438ux436ux438ux43b---runs}{%
 \subsubsection{\texorpdfstring{Хүснэгт 6.5 --- Төмрийн харьцуулалт (ижил загвар, ижил \texttt{-\/-runs})}{Хүснэгт 6.5 --- Төмрийн харьцуулалт (ижил загвар, ижил -\/-runs)}}\label{ux445ux4afux441ux43dux44dux433ux442-6.5-ux442ux4e9ux43cux440ux438ux439ux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442-ux438ux436ux438ux43b-ux437ux430ux433ux432ux430ux440-ux438ux436ux438ux43b---runs}}
@@ -464,9 +498,15 @@ p99 (мс)
 \hypertarget{ux430ux43bux445ux430ux43c-6-ux433ux43eux43b-ux445ux44dux43cux436ux438ux43bux442-ux438ux440ux43cux44dux433ux438ux439ux43d-ux448ux4afux4afux43bux442-60-ux43cux438ux43d-piux437ux43a}{%
 \subsection{Алхам 6 --- ГОЛ ХЭМЖИЛТ: ирмэгийн шүүлт (60 мин) {[}Pi{]}{[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-6-ux433ux43eux43b-ux445ux44dux43cux436ux438ux43bux442-ux438ux440ux43cux44dux433ux438ux439ux43d-ux448ux4afux4afux43bux442-60-ux43cux438ux43d-piux437ux43a}}
 
-Энэ бол лабораторийн төлбөр. Дүгнэлтийг ирмэг дээр хийснээр \textbf{уплинкээр юу явахгүй болохыг} хэмжинэ.
+Энэ бол лабораторийн төлбөр. Дүгнэлтийг ирмэг дээр хийснээр \textbf{өгсөх урсгалаар юу явахгүй болохыг} хэмжинэ.
 
-\textbf{6.1 Уплинкийн тоолуурыг тэглэж эхлэх.} {[}Pi{]} Ethernet интерфэйсийн байтын тоолуурыг ашиглана:
+\textbf{6.1 Өгсөх урсгалын тоолуурыг тэглэж эхлэх.} {[}Pi{]} Ethernet интерфэйсийн байтын тоолуурыг ашиглана. \texttt{/\allowbreak{}sys/\allowbreak{}class/\allowbreak{}net/\allowbreak{}eth0/\allowbreak{}statistics/\allowbreak{}tx\_\allowbreak{}bytes} нь тухайн сүлжээний төхөөрөмжийн \textbf{илгээсэн нийт байт} (цөмийн баримт: яг юуг тоолох нь драйвераас хамаарна). Энэ нь \textbf{бүх} гарах урсгалыг --- SSH, \texttt{apt}, гүүрний MQTT --- тоолно; тиймээс хэмжилтийн үед бусад ачааллыг зогсоож, SSH сешнийг идэвхгүй байлга.
+
+\begin{figure}
+\centering
+\includegraphics{figures/fig-edge-ai.pdf}
+\caption{Зураг 6.1 --- Ирмэгийн шүүлт: бүх өгөгдлийг үүл рүү илгээх vs Pi 3B дээр TFLite-аар шүүж зөвхөн аномали ба үе үеийн хураангуйг илгээх}
+\end{figure}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -512,7 +552,7 @@ p99 (мс)
 \end{Shaded}
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-6.6-ux438ux440ux43cux44dux433ux438ux439ux43d-ux448ux4afux4afux43bux442ux438ux439ux43d-ux4afux440-ux430ux448ux438ux433-600-ux43cux4e9ux447ux43bux4e9ux433---interval-0.5}{%
-\subsubsection{\texorpdfstring{Хүснэгт 6.6 --- Ирмэгийн шүүлтийн үр ашиг (600 мөчлөг, \texttt{-\/-interval\ 0.5})}{Хүснэгт 6.6 --- Ирмэгийн шүүлтийн үр ашиг (600 мөчлөг, -\/-interval 0.5)}}\label{ux445ux4afux441ux43dux44dux433ux442-6.6-ux438ux440ux43cux44dux433ux438ux439ux43d-ux448ux4afux4afux43bux442ux438ux439ux43d-ux4afux440-ux430ux448ux438ux433-600-ux43cux4e9ux447ux43bux4e9ux433---interval-0.5}}
+\subsubsection{\texorpdfstring{Хүснэгт 6.6 --- Ирмэгийн шүүлтийн үр ашиг (600 мөчлөг, \texttt{-\/\allowbreak{}-interval\ 0.\allowbreak{}5})}{Хүснэгт 6.6 --- Ирмэгийн шүүлтийн үр ашиг (600 мөчлөг, -\/-interval 0.5)}}\label{ux445ux4afux441ux43dux44dux433ux442-6.6-ux438ux440ux43cux44dux433ux438ux439ux43d-ux448ux4afux4afux43bux442ux438ux439ux43d-ux4afux440-ux430ux448ux438ux433-600-ux43cux4e9ux447ux43bux4e9ux433---interval-0.5}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -531,25 +571,25 @@ Pi-гийн CPU \% (\texttt{make\ mem}, \texttt{top}) & & & \\
 \end{longtable}\endgroup
 
 \begin{quote}
-\textbf{Анхаар --- \texttt{-\/-filter} нь зөвхөн гажлыг илгээдэггүй.} \texttt{-\/-health-every\ 15} тутамд "би амьд байна" хураангуй явна. Үүнгүй бол үүл нь \textbf{чимээгүй} ирмэгийг \textbf{үхсэн} ирмэгээс ялгаж чадахгүй. Тайландаа энэ солилцоог тайлбарла: шүүлт хэдий чинээ хатуу байна, ирмэгийн ажиглагдах чанар төдий чинээ муу.
+\textbf{Анхаар --- \texttt{-\/-filter} нь зөвхөн гажлыг илгээдэггүй.} \texttt{-\/\allowbreak{}-health-every\ 15} тутамд "би амьд байна" хураангуй явна. Үүнгүй бол үүл нь \textbf{чимээгүй} ирмэгийг \textbf{үхсэн} ирмэгээс ялгаж чадахгүй. Тайландаа энэ солилцоог тайлбарла: шүүлт хэдий чинээ хатуу байна, ирмэгийн ажиглагдах чанар төдий чинээ муу.
 \end{quote}
 
-\textbf{6.5 Босгын горимтой харьцуул.} \texttt{-\/-detector}-гүй ажиллуулбал агент энгийн босго ашиглана (0.6). Ижил \texttt{-\/-count}-оор давтаж, шүүлтийн үр ашиг ML загвартай харьцуулахад ялгаатай эсэхийг хэмж. Дүгнэлтийг агентаас \textbf{тусад нь} ажиллуулж, зөвхөн \texttt{anomaly} суваг руу нийтлэх хувилбарыг ч үз: \texttt{python3\ lab06/\allowbreak{}anomaly\_\allowbreak{}publish.\allowbreak{}py\ -\/\allowbreak{}-backend\ tflite\ -\/\allowbreak{}-model\ lab06/\allowbreak{}models/\allowbreak{}model\_\allowbreak{}int8.\allowbreak{}tflite\ -\/\allowbreak{}-field\ vibration\_\allowbreak{}g\ -\/\allowbreak{}-window\ 125\ -\/\allowbreak{}-threads\ 2\ -\/\allowbreak{}-threshold\ 0.\allowbreak{}8} ({[}Pi{]} Pi дээр, ирмэгийн брокероос). Аль архитектур нь дээр вэ --- агент дотор шүүх үү, тусдаа процесс уу?
+\textbf{6.5 Босгын горимтой харьцуул.} \texttt{-\/-detector}-гүй ажиллуулбал агент энгийн босго ашиглана (0.6). Ижил \texttt{-\/-count}-оор давтаж, шүүлтийн үр ашиг ML загвартай харьцуулахад ялгаатай эсэхийг хэмж. Дүгнэлтийг агентаас \textbf{тусад нь} ажиллуулж, зөвхөн \texttt{anomaly} суваг руу нийтлэх хувилбарыг ч үз: \texttt{edge/\allowbreak{}.\allowbreak{}venv/\allowbreak{}bin/\allowbreak{}python\ lab06/\allowbreak{}anomaly\_\allowbreak{}publish.\allowbreak{}py\ -\/\allowbreak{}-backend\ tflite\ -\/\allowbreak{}-model\ lab06/\allowbreak{}models/\allowbreak{}model\_\allowbreak{}int8.\allowbreak{}tflite\ -\/\allowbreak{}-threads\ 2\ -\/\allowbreak{}-threshold\ 0.\allowbreak{}8} ({[}Pi{]} Pi дээр, ирмэгийн брокероос). Загварын оролт \texttt{{[}1,\ 3{]}} тул скрипт мессеж бүрийн \texttt{proc\_\allowbreak{}temp\_\allowbreak{}c,\ vibration\_\allowbreak{}g,\ rpm}-ийг шууд дүгнэнэ (ВЕКТОР горим). Аль архитектур нь дээр вэ --- агент дотор шүүх үү, тусдаа процесс уу?
 
-\hypertarget{ux430ux43bux445ux430ux43c-7-ux443ux43fux43bux438ux43dux43aux438ux439ux43d-ux431ux430ux433ux442ux430ux430ux43cux436ux438ux439ux43d-ux442ux43eux43eux446ux43eux43e-20-ux43cux438ux43d-ux437ux43a}{%
-\subsection{Алхам 7 --- Уплинкийн багтаамжийн тооцоо (20 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-7-ux443ux43fux43bux438ux43dux43aux438ux439ux43d-ux431ux430ux433ux442ux430ux430ux43cux436ux438ux439ux43d-ux442ux43eux43eux446ux43eux43e-20-ux43cux438ux43d-ux437ux43a}}
+\hypertarget{ux430ux43bux445ux430ux43c-7-ux4e9ux433ux441ux4e9ux445-ux443ux440ux441ux433ux430ux43bux44bux43d-ux431ux430ux433ux442ux430ux430ux43cux436ux438ux439ux43d-ux442ux43eux43eux446ux43eux43e-20-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 7 --- Өгсөх урсгалын багтаамжийн тооцоо (20 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-7-ux4e9ux433ux441ux4e9ux445-ux443ux440ux441ux433ux430ux43bux44bux43d-ux431ux430ux433ux442ux430ux430ux43cux436ux438ux439ux43d-ux442ux43eux43eux446ux43eux43e-20-ux43cux438ux43d-ux437ux43a}}
 
-Лаб 4-т Pi-гийн 100 Mbit уплинк (бодитоор \textasciitilde90--95 Mbit, USB 2.0-той хуваалцана) хэзээ ханахыг хэмжсэн. Одоо ирмэгийн шүүлт тэр хязгаарыг \textbf{хэдэн дахин} ухраасныг тооцно.
+Лаб 4-т Pi-гийн 100 Base Ethernet өгсөх урсгал хэзээ ханахыг хэмжсэн (бодит дээд утгаа Лаб 4-өөс ав; доорх 90 Mbit нь жишээ). Одоо ирмэгийн шүүлт тэр хязгаарыг \textbf{хэдэн дахин} ухраасныг тооцно.
 
 Хүснэгт 6.6-гийн байт/секунд утгыг ашиглан нэг төхөөрөмжийн эзлэх зурвасыг гаргаад:
 
 \begin{verbatim}
-уплинкийн бодит багтаамж ≈ 90 Mbit/с = 11.25 MB/с
+өгсөх урсгалын бодит багтаамж ≈ 90 Mbit/с = 11.25 MB/с
 дэмжих төхөөрөмжийн тоо = 11 250 000 / (байт/секунд нэг төхөөрөмжид)
 \end{verbatim}
 
-\hypertarget{ux445ux4afux441ux43dux44dux433ux442-6.7-ux443ux43fux43bux438ux43dux43a-ux445ux44dux434ux44dux43d-ux442ux4e9ux445ux4e9ux4e9ux440ux4e9ux43cux436-ux434ux430ux430ux445-ux432ux44d}{%
-\subsubsection{Хүснэгт 6.7 --- Уплинк хэдэн төхөөрөмж даах вэ}\label{ux445ux4afux441ux43dux44dux433ux442-6.7-ux443ux43fux43bux438ux43dux43a-ux445ux44dux434ux44dux43d-ux442ux4e9ux445ux4e9ux4e9ux440ux4e9ux43cux436-ux434ux430ux430ux445-ux432ux44d}}
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-6.7-ux4e9ux433ux441ux4e9ux445-ux443ux440ux441ux433ux430ux43b-ux445ux44dux434ux44dux43d-ux442ux4e9ux445ux4e9ux4e9ux440ux4e9ux43cux436-ux434ux430ux430ux445-ux432ux44d}{%
+\subsubsection{Хүснэгт 6.7 --- Өгсөх урсгал хэдэн төхөөрөмж даах вэ}\label{ux445ux4afux441ux43dux44dux433ux442-6.7-ux4e9ux433ux441ux4e9ux445-ux443ux440ux441ux433ux430ux43b-ux445ux44dux434ux44dux43d-ux442ux4e9ux445ux4e9ux4e9ux440ux4e9ux43cux436-ux434ux430ux430ux445-ux432ux44d}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -566,7 +606,7 @@ Pi-гийн CPU \% (\texttt{make\ mem}, \texttt{top}) & & & \\
 \end{longtable}\endgroup
 
 \begin{quote}
-\textbf{Санамж:} уплинкийн хязгаар практикт хэзээ ч эхэлж ханадаггүй --- Лаб 4-т RAM түрүүлж ханасан байх магадлалтай. Тайландаа \textbf{аль нөөц түрүүлж ханав} гэдгийг Лаб 4-ийн тоотой тулгаж хариул. Шүүлт нь тэр эрэмбийг өөрчлөв үү?
+\textbf{Санамж:} өгсөх урсгалын хязгаар практикт хэзээ ч эхэлж ханадаггүй --- Лаб 4-т RAM түрүүлж ханасан байх магадлалтай. Тайландаа \textbf{аль нөөц түрүүлж ханав} гэдгийг Лаб 4-ийн тоотой тулгаж хариул. Шүүлт нь тэр эрэмбийг өөрчлөв үү?
 \end{quote}
 
 \hypertarget{ux430ux43bux445ux430ux43c-8-ux434ux4afux43d-ux448ux438ux43dux436ux438ux43bux433ux44dux44d-ux431ux430-git-commit-10-ux43cux438ux43d}{%
@@ -591,7 +631,8 @@ Pi-гийн CPU \% (\texttt{make\ mem}, \texttt{top}) & & & \\
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\FunctionTok{git}\NormalTok{ add lab06/README.md lab06/out/bench.csv lab06/report.md}
+\CommentTok{\# lab06/out/ нь .gitignore{-}д — bench.csv{-}г албадан нэмнэ}
+\FunctionTok{git}\NormalTok{ add lab06/report.md }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ add }\AttributeTok{{-}f}\NormalTok{ lab06/out/bench.csv}
 \FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 6: CPU дээрх ирмэгийн дүгнэлт, шүүлтийн үр ашиг"}
 \FunctionTok{git}\NormalTok{ tag lab06{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\AttributeTok{{-}{-}tags}
 \end{Highlighting}
@@ -648,7 +689,7 @@ Pi-гийн CPU \% (\texttt{make\ mem}, \texttt{top}) & & & \\
 \bottomrule
 \endlastfoot
 1 & Тайлан (Хүснэгт 6.1--6.7 бөглөсөн) & \texttt{lab06/report.md} → PDF \\
-2 & Бүх хэмжилтийн нэгдсэн CSV & \texttt{lab06/out/bench.csv} \\
+2 & Бүх хэмжилтийн нэгдсэн CSV & \texttt{lab06/\allowbreak{}out/\allowbreak{}bench.\allowbreak{}csv} \\
 3 & Edge Impulse төслийн холбоос эсвэл сургалтын кодын diff & тайлангийн хавсралт \\
 4 & Шүүлттэй/шүүлтгүй агентын терминалын гаралт & \texttt{lab06/out/*.log} \\
 5 & Git tag & \texttt{lab06-done} \\
@@ -674,12 +715,12 @@ Pi-гийн CPU \% (\texttt{make\ mem}, \texttt{top}) & & & \\
 \endlastfoot
 Загвар Pi дээр ачаалагдаж, дүгнэлт ажиллаж байна (амьд үзүүлнэ) & 2 \\
 Хүснэгт 6.1--6.5 бүрэн, throttling өмнө/дараа шалгагдсан & 3 \\
-\textbf{Ирмэгийн шүүлтийн үр ашиг хэмжигдэж, уплинкийн тооцоо хийгдсэн} & 3 \\
+\textbf{Ирмэгийн шүүлтийн үр ашиг хэмжигдэж, өгсөх урсгалын тооцоо хийгдсэн} & 3 \\
 MobileNet-ийн хэмжилт хийгдэж, шалтгаан нь тайлбарлагдсан & 1 \\
 Git цэвэр, загвар/өгөгдөл ороогүй & 1 \\
 \end{longtable}\endgroup
 
-\textbf{\texttt{-\/-backend\ synthetic}-ээр гүйцэтгэсэн бол} дээд тал нь 7 оноо.
+\textbf{\texttt{-\/\allowbreak{}-backend\ synthetic}-ээр гүйцэтгэсэн бол} дээд тал нь 7 оноо.
 
 \hypertarget{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}{%
 \section{8. Түгээмэл алдаа}\label{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}}
@@ -701,12 +742,52 @@ Git цэвэр, загвар/өгөгдөл ороогүй & 1 \\
 \bottomrule
 \endlastfoot
 \texttt{TFLite\ орчин\ олдсонгүй} & сан суулгаагүй & {[}Pi{]} \texttt{edge/\allowbreak{}.\allowbreak{}venv/\allowbreak{}bin/\allowbreak{}pip\ install\ ai-edge-litert} \\
+\texttt{pip}: \texttt{No\ matching\ distribution\ found\ for\ ai-edge-litert} & 32-бит OS (\texttt{armv7l}) эсвэл дэмжигдээгүй Python & \texttt{uname\ -m} → \texttt{aarch64} байх ёстой; 64-бит Raspberry Pi OS суулга \\
+Агент \texttt{{[}detector{]}\ ачаалж\ чадсангүй} / оролтын хэлбэр \texttt{(1,\ 3)} биш & Edge Impulse-ийн DSP блоктой экспорт & А замаар (\texttt{train\_\allowbreak{}tiny\_\allowbreak{}model.\allowbreak{}py}) дахин гарга \\
 Скрипт гаралтын код 4 буцаав & ажиллалтын явцад throttling эхэлсэн & 5 мин хөргөж, 5V/2.5A тэжээл шалгаад давт \\
 int8 нь float32-оос удаан & загвар хэт жижиг, де/квантчилалын зардал давамгайлав & хэвийн --- тайлбарла, алдаа биш \\
 Саатал маш хэлбэлзэлтэй (σ өндөр) & Pi дээр өөр ачаалал байна & \texttt{pkill\ -f\ vscode-server}, \texttt{docker\ compose\ ps} \\
-Санах ойн тоо 0 & \texttt{/proc/self/status} уншигдахгүй & контейнер дотор биш, Pi дээр шууд ажиллуул \\
+Санах ойн тоо 0 & \texttt{/\allowbreak{}proc/\allowbreak{}self/\allowbreak{}status} уншигдахгүй & контейнер дотор биш, Pi дээр шууд ажиллуул \\
 \texttt{-\/-detector} заасан ч босго ашиглаж байна & зам буруу эсвэл \texttt{.tflite} ачаалагдсангүй & агентын \texttt{{[}detector{]}} мөрийг унш \\
 \texttt{-\/-filter}-тэй ч мессеж багасахгүй & \texttt{-\/-anomaly-rate} хэт өндөр & 0.02--0.05 болго \\
-\texttt{eth0} олдохгүй & Wi-Fi ашиглаж байна & \texttt{ls\ /sys/class/net/}; кабельд шилжих (Лаб 1) \\
+\texttt{eth0} олдохгүй & Wi-Fi ашиглаж байна & \texttt{ls\ /\allowbreak{}sys/\allowbreak{}class/\allowbreak{}net/\allowbreak{}}; кабельд шилжих (Лаб 1) \\
 \texttt{mobilenet} ажиллуулахад OOM & 224×224×3 буфер + загвар & \texttt{-\/-runs} 30 болго, Docker-ыг зогсоо \\
+\end{longtable}\endgroup
+
+\hypertarget{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}{%
+\section{9. Эх сурвалж}\label{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Эх сурвалж
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Юуг баталгаажуулсан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хандсан
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & \href{https://ai.google.dev/edge/litert/migration}{LiteRT --- Migrate to LiteRT} & \texttt{tflite-runtime} → \texttt{ai-edge-litert}, \texttt{from\ ai\_\allowbreak{}edge\_\allowbreak{}litert.\allowbreak{}interpreter\ import\ Interpreter} & 2026-09 \\
+2 & \href{https://pypi.org/project/ai-edge-litert/}{pypi: ai-edge-litert}, \href{https://pypi.org/project/tflite-runtime/}{pypi: tflite-runtime} & ai-edge-litert 2.2.0: cp311 \texttt{manylinux\_\allowbreak{}2\_\allowbreak{}27\_\allowbreak{}aarch64} wheel; tflite-runtime сүүлийн 2.14.0 (2023-10) & 2026-09 \\
+3 & \href{https://ai.google.dev/edge/litert/microcontrollers/python}{LiteRT for Python (tflite\_\allowbreak{}runtime)} & \texttt{Interpreter(model\_\allowbreak{}path=\allowbreak{}…)}, хуучин багцын платформ & 2026-09 \\
+4 & \href{https://ai.google.dev/edge/litert/conversion/tensorflow/quantization/post_training_quantization}{LiteRT --- Post-training quantization} & full integer: \texttt{Optimize.DEFAULT}, \texttt{representative\_\allowbreak{}dataset}, \texttt{TFLITE\_\allowbreak{}BUILTINS\_\allowbreak{}INT8}, \texttt{inference\_\allowbreak{}input/\allowbreak{}output\_\allowbreak{}type}; "4x smaller, 3x+ speedup" & 2026-09 \\
+5 & \href{https://ai.google.dev/edge/litert/conversion/tensorflow/quantization/post_training_integer_quant}{LiteRT --- Post-training integer quantization} & \texttt{input\_\allowbreak{}details{[}"quantization"{]}} → (scale, zero\_point)-оор оролтыг квантчлах & 2026-09 \\
+6 & \href{https://www.tensorflow.org/api_docs/python/tf/keras/applications/MobileNetV2}{tf.\allowbreak{}keras.\allowbreak{}applications.\allowbreak{}MobileNetV2} & \texttt{input\_shape}, \texttt{weights=\textquotesingle{}imagenet\textquotesingle{}} & 2026-09 \\
+7 & \href{https://pypi.org/project/onnxruntime/}{pypi: onnxruntime} & 1.30.0, Python ≥3.11, \texttt{manylinux\_\allowbreak{}2\_\allowbreak{}28\_\allowbreak{}aarch64} wheel & 2026-09 \\
+8 & \href{https://docs.edgeimpulse.com/hardware}{Edge Impulse --- Supported hardware}, \href{https://docs.edgeimpulse.com/hardware/boards/raspberry-pi-4}{Raspberry Pi 4} & албан ёсны жагсаалтад Pi 4/5 (Pi 3 байхгүй); Node.js 20+, \texttt{npm\ install\ edge-impulse-linux\ -g\ -\/\allowbreak{}-unsafe-perm}, 64-бит OS & 2026-09 \\
+9 & \href{https://docs.edgeimpulse.com/tools/libraries/sdks/inference/linux/python}{Edge Impulse --- Linux Python SDK} & \texttt{pip3\ install\ edge\_\allowbreak{}impulse\_\allowbreak{}linux}, \texttt{ImpulseRunner}, \texttt{runner.init()} & 2026-09 \\
+10 & \href{https://www.raspberrypi.com/products/raspberry-pi-3-model-b/}{Raspberry Pi 3 Model B (бүтээгдэхүүний хуудас)} & BCM2837 4 цөм 1.2 ГГц 64-бит, 1 GB RAM, 100 Base Ethernet, 2.5 A & 2026-09 \\
+11 & \href{https://www.raspberrypi.com/products/ai-kit/}{Raspberry Pi AI Kit} & Pi 5, M.2 HAT+ → PCIe 2.0 & 2026-09 \\
+12 & \href{https://www.raspberrypi.com/documentation/computers/os.html}{Raspberry Pi --- Raspberry Pi OS (vcgencmd)} & \texttt{get\_throttled} битүүд, \texttt{measure\_temp} & 2026-09 \\
+13 & \href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html}{Raspberry Pi --- Raspberry Pi hardware} & 80--85 °C аажмаар, 85 °C-д Arm+GPU throttle; зөөлөн хязгаар 3B+-д & 2026-09 \\
+14 & \href{https://docs.kernel.org/admin-guide/abi-testing.html}{Linux kernel ABI --- sysfs-class-net-statistics}, \href{https://docs.kernel.org/networking/statistics.html}{Interface statistics} & \texttt{tx\_bytes} = илгээсэн байт (драйверээс хамаарна) & 2026-09 \\
 \end{longtable}\endgroup

@@ -1,8 +1,9 @@
 # Ирмэгийн тохиргоо. Compose дээрх edge/.env файлын K8s дахь хувилбар.
 #
-# ⚠ CLOUD_HOST-ыг ЗААВАЛ өөрийн ЗӨӨВРИЙН КОМПЬЮТЕРИЙН LAN IP болгож
-#   солино. localhost/127.0.0.1 бол Pi өөрийгөө заана — гүүр хэзээ ч
-#   холбогдохгүй.
+# ⚠ CLOUD_HOST-ыг ЗААВАЛ ЗӨӨВРИЙН КОМПЬЮТЕРИЙН (Windows/macOS хост) LAN IP
+#   болгож солино — EMQX тэнд Docker Desktop дээр ажиллаж байна.
+#   • K3s server VM-ийн IP БИШ: VM дээр EMQX байхгүй.
+#   • localhost/127.0.0.1 БИШ: pod дотроос энэ нь pod-ыг өөрийг нь заана.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -17,11 +18,11 @@ data:
   DEVICE_ID: "pi3b-01"          # баг бүр ӨӨР байх ёстой: pi3b-team03 гэх мэт
 
   # ── Үүлний давхарга (зөөврийн компьютер дээрх EMQX) ──
-  CLOUD_HOST: "192.168.1.100"   # ← ЗААВАЛ СОЛИНО
+  CLOUD_HOST: "192.168.1.100"   # ← ЗААВАЛ СОЛИНО (зөөврийн компьютерийн LAN IP)
   CLOUD_PORT: "1883"
 
   # ── Ирмэгийн агентын тохиргоо ──
-  MQTT_HOST: "mosquitto"        # кластер доторх Service-ийн нэр
+  MQTT_HOST: "mosquitto"        # кластер доторх Service-ийн нэр (coredns шийднэ)
   MQTT_PORT: "1883"
   INTERVAL: "2.0"               # телеметрийн үе (сек)
   INFER_THREADS: "2"            # Pi 3B: 4 цөм бий ч 2 нь тогтвортой

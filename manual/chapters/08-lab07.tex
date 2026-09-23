@@ -26,11 +26,11 @@
 \item
   \textbf{Барих} --- REST ба GraphQL-ийн ялгааг зохион бүтээх замаар ойлгох, Dex-ээр OIDC нэвтрэлт, RBAC үүрэг, бодит хугацааны шинэчлэл
 \item
-  \textbf{Эвдэх} --- \texttt{security\_tests.py}-г ажиллуулж эмзэг байдлыг олох, гараар батлах, \textbf{засах}, дахин ажиллуулж засварыг нотлох
+  \textbf{Эвдэх} --- \texttt{security\_\allowbreak{}tests.\allowbreak{}py}-г ажиллуулж эмзэг байдлыг олох, гараар батлах, \textbf{засах}, дахин ажиллуулж засварыг нотлох
 \end{enumerate}
 
 \begin{quote}
-\textbf{Чухал:} \texttt{lab07/\allowbreak{}graphql-api/\allowbreak{}main.\allowbreak{}py} дотор \textbf{ЯГ ХОЁР санаатай эмзэг байдал} бий. Тэдгээрийг олж засах нь энэ лабораторийн гол ажил. Лабораторийн эцэст \texttt{security\_tests.py} нь "Санаатай эмзэг байдал илрээгүй" гэж хэвлэх ёстой.
+\textbf{Чухал:} \texttt{lab07/\allowbreak{}graphql-api/\allowbreak{}main.\allowbreak{}py} дотор \textbf{ЯГ ХОЁР санаатай эмзэг байдал} бий: \textbf{(А)} \texttt{decode\_token} токены гарын үсэг ба хугацааг шалгадаггүй (\texttt{jwt.\allowbreak{}get\_\allowbreak{}unverified\_\allowbreak{}claims}); \textbf{(Б)} introspection нээлттэй, асуулгын нийлмэл байдлын хязгаар байхгүй. Тэдгээрийг олж засах нь энэ лабораторийн гол ажил. \texttt{security\_\allowbreak{}tests.\allowbreak{}py} (А)-г \textbf{2 ноцтой} (critical/high) УНАСАН мөрөөр, (Б)-г 2 АНХААР мөрөөр харуулна. Лабораторийн эцэст "Санаатай эмзэг байдал илрээгүй" гэж хэвлэж, (Б)-ийн хоёр мөр ТЭНЦСЭН болсон байх ёстой.
 \end{quote}
 
 \textbf{{[}ЗК{]} Энэ лаборатори бүхэлдээ үүлний давхаргад.} GraphQL API (:8000), Dex (:5556), бүртгэл (:8090), InfluxDB (:8181) --- бүгд зөөврийн компьютер дээр. {[}Pi{]} Pi 3B нь зөвхөн ирмэгийн үүргээ гүйцэтгэнэ (mosquitto + агент). Pi дээр энэ лабораторид ажиллуулах комманд \textbf{байхгүй} --- гэхдээ агент нь ажиллаж байх ёстой, эс бөгөөс InfluxDB-д унших өгөгдөл байхгүй.
@@ -76,7 +76,7 @@
 \subsection{Танилт (authentication) ≠ Эрх (authorization)}\label{ux442ux430ux43dux438ux43bux442-authentication-ux44dux440ux445-authorization}}
 
 Танилт: \emph{чи хэн бэ?} → OIDC токен (Dex) → \texttt{decode\_token()}.
-Эрх: \emph{чи юу хийж болох вэ?} → RBAC үүрэг → \texttt{Principal.require()}.
+Эрх: \emph{чи юу хийж болох вэ?} → RBAC үүрэг → \texttt{Principal.\allowbreak{}require()}.
 
 Хамгийн түгээмэл эмзэг байдал бол эхнийхийг хийгээд хоёр дахийг мартах, эсвэл \textbf{токеныг шалгалгүй итгэх}. Манай \texttt{main.py} яг сүүлийнхийг хийж байна.
 
@@ -89,6 +89,14 @@ GraphQL :8000 ──┬──► registry :8090   төхөөрөмж, firmware, 
 \end{verbatim}
 
 \textbf{ThingsBoard энд байхгүй.} Лаб 2-т бид бүртгэлээ өөрсдөө бичсэн тул түүн дээр GraphQL давхарга барихад юу ч нуугдахгүй.
+
+\begin{figure}
+\centering
+\includegraphics{figures/fig-oidc-rbac.pdf}
+\caption{Зураг 7.1 --- OIDC нэвтрэлт ба RBAC: клиент → Dex (токен) → GraphQL API (JWKS-ээр гарын үсэг шалгах → үүргийн шалгалт) → бүртгэл / InfluxDB}
+\end{figure}
+
+\textbf{ID токен юугаар хамгаалагдсан бэ.} JWT нь JWS-ээр гарын үсэглэгдсэн JSON (\href{https://www.rfc-editor.org/rfc/rfc7519}{RFC 7519}, \href{https://www.rfc-editor.org/rfc/rfc7515}{RFC 7515}). OpenID Connect Core §3.1.3.7-гоор хүлээн авагч: \texttt{iss} нь issuer-тэй \textbf{яг} таарах, \texttt{aud}-д өөрийн \texttt{client\_id} байх, гарын үсгийг \textbf{issuer-ийн түлхүүрээр} (\texttt{jwks\_uri}-ээс) шалгах, одоогийн цаг \texttt{exp}-ээс өмнө байх ёстой. Толгойн \texttt{kid} нь аль түлхүүрээр гарын үсэглэснийг заах \emph{hint} л (\href{https://www.rfc-editor.org/rfc/rfc7515\#section-4.1.4}{RFC 7515 §4.1.4}); \texttt{alg}-ийг токеноос биш, \textbf{урьдчилан зөвшөөрсөн жагсаалтаас} авна (\href{https://www.rfc-editor.org/rfc/rfc8725\#section-3.1}{RFC 8725 §3.1}).
 
 \textbf{Zero Trust:} "дотоод сүлжээ тул аюулгүй" гэсэн таамаг \textbf{байхгүй}. Хүсэлт бүрийг шалгана --- эх сурвалж хаанаас ирсэн нь хамаагүй. InfluxDB-г \texttt{-\/-without-auth} горимд ажиллуулж байгаа нь тэр зарчмыг илт зөрчсөн жишээ (Алхам 8).
 
@@ -105,20 +113,25 @@ GraphQL :8000 ──┬──► registry :8090   төхөөрөмж, firmware, 
 \hypertarget{ux430ux43bux445ux430ux43c-2-oidc-ux442ux43eux43aux435ux43d-ux431ux430-ux4afux4afux440ux433ux438ux439ux43d-ux44dux445-ux441ux443ux440ux432ux430ux43bux436-35-ux43cux438ux43d-ux437ux43a}{%
 \subsection{Алхам 2 --- OIDC токен ба үүргийн эх сурвалж (35 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-2-oidc-ux442ux43eux43aux435ux43d-ux431ux430-ux4afux4afux440ux433ux438ux439ux43d-ux44dux445-ux441ux443ux440ux432ux430ux43bux436-35-ux43cux438ux43d-ux437ux43a}}
 
-\textbf{2.1 Токен авах.} Dex-д гурван статик хэрэглэгч бий: \texttt{viewer@}, \texttt{operator@}, \texttt{admin@cnc302.mn}, бүгд нууц үг \texttt{cnc302}. Энэ туслах функцийг лабораторийн турш ашиглана:
+\textbf{2.1 Токен авах.} Dex-д гурван статик хэрэглэгч бий: \texttt{viewer@}, \texttt{operator@}, \texttt{admin@cnc302.mn}, бүгд нууц үг \texttt{cnc302}. Токены endpoint нь \texttt{\textless{}issuer\textgreater{}/\allowbreak{}token}, клиент нь \texttt{cnc302} / \texttt{cnc302-lab-secret} (\texttt{stack/\allowbreak{}dex/\allowbreak{}config.\allowbreak{}yaml}). Dex-ийн баримтын жишээний адил клиентийн нууцыг HTTP Basic-ээр (\texttt{-u}) илгээнэ:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{tok()} \KeywordTok{\{} \ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST http://localhost:5556/dex/token }\AttributeTok{{-}d}\NormalTok{ grant\_type=password }\DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}d}\NormalTok{ scope=}\StringTok{\textquotesingle{}openid email profile groups\textquotesingle{}} \AttributeTok{{-}d}\NormalTok{ client\_id=cnc302 }\DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}d}\NormalTok{ client\_secret=cnc302{-}lab{-}secret }\AttributeTok{{-}d}\NormalTok{ username=}\StringTok{"}\VariableTok{$1}\StringTok{@cnc302.mn"} \AttributeTok{{-}d}\NormalTok{ password=cnc302 }\DataTypeTok{\textbackslash{}}
+\ExtensionTok{curl} \AttributeTok{{-}s}\NormalTok{ localhost:5556/dex/.well{-}known/openid{-}configuration }\KeywordTok{|} \ExtensionTok{jq} \StringTok{\textquotesingle{}\{issuer, token\_endpoint, jwks\_uri\}\textquotesingle{}}
+\FunctionTok{tok()} \KeywordTok{\{} \ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}u}\NormalTok{ cnc302:cnc302{-}lab{-}secret http://localhost:5556/dex/token }\DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}data{-}urlencode}\NormalTok{ grant\_type=password }\AttributeTok{{-}{-}data{-}urlencode}\NormalTok{ scope=}\StringTok{\textquotesingle{}openid email profile groups\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}data{-}urlencode}\NormalTok{ username=}\StringTok{"}\VariableTok{$1}\StringTok{@cnc302.mn"} \AttributeTok{{-}{-}data{-}urlencode}\NormalTok{ password=cnc302 }\DataTypeTok{\textbackslash{}}
   \KeywordTok{|} \ExtensionTok{jq} \AttributeTok{{-}r}\NormalTok{ .id\_token}\KeywordTok{;} \KeywordTok{\}}
 \VariableTok{TOKEN}\OperatorTok{=}\VariableTok{$(}\ExtensionTok{tok}\NormalTok{ admin}\VariableTok{)} \KeywordTok{\&\&} \BuiltInTok{echo} \StringTok{"}\VariableTok{$\{TOKEN}\OperatorTok{:}\DecValTok{0}\OperatorTok{:}\DecValTok{40}\VariableTok{\}}\StringTok{…"}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{quote}
-\texttt{password} grant татгалзвал \texttt{stack/dex/config.yaml}-д \texttt{oauth2.\allowbreak{}passwordConnector:\allowbreak{}\ local} байгаа эсэхийг шалга, эсвэл authorization code урсгал руу шилж. Аль нь болсныг тайланд бич --- OAuth2-ын урсгал бүр өөр аюулгүй байдлын шинжтэй.
+Албан ёсны баримт: \href{https://dexidp.io/docs/connectors/local/}{Dex --- Local connector, Obtaining a token} · \href{https://dexidp.io/docs/configuration/oauth2/}{Dex --- OAuth2 grants}. Password grant ажиллахын тулд \texttt{enablePasswordDB:\allowbreak{}\ true} ба \texttt{oauth2.\allowbreak{}passwordConnector:\allowbreak{}\ local} хоёулаа хэрэгтэй. Dex-ийн баримтад энэ grant-ыг \emph{"not recommended"} гэж тэмдэглэсэн (OAuth 2.0 Security BCP) --- лабораторид л ашиглана; яагаад гэдгийг тайланд бич.
+\end{quote}
+
+\begin{quote}
+\texttt{null} буцаавал \texttt{curl}-аас \texttt{\textbar{}\ jq\ -r\ .id\_token}-ийг хасаж алдааг хар: \texttt{invalid\_grant}/\allowbreak\texttt{Invalid\ username\ or\ password} бол \texttt{config.yaml}-ийн bcrypt hash нууц үгтэй таарахгүй; \texttt{unsupported\_\allowbreak{}grant\_\allowbreak{}type} бол \texttt{oauth2.\allowbreak{}grantTypes}-д \texttt{password} нэм.
 \end{quote}
 
 \textbf{2.2 Токеныг API-д ашиглах. 2.3 Гурван хэрэглэгчээр давтах:}
@@ -160,9 +173,9 @@ operator@cnc302.mn & & & \\
 admin@cnc302.mn & & & \\
 \end{longtable}\endgroup
 
-Токеныг задлан үзэх: \texttt{echo\ "\$TOKEN"\ \textbar{}\ cut\ -d.\ -f2\ \textbar{}\ base64\ -d\ 2\textgreater{}/dev/null\ \textbar{}\ jq}
+Токеныг задлан үзэх: \texttt{echo\ "\$TOKEN"\ \textbar{}\ cut\ -d.\ -f2\ \textbar{}\ base64\ -d\ 2\textgreater{}/dev/null\ \textbar{}\ jq} (base64url тул padding дутуу бол \texttt{jq} алдаа өгч болно). Толгой: \texttt{echo\ "\$TOKEN"\ \textbar{}\ cut\ -d.\ -f1\ \textbar{}\ base64\ -d\ 2\textgreater{}/dev/null} --- \texttt{alg} ба \texttt{kid}-ийг тэмдэглэ.
 
-\textbf{Ажиглалт:} Dex-ийн статик хэрэглэгчид \texttt{groups} талбар \textbf{агуулдаггүй}. \texttt{decode\_token} нь \texttt{groups} олдохгүй бол \texttt{{[}"viewer"{]}}-д унана --- тиймээс \textbf{гурвуулаа viewer} болно. \textbf{2.4:} хоёр шийдлийг харьцуулж, нэгийг нь хэрэгжүүл.
+\textbf{Ажиглалт:} Dex-ийн статик хэрэглэгчид (\texttt{staticPasswords}: \texttt{email}, \texttt{hash}, \texttt{username}, \texttt{userID} --- \href{https://dexidp.io/docs/connectors/local/}{Dex local connector}) бүлгийн мэдээлэлгүй тул \texttt{groups} scope хүссэн ч токенд \texttt{groups} \textbf{ирэхгүй}. \texttt{decode\_token} нь \texttt{groups} олдохгүй бол \texttt{{[}"viewer"{]}}-д унана --- тиймээс \textbf{гурвуулаа viewer} болно. \textbf{2.4:} хоёр шийдлийг харьцуулж, нэгийг нь хэрэгжүүл.
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-7.2-ux4afux4afux440ux433ux438ux439ux43d-ux44dux445-ux441ux443ux440ux432ux430ux43bux436ux438ux439ux43d-ux441ux43eux43dux433ux43eux43bux442}{%
 \subsubsection{Хүснэгт 7.2 --- Үүргийн эх сурвалжийн сонголт}\label{ux445ux4afux441ux43dux44dux433ux442-7.2-ux4afux4afux440ux433ux438ux439ux43d-ux44dux445-ux441ux443ux440ux432ux430ux43bux436ux438ux439ux43d-ux441ux43eux43dux433ux43eux43bux442}}
@@ -189,7 +202,7 @@ admin@cnc302.mn & & & \\
 \textbf{Бидний сонголт ба шалтгаан} & & \\
 \end{longtable}\endgroup
 
-Лабораторийн цагт (б)-г хэрэгжүүлэх нь бодитой: \texttt{decode\_token}-д \texttt{claims.get("email")}-ээс \texttt{admin@} → \texttt{admin}, \texttt{operator@} → \texttt{operator} зурвасжуулна. Гэхдээ тайландаа \textbf{(а) яагаад илүү зөв болохыг} заавал бич.
+Лабораторийн цагт (б)-г хэрэгжүүлэх нь бодитой: \texttt{decode\_token}-д \texttt{claims.\allowbreak{}get("email")}-ээс \texttt{admin@} → \texttt{admin}, \texttt{operator@} → \texttt{operator} зурвасжуулна. Гэхдээ тайландаа \textbf{(а) яагаад илүү зөв болохыг} заавал бич.
 
 \hypertarget{ux430ux43bux445ux430ux43c-3-rest-ux431ux430-graphql-ux438ux439ux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442-45-ux43cux438ux43d-ux437ux43a}{%
 \subsection{Алхам 3 --- REST ба GraphQL-ийн харьцуулалт (45 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-3-rest-ux431ux430-graphql-ux438ux439ux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442-45-ux43cux438ux43d-ux437ux43a}}
@@ -240,7 +253,7 @@ admin@cnc302.mn & & & \\
 \end{longtable}\endgroup
 
 \begin{quote}
-\textbf{Санамз:} REST-ийн хугацаа нь \texttt{localhost} дээр хамгийн таатай нөхцөлд хэмжигдэж байна. Сүлжээний саатал (RTT) 200 мс байсан бол 51 хүсэлт \textbf{дор хаяж 10 секунд} болно. Хяналтын асуулт 1-д үүнийг тоогоор гарга.
+\textbf{Санамж:} REST-ийн хугацаа нь \texttt{localhost} дээр хамгийн таатай нөхцөлд хэмжигдэж байна. Сүлжээний саатал (RTT) 200 мс байсан бол 51 хүсэлт \textbf{дор хаяж 10 секунд} болно. Хяналтын асуулт 1-д үүнийг тоогоор гарга.
 \end{quote}
 
 \hypertarget{ux430ux43bux445ux430ux43c-4-devicestats-ux431ux430-ux43dux44dux433ux442ux433ux44dux43bux438ux439ux43d-ux431ux430ux439ux440ux43bux430ux43b-30-ux43cux438ux43d-ux437ux43a}{%
@@ -254,7 +267,7 @@ admin@cnc302.mn & & & \\
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{Дүрэм:} нэгтгэлийг \textbf{InfluxDB-д хийлгэнэ} (SQL-ийн \texttt{avg/min/max/count}), Python дээр биш:
+\textbf{Дүрэм:} нэгтгэлийг \textbf{InfluxDB-д хийлгэнэ} (SQL-ийн \texttt{avg/\allowbreak{}min/\allowbreak{}max/\allowbreak{}count}), Python дээр биш:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -306,10 +319,14 @@ InfluxDB-ээс татсан мөрийн тоо & & \\
 \begin{itemize}
 \tightlist
 \item
-  (а) Strawberry-гийн \texttt{@strawberry.subscription} + \texttt{GraphQLRouter}-ын \texttt{graphql-ws} протокол
+  (а) Strawberry-гийн \texttt{@strawberry.\allowbreak{}subscription} (async generator буцаадаг resolver) + \texttt{strawberry.\allowbreak{}Schema(.\allowbreak{}.\allowbreak{}.\allowbreak{},\ subscription=\allowbreak{}Subscription)}. \texttt{GraphQLRouter} анхдагчаар \texttt{graphql-transport-ws} ба хуучин \texttt{graphql-ws} хоёр протоколыг хоёуланг нь идэвхжүүлсэн байдаг (\href{https://strawberry.rocks/docs/general/subscriptions}{Strawberry --- Subscriptions}, \href{https://strawberry.rocks/docs/integrations/fastapi}{FastAPI integration}).
 \item
-  (б) FastAPI-гийн \texttt{@app.\allowbreak{}websocket("/\allowbreak{}ws/\allowbreak{}telemetry")} --- EMQX-д paho-mqtt-ээр захиалж, ирсэн мессежийг клиент рүү түлхэх
+  (б) FastAPI-гийн \texttt{@app.\allowbreak{}websocket("/\allowbreak{}ws/\allowbreak{}telemetry")} --- \texttt{await\ websocket.\allowbreak{}accept()}, дараа нь \texttt{await\ websocket.\allowbreak{}send\_\allowbreak{}text(.\allowbreak{}.\allowbreak{}.\allowbreak{})}; клиент салахад \texttt{WebSocketDisconnect} шидэгдэнэ (\href{https://fastapi.tiangolo.com/advanced/websockets/}{FastAPI --- WebSockets}). EMQX-д paho-mqtt-ээр захиалж, ирсэн мессежийг клиент рүү түлхэнэ. paho-гийн callback тусдаа thread-д ажилладаг тул мессежийг \texttt{asyncio.Queue}-д \texttt{loop.\allowbreak{}call\_\allowbreak{}soon\_\allowbreak{}threadsafe(queue.\allowbreak{}put\_\allowbreak{}nowait,\ msg)}-ээр дамжуул.
 \end{itemize}
+
+\begin{quote}
+WebSocket endpoint-д ч \texttt{Depends}, \texttt{Header}, \texttt{Query} ажилладаг (FastAPI баримт) --- \textbf{токен шалгахаа бүү март}: Zero Trust нь WebSocket-д ч хамаатай.
+\end{quote}
 
 (б) нь энэ архитектурт илүү шууд: {[}Pi{]} Pi-гийн агент → гүүр → EMQX → API → хөтөч. Дараа нь хэмжинэ:
 
@@ -345,7 +362,7 @@ InfluxDB-ээс татсан мөрийн тоо & & \\
 \hypertarget{ux430ux43bux445ux430ux43c-6-ux430ux44eux443ux43bux433ux4afux439-ux431ux430ux439ux434ux43bux44bux43d-ux448ux430ux43bux433ux430ux43bux442-30-ux43cux438ux43d-ux437ux43a}{%
 \subsection{Алхам 6 --- АЮУЛГҮЙ БАЙДЛЫН ШАЛГАЛТ (30 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-6-ux430ux44eux443ux43bux433ux4afux439-ux431ux430ux439ux434ux43bux44bux43d-ux448ux430ux43bux433ux430ux43bux442-30-ux43cux438ux43d-ux437ux43a}}
 
-\texttt{security\_tests.py} нь \textbf{9 шалгалт} ажиллуулна. Анхаар: \texttt{-\/-tb} тугийг \texttt{-\/-registry} \textbf{орлосон} --- ThingsBoard энэ архитектурт байхгүй.
+\texttt{security\_\allowbreak{}tests.\allowbreak{}py} нь \textbf{9 шалгалт} ажиллуулна. Анхаар: \texttt{-\/-tb} тугийг \texttt{-\/-registry} \textbf{орлосон} --- ThingsBoard энэ архитектурт байхгүй.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -384,7 +401,7 @@ InfluxDB-ээс татсан мөрийн тоо & & \\
 
 \texttt{roles=admin} гэж гарвал --- \textbf{та ямар ч нууц үггүйгээр админ боллоо}.
 
-Хугацаа дууссан токеныг ч давт (\texttt{\textquotesingle{}exp\textquotesingle{}:\ time.time()\ -\ 7200}) --- мөн адил \texttt{admin} гарах ёстой. Гурав дахь халдлага: 200 давхар нэрлэсэн (\texttt{a0:\allowbreak{}\ devices(limit:\allowbreak{}50)\{name\}\ a1:\ …\ a199:\ …}) талбартай нэг асуулга --- \texttt{security\_tests.py} үүнийг өөрөө үүсгэж илгээдэг, гаралтын хугацааг тэмдэглэ.
+Хугацаа дууссан токеныг ч давт (\texttt{\textquotesingle{}exp\textquotesingle{}:\ time.time()\ -\ 7200}) --- мөн адил \texttt{admin} гарах ёстой. Гурав дахь халдлага: 200 давхар нэрлэсэн талбартай нэг асуулга. \texttt{security\_\allowbreak{}tests.\allowbreak{}py} нь эрх шаарддаггүй \texttt{a0:\allowbreak{}\ whoami\ …\ a199:\allowbreak{}\ whoami}-г илгээдэг --- ингэснээр шалгалт токен ба registry-ээс хамаарахгүй, зөвхөн GraphQL-ийн \textbf{валидацийн} хязгаарыг шалгана. Бодит DoS-ийг гараар давт: хүчинтэй \texttt{viewer} токентой \texttt{a0:\allowbreak{}\ devices(limit:\allowbreak{}50)\{\ name\ readings(limit:\allowbreak{}500)\{\ time\ \}\ \}\ …} илгээж хариу ирэх хугацааг тэмдэглэ.
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-7.6-ux430ux44eux443ux43bux433ux4afux439-ux431ux430ux439ux434ux43bux44bux43d-9-ux448ux430ux43bux433ux430ux43bux442ux44bux43d-ux431ux4afux440ux442ux433ux44dux43b}{%
 \subsubsection{Хүснэгт 7.6 --- Аюулгүй байдлын 9 шалгалтын бүртгэл}\label{ux445ux4afux441ux43dux44dux433ux442-7.6-ux430ux44eux443ux43bux433ux4afux439-ux431ux430ux439ux434ux43bux44bux43d-9-ux448ux430ux43bux433ux430ux43bux442ux44bux43d-ux431ux4afux440ux442ux433ux44dux43b}}
@@ -434,52 +451,87 @@ InfluxDB-ээс татсан мөрийн тоо & & \\
 \hypertarget{ux430ux43bux445ux430ux43c-7-ux437ux430ux441ux430ux445-ux431ux430-ux434ux430ux445ux438ux43d-ux448ux430ux43bux433ux430ux445-45-ux43cux438ux43d-ux437ux43a}{%
 \subsection{Алхам 7 --- ЗАСАХ ба дахин шалгах (45 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-7-ux437ux430ux441ux430ux445-ux431ux430-ux434ux430ux445ux438ux43d-ux448ux430ux43bux433ux430ux445-45-ux43cux438ux43d-ux437ux43a}}
 
-\textbf{7.1 Гарын үсэг ба хугацааны шалгалт} (санаатай эмзэг байдал \#1). \texttt{jwt.\allowbreak{}get\_\allowbreak{}unverified\_\allowbreak{}claims(token)} мөрийг солино:
+\textbf{7.1 Гарын үсэг ба хугацааны шалгалт} (санаатай эмзэг байдал А). \texttt{jwt.\allowbreak{}get\_\allowbreak{}unverified\_\allowbreak{}claims(token)} мөрийг солино. python-jose-ийн \texttt{jwt.\allowbreak{}decode(token,\ key,\ algorithms=\allowbreak{}None,\ options=\allowbreak{}None,\ audience=\allowbreak{}None,\ issuer=\allowbreak{}None,\ subject=\allowbreak{}None,\ access\_\allowbreak{}token=\allowbreak{}None)} нь \texttt{key}-д JWK Set (\texttt{\{"keys":\allowbreak{}\ {[}.\allowbreak{}.\allowbreak{}.\allowbreak{}{]}\}}) хүлээн авна (\href{https://pypi.org/project/python-jose/}{python-jose}, \texttt{help(jose.\allowbreak{}jwt.\allowbreak{}decode)}):
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{\_JWKS }\OperatorTok{=} \VariableTok{None}
-\KeywordTok{def}\NormalTok{ \_jwks():}
-    \KeywordTok{global}\NormalTok{ \_JWKS}
-    \ControlFlowTok{if}\NormalTok{ \_JWKS }\KeywordTok{is} \VariableTok{None}\NormalTok{:}
-\NormalTok{        \_JWKS }\OperatorTok{=}\NormalTok{ httpx.get(}\SpecialStringTok{f"}\SpecialCharTok{\{}\NormalTok{OIDC\_ISSUER}\SpecialCharTok{\}}\SpecialStringTok{/keys"}\NormalTok{, timeout}\OperatorTok{=}\DecValTok{10}\NormalTok{).json()}
+\ImportTok{import}\NormalTok{ time}
+\ImportTok{from}\NormalTok{ jose }\ImportTok{import}\NormalTok{ JWTError, jwt}
+
+\NormalTok{\_JWKS, \_JWKS\_AT }\OperatorTok{=} \VariableTok{None}\NormalTok{, }\FloatTok{0.0}
+
+\KeywordTok{def}\NormalTok{ \_jwks(force: }\BuiltInTok{bool} \OperatorTok{=} \VariableTok{False}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{dict}\NormalTok{:}
+    \CommentTok{"""jwks\_uri{-}г discovery{-}гээс авна (OIDC Discovery), 5 минут кэшлэнэ."""}
+    \KeywordTok{global}\NormalTok{ \_JWKS, \_JWKS\_AT}
+    \ControlFlowTok{if}\NormalTok{ force }\KeywordTok{or}\NormalTok{ \_JWKS }\KeywordTok{is} \VariableTok{None} \KeywordTok{or}\NormalTok{ time.time() }\OperatorTok{{-}}\NormalTok{ \_JWKS\_AT }\OperatorTok{\textgreater{}} \DecValTok{300}\NormalTok{:}
+\NormalTok{        conf }\OperatorTok{=}\NormalTok{ httpx.get(}\SpecialStringTok{f"}\SpecialCharTok{\{}\NormalTok{OIDC\_ISSUER}\SpecialCharTok{\}}\SpecialStringTok{/.well{-}known/openid{-}configuration"}\NormalTok{, timeout}\OperatorTok{=}\DecValTok{10}\NormalTok{).json()}
+\NormalTok{        \_JWKS }\OperatorTok{=}\NormalTok{ httpx.get(conf[}\StringTok{"jwks\_uri"}\NormalTok{], timeout}\OperatorTok{=}\DecValTok{10}\NormalTok{).json()}
+\NormalTok{        \_JWKS\_AT }\OperatorTok{=}\NormalTok{ time.time()}
     \ControlFlowTok{return}\NormalTok{ \_JWKS}
 
+\NormalTok{\_VERIFY }\OperatorTok{=} \BuiltInTok{dict}\NormalTok{(}
+\NormalTok{    algorithms}\OperatorTok{=}\NormalTok{[}\StringTok{"RS256"}\NormalTok{],              }\CommentTok{\# ← ЗААВАЛ: токены alg{-}д итгэхгүй}
+\NormalTok{    audience}\OperatorTok{=}\StringTok{"cnc302"}\NormalTok{,                 }\CommentTok{\# Dex{-}ийн client\_id}
+\NormalTok{    issuer}\OperatorTok{=}\NormalTok{OIDC\_ISSUER,                }\CommentTok{\# http://dex:5556/dex — яг таарах ёстой}
+\NormalTok{    options}\OperatorTok{=}\NormalTok{\{}\StringTok{"require\_exp"}\NormalTok{: }\VariableTok{True}\NormalTok{, }\StringTok{"require\_iss"}\NormalTok{: }\VariableTok{True}\NormalTok{, }\StringTok{"require\_aud"}\NormalTok{: }\VariableTok{True}\NormalTok{,}
+             \StringTok{"verify\_at\_hash"}\NormalTok{: }\VariableTok{False}\NormalTok{\}, }\CommentTok{\# доорх тайлбарыг үз}
+\NormalTok{)}
+
 \KeywordTok{def}\NormalTok{ decode\_token(token: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Principal:}
-    \ImportTok{from}\NormalTok{ jose }\ImportTok{import}\NormalTok{ jwt}
-\NormalTok{    claims }\OperatorTok{=}\NormalTok{ jwt.decode(token, \_jwks(),}
-\NormalTok{        algorithms}\OperatorTok{=}\NormalTok{[}\StringTok{"RS256"}\NormalTok{],                 }\CommentTok{\# ← ЗААВАЛ заана}
-\NormalTok{        audience}\OperatorTok{=}\StringTok{"cnc302"}\NormalTok{, issuer}\OperatorTok{=}\NormalTok{OIDC\_ISSUER,}
-\NormalTok{        options}\OperatorTok{=}\NormalTok{\{}\StringTok{"verify\_exp"}\NormalTok{: }\VariableTok{True}\NormalTok{, }\StringTok{"verify\_aud"}\NormalTok{: }\VariableTok{True}\NormalTok{\})}
+    \ControlFlowTok{try}\NormalTok{:}
+\NormalTok{        claims }\OperatorTok{=}\NormalTok{ jwt.decode(token, \_jwks(), }\OperatorTok{**}\NormalTok{\_VERIFY)}
+    \ControlFlowTok{except}\NormalTok{ JWTError:}
+        \CommentTok{\# Dex түлхүүрээ ээлжлэн солидог — шинэ kid байж магадгүй тул JWKS{-}ийг}
+        \CommentTok{\# НЭГ удаа шинэчилж дахин оролдоно. Хоёр дахь алдаа → 401.}
+\NormalTok{        claims }\OperatorTok{=}\NormalTok{ jwt.decode(token, \_jwks(force}\OperatorTok{=}\VariableTok{True}\NormalTok{), }\OperatorTok{**}\NormalTok{\_VERIFY)}
 \NormalTok{    roles }\OperatorTok{=}\NormalTok{ claims.get(}\StringTok{"groups"}\NormalTok{) }\KeywordTok{or}\NormalTok{ claims.get(}\StringTok{"roles"}\NormalTok{) }\KeywordTok{or}\NormalTok{ [}\StringTok{"viewer"}\NormalTok{]}
 \NormalTok{    ...}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{quote}
-\textbf{\texttt{algorithms={[}"RS256"{]}}-ийг заавал заа.} Заахгүй бол халдагч \texttt{alg:\ none} (гарын үсэггүй) эсвэл \texttt{alg:\ HS256} (нийтийн түлхүүрийг нууц болгон ашиглах) халдлага хийж болно. Энэ бол JWT-ийн сонгодог эмзэг байдал. \texttt{verify\_exp} нь \#2-р шалгалтыг (хугацаа) нэг зэрэг хаана.
-\end{quote}
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\texttt{algorithms=\allowbreak{}{[}"RS256"{]}}-ийг заавал заа.} Заахгүй бол халдагч \texttt{alg:\ none} (гарын үсэггүй) эсвэл \texttt{alg:\ HS256} (нийтийн түлхүүрийг HMAC-ийн нууц болгон ашиглах) халдлага хийж болно. RFC 8725 §3.1: номын сан \emph{"MUST enable the caller to specify a supported set of algorithms and MUST NOT use any other algorithms"}.
+\item
+  \textbf{\texttt{require\_\allowbreak{}exp:\allowbreak{}\ True}} --- python-jose-ийн анхдагч \texttt{require\_\allowbreak{}exp:\allowbreak{}\ False}: \texttt{exp}-гүй токен ч хүлээн авагдана. \texttt{verify\_exp} нь анхдагчаар асаалттай, гэхдээ \texttt{exp} \textbf{байгаа} үед л шалгана.
+\item
+  \textbf{\texttt{verify\_\allowbreak{}at\_\allowbreak{}hash:\allowbreak{}\ False}} --- Dex-ийн ID токенд \texttt{at\_hash} (access token-ы hash) байж болно (\href{https://dexidp.io/docs/configuration/tokens/}{Dex --- Tokens}-ийн жишээнд бий). python-jose \texttt{at\_hash} байхад \texttt{access\_token=} дамжуулахыг шаарддаг, эс бөгөөс \emph{"No access\_token provided to compare against at\_hash claim"} алдаа өгнө (бид python-jose 3.5.0 дээр туршсан). Манай API зөвхөн ID токеныг Bearer болгон авдаг тул харьцуулах access token байхгүй --- энэ шалгалтыг ухамсартайгаар унтраана. Үлдсэн шалгалт (гарын үсэг, \texttt{iss}, \texttt{aud}, \texttt{exp}) хэвээр.
+\item
+  \textbf{\texttt{kid}} --- python-jose JWKS-ийн түлхүүрүүдийг нэг нэгээр туршина; \texttt{kid} зөвхөн түлхүүр солигдсоныг илрүүлэхэд (дээрх дахин татах логик) хэрэгтэй.
+\end{itemize}
 
-\textbf{7.2 Introspection ба нийлмэл байдал} (санаатай эмзэг байдал \#2):
+\textbf{7.2 Introspection ба нийлмэл байдал} (санаатай эмзэг байдал Б). Strawberry-д бэлэн өргөтгөлүүд (\href{https://strawberry.rocks/docs/extensions/max-aliases-limiter}{Strawberry extensions}):
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \ImportTok{import}\NormalTok{ os}
-\ImportTok{from}\NormalTok{ strawberry.extensions }\ImportTok{import}\NormalTok{ AddValidationRules, QueryDepthLimiter}
-\ImportTok{from}\NormalTok{ graphql.validation }\ImportTok{import}\NormalTok{ NoSchemaIntrospectionCustomRule}
+\ImportTok{from}\NormalTok{ strawberry.extensions }\ImportTok{import}\NormalTok{ (DisableIntrospection, MaxAliasesLimiter,}
+\NormalTok{                                   MaxTokensLimiter, QueryDepthLimiter)}
 
-\NormalTok{exts }\OperatorTok{=}\NormalTok{ [QueryDepthLimiter(max\_depth}\OperatorTok{=}\DecValTok{6}\NormalTok{)]}
-\ControlFlowTok{if}\NormalTok{ os.environ.get(}\StringTok{"ENV"}\NormalTok{) }\OperatorTok{==} \StringTok{"production"}\NormalTok{:}
-\NormalTok{    exts.append(AddValidationRules([NoSchemaIntrospectionCustomRule]))}
+\NormalTok{exts }\OperatorTok{=}\NormalTok{ [QueryDepthLimiter(max\_depth}\OperatorTok{=}\DecValTok{6}\NormalTok{),        }\CommentTok{\# ГҮН}
+\NormalTok{        MaxAliasesLimiter(max\_alias\_count}\OperatorTok{=}\DecValTok{15}\NormalTok{),  }\CommentTok{\# ӨРГӨН — шалгалт №6{-}ийн 200 alias}
+\NormalTok{        MaxTokensLimiter(max\_token\_count}\OperatorTok{=}\DecValTok{1000}\NormalTok{)] }\CommentTok{\# баримтын нийт хэмжээ}
+\ControlFlowTok{if}\NormalTok{ os.environ.get(}\StringTok{"ENV"}\NormalTok{, }\StringTok{"production"}\NormalTok{) }\OperatorTok{==} \StringTok{"production"}\NormalTok{:}
+\NormalTok{    exts.append(DisableIntrospection())}
 \NormalTok{schema }\OperatorTok{=}\NormalTok{ strawberry.Schema(query}\OperatorTok{=}\NormalTok{Query, mutation}\OperatorTok{=}\NormalTok{Mutation, extensions}\OperatorTok{=}\NormalTok{exts)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{quote}
-\texttt{QueryDepthLimiter} нь \textbf{гүнийг} хязгаарлана, харин шалгалт №6 нь \textbf{өргөнийг} (200 alias) шалгаж байгааг анзаар. Гүнээс гадна талбарын тоог хязгаарлах хэрэгтэй --- тайландаа энэ ялгааг бич.
+\texttt{QueryDepthLimiter} нь \textbf{гүнийг} л хязгаарлана --- 200 alias нэг түвшинд байгаа тул түүнийг зогсоохгүй. Шалгалт №6-г \texttt{MaxAliasesLimiter} (эсвэл \texttt{MaxTokensLimiter}) хаана. Тайландаа энэ ялгааг бич. \texttt{DisableIntrospection} идэвхтэй бол GraphiQL-ийн Docs самбар ажиллахгүй --- хөгжүүлэлтэд \texttt{ENV=dev} өг.
 \end{quote}
 
-\textbf{7.3 SQL мөр залгалт.} \texttt{Device.readings} дотор \texttt{self.name} шууд SQL-д залгагдаж байна. Хамгийн багадаа шалга: \texttt{if\ not\ re.fullmatch(r"{[}A-Za-z0-9\_-{]}\{1,64\}",\ self.name):\ raise\ ValueError(...)}. (\texttt{Query.device} нь харин Python дээр шүүдэг тул тарилгын гадаргуугүй --- яагаад болохыг тайланд бич.)
+\textbf{7.3 SQL мөр залгалт.} \texttt{Device.readings} дотор \texttt{self.name} шууд SQL-д залгагдаж байна. \texttt{self.name} нь бүртгэлээс ирдэг, харин бүртгэлийн \texttt{claim} нь дурын \texttt{device\_id} хүлээн авдаг (Лаб 2) --- тиймээс \texttt{x\textquotesingle{}\ OR\ \textquotesingle{}1\textquotesingle{}=\textquotesingle{}1} гэсэн нэртэй төхөөрөмж бүртгүүлж болно. Зөв засвар нь \textbf{параметржүүлсэн асуулга}: InfluxDB 3 \texttt{/\allowbreak{}api/\allowbreak{}v3/\allowbreak{}query\_\allowbreak{}sql} нь \texttt{params} объект хүлээн авч, \texttt{WHERE\ device\ =\allowbreak{}\ \$device} хэлбэрээр \textbf{зөвхөн WHERE-д} ашиглана (\href{https://docs.influxdata.com/influxdb3/core/query-data/sql/parameterized-queries/}{InfluxDB 3 --- Parameterized queries}):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{json}\OperatorTok{=}\NormalTok{\{}\StringTok{"db"}\NormalTok{: INFLUX\_DB, }\StringTok{"q"}\NormalTok{: }\StringTok{"SELECT … FROM telemetry WHERE device = $device ORDER BY time DESC LIMIT 20"}\NormalTok{,}
+      \StringTok{"params"}\NormalTok{: \{}\StringTok{"device"}\NormalTok{: }\VariableTok{self}\NormalTok{.name\}, }\StringTok{"format"}\NormalTok{: }\StringTok{"json"}\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{LIMIT} нь WHERE биш тул параметрээр өгөх боломжгүй --- \texttt{int()}-ээр хөрвүүлж, \texttt{min(limit,\ 500)} хэвээр үлдээ. (\texttt{Query.device} нь Python дээр шүүдэг тул тарилгын гадаргуугүй --- яагаад болохыг тайланд бич.) Шалгалт №7 нь энэ засварыг автоматаар илрүүлдэггүй (үргэлж АНХААР) --- засварыг кодоор нотол.
 
 \textbf{7.4 Дахин барьж, дахин шалгана:}
 
@@ -493,7 +545,7 @@ InfluxDB-ээс татсан мөрийн тоо & & \\
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{Хүлээгдэх:} \texttt{✓\ Санаатай\ эмзэг\ байдал\ илрээгүй\ —\ засвар\ ажиллаж\ байна.\allowbreak{}} Хуучин токен ажиллахаа болино --- \texttt{tok}-оор шинийг ав. Бүх токен татгалзвал \texttt{aud}/\texttt{iss} таарахгүй байна: issuer нь \texttt{http://dex:5556/dex} (контейнер доторх нэр) тул \texttt{OIDC\_ISSUER} мөн тэр утгатай байх ёстой.
+\textbf{Хүлээгдэх:} \texttt{✓\ Санаатай\ эмзэг\ байдал\ илрээгүй\ —\ засвар\ ажиллаж\ байна.\allowbreak{}}, Introspection ба нийлмэл байдлын мөрүүд ТЭНЦСЭН. Бүх бодит токен татгалзвал \texttt{aud}/\allowbreak\texttt{iss} таарахгүй байна: токеныг хостоос \texttt{localhost:5556}-аар авсан ч \texttt{iss} нь config-ийн \texttt{issuer:\allowbreak{}\ http:\allowbreak{}/\allowbreak{}/\allowbreak{}dex:\allowbreak{}5556/\allowbreak{}dex} байдаг тул \texttt{OIDC\_ISSUER} яг тэр утгатай байх ёстой; \texttt{aud} нь \texttt{client\_id} (\texttt{cnc302}). API-гийн логийг \texttt{docker\ compose\ logs\ graphql-api}-аар хар.
 
 \textbf{7.5 RBAC-ыг бодитоор турш:}
 
@@ -544,7 +596,7 @@ InfluxDB-ээс татсан мөрийн тоо & & \\
 
 \begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-& Өмнө (\texttt{security-before.json}) & Дараа (\texttt{security-after.json}) \\
+& Өмнө (\texttt{security-before.\allowbreak{}json}) & Дараа (\texttt{security-after.\allowbreak{}json}) \\
 \midrule
 \endhead
 \bottomrule
@@ -552,7 +604,7 @@ InfluxDB-ээс татсан мөрийн тоо & & \\
 ТЭНЦСЭН & & \\
 АНХААР & & \\
 УНАСАН & & \\
-\texttt{deliberate\_criticals} & \textbf{2} & \textbf{0} \\
+\texttt{deliberate\_\allowbreak{}criticals} & \textbf{2} & \textbf{0} \\
 \texttt{infra\_criticals} & & \\
 \end{longtable}\endgroup
 
@@ -589,7 +641,7 @@ InfluxDB-ээс татсан мөрийн тоо & & \\
 \item
   Хүснэгт 7.6-д \textbf{санаатай} эмзэг байдал хэд байв, \textbf{дэд бүтцийн} олдвор хэд байв? Эдгээрийг яагаад ялгаж дүгнэх шаардлагатай вэ? (Санамж: аль нь код засаж, аль нь тохиргоо засаж шийдэгддэг вэ.)
 \item
-  \texttt{algorithms={[}"RS256"{]}}-ийг заахгүй бол ямар хоёр халдлага боломжтой болох вэ? \texttt{alg:\ none} ба \texttt{alg:\ HS256} халдлагыг тус тус тайлбарла.
+  \texttt{algorithms=\allowbreak{}{[}"RS256"{]}}-ийг заахгүй бол ямар хоёр халдлага боломжтой болох вэ? \texttt{alg:\ none} ба \texttt{alg:\ HS256} халдлагыг тус тус тайлбарла.
 \item
   Токеныг цуцлах (revoke) хэрхэн ажилладаг вэ? JWT нь \textbf{төлөвгүй} тул энэ яагаад хэцүү вэ? Лаб 2-ын сертификат цуцлалт (Хүснэгт 2.7) болон MQTT session цуцлалттай ямар төстэй вэ?
 \item
@@ -616,7 +668,7 @@ InfluxDB-ээс татсан мөрийн тоо & & \\
 \bottomrule
 \endlastfoot
 1 & Тайлан (Хүснэгт 7.1--7.8 бөглөсөн) & \texttt{lab07/report.md} → PDF \\
-2 & Шалгалтын өмнөх/дараах JSON & \texttt{lab07/\allowbreak{}out/\allowbreak{}security-before.\allowbreak{}json}, \texttt{security-after.json} \\
+2 & Шалгалтын өмнөх/дараах JSON & \texttt{lab07/\allowbreak{}out/\allowbreak{}security-before.\allowbreak{}json}, \texttt{security-after.\allowbreak{}json} \\
 3 & \texttt{decode\_token} ба схемийн засвар (diff хэлбэрээр) & тайлангийн хавсралт \\
 4 & \texttt{deviceStats} ба WebSocket/subscription хэрэгжүүлэлт & \texttt{lab07/\allowbreak{}graphql-api/\allowbreak{}main.\allowbreak{}py} \\
 5 & Git tag & \texttt{lab07-done} \\
@@ -641,7 +693,7 @@ InfluxDB-ээс татсан мөрийн тоо & & \\
 REST/GraphQL харьцуулалт хэмжигдэж, \texttt{deviceStats} хэрэгжсэн & 2 \\
 OIDC нэвтрэлт ажиллаж, үүргийн эх сурвалж шийдэгдсэн & 1 \\
 Хоёр санаатай эмзэг байдал олдож, \textbf{гараар} батлагдсан & 2 \\
-Засвар кодод хэрэгжиж, \texttt{security-after} дээр \texttt{deliberate\_criticals\ =\allowbreak{}\ 0} & 3 \\
+Засвар кодод хэрэгжиж, \texttt{security-after} дээр \texttt{deliberate\_\allowbreak{}criticals\ =\allowbreak{}\ 0} & 3 \\
 WebSocket / subscription ажиллаж, Хүснэгт 7.5 бөглөгдсөн & 1 \\
 RBAC матриц бодитоор туршсан, Zero Trust дүгнэлт үндэслэлтэй & 1 \\
 \end{longtable}\endgroup
@@ -669,9 +721,52 @@ RBAC матриц бодитоор туршсан, Zero Trust дүгнэлт ү�
 \endlastfoot
 \texttt{graphql-api} эхлэхгүй & build алдаа & \texttt{docker\ compose\ logs\ graphql-api} \\
 \texttt{\{\ devices\ \}} → эрх байхгүй & токенгүй хүсэлт & Алхам 2-оор токен ав \\
-Dex \texttt{password} grant татгалзана & grant идэвхгүй & \texttt{passwordConnector:\allowbreak{}\ local}, эсвэл code flow \\
+Dex \texttt{password} grant татгалзана (\texttt{unsupported\_\allowbreak{}grant\_\allowbreak{}type}) & grant идэвхгүй & \texttt{enablePasswordDB:\allowbreak{}\ true} + \texttt{oauth2.\allowbreak{}passwordConnector:\allowbreak{}\ local}; шаардлагатай бол \texttt{oauth2.\allowbreak{}grantTypes}-д \texttt{password} \\
+Dex \texttt{invalid\_grant} / нууц үг буруу & \texttt{config.yaml}-ийн bcrypt hash \texttt{cnc302}-той таарахгүй & hash-ыг дахин үүсгэ (\texttt{htpasswd\ -bnBC\ 10\ ""\ cnc302\ \textbackslash{}\textbar{}\ tr\ -d\ \textquotesingle{}:\textbackslash{}n\textquotesingle{}}), \texttt{docker\ compose\ restart\ dex} \\
+Засварын дараа бүх бодит токен 401: \texttt{No\ access\_\allowbreak{}token\ provided\ to\ compare\ against\ at\_\allowbreak{}hash\ claim} & python-jose \texttt{at\_hash}-ыг шалгаж байна & \texttt{options=\allowbreak{}\{"verify\_\allowbreak{}at\_\allowbreak{}hash":\allowbreak{}\ False\}} (Алхам 7.1) \\
+Засварын дараа 401: \texttt{Invalid\ audience} / \texttt{Invalid\ issuer} & \texttt{audience}/\allowbreak\texttt{OIDC\_ISSUER} токентой таарахгүй & \texttt{aud} = \texttt{cnc302}, \texttt{iss} = \texttt{http:\allowbreak{}/\allowbreak{}/\allowbreak{}dex:\allowbreak{}5556/\allowbreak{}dex} \\
 \texttt{whoami} үргэлж \texttt{viewer} & Dex статик хэрэглэгчид \texttt{groups} байхгүй & Алхам 2.3--2.4 \\
-JWKS татагдахгүй & \texttt{OIDC\_ISSUER} буруу & контейнер дотроос \texttt{http://dex:5556/dex} байх ёстой \\
+JWKS татагдахгүй & \texttt{OIDC\_ISSUER} буруу & контейнер дотроос \texttt{http:\allowbreak{}/\allowbreak{}/\allowbreak{}dex:\allowbreak{}5556/\allowbreak{}dex} байх ёстой \\
 \texttt{readings} хоосон & {[}Pi{]} агент зогссон / гүүр тасарсан & {[}Pi{]} \texttt{make\ link} → \texttt{bridge/state\ 1} \\
 Шалгалт "санаатай 0" гэнэ (засварын өмнө) & API дахин баригдаагүй & \texttt{up\ -d\ -\/\allowbreak{}-build\ graphql-api} \\
+\end{longtable}\endgroup
+
+\hypertarget{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}{%
+\section{9. Эх сурвалж}\label{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Эх сурвалж
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Юуг баталгаажуулсан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хандсан
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & \href{https://dexidp.io/docs/configuration/oauth2/}{Dex --- OAuth2} & \texttt{grantTypes} (анхдагч жагсаалтад \texttt{password} байхгүй), \texttt{passwordConnector} password grant-д заавал, \texttt{skipApprovalScreen}, password grant "not recommended" & 2026-09 \\
+2 & \href{https://dexidp.io/docs/connectors/local/}{Dex --- Local connector} & \texttt{enablePasswordDB}, \texttt{staticPasswords} талбарууд, \texttt{\textless{}issuer\textgreater{}/\allowbreak{}token}-оор password grant авах жишээ (Basic auth) & 2026-09 \\
+3 & \href{https://dexidp.io/docs/configuration/custom-scopes-claims-clients/}{Dex --- Scopes and Claims} & \texttt{openid\ email\ profile\ groups} scope, \texttt{groups} claim & 2026-09 \\
+4 & \href{https://dexidp.io/docs/configuration/tokens/}{Dex --- Tokens} & ID токены бүтэц (\texttt{iss}, \texttt{aud}, \texttt{exp}, \texttt{at\_hash}), түлхүүрийн ээлжлэлт & 2026-09 \\
+5 & \href{https://openid.net/specs/openid-connect-core-1_0.html}{OpenID Connect Core 1.\allowbreak{}0 §3.\allowbreak{}1.\allowbreak{}3.\allowbreak{}7} & ID токены шалгалтын дүрэм (\texttt{iss}, \texttt{aud}, гарын үсэг, \texttt{exp}) & 2026-09 \\
+6 & \href{https://openid.net/specs/openid-connect-discovery-1_0.html}{OpenID Connect Discovery 1.\allowbreak{}0} & \texttt{jwks\_uri} & 2026-09 \\
+7 & \href{https://www.rfc-editor.org/rfc/rfc7519}{RFC 7519 --- JWT} & \texttt{exp} claim & 2026-09 \\
+8 & \href{https://www.rfc-editor.org/rfc/rfc7515}{RFC 7515 --- JWS} & \texttt{kid} толгой --- hint & 2026-09 \\
+9 & \href{https://www.rfc-editor.org/rfc/rfc8725}{RFC 8725 --- JWT Best Current Practices} & алгоритмын зөвшөөрөгдсөн жагсаалт & 2026-09 \\
+10 & \href{https://pypi.org/project/python-jose/}{python-jose (PyPI)} ба 3.5.0-ийн \texttt{jwt.decode} docstring & \texttt{jwt.\allowbreak{}decode(token,\ key,\ algorithms,\ options,\ audience,\ issuer,\ subject,\ access\_\allowbreak{}token)}, JWK Set, \texttt{options}-ийн анхдагч утгууд, \texttt{at\_hash} шаардлага. (python-jose.readthedocs.io-ийн API хуудас хоосон --- 0.2.0) & 2026-09 \\
+11 & \href{https://strawberry.rocks/docs/extensions/query-depth-limiter}{Strawberry --- Query Depth Limiter} · \href{https://strawberry.rocks/docs/extensions/max-aliases-limiter}{Max Aliases Limiter} · \href{https://strawberry.rocks/docs/extensions/max-tokens-limiter}{Max Tokens Limiter} · \href{https://strawberry.rocks/docs/extensions/disable-introspection}{Disable Introspection} & өргөтгөлийн нэр ба параметр & 2026-09 \\
+12 & \href{https://strawberry.rocks/docs/integrations/fastapi}{Strawberry --- FastAPI integration} · \href{https://strawberry.rocks/docs/general/subscriptions}{Subscriptions} · \href{https://strawberry.rocks/docs/types/resolvers}{Resolvers} & \texttt{GraphQLRouter}, \texttt{context\_getter}, \texttt{graphql-transport-ws}/\allowbreak\texttt{graphql-ws}, \texttt{strawberry.Info} & 2026-09 \\
+13 & \href{https://fastapi.tiangolo.com/advanced/websockets/}{FastAPI --- WebSockets} & \texttt{@app.websocket}, \texttt{accept}/\allowbreak\texttt{send\_text}, \texttt{WebSocketDisconnect}, \texttt{Depends}/\allowbreak\texttt{Header} & 2026-09 \\
+14 & \href{https://docs.influxdata.com/influxdb3/core/query-data/execute-queries/influxdb-v3-api/}{InfluxDB 3 Core --- Query with the HTTP API} & \texttt{POST\ /\allowbreak{}api/\allowbreak{}v3/\allowbreak{}query\_\allowbreak{}sql} (\texttt{db}, \texttt{q}, \texttt{format}, \texttt{params}) & 2026-09 \\
+15 & \href{https://docs.influxdata.com/influxdb3/core/query-data/sql/parameterized-queries/}{InfluxDB 3 Core --- Parameterized SQL queries} & \texttt{\$name} параметр, зөвхөн WHERE-д & 2026-09 \\
+16 & \href{https://docs.influxdata.com/influxdb3/core/reference/config-options/}{InfluxDB 3 Core --- Configuration options} & \texttt{-\/-without-auth}, \texttt{-\/\allowbreak{}-disable-authz} (health, ping, metrics) & 2026-09 \\
 \end{longtable}\endgroup

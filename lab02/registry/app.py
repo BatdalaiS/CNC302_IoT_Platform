@@ -3,9 +3,9 @@
 CNC302 — ТӨХӨӨРӨМЖИЙН БҮРТГЭЛ ба OTA СЕРВЕР.
 
 Яагаад ThingsBoard биш вэ:
-  Raspberry Pi 3B-д 1 GB санах ой байдаг тул ThingsBoard (1.5–2.5 GB)
+  Raspberry Pi 3B-д 1 GB санах ой байдаг тул ThingsBoard (албан ёсоор ≥ 4 GB)
   ажиллахгүй. Гэхдээ илүү чухал шалтгаан бий: худалдааны платформ нь
-  provisioning, identity, OTA-г ХАР ХАЙРЦАГ болгож нуудаг. Энэ 400 мөр
+  provisioning, identity, OTA-г ХАР ХАЙРЦАГ болгож нуудаг. Энэ ~500 мөр
   код нь тэр гурвыг ИЛ харуулна. Оюутан ThingsBoard-ыг Лаб 2-ын
   сонголтот хэсэгт харьцуулж үзнэ.
 
@@ -18,7 +18,7 @@ CNC302 — ТӨХӨӨРӨМЖИЙН БҮРТГЭЛ ба OTA СЕРВЕР.
     POST   /devices                 бөөнөөр бүртгэх (bulk provisioning)
     POST   /devices/claim           төхөөрөмж өөрөө бүртгүүлэх (JIT)
     GET    /devices                 жагсаалт
-    DELETE /devices/{id}            хүчингүй болгох (revoke)
+    DELETE /devices/{id}            хүчингүй болгох (revoke) + идэвхтэй холболтыг таслах
     POST   /firmware                хувилбар байршуулах
     GET    /firmware
     POST   /rollout                 тараалт эхлүүлэх (canary дэмжинэ)
@@ -35,6 +35,7 @@ import threading
 import time
 from contextlib import asynccontextmanager
 from pathlib import Path
+from urllib.parse import quote
 
 import httpx
 import paho.mqtt.client as mqtt
@@ -51,6 +52,10 @@ EMQX_KEY = os.getenv("EMQX_API_KEY", "")
 EMQX_SECRET = os.getenv("EMQX_API_SECRET", "")
 MQTT_HOST = os.getenv("MQTT_HOST", "localhost")
 MQTT_PORT = int(os.getenv("MQTT_PORT", "1883"))
+# EMQX-д нэвтрэлт (authenticator) идэвхтэй үед бүртгэлийн үйлчилгээ өөрөө ч
+# нэвтрэх ёстой — эс бөгөөс дахин холбогдоход EMQX татгалзана.
+MQTT_USERNAME = os.getenv("MQTT_USERNAME", "")
+MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", "")
 SITE = os.getenv("SITE", "shutis")
 AREA = os.getenv("AREA", "mhts")
 LINE = os.getenv("LINE", "lab")
@@ -108,19 +113,26 @@ def init_db() -> None:
 
 
 # ─────────────────────── EMQX-ийн нэвтрэлт ───────────────────────
+# EMQX REST API: /api/v5, HTTP Basic (API key = нэр, secret key = нууц үг).
+# Authenticator ID нь "<mechanism>:<backend>"; URL-д ":"-ийг %3A болгоно.
+AUTHN_ID = quote("password_based:built_in_database", safe="")
+
+
 def emqx_auth() -> tuple[str, str] | None:
     return (EMQX_KEY, EMQX_SECRET) if EMQX_KEY and EMQX_SECRET else None
 
 
 def emqx_add_user(username: str, password: str) -> str:
     """
-    EMQX-ийн built-in_database authenticator-т хэрэглэгч нэмнэ.
+    EMQX-ийн built-in database authenticator-т хэрэглэгч нэмнэ.
     Түлхүүр байхгүй бол алгасна (Лаб 1-2-ын эхэнд EMQX нээлттэй байна).
+    Authenticator-ыг УРЬДЧИЛАН үүсгэсэн байх ёстой (Лаб 2, Алхам 0) —
+    эс бөгөөс EMQX 404 буцаана.
     """
     auth = emqx_auth()
     if auth is None:
         return "skipped (EMQX_API_KEY тохируулаагүй)"
-    url = f"{EMQX_API}/authentication/password_based:built_in_database/users"
+    url = f"{EMQX_API}/authentication/{AUTHN_ID}/users"
     try:
         r = httpx.post(url, auth=auth, timeout=8.0,
                        json={"user_id": username, "password": password})
@@ -128,6 +140,8 @@ def emqx_add_user(username: str, password: str) -> str:
             return "created"
         if r.status_code == 409:
             return "exists"
+        if r.status_code == 404:
+            return "error 404: authenticator үүсгээгүй (Лаб 2, Алхам 0)"
         return f"error {r.status_code}: {r.text[:120]}"
     except httpx.HTTPError as e:
         return f"unreachable: {e}"
@@ -137,12 +151,42 @@ def emqx_del_user(username: str) -> str:
     auth = emqx_auth()
     if auth is None:
         return "skipped"
-    url = (f"{EMQX_API}/authentication/password_based:built_in_database"
-           f"/users/{username}")
+    url = f"{EMQX_API}/authentication/{AUTHN_ID}/users/{quote(username, safe='')}"
     try:
         r = httpx.delete(url, auth=auth, timeout=8.0)
-        return "deleted" if r.status_code in (204, 200) else f"error {r.status_code}"
+        if r.status_code in (204, 200):
+            return "deleted"
+        if r.status_code == 404:
+            return "not found"
+        return f"error {r.status_code}"
     except httpx.HTTPError as e:
+        return f"unreachable: {e}"
+
+
+def emqx_kick(username: str) -> list[str] | str:
+    """
+    Хэрэглэгчийг устгах нь зөвхөн ШИНЭ холболтыг хаана — EMQX нэвтрэлтийг
+    CONNECT үед л шалгадаг. Аль хэдийн холбогдсон session-ыг таслахын тулд
+    тухайн username-тэй бүх клиентийг олж (GET /clients?username=),
+    client ID-гаар нь хөөнө (DELETE /clients/{clientid}).
+    """
+    auth = emqx_auth()
+    if auth is None:
+        return "skipped"
+    try:
+        r = httpx.get(f"{EMQX_API}/clients", auth=auth, timeout=8.0,
+                      params={"username": username, "limit": 100})
+        if r.status_code != 200:
+            return f"error {r.status_code}"
+        kicked = []
+        for cl in r.json().get("data", []):
+            cid = cl.get("clientid", "")
+            d = httpx.delete(f"{EMQX_API}/clients/{quote(cid, safe='')}",
+                             auth=auth, timeout=8.0)
+            if d.status_code in (200, 204):
+                kicked.append(cid)
+        return kicked
+    except (httpx.HTTPError, ValueError) as e:
         return f"unreachable: {e}"
 
 
@@ -154,23 +198,34 @@ class Bus:
         self.c = mqtt.Client(CallbackAPIVersion.VERSION2,
                              client_id=f"registry-{secrets.token_hex(3)}",
                              protocol=mqtt.MQTTv5)
+        if MQTT_USERNAME:
+            self.c.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
         self.c.on_connect = self._on_connect
+        self.c.on_disconnect = self._on_disconnect
         self.c.on_message = self._on_message
         self.connected = False
 
     def start(self) -> None:
-        try:
-            self.c.connect(MQTT_HOST, MQTT_PORT, keepalive=45)
-            self.c.loop_start()
-        except OSError as e:
-            print(f"[mqtt] холбогдож чадсангүй: {e}")
+        # connect_async + loop_start: EMQX түр унасан эсвэл хоцорч эхэлсэн ч
+        # сүлжээний thread (loop_forever) өөрөө дахин холбогдоно.
+        self.c.reconnect_delay_set(min_delay=1, max_delay=30)
+        self.c.connect_async(MQTT_HOST, MQTT_PORT, keepalive=45)
+        self.c.loop_start()
 
+    # paho-mqtt 2.x, CallbackAPIVersion.VERSION2:
+    #   on_connect(client, userdata, flags, reason_code, properties)
     def _on_connect(self, c, u, f, rc, p=None):
         self.connected = rc == 0
         if rc == 0:
             c.subscribe(f"cnc302/{SITE}/+/+/+/ota/state", qos=1)
             c.subscribe(f"cnc302/{SITE}/+/+/+/ota/request", qos=1)
             print(f"[mqtt] холбогдлоо {MQTT_HOST}:{MQTT_PORT}")
+        else:
+            print(f"[mqtt] EMQX татгалзав: {rc}")
+
+    #   on_disconnect(client, userdata, disconnect_flags, reason_code, properties)
+    def _on_disconnect(self, c, u, f, rc, p=None):
+        self.connected = False
 
     def _on_message(self, c, u, msg):
         parts = msg.topic.split("/")
@@ -319,13 +374,21 @@ def list_devices(state: str | None = None, limit: int = 500):
 
 @app.delete("/devices/{device_id}")
 def revoke(device_id: str):
-    """Хүчингүй болгох: EMQX-ээс нэвтрэлтийг устгаж, бүртгэлд тэмдэглэнэ."""
+    """
+    Хүчингүй болгох, ДАРААЛАЛ чухал:
+      1) бүртгэлд тэмдэглэнэ,
+      2) EMQX-ээс нэвтрэлтийг устгана → шинэ холболт татгалзагдана,
+      3) идэвхтэй session-ыг хөөнө → дахин холбогдох гэхэд (2)-т бүдэрнэ.
+    (3)-ыг (2)-оос өмнө хийвэл төхөөрөмж тэр дороо дахин холбогдож амжина.
+    """
     with _lock, db() as c:
         r = c.execute("UPDATE devices SET state='revoked' WHERE id=?",
                       (device_id,))
         if r.rowcount == 0:
             raise HTTPException(404, "олдсонгүй")
-    return {"id": device_id, "state": "revoked", "emqx": emqx_del_user(device_id)}
+    user = emqx_del_user(device_id)
+    kicked = emqx_kick(device_id)
+    return {"id": device_id, "state": "revoked", "emqx": user, "kicked": kicked}
 
 
 @app.post("/firmware")
@@ -394,13 +457,22 @@ def promote(rid: str):
         ro = c.execute("SELECT * FROM rollouts WHERE id=?", (rid,)).fetchone()
         if ro is None:
             raise HTTPException(404, "rollout олдсонгүй")
+        if ro["state"] != "running":
+            raise HTTPException(409, f"rollout төлөв: {ro['state']}")
         fw = c.execute("SELECT * FROM firmware WHERE id=?", (ro["fw_id"],)).fetchone()
         canary = list(c.execute(
             "SELECT state FROM rollout_targets WHERE rollout_id=? AND wave=0", (rid,)))
         failed = [r for r in canary if r["state"] in ("FAILED", "ROLLED_BACK")]
         if failed:
+            with _lock:
+                c.execute("UPDATE rollouts SET state='halted' WHERE id=?", (rid,))
+                c.commit()        # HTTPException нь `with db()`-г rollback хийлгэнэ
             raise HTTPException(409,
                                 f"canary-д {len(failed)} алдаа — тараалтыг зогсоов")
+        unfinished = [r for r in canary if r["state"] != "UPDATED"]
+        if unfinished:
+            raise HTTPException(409, f"canary дуусаагүй: {len(unfinished)} төхөөрөмж "
+                                     "UPDATED болоогүй — хүлээгээд дахин оролд")
         rest = [r["device_id"] for r in c.execute(
             "SELECT device_id FROM rollout_targets WHERE rollout_id=? AND wave=1",
             (rid,))]

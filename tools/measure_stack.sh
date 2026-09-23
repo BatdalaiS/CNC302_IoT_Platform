@@ -4,7 +4,7 @@
 # Хичээлийн стек ХОЁР хостод хуваагдсан тул энэ скрипт ХОЁР үүрэгтэй:
 #
 #   --role edge    Raspberry Pi 3B — 1 GB RAM, 4×Cortex-A53 @1.2 GHz,
-#                  100 Mbit Ethernet (USB 2.0 дээр), microSD.
+#                  100 Mb/s Ethernet, 4×USB 2.0, microSD (албан ёсны үзүүлэлт).
 #                  Ажиллах зүйл: mosquitto (гүүр) + ирмэгийн агент.
 #   --role cloud   Зөөврийн компьютер — cnc302-cloud төсөл:
 #                  emqx, influxdb, grafana, registry, nodered …
@@ -137,7 +137,7 @@ sysinfo_edge() {
   echo "Температур : ${temp#*=}" | sed "s/'C/°C/"
   echo "Throttle   : ${thr#*=}"
   explain_throttled "$thr"
-  echo "Сүлжээ     : 100 Mbit (USB 2.0-оор) — бодит хурд ~90–95 Mbit"
+  echo "Сүлжээ     : 100 Mb/s Ethernet (албан ёсны үзүүлэлт; бодит хурдыг хэмжинэ)"
   echo "Docker     : $(docker --version 2>/dev/null || echo 'суугаагүй')"
   hr
   warn_low_ram "$avail"

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" font-family="DejaVu Sans, Arial, sans-serif">
+<title>Ирмэгийн шүүлт</title>
+<defs><marker id="a2E7D4F" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2E7D4F"/></marker><marker id="a374151" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#374151"/></marker><marker id="aB91C1C" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#B91C1C"/></marker></defs>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<text x="20" y="34" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="start" font-weight="bold">А. Шүүлтгүй — бүгдийг үүл рүү</text>
+<rect x="20" y="50" width="130" height="70" rx="6" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.4"/>
+<text x="85.0" y="81.8" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">Мэдрэгч</text>
+<text x="85.0" y="101.19999999999999" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">2 с тутам</text>
+<rect x="180" y="46" width="330" height="150" rx="10" fill="#E8F4EC" stroke="#2E7D4F" stroke-width="2"/>
+<text x="194" y="68" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" fill="#2E7D4F" text-anchor="start" font-weight="bold">Raspberry Pi 3B</text>
+<rect x="200" y="75" width="290" height="70" rx="6" fill="#FFFFFF" stroke="#2E7D4F" stroke-width="1.4"/>
+<text x="345.0" y="106.8" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">edge_agent.py</text>
+<text x="345.0" y="126.19999999999999" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">мөчлөг бүрт telemetry нийтэлнэ</text>
+<line x1="150" y1="85" x2="200" y2="105" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<text x="540" y="72" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="start" font-weight="normal">өгсөх урсгал (uplink) · 100 Mb/s</text>
+<rect x="540" y="80" width="300" height="26" rx="4" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<rect x="540" y="80" width="255.0" height="26" rx="4" fill="#B91C1C" stroke="none" stroke-width="0"/>
+<text x="540" y="126" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="start" font-weight="normal">N төхөөрөмж × 0.5 мессеж/с × хэмжээ</text>
+<line x1="510" y1="93" x2="540" y2="93" stroke="#B91C1C" stroke-width="2.2" marker-end="url(#aB91C1C)"/>
+<rect x="845" y="70" width="50" height="46" rx="6" fill="#EAF0FA" stroke="#2E5496" stroke-width="1.4"/>
+<text x="870.0" y="98.2" font-family="DejaVu Sans, Arial, sans-serif" font-size="16" fill="#1F2937" text-anchor="middle" font-weight="bold">☁</text>
+<text x="20" y="224" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="start" font-weight="bold">Б. Ирмэг дээр шүүх — edge_agent.py --filter --detector</text>
+<rect x="20" y="240" width="130" height="70" rx="6" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.4"/>
+<text x="85.0" y="271.8" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">Мэдрэгч</text>
+<text x="85.0" y="291.20000000000005" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">2 с тутам</text>
+<rect x="180" y="236" width="330" height="150" rx="10" fill="#E8F4EC" stroke="#2E7D4F" stroke-width="2"/>
+<text x="194" y="258" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" fill="#2E7D4F" text-anchor="start" font-weight="bold">Raspberry Pi 3B</text>
+<rect x="200" y="265" width="130" height="70" rx="6" fill="#FFFFFF" stroke="#2E7D4F" stroke-width="1.4"/>
+<text x="265.0" y="289.375" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">LiteRT int8</text>
+<text x="265.0" y="308.77500000000003" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">[temp, vib, rpm]</text>
+<text x="265.0" y="323.625" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">→ score 0..1</text>
+<rect x="350" y="265" width="140" height="70" rx="6" fill="#FEF3E2" stroke="#B45309" stroke-width="1.4"/>
+<text x="420.0" y="281.95000000000005" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">шүүлт</text>
+<text x="420.0" y="301.3500000000001" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">score ≥ 0.6 → илгээ</text>
+<text x="420.0" y="316.20000000000005" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">+ 15 мөчлөг тутам</text>
+<text x="420.0" y="331.05000000000007" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">хураангуй</text>
+<line x1="330" y1="300" x2="350" y2="300" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<line x1="150" y1="275" x2="200" y2="295" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<text x="540" y="262" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="start" font-weight="normal">өгсөх урсгал (uplink) · 100 Mb/s</text>
+<rect x="540" y="270" width="300" height="26" rx="4" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<rect x="540" y="270" width="36.0" height="26" rx="4" fill="#2E7D4F" stroke="none" stroke-width="0"/>
+<text x="540" y="316" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="start" font-weight="normal">мессежийн тоо, байт → Хүснэгт 6.x-д хэмжинэ</text>
+<line x1="510" y1="283" x2="540" y2="283" stroke="#2E7D4F" stroke-width="2.2" marker-end="url(#a2E7D4F)"/>
+<rect x="845" y="260" width="50" height="46" rx="6" fill="#EAF0FA" stroke="#2E5496" stroke-width="1.4"/>
+<text x="870.0" y="288.2" font-family="DejaVu Sans, Arial, sans-serif" font-size="16" fill="#1F2937" text-anchor="middle" font-weight="bold">☁</text>
+<text x="450" y="408" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">Зурвасын урт нь схем — бодит харьцааг /sys/class/net/eth0/statistics/tx_bytes-ээр хэмжинэ.</text>
+</svg>

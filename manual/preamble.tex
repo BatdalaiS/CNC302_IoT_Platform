@@ -79,6 +79,12 @@
 % ── График, диаграм ─────────────────────────────────────────────────────────
 \usepackage{graphicx}
 \usepackage{float}
+% Зураг: хуудасны өргөнөөр, өндрийг хязгаарлаж, бичвэрийн дунд байрлуулна.
+% Гарын авлага тул зургийг ДАВХАР хөвүүлэхгүй — яг тайлбарласан газраа ([H]).
+\setkeys{Gin}{width=\linewidth,height=0.40\textheight,keepaspectratio}
+\floatplacement{figure}{H}
+% Тайлбар нь өөрөө "Зураг 1.1 — …" гэж эхэлдэг тул LaTeX-ийн дугаарыг нэмэхгүй
+\captionsetup[figure]{labelformat=empty,font=small,skip=6pt}
 
 % ── Жагсаалт ────────────────────────────────────────────────────────────────
 \usepackage{enumitem}

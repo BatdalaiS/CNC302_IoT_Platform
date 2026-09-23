@@ -12,11 +12,16 @@ CNC302 Лаб 4 — Ачааллын муруй зурах (ирмэг ба үү
 Муруйнуудыг CSV-ийн `target` баганаар (edge | cloud) ялгана. Хуучин, `target`
 баганагүй CSV-д файлын нэрээс таана, олдохгүй бол "unknown" гэж үзнэ.
 
+X тэнхлэг = ЗОРИЛТЫН брокерын холболтын тоо (`broker_connections`: edge дээр
+mosquitto-гийн $SYS/broker/clients/connected, cloud дээр EMQX connections.count).
+Y = брокерт ирсэн PUBLISH/с (`broker_msg_in_rate`). Цуглуулагч өөрөө нэг
+холболт эзэлдэг тул холболтын тоо шатнаас 1–2-оор их байна.
+
 matplotlib байхгүй бол ASCII графикаар зурна (Pi дээр ашигтай) — ASCII
 хувилбар дээр ч хоёр муруй нэг талбарт зэрэг гарна: edge = ●, cloud = ○.
 
 Шатны өндөр нь зорилтоос хамаарна:
-  edge  (Pi 3B, 1 GB RAM, 100 Mbit): 10, 25, 50, 100, 200, 350, 500
+  edge  (Pi 3B, 1 GB RAM, 100 Mb/s): 10, 25, 50, 100, 200, 350, 500
   cloud (зөөврийн компьютер)       : 50, 100, 250, 500, 1000, 2000
 """
 from __future__ import annotations
@@ -32,7 +37,7 @@ RUNGS = {
 MARKERS = {"edge": "●", "cloud": "○", "unknown": "+"}
 
 TARGET_TITLE = {
-    "edge": "ирмэг — Raspberry Pi 3B (1 GB, 100 Mbit)",
+    "edge": "ирмэг — Raspberry Pi 3B (1 GB, 100 Mb/s)",
     "cloud": "үүл — зөөврийн компьютер",
     "unknown": "тодорхойгүй зорилт",
 }
@@ -48,6 +53,18 @@ def num(v, d=0.0):
         return float(v)
     except (TypeError, ValueError):
         return d
+
+
+def conns(r: dict) -> float:
+    """Зорилтын брокерын холболт; хуучин CSV-д emqx_connections."""
+    v = r.get("broker_connections")
+    return num(v) if v not in (None, "") else num(r.get("emqx_connections"))
+
+
+def rate(r: dict) -> float:
+    """Брокерт ирсэн мсж/с; хуучин CSV-д emqx_msg_out_rate-д бичигддэг байсан."""
+    v = r.get("broker_msg_in_rate")
+    return num(v) if v not in (None, "") else num(r.get("emqx_msg_out_rate"))
 
 
 def row_target(row: dict, path: str) -> str:
@@ -99,17 +116,25 @@ def ascii_plot(series: dict[str, tuple[list[float], list[float]]],
 # ─────────────────────────────── тайлан ───────────────────────────────
 
 def summarise(target: str, rows: list[dict]) -> None:
-    conns = [num(r.get("emqx_connections")) for r in rows]
-    rate = [num(r.get("emqx_msg_out_rate")) for r in rows]
+    cn = [conns(r) for r in rows]
+    rt = [rate(r) for r in rows]
     cpu = [num(r.get("cpu_total_pct")) for r in rows]
     memfree = [num(r.get("mem_available_mib")) for r in rows]
+    tx = [num(r.get("net_tx_mbit")) for r in rows]
+    swo = [num(r.get("swap_out_pages_s")) for r in rows]
+    mpct = [num(r.get("mem_mosquitto_pct")) for r in rows]
 
     print(f"\n  ── {target.upper()}  ({TARGET_TITLE.get(target, target)}) "
           f"— {len(rows)} дээж")
-    print(f"     Дээд холболт        : {max(conns):.0f}")
-    print(f"     Дээд мессежийн хурд : {max(rate):.1f} мсж/с")
+    print(f"     Дээд холболт        : {max(cn):.0f}")
+    print(f"     Дээд мессежийн хурд : {max(rt):.1f} мсж/с")
     print(f"     Дээд CPU            : {max(cpu):.1f} %")
     print(f"     Хамгийн бага сул RAM: {min(memfree):.0f} MiB")
+    print(f"     Дээд tx (өгсөх)     : {max(tx):.2f} Mbit/с")
+    if target == "edge":
+        print(f"     mosquitto RAM дээд  : {max(mpct):.1f} % (контейнерийн хязгаараас)")
+    if max(swo) > 0:
+        print(f"     ⚠ swap out илэрлээ  : {max(swo):.0f} хуудас/с → энэ үеийн тоо гажсан")
     temps = [num(r["temp_c"]) for r in rows if r.get("temp_c")]
     if temps:
         print(f"     Дээд температур     : {max(temps):.1f} °C")
@@ -125,7 +150,7 @@ def bucket_table(target: str, rows: list[dict]) -> None:
     rungs = RUNGS.get(target, RUNGS["unknown"])
     buckets: dict[int, list[dict]] = {}
     for r in rows:
-        c = int(num(r.get("emqx_connections")))
+        c = int(conns(r))
         key = min(rungs, key=lambda k: abs(k - c))
         buckets.setdefault(key, []).append(r)
 
@@ -138,7 +163,7 @@ def bucket_table(target: str, rows: list[dict]) -> None:
         if len(b) < 2:
             continue
         print(f"  {k:>9} {len(b):>6} "
-              f"{sum(num(r.get('emqx_msg_out_rate')) for r in b)/len(b):>10.1f} "
+              f"{sum(rate(r) for r in b)/len(b):>10.1f} "
               f"{sum(num(r.get('cpu_total_pct')) for r in b)/len(b):>8.1f} "
               f"{min(num(r.get('mem_available_mib')) for r in b):>9.0f} "
               f"{max((num(r['temp_c']) for r in b if r.get('temp_c')), default=0):>6.1f}")
@@ -179,13 +204,13 @@ def main() -> int:
     if len(order) > 1:
         print("\n  ХАРЬЦУУЛАЛТ: хоёр муруйг нэг тэнхлэг дээр харьцуулахдаа "
               "'хэдэн\n  холболт даасан' гэдгээс илүү 'АЛЬ НӨӨЦ ТҮРҮҮЛЖ ХАНАСАН' "
-              "гэдгийг\n  тайлбарла — ирмэг дээр ихэвчлэн RAM эсвэл 100 Mbit "
-              "уплинк, CPU биш.")
+              "гэдгийг\n  тоогоор тайлбарла (RAM, CPU, өгсөх урсгал Mbit/с, "
+              "microSD).")
 
-    series_rate = {t: ([num(r.get("emqx_connections")) for r in by_target[t]],
-                       [num(r.get("emqx_msg_out_rate")) for r in by_target[t]])
+    series_rate = {t: ([conns(r) for r in by_target[t]],
+                       [rate(r) for r in by_target[t]])
                    for t in order}
-    series_cpu = {t: ([num(r.get("emqx_connections")) for r in by_target[t]],
+    series_cpu = {t: ([conns(r) for r in by_target[t]],
                       [num(r.get("cpu_total_pct")) for r in by_target[t]])
                   for t in order}
 
@@ -199,8 +224,8 @@ def main() -> int:
             fig, ax = plt.subplots(3, 1, figsize=(9, 11), sharex=True)
             for t in order:
                 rows = by_target[t]
-                x = [num(r.get("emqx_connections")) for r in rows]
-                ax[0].plot(x, [num(r.get("emqx_msg_out_rate")) for r in rows],
+                x = [conns(r) for r in rows]
+                ax[0].plot(x, [rate(r) for r in rows],
                            ".", color=colors.get(t), label=t)
                 ax[1].plot(x, [num(r.get("cpu_total_pct")) for r in rows],
                            ".", color=colors.get(t), label=t)

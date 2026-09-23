@@ -42,6 +42,7 @@ GLYPH_MAP = {
     # хувилбарт товчилсон текстээр орлуулна (Markdown-д эможи хэвээр).
     "💻": "[ЗК]",       # зөөврийн компьютер (үүлний давхарга)
     "🥧": "[Pi]",       # Raspberry Pi 3B (ирмэгийн давхарга)
+    "🖥": "[VM]",       # Лаб 8: K3s server-ийн VirtualBox VM
     "⭐": "",           # хүснэгтийн тэмдэглэгээ — доор текстээр орлоно
     "⛔": "СТОП:",
     "🔒": "",
@@ -73,6 +74,11 @@ def preprocess(md: str) -> str:
         lambda m: "**" + re.sub(r"</?b>", "", m.group(1)).strip() + "**\n\n"
                   + m.group(2),
         md, flags=re.S)
+
+    # Зураг: Markdown дахь `../docs/img/X.svg` (эсвэл `docs/img/X.svg`)
+    # холбоосыг convert_figures()-ийн үүсгэсэн `figures/X.pdf` руу заалгана.
+    md = re.sub(r"\]\((?:\.\./)?docs/img/([A-Za-z0-9_-]+)\.svg\)",
+                r"](figures/\1.pdf)", md)
 
     # H1 гарчгийг авна (бүлгийн нэр болгоно)
     lines = md.split("\n")
@@ -131,6 +137,27 @@ def _underscores_to_rule(line: str) -> str:
     return re.sub(r"_{6,}", "`\\rule{1.5cm}{0.4pt}`{=latex}", line)
 
 
+def convert_figures(src: str) -> int:
+    """docs/img/*.svg → figures/*.pdf (вектор хэвээр, cairosvg)."""
+    img = os.path.join(src, "docs", "img")
+    if not os.path.isdir(img):
+        return 0
+    try:
+        import cairosvg
+    except ImportError:
+        print("  ! cairosvg алга:  pip install cairosvg", file=sys.stderr)
+        return 0
+    os.makedirs("figures", exist_ok=True)
+    n = 0
+    for name in sorted(os.listdir(img)):
+        if not name.endswith(".svg"):
+            continue
+        dst = os.path.join("figures", name[:-4] + ".pdf")
+        cairosvg.svg2pdf(url=os.path.join(img, name), write_to=dst)
+        n += 1
+    return n
+
+
 def pandoc(md: str, top: str) -> str:
     with tempfile.NamedTemporaryFile("w", suffix=".md", delete=False,
                                      encoding="utf-8") as f:
@@ -172,11 +199,29 @@ def postprocess(tex: str) -> str:
         # Урт URL / зам нь мөрөнд багтахгүй тул тусгаарлагчийн ДАРАА таслах
         # боломж нэмнэ (жишээ: http://influxdb:8181/api/v3/write_lp?db=…).
         # \allowbreak нь зөвхөн БОЛОМЖ өгнө — шаардлагагүй бол таслахгүй.
-        if len(inner) > 24:
+        if len(inner) > 16:
             for sep in ("/", "?", "\\&", "=", ":", "."):
                 inner = inner.replace(sep, sep + "\\allowbreak{}")
+            if "\\_\\allowbreak" not in inner:
+                inner = inner.replace("\\_", "\\_\\allowbreak{}")
         return "\\texttt{" + inner + "}"
-    tex = re.sub(r"\\texttt\{((?:[^{}]|\\[{}_&%#$])*)\}", brk, tex)
+    # pandoc нь <, >, [, ] тэмдэгтийг \textless{}, \textgreater{}, {[}, {]}
+    # болгодог — эдгээр хаалт ч таарах ёстой, эс бөгөөс урт texttt алгасагдана.
+    TT_INNER = r"(?:[^{}]|\\[{}_&%#$]|\\text(?:less|greater)\{\}|\{\[\}|\{\]\})*"
+    tex = re.sub(r"\\texttt\{(" + TT_INNER + r")\}", brk, tex)
+    # \texttt{a}/\texttt{b}/… дарааллын "/"-ийн дараа таслах боломж
+    tex = tex.replace("}/\\texttt{", "}/\\allowbreak\\texttt{")
+
+    # \href{url}{бичвэр}: Эх сурвалжийн хүснэгтийн нарийн нүдэнд урт холбоосын
+    # бичвэр (жишээ: github.com/raspberrypi/documentation) багтахгүй. URL-ийг
+    # хөндөхгүйгээр ЗӨВХӨН харагдах бичвэрт таслах боломж нэмнэ.
+    def hbrk(m):
+        url, txt = m.group(1), m.group(2)
+        if len(txt) > 20:
+            for sep in ("/", ".", "\\_"):     # "-" БИШ: '---' (—) хуваагдана
+                txt = txt.replace(sep, sep + "\\allowbreak{}")
+        return "\\href{" + url + "}{" + txt + "}"
+    tex = re.sub(r"\\href\{([^{}]*)\}\{((?:[^{}]|\\[{}_&%#$])*)\}", hbrk, tex)
 
     # \tightlist-ийг хэвээр үлдээнэ (preamble-д тодорхойлсон)
     # Хоосон догол мөрийг цэгцлэнэ
@@ -192,6 +237,8 @@ def main() -> int:
 
     os.makedirs(OUT, exist_ok=True)
     print(f"Эх сурвалж: {os.path.abspath(a.src)}\n")
+    nfig = convert_figures(a.src)
+    print(f"  ✓ {nfig} зураг → figures/*.pdf\n")
 
     for src, dst, forced_title, top in CHAPTERS:
         path = os.path.join(a.src, src)

@@ -24,6 +24,9 @@ lab02/certs/*
 measurements/
 *.csv.raw
 
+# Лаб 8 — компьютер дээр барьсан arm64 дүрсийн архив (том)
+edge-agent-*.tar
+
 # Загварын файлууд (том)
 lab06/models/*.eim
 lab06/models/*.tflite
@@ -41,6 +44,10 @@ node_modules/
 .DS_Store
 Thumbs.db
 *.log
+
+# Лаб 1 гаралт
+lab01/out/*
+!lab01/out/.gitkeep
 
 # Лаб 2 — итгэмжлэл агуулсан гаралт
 lab02/out/*

@@ -15,10 +15,9 @@ CNC302 — виртуал төхөөрөмжийн флот (MQTT 5.0)
   --target cloud  → EMQX рүү шууд. Зөөврийн компьютер хүчирхэг тул энд
                     хязгаар нь ихэвчлэн олдохгүй. Энэ бол "жишиг шугам".
   --target edge   → Pi-гийн mosquitto руу. ЭНЭ НЬ СОНИРХОЛТОЙ ХЭМЖИЛТ:
-                    бүх мессеж Pi-гаас гүүрээр дамжин 100 Mbit холбоосоор
-                    гарна. Pi 3B дээр Ethernet нь USB 2.0 дээр сууж байгаа
-                    тул бодит хурд ~90–95 Mbit бөгөөд USB-тэй өрсөлддөг.
-                    Хязгаар нь CPU биш, ихэнхдээ RAM (1 GB) эсвэл уплинк.
+                    бүх мессеж Pi-гаас гүүрээр дамжин 100 Mb/s Ethernet-ээр
+                    (албан ёсны үзүүлэлт) гарна. Хязгаар нь CPU, RAM (1 GB)
+                    эсвэл өгсөх урсгал (uplink) — алийг нь та хэмжиж тогтооно.
 
 `--target` нь зөвхөн АНХДАГЧ ЗӨВЛӨМЖИЙГ (хаяг/порт) л өөрчилнө; бодит хаягийг
 `--host`/`--port` тодорхойлно — тэдгээр нь үргэлж давамгайлна.
@@ -30,7 +29,7 @@ CNC302 — виртуал төхөөрөмжийн флот (MQTT 5.0)
   # 10 төхөөрөмж, 2 секунд тутам, зөөврийн компьютерийн EMQX рүү
   python sim_device.py --target cloud --host 192.168.1.100 --devices 10 --interval 2
 
-  # Мөн 10 төхөөрөмж, харин Pi-гийн mosquitto руу (уплинкийг ачаална)
+  # Мөн 10 төхөөрөмж, харин Pi-гийн mosquitto руу (өгсөх урсгалыг ачаална)
   python sim_device.py --target edge --host pi3b-01.local --devices 10 --interval 2
 
   # TLS + клиентийн сертификаттай (Лаб 2) — EMQX-ийн 8883
@@ -89,7 +88,7 @@ TARGET_HINTS = {
         "host": "pi3b-01.local",
         "port": 1883,
         "what": "Raspberry Pi 3B дээрх mosquitto (ирмэгийн брокер)",
-        "note": "мессеж Pi-гийн 100 Mbit уплинкээр гүүрдэнэ — энэ нь хэмжих гол зам",
+        "note": "мессеж Pi-гийн 100 Mb/s өгсөх урсгалаар (uplink) гүүрдэнэ — энэ нь хэмжих гол зам",
     },
     "cloud": {
         "host": "192.168.1.100",
@@ -121,7 +120,7 @@ def target_banner(args: argparse.Namespace) -> str:
         lines.insert(
             -1,
             "  ⚠ --target edge боловч --host заагаагүй. Pi-гийн хаягийг өгнө үү, "
-            "эс бөгөөс\n    уплинк огт ачаалагдахгүй.",
+            "эс бөгөөс\n    өгсөх урсгал (uplink) огт ачаалагдахгүй.",
         )
     return "\n".join(lines)
 
@@ -283,7 +282,7 @@ def build_parser() -> argparse.ArgumentParser:
         help=("аль брокер рүү чиглэж байгааг заана. Зөвхөн анхдагч ЗӨВЛӨМЖ ба "
               "эхлэх мэдээллийг өөрчилнө — бодит хаягийг --host шийднэ.  "
               f"edge = {TARGET_HINTS['edge']['host']}:{TARGET_HINTS['edge']['port']} "
-              "(Pi 3B mosquitto, 100 Mbit уплинкийг ачаална);  "
+              "(Pi 3B mosquitto, 100 Mb/s өгсөх урсгалыг ачаална);  "
               f"cloud = {TARGET_HINTS['cloud']['host']}:{TARGET_HINTS['cloud']['port']} "
               "(зөөврийн компьютерийн EMQX). Анхдагч: cloud"))
     conn.add_argument("--host", default="localhost",

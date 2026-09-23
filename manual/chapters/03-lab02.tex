@@ -24,10 +24,10 @@
 бүртгэл (provisioning) → таних тэмдэг (identity) → OTA шинэчлэлт → хүчингүй болгох (revocation)
 \end{verbatim}
 
-Худалдааны платформууд (ThingsBoard, AWS IoT, Azure IoT Hub) эдгээрийг \textbf{хар хайрцаг} болгож нуудаг. Энэ лабораторид та \texttt{lab02/registry/app.py} (≈400 мөр) ба \texttt{lab02/ota\_agent.py} (≈300 мөр) хоёрыг \textbf{уншиж, ажиллуулж, эвдэж} протоколыг ил харна.
+Худалдааны платформууд (ThingsBoard, AWS IoT, Azure IoT Hub) эдгээрийг \textbf{хар хайрцаг} болгож нуудаг. Энэ лабораторид та \texttt{lab02/\allowbreak{}registry/\allowbreak{}app.\allowbreak{}py} (≈500 мөр) ба \texttt{lab02/\allowbreak{}ota\_\allowbreak{}agent.\allowbreak{}py} (≈270 мөр) хоёрыг \textbf{уншиж, ажиллуулж, эвдэж} протоколыг ил харна.
 
 \begin{quote}
-\textbf{Яагаад ThingsBoard биш вэ:} ThingsBoard-ын JVM 1.5--2.5 GB шаарддаг. Pi 3B-д 925 MiB. Гэхдээ илүү чухал шалтгаан бий --- та энэ хичээлээр \emph{платформ ашиглагч} биш \emph{платформ зохиогч} болох ёстой. Лабораторийн эцэст сонголтот харьцуулалт хийнэ (§4, Алхам 7).
+\textbf{Яагаад ThingsBoard биш вэ:} ThingsBoard-ын албан ёсны заавар хөгжүүлэлт/PoC-д хүртэл 4 GB RAM шаарддаг. Pi 3B-д нийт 1 GB (OS-д \textasciitilde925 MiB). Гэхдээ илүү чухал шалтгаан бий --- та энэ хичээлээр \emph{платформ ашиглагч} биш \emph{платформ зохиогч} болох ёстой. Лабораторийн эцэст сонголтот харьцуулалт хийнэ (§4, Алхам 8).
 \end{quote}
 
 \hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}{%
@@ -108,6 +108,12 @@ JIT-ийн гол эрсдэл: баталгаагүй бол \textbf{хэн ч}
 төхөөрөмж → сервер   .../ota/state     {state, progress, error}
 \end{verbatim}
 
+\begin{figure}
+\centering
+\includegraphics{figures/fig-ota-states.pdf}
+\caption{Зураг 2.1 --- OTA-гийн төлөвийн машин ба MQTT мессежийн дараалал (offer → request → chunk/N → state)}
+\end{figure}
+
 Төлөвийн дараалал:
 
 \begin{verbatim}
@@ -131,6 +137,51 @@ DOWNLOADING → DOWNLOADED → VERIFIED → UPDATING → UPDATED
 
 \hypertarget{ux430ux43bux445ux43cux443ux443ux434}{%
 \section{4. Алхмууд}\label{ux430ux43bux445ux43cux443ux443ux434}}
+
+\hypertarget{ux430ux43bux445ux430ux43c-0-emqx-rest-api-ux442ux4afux43bux445ux4afux4afux440-ux431ux430-authenticator-15-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 0 --- EMQX REST API түлхүүр ба authenticator (15 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-0-emqx-rest-api-ux442ux4afux43bux445ux4afux4afux440-ux431ux430-authenticator-15-ux43cux438ux43d-ux437ux43a}}
+
+\texttt{registry} нь EMQX-ийн REST API-г (\texttt{/api/v5}) дуудаж төхөөрөмж бүрд MQTT нэвтрэлт үүсгэнэ. REST API нь \textbf{самбарын admin нууц үгийг хүлээн авдаггүй} (EMQX 5.0-оос хойш) --- зөвхөн API key / secret key-г HTTP Basic нэвтрэлтээр хүлээн авна.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  http://localhost:18083 → \textbf{System → API Key → + Create} → Expire At хоосон → \textbf{Confirm}. Secret key-г \textbf{тэр дор нь} хуулж ав --- дахин харагдахгүй.
+\item
+  \texttt{stack/.env}-д бичээд \texttt{registry}-г шинэ утгатай нь дахин үүсгэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack}
+\FunctionTok{nano}\NormalTok{ .env                         }\CommentTok{\# EMQX\_API\_KEY=…  EMQX\_API\_SECRET=…}
+\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core up }\AttributeTok{{-}d}\NormalTok{ registry}
+\BuiltInTok{export} \VariableTok{EMQX\_API\_KEY}\OperatorTok{=}\VariableTok{$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}EMQX\_API\_KEY=\textquotesingle{}}\NormalTok{ .env }\KeywordTok{|} \FunctionTok{cut} \AttributeTok{{-}d}\OperatorTok{=} \AttributeTok{{-}f2}\VariableTok{)}
+\BuiltInTok{export} \VariableTok{EMQX\_API\_SECRET}\OperatorTok{=}\VariableTok{$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}EMQX\_API\_SECRET=\textquotesingle{}}\NormalTok{ .env }\KeywordTok{|} \FunctionTok{cut} \AttributeTok{{-}d}\OperatorTok{=} \AttributeTok{{-}f2}\VariableTok{)}
+\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}u} \StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"}\NormalTok{ localhost:18083/api/v5/nodes }\KeywordTok{|} \ExtensionTok{jq} \StringTok{\textquotesingle{}.[0].version\textquotesingle{}}
+\CommentTok{\# → "5.8.6"}
+\end{Highlighting}
+\end{Shaded}
+\item
+  \textbf{Built-in database} authenticator-ыг \textbf{идэвхгүй} (\texttt{"enable":\ false}) байдлаар үүсгэнэ. Үүсгээгүй бол хэрэглэгч нэмэх дуудлага \texttt{404\ Authenticator\ not\ found} буцаана. Идэвхгүй үед ч хэрэглэгч нэмэх боломжтой; харин EMQX нээлттэй хэвээр үлдэж, гүүр ба бусад клиент тасрахгүй. Алхам 7-д л идэвхжүүлнэ.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}u} \StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"} \AttributeTok{{-}X}\NormalTok{ POST localhost:18083/api/v5/authentication }\DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}H} \StringTok{\textquotesingle{}content{-}type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}d} \StringTok{\textquotesingle{}\{"mechanism":"password\_based","backend":"built\_in\_database",}
+\StringTok{       "user\_id\_type":"username",}
+\StringTok{       "password\_hash\_algorithm":\{"name":"sha256","salt\_position":"suffix"\},}
+\StringTok{       "enable":false\}\textquotesingle{}} \KeywordTok{|} \ExtensionTok{jq} \StringTok{\textquotesingle{}.id, .enable\textquotesingle{}}
+\CommentTok{\# → "password\_based:built\_in\_database"  false}
+\end{Highlighting}
+\end{Shaded}
+\end{enumerate}
+
+\begin{quote}
+⚠ EMQX-ийн баримтаар authenticator идэвхтэй үед нэвтрэлтийн мэдээлэл нь олдоогүй клиент (сүүлийн authenticator дээр) \textbf{татгалзагдана} --- нэр/нууц үггүй бүх клиент ч мөн адил. Иймээс authenticator-ыг зөвхөн Алхам 7-д богино хугацаанд асаана.
+
+Албан ёсны баримт: \href{https://docs.emqx.com/en/emqx/v5.8/guides/api.html}{EMQX REST API} · \href{https://docs.emqx.com/en/emqx/v5.8/guides/api-keys.html}{API Keys} · \href{https://docs.emqx.com/en/emqx/v5.8/guides/access-control/authn/authn.html}{Authentication} · \href{https://docs.emqx.com/en/emqx/v5.8/guides/access-control/authn/mnesia.html}{Built-in Database}
+\end{quote}
 
 \hypertarget{ux430ux43bux445ux430ux43c-1-bulk-ux431ux4afux440ux442ux433ux44dux43b-ux431ux430-ux445ux443ux440ux434ux43dux44b-ux445ux44dux43cux436ux438ux43bux442-30-ux43cux438ux43d-ux437ux43a}{%
 \subsection{Алхам 1 --- Bulk бүртгэл ба хурдны хэмжилт (30 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-1-bulk-ux431ux4afux440ux442ux433ux44dux43b-ux431ux430-ux445ux443ux440ux434ux43dux44b-ux445ux44dux43cux436ux438ux43bux442-30-ux43cux438ux43d-ux437ux43a}}
@@ -161,7 +212,9 @@ DOWNLOADING → DOWNLOADED → VERIFIED → UPDATING → UPDATED
 \end{longtable}\endgroup
 
 \begin{quote}
-Хугацаа \textbf{шугаман} өсөж байна уу? Үгүй бол хаана бөглөрч байна вэ? (Санамж: SQLite нэг бичилт бүрд диск рүү fsync хийдэг.)
+Хугацаа \textbf{шугаман} өсөж байна уу? Үгүй бол хаана бөглөрч байна вэ? (Санамж: \texttt{app.py}-ийн \texttt{bulk()} бүх INSERT-ийг НЭГ transaction-д хийдэг, харин төхөөрөмж бүрд EMQX руу нэг HTTP дуудлага (\texttt{emqx\_\allowbreak{}add\_\allowbreak{}user}) явуулдаг. \texttt{EMQX\_\allowbreak{}API\_\allowbreak{}KEY}-гүйгээр ажиллуулж харьцуул.)
+
+\texttt{devices.csv}-ийн \texttt{emqx} багана \texttt{created} байх ёстой. \texttt{skipped} бол Алхам 0-ийн 2-р хэсэг, \texttt{error\ 404} бол 3-р хэсэг хийгдээгүй.
 \end{quote}
 
 ⚠ \texttt{out/devices.csv} нь нууц үг агуулна. \texttt{.gitignore}-д байгааг батал:
@@ -210,54 +263,97 @@ DOWNLOADING → DOWNLOADED → VERIFIED → UPDATING → UPDATED
 \hypertarget{ux430ux43bux445ux430ux43c-3-x.509-ux442ux430ux43dux438ux445-ux442ux44dux43cux434ux44dux433-ux431ux430-mtls-50-ux43cux438ux43d-ux437ux43api}{%
 \subsection{Алхам 3 --- X.509 таних тэмдэг ба mTLS (50 мин) {[}ЗК{]}{[}Pi{]}}\label{ux430ux43bux445ux430ux43c-3-x.509-ux442ux430ux43dux438ux445-ux442ux44dux43cux434ux44dux433-ux431ux430-mtls-50-ux43cux438ux43d-ux437ux43api}}
 
-Өөрсдийн CA үүсгэж, төхөөрөмжид сертификат олгоно.
+Өөрсдийн CA үүсгэж, төхөөрөмжид сертификат олгоно. Брокерийн (EMQX) сертификат нь \textbf{зөөврийн компьютерт} зориулагдана: клиент холбогдсон хаягаа сертификатын subjectAltName (SAN)-тай тулгадаг тул Pi-гаас холбогдох LAN IP (\texttt{CLOUD\_HOST}) SAN-д заавал орно.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [ЗК] компьютер дээр}
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/lab02}
-\ExtensionTok{./make\_certs.sh}\NormalTok{ init                       }\CommentTok{\# CA үүсгэнэ}
+\VariableTok{CLOUD\_HOST}\OperatorTok{=\textless{}}\NormalTok{компьютерийн }\ExtensionTok{LAN}\NormalTok{ IP}\OperatorTok{\textgreater{}}\NormalTok{ ./make\_certs.sh init   }\CommentTok{\# CA + брокерийн сертификат}
 \ExtensionTok{./make\_certs.sh}\NormalTok{ device pi3b{-}01}
 \ExtensionTok{./make\_certs.sh}\NormalTok{ device dev0001}
 \ExtensionTok{./make\_certs.sh}\NormalTok{ list}
 
 \CommentTok{\# Гинжин хэлхээг батлах}
-\ExtensionTok{openssl}\NormalTok{ verify }\AttributeTok{{-}CAfile}\NormalTok{ certs/ca.crt certs/pi3b{-}01.crt    }\CommentTok{\# → OK}
-\ExtensionTok{openssl}\NormalTok{ x509 }\AttributeTok{{-}in}\NormalTok{ certs/pi3b{-}01.crt }\AttributeTok{{-}noout} \AttributeTok{{-}subject} \AttributeTok{{-}dates}
+\ExtensionTok{openssl}\NormalTok{ verify }\AttributeTok{{-}CAfile}\NormalTok{ certs/ca.crt certs/server.crt certs/pi3b{-}01.crt   }\CommentTok{\# → OK, OK}
+\ExtensionTok{openssl}\NormalTok{ x509 }\AttributeTok{{-}in}\NormalTok{ certs/server.crt }\AttributeTok{{-}noout} \AttributeTok{{-}ext}\NormalTok{ subjectAltName              }\CommentTok{\# CLOUD\_HOST байгаа юу?}
+\ExtensionTok{openssl}\NormalTok{ x509 }\AttributeTok{{-}in}\NormalTok{ certs/pi3b{-}01.crt }\AttributeTok{{-}noout} \AttributeTok{{-}subject} \AttributeTok{{-}dates} \AttributeTok{{-}ext}\NormalTok{ extendedKeyUsage}
 \end{Highlighting}
 \end{Shaded}
 
-EMQX-д mTLS сонсогчийг асаана:
+\begin{quote}
+Албан ёсны баримт: \href{https://docs.openssl.org/3.0/man1/openssl-req/}{openssl-req} · \href{https://docs.openssl.org/3.0/man1/openssl-x509/}{openssl-x509} · \href{https://docs.openssl.org/3.0/man1/openssl-verify/}{openssl-verify} · \href{https://docs.openssl.org/3.0/man5/x509v3_config/}{x509v3\_\allowbreak{}config (subjectAltName, extendedKeyUsage)}
+\end{quote}
+
+EMQX-д mTLS сонсогчийг асаана. SSL сонсогч (8883) анхдагчаар \textbf{нэг талын} TLS: клиентийн сертификатыг шаарддаггүй. Хоёр талын (mTLS) болгохын тулд \texttt{ssl\_\allowbreak{}options.\allowbreak{}verify\ =\allowbreak{}\ verify\_\allowbreak{}peer} ба \texttt{ssl\_\allowbreak{}options.\allowbreak{}fail\_\allowbreak{}if\_\allowbreak{}no\_\allowbreak{}peer\_\allowbreak{}cert\ =\allowbreak{}\ true} хоёулаа хэрэгтэй. \texttt{stack/\allowbreak{}docker-compose.\allowbreak{}yml} эдгээрийг \texttt{EMQX\_\allowbreak{}LISTENERS\_\allowbreak{}\_\allowbreak{}SSL\_\allowbreak{}\_\allowbreak{}DEFAULT\_\allowbreak{}\_\allowbreak{}SSL\_\allowbreak{}OPTIONS\_\allowbreak{}\_\allowbreak{}…} орчны хувьсагчаар (\texttt{.} → \texttt{\_\allowbreak{}\_\allowbreak{}}, угтвар \texttt{EMQX\_}) аль хэдийн тохируулсан; \texttt{EMQX\_\allowbreak{}TLS\_\allowbreak{}ENABLE} нь сонсогчийг асаана:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack}
 \FunctionTok{cp}\NormalTok{ ../lab02/certs/}\DataTypeTok{\{ca.crt}\OperatorTok{,}\DataTypeTok{server.crt}\OperatorTok{,}\DataTypeTok{server.key\}}\NormalTok{ emqx/certs/}
 \FunctionTok{sed} \AttributeTok{{-}i} \StringTok{\textquotesingle{}s/\^{}EMQX\_TLS\_ENABLE=.*/EMQX\_TLS\_ENABLE=true/\textquotesingle{}}\NormalTok{ .env}
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core up }\AttributeTok{{-}d}\NormalTok{ emqx}
-\ExtensionTok{docker}\NormalTok{ compose logs emqx }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}i}\NormalTok{ ssl }\KeywordTok{|} \FunctionTok{tail} \AttributeTok{{-}5}
+\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core up }\AttributeTok{{-}d}\NormalTok{ emqx          }\CommentTok{\# орчны хувьсагч өөрчлөгдсөн тул контейнер дахин үүснэ}
+\ExtensionTok{docker}\NormalTok{ compose exec emqx emqx ctl listeners }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}A3} \StringTok{\textquotesingle{}ssl:default\textquotesingle{}}   \CommentTok{\# running: true}
+\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}u} \StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"}\NormalTok{ localhost:18083/api/v5/listeners/ssl:default }\DataTypeTok{\textbackslash{}}
+  \KeywordTok{|} \ExtensionTok{jq} \StringTok{\textquotesingle{}.ssl\_options | \{verify, fail\_if\_no\_peer\_cert\}\textquotesingle{}}
+\CommentTok{\# → \{"verify":"verify\_peer","fail\_if\_no\_peer\_cert":true\}}
 \end{Highlighting}
 \end{Shaded}
 
-Сертификаттай холбогдож үзнэ ({[}Pi{]} Pi дээр --- CA ба төхөөрөмжийн файлыг хуулж авна):
+\begin{quote}
+Логт \texttt{cert\_\allowbreak{}file\_\allowbreak{}not\_\allowbreak{}found} эсвэл permission алдаа гарвал: Linux хост дээр \texttt{server.key} нь зөвхөн таны хэрэглэгчид уншигдах (600) тул контейнер доторх \texttt{emqx} хэрэглэгч уншиж чадахгүй байж болно. Зөвхөн лабораторид: \texttt{chmod\ 644\ emqx/\allowbreak{}certs/\allowbreak{}server.\allowbreak{}key}.
+
+Албан ёсны баримт: \href{https://docs.emqx.com/en/emqx/v5.8/guides/network/emqx-mqtt-tls.html}{EMQX --- Enable SSL/\allowbreak{}TLS Connection} · \href{https://docs.emqx.com/en/emqx/v5.8/guides/configuration/configuration.html}{EMQX --- Configuration (environment variables)}
+\end{quote}
+
+CA ба төхөөрөмжийн файлыг Pi руу хуулна (\texttt{lab02/certs/} нь \texttt{.gitignore}-д байгаа):
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}p}\NormalTok{ 8883 }\DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}{-}cafile}\NormalTok{ ca.crt }\AttributeTok{{-}{-}cert}\NormalTok{ pi3b{-}01.crt }\AttributeTok{{-}{-}key}\NormalTok{ pi3b{-}01.key }\DataTypeTok{\textbackslash{}}
+\CommentTok{\# [ЗК]}
+\FunctionTok{scp} \AttributeTok{{-}i}\NormalTok{ \textasciitilde{}/.ssh/cnc302 certs/}\DataTypeTok{\{ca.crt}\OperatorTok{,}\DataTypeTok{pi3b{-}01.crt}\OperatorTok{,}\DataTypeTok{pi3b{-}01.key\}} \DataTypeTok{\textbackslash{}}
+\NormalTok{    cnc302@pi{-}team03.local:\textasciitilde{}/cnc302/lab02/certs/}
+\end{Highlighting}
+\end{Shaded}
+
+Сертификаттай холбогдоно ({[}Pi{]} Pi дээр):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/lab02}
+\BuiltInTok{export} \VariableTok{CLOUD\_HOST}\OperatorTok{=}\VariableTok{$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}CLOUD\_HOST=\textquotesingle{}}\NormalTok{ ../edge/.env }\KeywordTok{|} \FunctionTok{cut} \AttributeTok{{-}d}\OperatorTok{=} \AttributeTok{{-}f2}\VariableTok{)}
+\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}p}\NormalTok{ 8883 }\AttributeTok{{-}d} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}cafile}\NormalTok{ certs/ca.crt }\AttributeTok{{-}{-}cert}\NormalTok{ certs/pi3b{-}01.crt }\AttributeTok{{-}{-}key}\NormalTok{ certs/pi3b{-}01.key }\DataTypeTok{\textbackslash{}}
   \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/pi3b{-}01/telemetry\textquotesingle{}} \AttributeTok{{-}m} \StringTok{\textquotesingle{}\{"tls":true\}\textquotesingle{}}
+\CommentTok{\# → Client … received CONNACK (0)}
 \end{Highlighting}
 \end{Shaded}
 
-Сертификатгүй холбогдож үзнэ --- \textbf{татгалзах ёстой}:
+Сертификатгүй холбогдоно --- \textbf{татгалзах ёстой}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}p}\NormalTok{ 8883 }\AttributeTok{{-}{-}cafile}\NormalTok{ ca.crt }\DataTypeTok{\textbackslash{}}
+\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}p}\NormalTok{ 8883 }\AttributeTok{{-}d} \AttributeTok{{-}{-}cafile}\NormalTok{ certs/ca.crt }\DataTypeTok{\textbackslash{}}
   \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/pi3b{-}01/telemetry\textquotesingle{}} \AttributeTok{{-}m} \StringTok{\textquotesingle{}\{"tls":false\}\textquotesingle{}}
-\CommentTok{\# → Error: A TLS error occurred}
+\CommentTok{\# → OpenSSL Error[0]: … tlsv13 alert certificate required}
+\CommentTok{\# → Error: The connection was lost.}
 \end{Highlighting}
 \end{Shaded}
+
+Өөрөө гарын үсэг зурсан (манай CA-гаар батлагдаагүй) сертификатаар оролдож үз --- мөн татгалзах ёстой:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{openssl}\NormalTok{ req }\AttributeTok{{-}x509} \AttributeTok{{-}newkey}\NormalTok{ rsa:2048 }\AttributeTok{{-}nodes} \AttributeTok{{-}days}\NormalTok{ 1 }\AttributeTok{{-}subj}\NormalTok{ /CN=pi3b{-}01 }\DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}keyout}\NormalTok{ /tmp/rogue.key }\AttributeTok{{-}out}\NormalTok{ /tmp/rogue.crt}
+\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}p}\NormalTok{ 8883 }\AttributeTok{{-}{-}cafile}\NormalTok{ certs/ca.crt }\DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}cert}\NormalTok{ /tmp/rogue.crt }\AttributeTok{{-}{-}key}\NormalTok{ /tmp/rogue.key }\AttributeTok{{-}t}\NormalTok{ test }\AttributeTok{{-}m}\NormalTok{ x}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+Албан ёсны баримт: \href{https://mosquitto.org/man/mosquitto_pub-1.html}{mosquitto\_pub(1)} --- \texttt{-\/-cafile}, \texttt{-\/-cert}, \texttt{-\/-key}, \texttt{-d}. \texttt{-\/-insecure} (хостын нэр шалгахгүй) -ийг бүү хэрэглэ: SAN зөв бол шаардлагагүй.
+\end{quote}
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-2.3-mtls-ux438ux439ux43d-ux4afux43dux44d}{%
 \subsubsection{Хүснэгт 2.3 --- mTLS-ийн үнэ}\label{ux445ux4afux441ux43dux44dux433ux442-2.3-mtls-ux438ux439ux43d-ux4afux43dux44d}}
@@ -279,15 +375,24 @@ Pi-гийн CPU \% нийтлэх үед & & & \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [Pi] Pi дээр}
+\CommentTok{\# [Pi] Pi дээр (\textasciitilde{}/cnc302/lab02)}
 \ExtensionTok{python3}\NormalTok{ ../tools/qos\_latency.py }\AttributeTok{{-}{-}host} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}{-}port}\NormalTok{ 1883 }\AttributeTok{{-}{-}path}\NormalTok{ lan }\AttributeTok{{-}{-}count}\NormalTok{ 200}
 \ExtensionTok{python3}\NormalTok{ ../tools/qos\_latency.py }\AttributeTok{{-}{-}host} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}{-}port}\NormalTok{ 8883 }\AttributeTok{{-}{-}path}\NormalTok{ lan }\AttributeTok{{-}{-}count}\NormalTok{ 200 }\DataTypeTok{\textbackslash{}}
-        \AttributeTok{{-}{-}tls} \AttributeTok{{-}{-}ca}\NormalTok{ ca.crt }\AttributeTok{{-}{-}cert}\NormalTok{ pi3b{-}01.crt }\AttributeTok{{-}{-}key}\NormalTok{ pi3b{-}01.key}
+        \AttributeTok{{-}{-}tls} \AttributeTok{{-}{-}ca}\NormalTok{ certs/ca.crt }\AttributeTok{{-}{-}cert}\NormalTok{ certs/pi3b{-}01.crt }\AttributeTok{{-}{-}key}\NormalTok{ certs/pi3b{-}01.key}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{quote}
-\textbf{Pi 3B-гийн онцлог:} Cortex-A53 нь ARMv8 крипто өргөтгөлгүй (AES, SHA хурдасгуургүй). Тиймээс TLS-ийн зардал Pi 5 эсвэл компьютер дээрхээс \textbf{мэдэгдэхүйц} өндөр. Энэ бол ирмэгийн төхөөрөмж сонгохдоо анхаарах бодит хүчин зүйл.
+\textbf{Pi 3B-гийн онцлог --- өөрсдөө шалга.} Armv8-ийн Cryptography Extension (AES/SHA-ийн техник хангамжийн заавар) нь Cortex-A53-д \emph{сонголттой} хэсэг; BCM2837 түүнийг агуулдаг эсэхийг Raspberry Pi-гийн баримт тодорхой заагаагүй. Тиймээс таамаглах биш, хэмжинэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{grep} \AttributeTok{{-}m1}\NormalTok{ Features /proc/cpuinfo      }\CommentTok{\# aes, sha1, sha2, pmull байгаа эсэх}
+\ExtensionTok{openssl}\NormalTok{ speed }\AttributeTok{{-}evp}\NormalTok{ aes{-}128{-}gcm        }\CommentTok{\# Pi дээр ба компьютер дээр харьцуул}
+\end{Highlighting}
+\end{Shaded}
+
+Хэрэв \texttt{aes}/\allowbreak\texttt{sha2} алга бол TLS-ийн шифрлэлт бүхэлдээ програмаар хийгдэж, CPU-гийн зардал өндөр байна --- ирмэгийн төхөөрөмж сонгохдоо анхаарах бодит хүчин зүйл.
 \end{quote}
 
 \hypertarget{ux430ux43bux445ux430ux43c-4-ota-ux430ux437-ux436ux430ux440ux433ux430ux43bux442ux430ux439-ux437ux430ux43c-35-ux43cux438ux43d-ux437ux43api}{%
@@ -326,6 +431,23 @@ Firmware дүрс байршуулна (жинхэнэ биш, санамсар�
 
 Pi дээрх лог \texttt{DOWNLOADING\ →\ …\ →\ UPDATED} дарааллыг харуулах ёстой.
 
+\begin{quote}
+\texttt{offer} мессеж retained биш: агент \textbf{эхэлж} ажиллаж, захиалгаа хийсэн байх ёстой, дараа нь л тараалтыг эхлүүлнэ. Эс бөгөөс агент саналыг хэзээ ч авахгүй.
+\end{quote}
+
+Хүснэгт 2.4-ийн гурван зам (агент бүрийг ажиллуулаад дээрх \texttt{rollout}-ыг дахин дуудна):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# [Pi] Pi → үүл шууд (LAN)}
+\ExtensionTok{python3}\NormalTok{ ota\_agent.py }\AttributeTok{{-}{-}host} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}{-}device}\NormalTok{ pi3b{-}01 }\AttributeTok{{-}{-}out}\NormalTok{ out/fw }\AttributeTok{{-}{-}once}
+\CommentTok{\# [Pi] Pi → гүүрээр: Pi{-}гийн mosquitto руу холбогдоно (ota/\# нь гүүрийн "in" сэдэвт бий)}
+\ExtensionTok{python3}\NormalTok{ ota\_agent.py }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\AttributeTok{{-}{-}device}\NormalTok{ pi3b{-}01 }\AttributeTok{{-}{-}out}\NormalTok{ out/fw }\AttributeTok{{-}{-}once}
+\CommentTok{\# [ЗК] (лавлагаа) loopback: компьютер дээр, EMQX руу шууд}
+\ExtensionTok{python3}\NormalTok{ ota\_agent.py }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\AttributeTok{{-}{-}device}\NormalTok{ pi3b{-}01 }\AttributeTok{{-}{-}out}\NormalTok{ /tmp/fw{-}loop }\AttributeTok{{-}{-}once}
+\end{Highlighting}
+\end{Shaded}
+
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-2.4-ota-ux433ux438ux439ux43d-ux433ux4afux439ux446ux44dux442ux433ux44dux43b-512-kib-128-ux445ux44dux441ux44dux433}{%
 \subsubsection{Хүснэгт 2.4 --- OTA-гийн гүйцэтгэл (512 KiB, 128 хэсэг)}\label{ux445ux4afux441ux43dux44dux433ux442-2.4-ota-ux433ux438ux439ux43d-ux433ux4afux439ux446ux44dux442ux433ux44dux43b-512-kib-128-ux445ux44dux441ux44dux433}}
 
@@ -356,13 +478,25 @@ Pi → гүүрээр & & & & \\
 \end{longtable}\endgroup
 
 \begin{quote}
-\textbf{Асуулт:} хурд нь хэмжээтэй шугаман өсөж байна уу? Үгүй бол хязгаарлагч нь юу вэ --- 100 Mbit сүлжээ, microSD-гийн бичилт, эсвэл MQTT-ийн round-trip? (Санамз: 128 хэсэг × round-trip.)
+\textbf{Асуулт:} хурд нь хэмжээтэй шугаман өсөж байна уу? Үгүй бол хязгаарлагч нь юу вэ --- 100 Mbit сүлжээ, microSD-гийн бичилт, эсвэл MQTT-ийн round-trip? (Санамж: 128 хэсэг × round-trip.)
 \end{quote}
 
 \hypertarget{ux430ux43bux445ux430ux43c-5-ota-ux44dux432ux434ux440ux44dux43bux438ux439ux43d-ux433ux443ux440ux432ux430ux43d-ux445ux443ux432ux438ux43bux431ux430ux440-40-ux43cux438ux43d-pi}{%
 \subsection{Алхам 5 --- OTA: эвдрэлийн гурван хувилбар (40 мин) {[}Pi{]}}\label{ux430ux43bux445ux430ux43c-5-ota-ux44dux432ux434ux440ux44dux43bux438ux439ux43d-ux433ux443ux440ux432ux430ux43d-ux445ux443ux432ux438ux43bux431ux430ux440-40-ux43cux438ux43d-pi}}
 
-Гурвуулангийн гаралтыг тайланд хадгална.
+Гурвуулангийн гаралтыг тайланд хадгална. Хувилбар бүрт {[}ЗК{]} компьютер дээр \textbf{шинэ} тараалт эхлүүлнэ. Rollback-ийг бодитоор харахын тулд өөр агуулгатай 2-р хувилбар (1.3.0) байршуулна --- эс бөгөөс \texttt{current.bin} ба \texttt{previous.bin} ижил файл тул юу ч батлахгүй:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# [ЗК]}
+\FunctionTok{head} \AttributeTok{{-}c}\NormalTok{ 131072 /dev/urandom }\OperatorTok{\textgreater{}}\NormalTok{ /tmp/fw{-}1.3.0.bin}
+\VariableTok{FW2}\OperatorTok{=}\VariableTok{$(}\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST }\StringTok{"localhost:8090/firmware?version=1.3.0"} \DataTypeTok{\textbackslash{}}
+      \AttributeTok{{-}F} \StringTok{"file=@/tmp/fw{-}1.3.0.bin"} \KeywordTok{|} \ExtensionTok{jq} \AttributeTok{{-}r}\NormalTok{ .fw\_id}\VariableTok{)}
+\FunctionTok{offer()} \KeywordTok{\{} \ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST localhost:8090/rollout }\AttributeTok{{-}H} \StringTok{\textquotesingle{}content{-}type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}d} \StringTok{"\{}\DataTypeTok{\textbackslash{}"}\StringTok{fw\_id}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\VariableTok{$FW2}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{canary\_percent}\DataTypeTok{\textbackslash{}"}\StringTok{:100,}\DataTypeTok{\textbackslash{}"}\StringTok{devices}\DataTypeTok{\textbackslash{}"}\StringTok{:[}\DataTypeTok{\textbackslash{}"}\StringTok{pi3b{-}01}\DataTypeTok{\textbackslash{}"}\StringTok{]\}"} \KeywordTok{|} \ExtensionTok{jq} \AttributeTok{{-}c}\KeywordTok{;} \KeywordTok{\}}
+\CommentTok{\# [Pi] агентыг ажиллуулсны ДАРАА [ЗК] дээр \textasciigrave{}offer\textasciigrave{} гэж дуудна}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{А. Шалгалт унах (checksum failure)}
 
@@ -372,7 +506,7 @@ Pi → гүүрээр & & & & \\
 \end{Highlighting}
 \end{Shaded}
 
-Хүлээгдэх: \texttt{DOWNLOADED\ →\ FAILED}. \textbf{Суулгахгүй.} \texttt{out/fw/version.txt} өөрчлөгдөөгүй байх ёстой.
+Хүлээгдэх: \texttt{DOWNLOADED\ →\ FAILED}. \textbf{Суулгахгүй.} \texttt{out/\allowbreak{}fw/\allowbreak{}version.\allowbreak{}txt} өөрчлөгдөөгүй (1.2.0) байх ёстой.
 
 \textbf{Б. Суулгасны дараа ачаалагдахгүй (rollback)}
 
@@ -382,11 +516,12 @@ Pi → гүүрээр & & & & \\
 \end{Highlighting}
 \end{Shaded}
 
-Хүлээгдэх: \texttt{VERIFIED\ →\ UPDATING\ →\ ROLLED\_BACK}. \texttt{out/fw/current.bin} нь \texttt{previous.bin}-тэй ижил болсон эсэхийг батал:
+Хүлээгдэх: \texttt{VERIFIED\ →\ UPDATING\ →\ ROLLED\_\allowbreak{}BACK}. \texttt{out/\allowbreak{}fw/\allowbreak{}current.\allowbreak{}bin} нь \texttt{previous.bin} (1.2.0)-тэй ижил болж, \texttt{version.txt} нь 1.2.0 хэвээр үлдсэнийг батал:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{sha256sum}\NormalTok{ out/fw/current.bin out/fw/previous.bin}
+\FunctionTok{cat}\NormalTok{ out/fw/version.txt}
 \end{Highlighting}
 \end{Shaded}
 
@@ -430,7 +565,7 @@ Pi → гүүрээр & & & & \\
 Хэвийн & UPDATED & & 0 & 0 & --- \\
 \texttt{-\/-fail-verify} & & & & & \\
 \texttt{-\/-fail-apply} & & & & & \\
-\texttt{-\/-drop-rate\ 0.2} & & & & & \\
+\texttt{-\/\allowbreak{}-drop-rate\ 0.\allowbreak{}2} & & & & & \\
 \end{longtable}\endgroup
 
 \begin{quote}
@@ -449,21 +584,23 @@ Pi → гүүрээр & & & & \\
 
 \CommentTok{\# 20 OTA клиент зэрэг ажиллуулна (2 нь эвдэрсэн байхаар)}
 \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \VariableTok{$(}\FunctionTok{seq} \AttributeTok{{-}w}\NormalTok{ 1 18}\VariableTok{)}\KeywordTok{;} \ControlFlowTok{do}
-  \ExtensionTok{python3}\NormalTok{ ota\_agent.py }\AttributeTok{{-}{-}host} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}{-}device}\NormalTok{ ota00}\VariableTok{$i} \AttributeTok{{-}{-}out}\NormalTok{ out/f}\VariableTok{$i} \AttributeTok{{-}{-}once} \KeywordTok{\&}
+  \ExtensionTok{python3}\NormalTok{ ota\_agent.py }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\AttributeTok{{-}{-}device}\NormalTok{ ota00}\VariableTok{$i} \AttributeTok{{-}{-}out}\NormalTok{ out/f}\VariableTok{$i} \AttributeTok{{-}{-}once} \KeywordTok{\&}
 \ControlFlowTok{done}
 \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in}\NormalTok{ 19 20}\KeywordTok{;} \ControlFlowTok{do}
-  \ExtensionTok{python3}\NormalTok{ ota\_agent.py }\AttributeTok{{-}{-}host} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}{-}device}\NormalTok{ ota00}\VariableTok{$i} \AttributeTok{{-}{-}out}\NormalTok{ out/f}\VariableTok{$i} \AttributeTok{{-}{-}once} \AttributeTok{{-}{-}fail{-}apply} \KeywordTok{\&}
+  \ExtensionTok{python3}\NormalTok{ ota\_agent.py }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\AttributeTok{{-}{-}device}\NormalTok{ ota00}\VariableTok{$i} \AttributeTok{{-}{-}out}\NormalTok{ out/f}\VariableTok{$i} \AttributeTok{{-}{-}once} \AttributeTok{{-}{-}fail{-}apply} \KeywordTok{\&}
 \ControlFlowTok{done}
+\FunctionTok{sleep}\NormalTok{ 3}
 
-\CommentTok{\# Canary 20\% (4 төхөөрөмж)}
-\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST localhost:8090/rollout }\AttributeTok{{-}H} \StringTok{\textquotesingle{}content{-}type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}d} \StringTok{"\{}\DataTypeTok{\textbackslash{}"}\StringTok{fw\_id}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\VariableTok{$FW}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{canary\_percent}\DataTypeTok{\textbackslash{}"}\StringTok{:20\}"} \KeywordTok{|} \ExtensionTok{jq}
-\VariableTok{RID}\OperatorTok{=\textless{}}\NormalTok{буцаасан }\ExtensionTok{rollout\_id}\OperatorTok{\textgreater{}}
+\CommentTok{\# Canary 20\% (жагсаалтын ЭХНИЙ 4 төхөөрөмж). \textasciigrave{}devices\textasciigrave{}{-}ийг заавал өгнө —}
+\CommentTok{\# эс бөгөөс хүчингүй болоогүй БҮХ төхөөрөмж (dev*, b100*, b500* …) зорилт болно.}
+\VariableTok{DEVS}\OperatorTok{=}\VariableTok{$(}\FunctionTok{seq} \AttributeTok{{-}f} \StringTok{\textquotesingle{}"ota\%04g"\textquotesingle{}}\NormalTok{ 1 20 }\KeywordTok{|} \FunctionTok{paste} \AttributeTok{{-}sd,} \AttributeTok{{-}}\VariableTok{)}
+\VariableTok{RID}\OperatorTok{=}\VariableTok{$(}\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST localhost:8090/rollout }\AttributeTok{{-}H} \StringTok{\textquotesingle{}content{-}type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}d} \StringTok{"\{}\DataTypeTok{\textbackslash{}"}\StringTok{fw\_id}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\VariableTok{$FW}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{canary\_percent}\DataTypeTok{\textbackslash{}"}\StringTok{:20,}\DataTypeTok{\textbackslash{}"}\StringTok{devices}\DataTypeTok{\textbackslash{}"}\StringTok{:[}\VariableTok{$DEVS}\StringTok{]\}"} \KeywordTok{|} \ExtensionTok{jq} \AttributeTok{{-}r}\NormalTok{ .rollout\_id}\VariableTok{)}
 
-\FunctionTok{sleep}\NormalTok{ 30}
+\FunctionTok{sleep}\NormalTok{ 10}
 \ExtensionTok{curl} \AttributeTok{{-}s}\NormalTok{ localhost:8090/rollout/}\VariableTok{$RID} \KeywordTok{|} \ExtensionTok{jq} \StringTok{\textquotesingle{}.summary, .success\_rate\textquotesingle{}}
 
-\CommentTok{\# Canary амжилттай бол бусдад тараана}
+\CommentTok{\# Canary{-}гийн БҮХ төхөөрөмж UPDATED бол бусдад тараана (эс бөгөөс HTTP 409)}
 \ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST localhost:8090/rollout/}\VariableTok{$RID}\NormalTok{/promote }\KeywordTok{|} \ExtensionTok{jq}
 \end{Highlighting}
 \end{Shaded}
@@ -501,28 +638,72 @@ Canary (20\%) & & & & & \\
 \textbf{Нийт} & 20 & & & & \\
 \end{longtable}\endgroup
 
-Одоо \textbf{canary унасан} хувилбарыг туршина: \texttt{-\/-fail-apply}-тай төхөөрөмжийг canary давалгаанд оруулж, \texttt{promote} дуудвал юу болох вэ? (Хүлээгдэх: HTTP 409, тараалт зогсоно.)
+Одоо \textbf{canary унасан} хувилбарыг туршина: агентуудыг дахин ажиллуулаад \texttt{devices} жагсаалтын эхэнд \texttt{"ota0019","ota0020"}-ийг тавьж canary-д оруул, дараа нь \texttt{promote} дууд. (Хүлээгдэх: HTTP 409, \texttt{rollout.state} = \texttt{halted}; дахин \texttt{promote} дуудсан ч 409.)
 
-\hypertarget{ux430ux43bux445ux430ux43c-7-ux445ux4afux447ux438ux43dux433ux4afux439-ux431ux43eux43bux433ux43eux445-revocation-20-ux43cux438ux43d-ux437ux43a}{%
-\subsection{Алхам 7 --- Хүчингүй болгох (revocation) (20 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-7-ux445ux4afux447ux438ux43dux433ux4afux439-ux431ux43eux43bux433ux43eux445-revocation-20-ux43cux438ux43d-ux437ux43a}}
+\hypertarget{ux430ux43bux445ux430ux43c-7-ux445ux4afux447ux438ux43dux433ux4afux439-ux431ux43eux43bux433ux43eux445-revocation-25-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 7 --- Хүчингүй болгох (revocation) (25 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-7-ux445ux4afux447ux438ux43dux433ux4afux439-ux431ux43eux43bux433ux43eux445-revocation-25-ux43cux438ux43d-ux437ux43a}}
+
+Хүчингүй болгохыг шалгахын тулд EMQX нэвтрэлт шаардах ёстой. Алхам 0-д үүсгэсэн authenticator-ыг \textbf{түр} идэвхжүүлнэ. Идэвхтэй үед нэр/нууц үггүй \textbf{бүх шинэ} холболт татгалзагдана (гүүр, \texttt{registry}, OTA агент). Одоо холбогдсон байгаа клиентүүд тасрахгүй --- нэвтрэлтийг зөвхөн CONNECT үед шалгадаг.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# [ЗК] (Алхам 0{-}ийн EMQX\_API\_KEY / EMQX\_API\_SECRET export хийсэн терминал)}
+\VariableTok{AUTHN}\OperatorTok{=}\NormalTok{localhost:18083/api/v5/authentication/password\_based\%3Abuilt\_in\_database}
+\FunctionTok{authn()} \KeywordTok{\{} \ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}o}\NormalTok{ /dev/null }\AttributeTok{{-}w} \StringTok{"authn enable=}\VariableTok{$1}\StringTok{ → HTTP \%\{http\_code\}\textbackslash{}n"} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}u} \StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"} \AttributeTok{{-}X}\NormalTok{ PUT }\StringTok{"}\VariableTok{$AUTHN}\StringTok{"} \AttributeTok{{-}H} \StringTok{\textquotesingle{}content{-}type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}d} \StringTok{"\{}\DataTypeTok{\textbackslash{}"}\StringTok{mechanism}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{password\_based}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{backend}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{built\_in\_database}\DataTypeTok{\textbackslash{}"}\StringTok{,}
+\StringTok{       }\DataTypeTok{\textbackslash{}"}\StringTok{user\_id\_type}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{username}\DataTypeTok{\textbackslash{}"}\StringTok{,}
+\StringTok{       }\DataTypeTok{\textbackslash{}"}\StringTok{password\_hash\_algorithm}\DataTypeTok{\textbackslash{}"}\StringTok{:\{}\DataTypeTok{\textbackslash{}"}\StringTok{name}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{sha256}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{salt\_position}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{suffix}\DataTypeTok{\textbackslash{}"}\StringTok{\},}
+\StringTok{       }\DataTypeTok{\textbackslash{}"}\StringTok{enable}\DataTypeTok{\textbackslash{}"}\StringTok{:}\VariableTok{$1}\StringTok{\}"}\KeywordTok{;} \KeywordTok{\}}
+\ExtensionTok{authn}\NormalTok{ true                                                   }\CommentTok{\# → HTTP 204}
+
+\VariableTok{PW}\OperatorTok{=}\VariableTok{$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}dev0001,\textquotesingle{}}\NormalTok{ out/devices.csv }\KeywordTok{|} \FunctionTok{cut} \AttributeTok{{-}d,} \AttributeTok{{-}f3}\VariableTok{)}
+\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}u}\NormalTok{ dev0001 }\AttributeTok{{-}P} \StringTok{"}\VariableTok{$PW}\StringTok{"} \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/dev0001/telemetry\textquotesingle{}} \AttributeTok{{-}m} \StringTok{\textquotesingle{}\{"test":1\}\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+  \KeywordTok{\&\&} \BuiltInTok{echo} \StringTok{"нэвтрэлт OK"}
+\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/dev0001/telemetry\textquotesingle{}} \AttributeTok{{-}m}\NormalTok{ x   }\CommentTok{\# нэргүй → "bad user name or password"}
+
+\CommentTok{\# «Хулгайлагдсан» төхөөрөмж холбогдсон хэвээр байна (тусдаа терминал)}
+\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}u}\NormalTok{ dev0001 }\AttributeTok{{-}P} \StringTok{"}\VariableTok{$PW}\StringTok{"} \AttributeTok{{-}i}\NormalTok{ dev0001{-}live }\AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/dev0001/\#\textquotesingle{}} \AttributeTok{{-}v}
+\end{Highlighting}
+\end{Shaded}
+
+Одоо хүчингүй болгоно:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \ExtensionTok{python3}\NormalTok{ provision.py revoke }\AttributeTok{{-}{-}device{-}id}\NormalTok{ dev0001}
+\CommentTok{\# ✓ dev0001 хүчингүй боллоо (EMQX хэрэглэгч: deleted)}
+\CommentTok{\#   Хөөсөн идэвхтэй холболт: [\textquotesingle{}dev0001{-}live\textquotesingle{}]}
 \ExtensionTok{python3}\NormalTok{ provision.py list }\AttributeTok{{-}{-}state}\NormalTok{ revoked}
+\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}u}\NormalTok{ dev0001 }\AttributeTok{{-}P} \StringTok{"}\VariableTok{$PW}\StringTok{"} \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/dev0001/telemetry\textquotesingle{}} \AttributeTok{{-}m}\NormalTok{ x}
+\CommentTok{\# → Connection error: Connection Refused: not authorised.}
 \end{Highlighting}
 \end{Shaded}
 
-Хүчингүй болсон төхөөрөмж дахин холбогдож чадах уу? Туршиж үз:
+\texttt{registry} хүчингүй болгохдоо \textbf{гурван} зүйл хийнэ (\texttt{app.py} → \texttt{revoke()}): бүртгэлд \texttt{revoked} гэж тэмдэглэнэ → EMQX-ээс хэрэглэгчийг устгана (\texttt{DELETE\ /\allowbreak{}api/\allowbreak{}v5/\allowbreak{}authentication/\allowbreak{}\{id\}/users/\{user\_id\}}) → тухайн username-тэй клиентүүдийг хайж (\texttt{GET\ /\allowbreak{}api/\allowbreak{}v5/\allowbreak{}clients?\allowbreak{}username=\allowbreak{}}) хөөнө (\texttt{DELETE\ /\allowbreak{}api/\allowbreak{}v5/\allowbreak{}clients/\allowbreak{}\{clientid\}}). \textbf{Хөөх алхамгүй бол яах вэ?} \texttt{dev0002}-оор \texttt{mosquitto\_sub}-ийг (\texttt{-i\ dev0002-live}) дахин холбоод, хэрэглэгчийг зөвхөн EMQX-ээс устга:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}p}\NormalTok{ 1883 }\AttributeTok{{-}u}\NormalTok{ dev0001 }\AttributeTok{{-}P} \StringTok{\textquotesingle{}\textless{}devices.csv{-}ийн нууц үг\textgreater{}\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/dev0001/telemetry\textquotesingle{}} \AttributeTok{{-}m} \StringTok{\textquotesingle{}\{"test":1\}\textquotesingle{}}
+\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}o}\NormalTok{ /dev/null }\AttributeTok{{-}w} \StringTok{\textquotesingle{}\%\{http\_code\}\textbackslash{}n\textquotesingle{}} \AttributeTok{{-}u} \StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"} \AttributeTok{{-}X}\NormalTok{ DELETE }\DataTypeTok{\textbackslash{}}
+  \StringTok{"localhost:18083/api/v5/authentication/password\_based\%3Abuilt\_in\_database/users/dev0002"}   \CommentTok{\# 204}
+\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}u} \StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"} \StringTok{"localhost:18083/api/v5/clients?username=dev0002"} \DataTypeTok{\textbackslash{}}
+  \KeywordTok{|} \ExtensionTok{jq} \StringTok{\textquotesingle{}[.data[].clientid]\textquotesingle{}}          \CommentTok{\# → ["dev0002{-}live"] — холбогдсон хэвээр!}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{Гол ажиглалт:} аль хэдийн \textbf{холбогдсон} session яах вэ? EMQX самбар → Clients → тухайн клиентийг олж, гараар таслах хэрэгтэй. Энэ бол бодит системийн ноцтой цоорхой --- хүчингүй болгосон боловч холбогдсон хэвээр байгаа төхөөрөмж цагийн турш өгөгдөл илгээж чадна.
+Нэвтрэлт устсан ч session амьд үлдэж, өгөгдөл илгээсээр байна. Дараа нь \texttt{python3\ provision.\allowbreak{}py\ revoke\ -\/\allowbreak{}-device-id\ dev0002} --- одоо л тасарна.
+
+Дуусаад authenticator-ыг \textbf{заавал} унтраана (гүүр, агент дахин холбогдох боломжтой болно):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{authn}\NormalTok{ false                                                  }\CommentTok{\# → HTTP 204}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+Албан ёсны баримт: \href{https://docs.emqx.com/en/emqx/v5.8/guides/access-control/authn/authn.html}{EMQX --- Authentication (chain, ignore/\allowbreak{}deny)} · \href{https://docs.emqx.com/en/emqx/v5.8/guides/access-control/authn/user_management.html}{Manage user data via HTTP API} · \href{https://docs.emqx.com/en/emqx/v5.8/guides/dashboard/connections.html}{Dashboard --- Clients (Kick Out)}. \texttt{DELETE\ /\allowbreak{}api/\allowbreak{}v5/\allowbreak{}clients/\allowbreak{}\{clientid\}} («Kick out client by client ID») нь EMQX-ийн Swagger баримтад (\texttt{http:\allowbreak{}/\allowbreak{}/\allowbreak{}localhost:\allowbreak{}18083/\allowbreak{}api-docs}) бий.
+\end{quote}
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-2.7-ux445ux4afux447ux438ux43dux433ux4afux439-ux431ux43eux43bux433ux43eux445}{%
 \subsubsection{Хүснэгт 2.7 --- Хүчингүй болгох}\label{ux445ux4afux441ux43dux44dux433ux442-2.7-ux445ux4afux447ux438ux43dux433ux4afux439-ux431ux43eux43bux433ux43eux445}}
@@ -544,7 +725,7 @@ X.509 бол CRL/OCSP хэрэгтэй юу & \\
 \subsection{Алхам 8 --- Сонголтот: ThingsBoard-тай харьцуулах (25 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-8-ux441ux43eux43dux433ux43eux43bux442ux43eux442-thingsboard-ux442ux430ux439-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux445-25-ux43cux438ux43d-ux437ux43a}}
 
 \begin{quote}
-Зөвхөн компьютерт ≥ 16 GB RAM байвал.
+Зөвхөн компьютерт ≥ 16 GB RAM байвал. ThingsBoard-ын албан ёсны заавар хөгжүүлэлт/PoC-д 1 цөм, \textbf{4 GB RAM}-ыг доод шаардлага гэж заасан.
 \end{quote}
 
 \begin{Shaded}
@@ -557,21 +738,34 @@ X.509 бол CRL/OCSP хэрэгтэй юу & \\
 \end{Highlighting}
 \end{Shaded}
 
-http://localhost:8080 (sysadmin@thingsboard.org / sysadmin) → Devices → Add device.
+http://localhost:8080 --- анхдагч нэвтрэлт: \textbf{System Administrator} \texttt{sysadmin@thingsboard.\allowbreak{}org} / \texttt{sysadmin}. Системийн админ төхөөрөмж үүсгэдэггүй --- түрээслэгч (tenant) удирддаг. Демо өгөгдөлтэй суусан бол \texttt{tenant@thingsboard.\allowbreak{}org} / \texttt{tenant}-аар нэвтэр; эс бөгөөс sysadmin-аар \textbf{Tenants → +} шинэ tenant ба tenant admin үүсгэ. Дараа нь tenant admin-аар \textbf{Entities → Devices → + Add device}.
+
+\begin{quote}
+Албан ёсны баримт: \href{https://thingsboard.io/docs/installation/docker/}{ThingsBoard --- Installing using Docker}
+\end{quote}
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-2.8-ux4e9ux4e9ux440ux441ux434ux438ux439ux43d-ux431ux4afux440ux442ux433ux44dux43b-vs-thingsboard}{%
 \subsubsection{Хүснэгт 2.8 --- Өөрсдийн бүртгэл vs ThingsBoard}\label{ux445ux4afux441ux43dux44dux433ux442-2.8-ux4e9ux4e9ux440ux441ux434ux438ux439ux43d-ux431ux4afux440ux442ux433ux44dux43b-vs-thingsboard}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
 \toprule
-Шалгуур & \texttt{registry} (бидний) & ThingsBoard \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Шалгуур
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\texttt{registry} (бидний)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+ThingsBoard
+\end{minipage} \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
 RAM (MiB) & & \\
 Эхлэх хугацаа (сек) & & \\
-Кодын мөрийн тоо & \textasciitilde400 & \textasciitilde1 000 000+ \\
+Кодын мөрийн тоо & \textasciitilde500 (\texttt{wc\ -l\ registry/\allowbreak{}app.\allowbreak{}py}) & (GitHub сангаас тооцоол) \\
 Pi 3B дээр ажиллах уу & & \\
 Rule engine, UI, олон түрээслэгч & ✗ & ✓ \\
 Протокол ил харагдах уу & ✓ & ✗ \\
@@ -581,7 +775,7 @@ Rule engine, UI, олон түрээслэгч & ✗ & ✓ \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ tb stop thingsboard}
+\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}f}\NormalTok{ docker{-}compose.yml }\AttributeTok{{-}f}\NormalTok{ docker{-}compose.tb.yml }\AttributeTok{{-}{-}profile}\NormalTok{ tb stop thingsboard}
 \end{Highlighting}
 \end{Shaded}
 
@@ -610,7 +804,7 @@ Rule engine, UI, олон түрээслэгч & ✗ & ✓ \\
 \item
   JIT бүртгэлийн эмзэг байдлыг \textbf{X.509-ээр} хэрхэн хаах вэ? Төхөөрөмж дээр хувийн түлхүүр яаж аюулгүй хадгалагдах вэ (Pi 3B-д TPM/Secure Element байхгүй --- энэ юу гэсэн үг вэ)?
 \item
-  Хүснэгт 2.3-д mTLS-ийн саатлын нэмэгдэл хэдэн хувь байв? Cortex-A53-д крипто хурдасгуур байхгүйг харгалзан, 1 000 төхөөрөмжтэй флотод энэ ямар үр дагавартай вэ?
+  Хүснэгт 2.3-д mTLS-ийн саатлын нэмэгдэл хэдэн хувь байв? Таны Pi-гийн \texttt{/proc/cpuinfo}-д \texttt{aes}/\allowbreak\texttt{sha2} байсан уу, \texttt{openssl\ speed} Pi ба компьютер дээр хэд дахин ялгаатай гарав? 1 000 төхөөрөмжтэй флотод энэ ямар үр дагавартай вэ?
 \item
   Хүснэгт 2.4-т OTA-гийн хурд файлын хэмжээтэй шугаман өсөв үү? Хэрэв хязгаарлагч нь round-trip бол \texttt{chunk\_size}-ыг 4 KiB-аас 64 KiB болговол юу өөрчлөгдөх вэ? Ямар эрсдэл нэмэгдэх вэ?
 \item
@@ -618,7 +812,7 @@ Rule engine, UI, олон түрээслэгч & ✗ & ✓ \\
 \item
   Canary 20\% нь 5 000 төхөөрөмжийн флотод 1 000 төхөөрөмж болно. Энэ хэт олон уу? Canary-гийн хэмжээг юугаар тодорхойлох вэ?
 \item
-  Хүчингүй болгосон төхөөрөмжийн \textbf{одоо байгаа} холболт тасрахгүй байв. Энэ ямар халдлагын боломж олгох вэ? MQTT 5.0-ийн ямар боломж (\texttt{Session\ Expiry\ Interval}, \texttt{Server\ Disconnect}) үүнд тусалж болох вэ?
+  Алхам 7-д зөвхөн хэрэглэгчийг устгахад \textbf{одоо байгаа} холболт тасраагүй. Энэ ямар халдлагын боломж олгох вэ? \texttt{registry} хөөх алхмыг нэмсэн ч ямар цоорхой үлдэх вэ (жишээ нь X.509-ээр холбогдсон төхөөрөмж)? MQTT 5.0-ийн ямар боломж (\texttt{Session\ Expiry\ Interval}, сервер талаас илгээх \texttt{DISCONNECT}) үүнд тусалж болох вэ?
 \end{enumerate}
 
 \hypertarget{ux445ux4afux43bux44dux44dux43bux433ux44dux43d-ux4e9ux433ux4e9ux445-ux437ux4afux439ux43b}{%
@@ -687,7 +881,56 @@ Git цэвэр, нууц файл ороогүй & 1 \\
 \texttt{бүртгэлийн\ үйлчилгээнд\ хүрэхгүй} & \texttt{registry} асаагүй & {[}ЗК{]} \texttt{cd\ stack\ \&\allowbreak{}\&\allowbreak{}\ make\ up} \\
 OTA-д санал ирэхгүй & сэдвийн угтвар / SITE зөрсөн & troubleshooting §2 \\
 mTLS: \texttt{TLS\ error} зөв сертификаттай ч & цаг синхрончлогдоогүй & {[}Pi{]} \texttt{timedatectl\ status} \\
-\texttt{openssl\ verify} → error 10 & сертификат хугацаа дууссан & \texttt{make\_certs.sh\ device\ \textless{}нэр\textgreater{}} дахин \\
-OTA хэт удаан (\textgreater5 мин) & throttling эсвэл Wi-Fi & \texttt{vcgencmd\ get\_throttled}, кабель \\
-\texttt{promote} → HTTP 409 & canary-д алдаа гарсан & зөв ажиллаж байна --- лог шалга \\
+\texttt{openssl\ verify} → error 10 & сертификат хугацаа дууссан & \texttt{make\_\allowbreak{}certs.\allowbreak{}sh\ device\ \textless{}нэр\textgreater{}} дахин \\
+OTA хэт удаан (\textgreater5 мин) & throttling эсвэл Wi-Fi & \texttt{vcgencmd\ get\_\allowbreak{}throttled}, кабель \\
+OTA-д санал ирэхгүй, агент 180 сек хүлээгээд гарна & тараалтыг агентаас ӨМНӨ эхлүүлсэн (offer retained биш) & агентыг эхлүүлээд \texttt{rollout}-ыг дахин дууд \\
+mTLS: \texttt{host\ name\ verification\ failed} & серверийн сертификатын SAN-д \texttt{CLOUD\_HOST} алга & \texttt{CLOUD\_\allowbreak{}HOST=\allowbreak{}\textless{}IP\textgreater{}\ .\allowbreak{}/\allowbreak{}make\_\allowbreak{}certs.\allowbreak{}sh\ server}, EMQX-д дахин хуулна \\
+mTLS: \texttt{TLS\ error} зөв сертификаттай ч & цаг синхрончлогдоогүй & {[}Pi{]} \texttt{timedatectl\ status} \\
+Сертификатгүй клиент 8883-т холбогдчихлоо & \texttt{verify\_peer} / \texttt{fail\_\allowbreak{}if\_\allowbreak{}no\_\allowbreak{}peer\_\allowbreak{}cert} тохируулаагүй & \texttt{curl\ …/\allowbreak{}api/\allowbreak{}v5/\allowbreak{}listeners/\allowbreak{}ssl:\allowbreak{}default} → \texttt{ssl\_options} шалга \\
+\texttt{devices.csv}-д \texttt{emqx\ =\allowbreak{}\ error\ 404} & authenticator үүсгээгүй & Алхам 0-ийн 3 \\
+\texttt{devices.csv}-д \texttt{emqx\ =\ skipped} & \texttt{EMQX\_\allowbreak{}API\_\allowbreak{}KEY} хоосон & Алхам 0-ийн 1--2 \\
+Алхам 7-ийн дараа гүүр/агент холбогдохгүй & authenticator идэвхтэй хэвээр & \texttt{authn\ false} \\
+\texttt{openssl\ verify} → error 10 & сертификат хугацаа дууссан & \texttt{make\_\allowbreak{}certs.\allowbreak{}sh\ device\ \textless{}нэр\textgreater{}} дахин \\
+OTA хэт удаан (\textgreater5 мин) & throttling эсвэл Wi-Fi & \texttt{vcgencmd\ get\_\allowbreak{}throttled}, кабель \\
+\texttt{promote} → HTTP 409 & canary-д алдаа гарсан эсвэл дуусаагүй & зөв ажиллаж байна --- \texttt{detail}, лог шалга \\
+\end{longtable}\endgroup
+
+\hypertarget{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}{%
+\section{9. Эх сурвалж}\label{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Эх сурвалж
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Юуг баталгаажуулсан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хандсан
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/api.html}{EMQX 5.\allowbreak{}8 --- REST API} & суурь зам \texttt{/api/v5}, API key/secret-ээр HTTP Basic, самбарын нэвтрэлт REST-д ажиллахгүй, 201/204/404/409 кодууд & 2026-09 \\
+2 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/api-keys.html}{EMQX 5.\allowbreak{}8 --- API Keys} & System → API Key → Create; secret нэг л удаа харагдана & 2026-09 \\
+3 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/access-control/authn/authn.html}{EMQX 5.\allowbreak{}8 --- Authentication} & анхдагчаар нээлттэй; сүүлийн authenticator-т олдоогүй бол татгалзана; ID \texttt{password\_\allowbreak{}based:\allowbreak{}built\_\allowbreak{}in\_\allowbreak{}database}, \texttt{:} → \texttt{\%3A} & 2026-09 \\
+4 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/access-control/authn/mnesia.html}{EMQX 5.\allowbreak{}8 --- Built-in Database} & \texttt{mechanism}, \texttt{backend}, \texttt{user\_\allowbreak{}id\_\allowbreak{}type}, \texttt{password\_\allowbreak{}hash\_\allowbreak{}algorithm} & 2026-09 \\
+5 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/access-control/authn/user_management.html}{EMQX 5.\allowbreak{}8 --- Manage user data via HTTP API} & \texttt{/\allowbreak{}api/\allowbreak{}v5/\allowbreak{}authentication/\allowbreak{}\{id\}/users} & 2026-09 \\
+6 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/network/emqx-mqtt-tls.html}{EMQX 5.\allowbreak{}8 --- Enable SSL/\allowbreak{}TLS Connection} & 8883 анхдагчаар нэг талын; mTLS-д \texttt{verify\ =\allowbreak{}\ verify\_\allowbreak{}peer}, \texttt{fail\_\allowbreak{}if\_\allowbreak{}no\_\allowbreak{}peer\_\allowbreak{}cert\ =\allowbreak{}\ true} & 2026-09 \\
+7 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/configuration/configuration.html}{EMQX 5.\allowbreak{}8 --- Configuration} & орчны хувьсагч: \texttt{EMQX\_} угтвар, \texttt{.} → \texttt{\_\allowbreak{}\_\allowbreak{}} & 2026-09 \\
+8 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/network/crl.html}{EMQX 5.\allowbreak{}8 --- CRL Check} & CRL-ийг сертификатын CRL Distribution Point-оос татна; зөвхөн \texttt{ssl} сонсогч & 2026-09 \\
+9 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/dashboard/connections.html}{EMQX 5.\allowbreak{}8 --- Dashboard: Clients} & Kick Out & 2026-09 \\
+10 & \href{https://mosquitto.org/man/mosquitto_pub-1.html}{mosquitto\_pub(1)} & \texttt{-\/-cafile}, \texttt{-\/-cert}, \texttt{-\/-key}, \texttt{-d}, \texttt{-\/-insecure} & 2026-09 \\
+11 & \href{https://docs.openssl.org/3.0/man1/openssl-req/}{openssl-req(1)} · \href{https://docs.openssl.org/3.0/man1/openssl-x509/}{openssl-x509(1)} · \href{https://docs.openssl.org/3.0/man1/openssl-verify/}{openssl-verify(1)} & \texttt{-subj}, \texttt{-x509}, \texttt{-req\ -CA\ -CAkey\ -CAcreateserial\ -extfile}, \texttt{-ext}, \texttt{-CAfile} & 2026-09 \\
+12 & \href{https://docs.openssl.org/3.0/man5/x509v3_config/}{x509v3\_config(5)} & \texttt{subjectAltName}, \texttt{extendedKeyUsage\ =\allowbreak{}\ serverAuth\ /\allowbreak{}\ clientAuth} & 2026-09 \\
+13 & \href{https://eclipse.dev/paho/files/paho.mqtt.python/html/migrations.html}{Eclipse Paho Python --- Migrations (2.\allowbreak{}0)} · \href{https://eclipse.dev/paho/files/paho.mqtt.python/html/client.html}{Client} & \texttt{CallbackAPIVersion.\allowbreak{}VERSION2}, \texttt{on\_\allowbreak{}connect(client,\ userdata,\ flags,\ reason\_\allowbreak{}code,\ properties)}, \texttt{on\_\allowbreak{}disconnect(…,\ flags,\ reason\_\allowbreak{}code,\ properties)}, \texttt{tls\_set}, \texttt{username\_\allowbreak{}pw\_\allowbreak{}set} & 2026-09 \\
+14 & \href{https://fastapi.tiangolo.com/tutorial/request-files/}{FastAPI --- Request Files} · \href{https://fastapi.tiangolo.com/advanced/events/}{Lifespan Events} & \texttt{UploadFile} нь \texttt{python-multipart} шаардана; \texttt{lifespan} & 2026-09 \\
+15 & \href{https://www.raspberrypi.com/documentation/computers/processors.html\#bcm2837}{Raspberry Pi --- BCM2837} (эх: \href{https://github.com/raspberrypi/documentation/blob/master/documentation/asciidoc/computers/processors/bcm2837.adoc}{bcm2837.adoc}) & Cortex-A53 (Armv8); крипто өргөтгөлийн тухай дурдаагүй & 2026-09 \\
+16 & \href{https://thingsboard.io/docs/installation/docker/}{ThingsBoard --- Installing using Docker} & \texttt{sysadmin@thingsboard.\allowbreak{}org} / \texttt{sysadmin}; \texttt{tenant@…} зөвхөн демо өгөгдөлтэй; Dev/PoC 4 GB RAM & 2026-09 \\
 \end{longtable}\endgroup

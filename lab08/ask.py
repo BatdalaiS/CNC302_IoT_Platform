@@ -13,12 +13,13 @@ CNC302 Лаб 8 — GenAI аналитик: байгалийн хэлээр ца
   байгалийн хэлээр хариулт
 
 ⚠ ЯАГААД LLM НЬ PI ДЭЭР БИШ ВЭ:
-  Raspberry Pi 3B-д НИЙТ 1 GB санах ой (практикт ~880 MiB сул) байна.
-  Хамгийн жижиг ашигтай загвар болох qwen2.5:1.5b нь q4 квантчилалтай ч
-  ~1.1–1.5 GiB жинтэй, дээрээс нь KV кэш, Ollama-гийн ажиллах орчин
-  нэмэгдэнэ. Өөрөөр хэлбэл Ollama Pi 3B дээр ЗҮГЭЭР Л АЖИЛЛАХГҮЙ —
-  OOM болж унана (ARMv8 дээр GPU/NPU дэмжлэг ч байхгүй, зөвхөн
-  4×A53 CPU). Тиймээс LLM нь ҮҮЛНИЙ давхаргад (зөөврийн компьютер)
+  Raspberry Pi 3B-д НИЙТ 1 GB санах ой (`MemTotal` ~925 MiB) байна.
+  Энэ лабораторийн qwen2.5:1.5b (Q4_K_M) загварын файл ганцаараа 986 MB
+  (~940 MiB, ollama.com/library/qwen2.5), дээрээс нь KV кэш (Ollama-гийн
+  анхдагч контекст 4096 токен) ба ажиллах орчин нэмэгдэнэ. Өөрөөр хэлбэл
+  1.5B загвар Pi 3B-д БАГТАХГҮЙ; 0.5B (398 MB) багтаж магадгүй ч ирмэгийн
+  үүрэгт зай үлдээхгүй, SQL-ийн чанар хэт сул. GPU/NPU хурдасгуур ч
+  байхгүй, зөвхөн 4×Cortex-A53. Тиймээс LLM нь ҮҮЛНИЙ давхаргад (зөөврийн компьютер)
   амьдарч, Pi нь ИРМЭГИЙН үүргээ хадгална: мэдрэгч, шүүлт, жижиг
   TFLite дүгнэлт, store-and-forward. Энэ бол архитектурын шийдвэр —
   "юуг хаана тооцоолох вэ" гэсэн лабораторийн гол асуултын хариу.
@@ -89,6 +90,33 @@ FORBIDDEN = re.compile(
     r"\b(insert|update|delete|drop|create|alter|truncate|grant|revoke|"
     r"copy|attach|pragma|call|execute)\b", re.I)
 MULTI_STMT = re.compile(r";\s*\S")
+ALLOWED_TABLES = {"telemetry", "telemetry_1m"}
+# FROM/JOIN-ийн дараах хүснэгтийн жагсаалт хаана дуусахыг заах түлхүүр үгс
+_CLAUSE_END = re.compile(
+    r"\b(where|group|order|limit|offset|having|union|intersect|except|"
+    r"window|on|using)\b|\)", re.I)
+_JOIN_WORD = re.compile(r"\b(?:inner|left|right|full|outer|cross|natural|join)\b",
+                        re.I)
+
+
+def referenced_tables(sql: str) -> list[str]:
+    """
+    FROM ба JOIN-ийн дараах БҮХ хүснэгтийн нэрийг буцаана — таслалаар
+    холбосон (`FROM telemetry, users`) жагсаалтыг ч оролцуулна.
+    Үүрлэсэн `FROM (SELECT …)`-ийн дотоод FROM нь тусдаа тааралдана.
+    """
+    out: list[str] = []
+    for m in re.finditer(r"\b(?:from|join)\b", sql, re.I):
+        rest = sql[m.end():]
+        end = _CLAUSE_END.search(rest)
+        seg = rest[:end.start()] if end else rest
+        seg = _JOIN_WORD.split(seg)[0]
+        for item in seg.split(","):
+            item = item.strip()
+            if not item or item.startswith("("):
+                continue
+            out.append(item.split()[0].lower())
+    return out
 
 
 def guard_sql(sql: str, max_limit: int = 200) -> str:
@@ -115,18 +143,22 @@ def guard_sql(sql: str, max_limit: int = 200) -> str:
         raise ValueError(f"хориотой түлхүүр үг илэрлээ: {sql[:80]}")
     if re.search(r"--|/\*", sql):
         raise ValueError("тайлбар (comment) хориотой")
+    # Хашилттай нэр ("users") нь доорх хүснэгтийн шалгалтыг тойрох зам.
+    # Манай схемийн бүх нэр жижиг үсэгтэй тул хашилт огт хэрэггүй.
+    if '"' in sql or "`" in sql:
+        raise ValueError("хашилттай нэр (\" эсвэл `) хориотой")
 
-    tables = set(re.findall(r"\bfrom\s+([a-zA-Z_][\w]*)", sql, re.I))
-    tables |= set(re.findall(r"\bjoin\s+([a-zA-Z_][\w]*)", sql, re.I))
-    allowed = {"telemetry", "telemetry_1m"}
-    if not tables or not tables <= allowed:
-        raise ValueError(f"зөвшөөрөгдөөгүй хүснэгт: {tables - allowed}")
+    tables = set(referenced_tables(sql))
+    if not tables or not tables <= ALLOWED_TABLES:
+        raise ValueError(f"зөвшөөрөгдөөгүй хүснэгт: {tables - ALLOWED_TABLES}")
 
-    m = re.search(r"\blimit\s+(\d+)", sql, re.I)
-    if not m:
+    # LIMIT-ийг ГАДНА талын асуулгын ТӨГСГӨЛД шаардана: үүрлэсэн асуулгын
+    # дотоод LIMIT нь гадна талын үр дүнг хязгаарлахгүй.
+    if not re.search(r"\blimit\s+\d+(\s+offset\s+\d+)?\s*$", sql, re.I):
         sql += f" LIMIT {max_limit}"
-    elif int(m.group(1)) > max_limit:
-        sql = re.sub(r"\blimit\s+\d+", f"LIMIT {max_limit}", sql, flags=re.I)
+    sql = re.sub(r"\blimit\s+(\d+)",
+                 lambda m: f"LIMIT {min(int(m.group(1)), max_limit)}",
+                 sql, flags=re.I)
     return sql
 
 

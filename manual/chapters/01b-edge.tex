@@ -5,7 +5,7 @@
 СТОП: Энэ фолдерыг \textbf{зөөврийн компьютер дээр ажиллуулахгүй}. Компьютерийн хэсэг нь \texttt{../stack/}.
 \end{quote}
 
-Pi 3B: \textbf{1 GB RAM} (\textasciitilde925 MiB харагдана, \textasciitilde720--780 MiB ашиглах боломжтой), 4×Cortex-A53 @1.2 GHz, 100 Mbit (USB 2.0-ийн зурвасыг хуваана), microSD.
+Pi 3B (албан ёсны үзүүлэлт): \textbf{1 GB RAM}, 4×Cortex-A53 @1.2 GHz, 100 Mb/s Ethernet, 4×USB 2.0, microSD. OS-д хэдэн MiB харагдаж, хэд нь ажилд үлдэхийг Лаб 1-д хэмжинэ (\texttt{.\allowbreak{}.\allowbreak{}/\allowbreak{}docs/\allowbreak{}resource-budget.\allowbreak{}md}).
 
 \hypertarget{ux445ux443ux440ux434ux430ux43d-ux44dux445ux43bux44dux445}{%
 \section{Хурдан эхлэх}\label{ux445ux443ux440ux434ux430ux43d-ux44dux445ux43bux44dux445}}
@@ -43,13 +43,13 @@ RAM
 \endhead
 \bottomrule
 \endlastfoot
-\texttt{mosquitto} & Docker & 12--25 MiB & локал брокер + үүл рүү гүүр + диск дээрх дараалал \\
+\texttt{mosquitto} & Docker & 12--25 MiB & локал брокер + үүл рүү гүүр + дараалал (RAM-д; диск рүү autosave-аар) \\
 ирмэгийн агент & venv (Docker биш) & 45--70 MiB & Pi-гийн бодит хэмжүүр + процессын дохио → UNS \\
-TFLite дүгнэлт & агентын дотор & +40--90 MiB & Лаб 6: локал аномали илрүүлэлт \\
-K3s & Лаб 8 & 250--350 MiB & Docker-ийг \textbf{зогсоож} ажиллуулна \\
+LiteRT (TFLite) дүгнэлт & агентын дотор & +40--90 MiB & Лаб 6: локал аномали илрүүлэлт \\
+K3s \textbf{agent} & Лаб 8 & ≈ 268 MiB (K3s-ийн Pi 4B хэмжилт) & server нь зөөврийн компьютер дээрх VM; Pi дээр Docker-ийг \textbf{зогсоож} ажиллуулна \\
 \end{longtable}\endgroup
 
-Агентыг Docker-т биш \textbf{venv-д} ажиллуулж байгаа шалтгаан: контейнерийн давхарга Pi 3B дээр 60--80 MiB нэмнэ, мөн кодыг засаад шууд дахин ажиллуулах нь илүү хурдан. Лаб 8-д K3s-д оруулахын тулд \texttt{agent/Dockerfile}-ээр дүрс барина.
+RAM-ын тоо бол \textbf{таамаг} --- Лаб 1-д өөрсдөө хэмжинэ. Агентыг Docker-т биш \textbf{venv-д} ажиллуулж байгаа шалтгаан: Docker демон ба контейнерийн давхаргын зардлыг хэмнэх, мөн кодыг засаад шууд дахин ажиллуулах нь хурдан. Лаб 8-д K3s agent-д оруулахдаа \texttt{agent/Dockerfile}-ээр дүрсийг \textbf{зөөврийн компьютер дээр} arm64-д барьж, Pi-д хуулна (Dockerfile-ийн толгой хэсэг).
 
 \hypertarget{make-ux43aux43eux43cux430ux43dux434ux443ux443ux434}{%
 \section{\texorpdfstring{\texttt{make} командууд}{make командууд}}\label{make-ux43aux43eux43cux430ux43dux434ux443ux443ux434}}
@@ -67,7 +67,7 @@ K3s & Лаб 8 & 250--350 MiB & Docker-ийг \textbf{зогсоож} ажилл
 \endhead
 \bottomrule
 \endlastfoot
-\texttt{make\ bridge} & \texttt{.env}-ээс \texttt{conf.d/bridge.conf} үүсгэнэ (\textbf{эхлээд энэ}) \\
+\texttt{make\ bridge} & \texttt{.env}-ээс \texttt{conf.\allowbreak{}d/\allowbreak{}bridge.\allowbreak{}conf} үүсгэнэ (\textbf{эхлээд энэ}) \\
 \texttt{make\ up} & \texttt{bridge} + mosquitto асаана \\
 \texttt{make\ link} & гүүрний төлөв сонсоно (1 = холбогдсон) \\
 \texttt{make\ agent} & ирмэгийн агент (venv байхгүй бол өөрөө үүсгэнэ) \\
@@ -95,7 +95,7 @@ edge/
 └── agent/
     ├── edge_agent.py             ирмэгийн агент
     ├── requirements.txt
-    ├── Dockerfile                Лаб 8-д K3s-д хэрэгтэй
+    ├── Dockerfile                Лаб 8-д K3s agent-д (компьютер дээр arm64-д барина)
     └── cnc302-edge-agent.service systemd (тэжээл тасрахад сэргэнэ)
 \end{verbatim}
 
@@ -122,13 +122,13 @@ edge/
 \bottomrule
 \endlastfoot
 \texttt{-\/-dry-run} & брокергүйгээр зөвхөн хэвлэнэ (SETUP-д шалгахад) \\
-\texttt{-\/-interval\ 2.0} & телеметрийн үе (сек) \\
+\texttt{-\/\allowbreak{}-interval\ 2.\allowbreak{}0} & телеметрийн үе (сек) \\
 \texttt{-\/-qos\ 0\textbackslash{}\textbar{}1\textbackslash{}\textbar{}2} & нийтлэх QoS \\
-\texttt{-\/-anomaly-rate\ 0.02} & санамсаргүй аномали оруулах магадлал \\
-\texttt{-\/-detector\ \textless{}model\textgreater{}} & TFLite загвар (Лаб 6). Байхгүй бол босгын горим \\
+\texttt{-\/\allowbreak{}-anomaly-rate\ 0.\allowbreak{}02} & санамсаргүй аномали оруулах магадлал \\
+\texttt{-\/\allowbreak{}-detector\ \textless{}model\textgreater{}} & TFLite (LiteRT) загвар (Лаб 6). Байхгүй бол босгын горим \\
 \texttt{-\/-threads\ 2} & дүгнэлтийн урсгал. 4×A53-д 4 нь ихэвчлэн 2-оос \textbf{удаан} \\
-\texttt{-\/-filter} & зөвхөн аномали + үе үе хураангуй илгээнэ (уплинк хэмнэнэ) \\
-\texttt{-\/-health-every\ 15} & хэдэн мөчлөг тутам эрүүл мэндийн мессеж \\
+\texttt{-\/-filter} & зөвхөн аномали + үе үе хураангуй илгээнэ (өгсөх урсгалыг (uplink) хэмнэнэ) \\
+\texttt{-\/\allowbreak{}-health-every\ 15} & хэдэн мөчлөг тутам эрүүл мэндийн мессеж \\
 \end{longtable}\endgroup
 
 Дохио нь \texttt{DEVICE\_ID}-аар seed хийгдсэн тул \textbf{давтагдана} --- нэг Pi үргэлж ижил цуваа өгнө. Лаб 6-д загвар харьцуулахад зайлшгүй.
@@ -145,14 +145,14 @@ edge/
 \end{Highlighting}
 \end{Shaded}
 
-\texttt{MemoryMax=200M} тавьсан --- агент хэтэрвэл systemd таслана. Pi-г нэг GB-тай гэдгийг мартаж болохгүй.
+\texttt{MemoryMax=200M} тавьсан --- systemd-ийн баримтаар хязгаарт багтахгүй бол тухайн unit дотор OOM killer ажиллана. \texttt{.env}-ийг \texttt{EnvironmentFile=} уншдаг тул тайлбарыг \textbf{тусдаа мөрөнд} бич (мөрийн дундах \texttt{\#} утгад орно).
 
 \hypertarget{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux4e9ux43cux43dux4e9-ux437ux430ux430ux432ux430ux43b}{%
 \section{Хэмжилтийн өмнө ЗААВАЛ}\label{ux445ux44dux43cux436ux438ux43bux442ux438ux439ux43d-ux4e9ux43cux43dux4e9-ux437ux430ux430ux432ux430ux43b}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{pkill} \AttributeTok{{-}f}\NormalTok{ vscode{-}server        }\CommentTok{\# VS Code Remote сервер 150–250 MiB иднэ}
+\ExtensionTok{pkill} \AttributeTok{{-}f}\NormalTok{ vscode{-}server        }\CommentTok{\# VS Code Remote сервер ихээхэн RAM иднэ — хэмжээг Лаб 1{-}д хэмж}
 \ExtensionTok{vcgencmd}\NormalTok{ get\_throttled        }\CommentTok{\# 0x0 байх ЁСТОЙ}
 \FunctionTok{free} \AttributeTok{{-}m} \KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}/Mem:/\{print $7 " MiB available"\}\textquotesingle{}}
 \end{Highlighting}
@@ -178,10 +178,43 @@ edge/
 \endlastfoot
 \texttt{bridge/state\ 0} & \texttt{CLOUD\_HOST} буруу, эсвэл компьютерийн галт хана (SETUP.md А.6) \\
 Гүүр холбогдсон ч мессеж алга & \texttt{SITE} нь \texttt{.env} ба \texttt{bridge.conf}-д зөрсөн → \texttt{make\ bridge\ \&\allowbreak{}\&\allowbreak{}\ make\ restart} \\
-\texttt{.env\ олдсонгүй} & \texttt{cp\ .env.example\ .env} \\
+\texttt{.env\ олдсонгүй} & \texttt{cp\ .\allowbreak{}env.\allowbreak{}example\ .\allowbreak{}env} \\
 \texttt{paho-mqtt\ суулгаагүй} & \texttt{make\ venv} \\
 Контейнер дахин дахин эхэлнэ & OOM. \texttt{docker\ inspect\ …\ OOMKilled}, \texttt{free\ -m}, swap шалга \\
 \texttt{exec\ format\ error} & 32-bit OS. \texttt{uname\ -m} → \texttt{aarch64} байх ёстой \\
+Лаб 8-д \texttt{bridge/state} анивчина & Compose-ийн mosquitto K3s-ийн pod-той зэрэг ажиллаж байна (ижил client ID) → \texttt{docker\ compose\ down} \\
 \end{longtable}\endgroup
 
 Дэлгэрэнгүйг \texttt{.\allowbreak{}.\allowbreak{}/\allowbreak{}docs/\allowbreak{}troubleshooting.\allowbreak{}md}-ээс.
+
+\hypertarget{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}{%
+\section{Эх сурвалж}\label{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Эх сурвалж
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Юуг баталгаажуулсан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хандсан
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & \href{https://mosquitto.org/man/mosquitto-conf-5.html}{mosquitto.conf(5)} & Бүх тохиргооны түлхүүр ба хамрах хүрээ (глобал / listener / bridge); \texttt{keepalive\_\allowbreak{}interval} (анхдагч 60, доод 5); \texttt{notification\_\allowbreak{}topic}-ийн анхдагч \texttt{\$SYS/\allowbreak{}broker/\allowbreak{}connection/\allowbreak{}\textless{}remote\_\allowbreak{}clientid\textgreater{}/\allowbreak{}state}; persistence нь autosave / зогсоох / SIGUSR1 үед бичигдэнэ & 2026-09 \\
+2 & \href{https://mosquitto.org/ChangeLog.txt}{Mosquitto ChangeLog} & 2.0.20 → 2.0.22 засварууд & 2026-09 \\
+3 & \href{https://man7.org/linux/man-pages/man5/systemd.exec.5.html}{systemd.exec(5)} & \texttt{EnvironmentFile=}: зөвхөн мөрийн эхний \texttt{\#}/\allowbreak\texttt{;} тайлбар, мөрийн доторх хоосон зай хадгалагдана & 2026-09 \\
+4 & \href{https://man7.org/linux/man-pages/man5/systemd.resource-control.5.html}{systemd.\allowbreak{}resource-control(5)} & \texttt{MemoryMax=} --- хязгаар давбал unit дотор OOM killer; K/M/G утга 1024 суурьтай & 2026-09 \\
+5 & \href{https://docs.docker.com/reference/cli/docker/image/save/}{docker image save}, \href{https://docs.docker.com/build/building/multi-platform/}{Multi-platform builds} & \texttt{-\/-platform} (API 1.48+), \texttt{-o} & 2026-09 \\
+6 & \href{https://docs.k3s.io/add-ons/import-images}{K3s --- Import Images} & \texttt{/\allowbreak{}var/\allowbreak{}lib/\allowbreak{}rancher/\allowbreak{}k3s/\allowbreak{}agent/\allowbreak{}images/\allowbreak{}} & 2026-09 \\
+7 & \href{https://docs.k3s.io/reference/resource-profiling}{K3s --- Resource Profiling} & K3s agent (Pi 4B) ≈ 268 M & 2026-09 \\
+8 & \href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html}{Raspberry Pi hardware} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/raspberry-pi/introduction.adoc}{эх}) & Pi 3B-ийн үзүүлэлт & 2026-09 \\
+\end{longtable}\endgroup

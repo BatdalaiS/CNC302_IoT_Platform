@@ -1,35 +1,46 @@
 # Хэвтээ автомат өргөтгөл (HPA) — edge-agent дээр.
 #
-# ⚠ ҮНЭНИЙГ ХЭЛЬЕ: Raspberry Pi 3B-ийн ГАНЦ зангилаа дээр энэ HPA
-#   бодит байдал дээр зөвхөн 1 → 2 болж чадна. Тэгээд зогсоно. Учир нь:
+# ⚠ ҮНЭНИЙГ ХЭЛЬЕ: кластер ХОЁР зангилаатай ч edge-agent-ийн БҮХ хувь
+#   nodeSelector-оор НЭГ Raspberry Pi 3B (1 GB) дээр хадагдсан. VM-ийн
+#   2–4 GB энэ ажилд ОГТ хамаагүй. Тиймээс HPA хол өргөжиж чадахгүй:
 #
-#   1. САНАХ ОЙ. Нийт ~880 MiB боломжтойгоос k3s server өөрөө ~400 MiB
-#      иднэ. Үлдсэн ~400 MiB-ийг coredns + metrics-server + local-path +
-#      mosquitto хуваана. edge-agent-ийн request нь 96 MiB тул 3 дахь
-#      хувь нь Pending эсвэл OOMKilled болох магадлалтай.
-#      (Тооцоог lab08/k3s/README.md-д бүтнээр нь бичсэн.)
+#   1. ТОВЛОГЧ vs БОДИТ САНАХ ОЙ. K3s kubelet-д kube/system-reserved
+#      тавиагүй, санах ойн hard eviction босго ч байхгүй (зөвхөн дискний:
+#      imagefs/nodefs.available<5%, https://docs.k3s.io/security/self-assessment-1.12).
+#      Тиймээс Pi-гийн Allocatable ≈ бүх MemTotal (~925 Mi) — товлогч
+#      k3s agent (~270 MiB) ба OS (~110 MiB)-ийг "харахгүй". requests
+#      (32 + 96×N Mi) N≈9 хүртэл "багтана", гэвч бодит сул санах ой
+#      (~545 MiB) ~110 MiB-ийн агентыг 4–5-аас илүү даахгүй.
+#      Тооцоог lab08/k3s/README.md §2-т бүтнээр нь бичсэн.
 #
-#   2. ГАНЦ ЗАНГИЛАА. Хувь нэмэгдэх бүрт тэдгээр нь ИЖИЛ 4×A53 цөмийг
-#      хуваана. Өөр зангилаа байхгүй тул нийт тооцоолох чадвар
-#      НЭМЭГДЭХГҮЙ — зөвхөн нэг ажлыг хоёр процесс болгож хуваана.
-#      Хэвтээ өргөтгөлийн утга нь НЭМЭЛТ ТӨМӨР дээр л гарна.
+#   2. НЭГ ТӨМӨР. Нэмэгдсэн хувь бүр ИЖИЛ 4×Cortex-A53-ийг хуваана.
+#      Нийт тооцоолох чадвар НЭМЭГДЭХГҮЙ. Хэвтээ өргөтгөлийн утга нь
+#      НЭМЭЛТ ТӨМӨР дээр л гарна.
 #
 #   3. ИРМЭГИЙН АЖИЛ STATEFUL. Агент бүр өөрийн UNS ID-тай байх ёстой.
-#      Хоёр ижил агент нэг сэдэв рүү бичвэл өгөгдөл давхардана —
-#      Deployment биш, StatefulSet эсвэл DaemonSet илүү тохирно.
+#      Хувилсан агентууд нэг сэдэв рүү давхар бичнэ — Deployment биш,
+#      StatefulSet эсвэл DaemonSet илүү тохирно.
 #
-#   ЭНЭ ГУРВЫГ ХЭМЖИЖ НОТЛОХ нь даалгаврын гол хэсэг. "HPA ажиллаагүй"
-#   гэж бичих биш, ЯАГААД өргөжиж чадахгүйг тоогоор харуул:
+#   4. ДУНДАЖ БА ТАРААГДААГҮЙ АЧААЛАЛ. HPA-гийн хэмжүүр бол бүх pod-ын
+#      ДУНДАЖ CPU / requests. `kubectl exec`-ээр НЭГ pod-д үүсгэсэн
+#      ачааллыг шинэ хувиуд хуваалцахгүй (агентын ажил Service-ээр
+#      тархдаггүй) — HPA maxReplicas хүртэл хөөрөөд тэнд гацна.
+#
+#   ЭДГЭЭРИЙГ ХЭМЖИЖ НОТЛОХ нь даалгаврын гол хэсэг (README Алхам 8.2):
 #     kubectl -n cnc302 get hpa edge-agent -w
 #     kubectl -n cnc302 describe hpa edge-agent      # events → шалтгаан
-#     kubectl -n cnc302 get pods -o wide             # Pending үү?
-#     kubectl -n cnc302 describe pod <pending-pod>   # Insufficient memory
+#     kubectl -n cnc302 get pods -o wide             # аль зангилаа, Pending үү?
+#     kubectl -n cnc302 describe pod <pod>           # Insufficient memory / OOMKilled
 #     kubectl top pods -n cnc302
-#     kubectl get events -n cnc302 --field-selector reason=OOMKilling
 #
-# ШААРДЛАГА: metrics-server. K3s-д анхнаасаа суусан байдаг тул
-#   `--disable metrics-server` гэж БҮҮ бич:
-#     kubectl top nodes        # утга гарч ирвэл бэлэн
+# ШААРДЛАГА: metrics-server. K3s-д анхнаасаа суусан (packaged component).
+#   `--disable metrics-server` гэж БҮҮ бич. metrics-server нь Pi-гийн
+#   kubelet-ээс 10250/tcp-ээр хэмжүүр авдаг тул VM ↔ Pi хооронд энэ порт
+#   нээлттэй байх ёстой:
+#     kubectl top nodes        # ХОЁР зангилааны утга гарвал бэлэн
+#
+# Талбарууд: autoscaling/v2 HorizontalPodAutoscaler —
+#   https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/horizontal-pod-autoscaler-v2/
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -38,19 +49,21 @@ metadata:
 spec:
   scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: edge-agent}
   minReplicas: 1
-  maxReplicas: 2          # ⚠ 3+ нь 1 GB-д бодитоор багтахгүй (дээрхийг үз)
+  maxReplicas: 3          # ⚠ Алхам 8.2-т 8 болгож patch хийгээд юу болохыг хэмжинэ
   metrics:
     - type: Resource
       resource:
         name: cpu
-        # requests.cpu = 100m тул 70% гэдэг нь ~70m. Агент амралтад
-        # ~20–40m иддэг; ачаалал үүсгэхийн тулд `stress-ng --cpu 2`
-        # эсвэл --interval 0.2 болгож туршина.
+        # averageUtilization = requests-ийн ХУВЬ. requests.cpu = 100m тул
+        # 70% гэдэг нь pod тутамд дунджаар ~70m. Агент амралтад ~20–40m
+        # иддэг; ачаалал үүсгэх аргыг README Алхам 8.2-оос үз.
         target: {type: Utilization, averageUtilization: 70}
   behavior:
     scaleUp:
-      # microSD дээр pod эхлэх нь удаан — хэт хурдан томруулбал
-      # эхлэх ачаалал өөрөө CPU-г цохиж, хиймэл давалгаа үүснэ.
+      # microSD дээр pod эхлэх нь удаан — хэт хурдан томруулбал эхлэх
+      # ачаалал өөрөө CPU-г цохиж хиймэл давалгаа үүсгэнэ.
+      # (Анхдагч нь 0 сек — тогтворжуулалтгүй.)
       stabilizationWindowSeconds: 60
     scaleDown:
+      # Анхдагч 300 сек; лабораторийн цагт хурдан буухын тулд 180.
       stabilizationWindowSeconds: 180

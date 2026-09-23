@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # CNC302 Лаб 4 — Ачааллын тест (emqtt-bench ашиглана)
 #
-# emqtt-bench бол EMQX-ийн албан ёсны хэмжилтийн хэрэгсэл. Олон мянган
-# холболтод Python скриптээс хамаагүй тогтвортой (Erlang дээр бичигдсэн).
+# emqtt-bench — EMQX багийн нээлттэй эхийн MQTT хэмжилтийн хэрэгсэл (Erlang).
+#   https://github.com/emqx/emqtt-bench  (README: conn/sub/pub дэд команд, туг)
+#   Docker дүрс: emqx/emqtt-bench:0.6.3 (amd64 + arm64). Docker байхгүй бол
+#   releases хуудаснаас OS-д тохирох бэлэн багцыг татаж, bin/-ийг PATH-д нэмнэ.
+#   Сэдэв дэх %i нь клиент бүрийн дэс дугаар (1, 2, 3 …) болж орлоно.
 #
 # ЗӨӨВРИЙН КОМПЬЮТЕР дээр ажиллуулна — Pi-г ачаалахгүйн тулд!
 #
@@ -13,15 +16,17 @@
 #                   Шатууд: 10, 25, 50, 100, 200, 350, 500   ← анхдагч
 #
 # ⚠ АНХААР — edge зорилт дээр хязгаар нь ХАМГИЙН МАГАДЛАЛТАЙГААР CPU БИШ:
-#     1) САНАХ ОЙ — Pi 3B-д нийт 1 GB (бодитоор ~925 MiB). mosquitto холболт
-#        бүрт хэдэн арван KiB буфер эзэлнэ. Сул RAM 150 MiB-ээс доош орвол
-#        цөм swap руу орж, microSD дээр бичиж эхэлнэ → бүх тоо гажина.
-#     2) 100 Mbit УПЛИНК — Ethernet нь USB 2.0 дээр сууж байгаа тул бодит
-#        хурд ~90–95 Mbit бөгөөд USB-тэй зурвасаа хуваана.
-#   4×Cortex-A53 нь ихэвчлэн эхлээд дүүрэхгүй. Тиймээс тайланд заавал
-#   **АЛЬ НӨӨЦ ТҮРҮҮЛЖ ХАНАСАН БЭ** гэдгийг тоогоор бичих ёстой:
-#   RAM (MiB), уплинкийн Mbit, эсвэл CPU %. Хоёр дахь хостын хэмжилтгүйгээр
-#   энэ асуултад хариулах боломжгүй.
+#     1) САНАХ ОЙ — Pi 3B-д нийт 1 GB (MemTotal-ыг `free -m`-ээр өөрөө хар).
+#        Ирмэгийн mosquitto контейнер 128 MiB хязгаартай (edge/docker-compose.yml):
+#        эхлээд ЭНЭ хязгаар ханаж болно (docker stats MEM %, OOMKilled).
+#        Хостын сул RAM 150 MiB-ээс доош орвол swap идэвхжиж бүх тоо гажина.
+#     2) 100 Mb/s Ethernet өгсөх урсгал (uplink) — албан ёсны үзүүлэлт нь
+#        "100 Mb/s Ethernet, 4 × USB 2.0". Ethernet USB-тэй зурвас хуваадаг
+#        эсэх нь ТААМАГ — өөрсдөө хэмжиж шалгана.
+#   4×Cortex-A53 эхлээд дүүрэх эсэх нь бас таамаг. Тайланд заавал
+#   **АЛЬ НӨӨЦ ТҮРҮҮЛЖ ХАНАСАН БЭ** гэдгийг тоогоор бичнэ: RAM (MiB),
+#   өгсөх урсгалын Mbit/с, эсвэл CPU %. Хоёр хостын хэмжилтгүйгээр энэ
+#   асуултад хариулах боломжгүй.
 #
 # Хэмжилтийг ЗЭРЭГ ажиллуулна (ирмэгийн хостын дээр):
 #   bash tools/measure_stack.sh --role edge --watch 900 5
@@ -36,10 +41,12 @@
 # ШААРДЛАГА: зөөврийн компьютер дээрх файлын дескрипторын хязгаар
 #   Linux/macOS:  ulimit -n 65535
 #   Windows:      WSL2 дотор ажиллуулна
+#   Docker-оор ажиллуулахад контейнерт --ulimit nofile-ийг тусад нь өгнө
+#   (хостын `ulimit -n` контейнерт шилждэггүй) — доорх run_bench үүнийг хийнэ.
 
 set -euo pipefail
 
-IMAGE="${IMAGE:-emqx/emqtt-bench:0.4.20}"
+IMAGE="${IMAGE:-emqx/emqtt-bench:0.6.3}"
 TOPIC="${TOPIC:-cnc302/bench/%i/telemetry}"
 PAYLOAD_SIZE="${PAYLOAD_SIZE:-200}"
 QOS="${QOS:-1}"
@@ -52,7 +59,7 @@ REST_SECONDS="${REST_SECONDS:-20}"
 RAMP_EDGE="10 25 50 100 200 350 500"
 RAMP_CLOUD="50 100 250 500 1000 2000"
 
-usage() { sed -n '2,38p' "$0"; }
+usage() { sed -n '2,45p' "$0"; }
 
 # ── Тугуудыг эхэнд нь задална, дараа нь хуучин байрлалт аргументууд ─────────
 while [ $# -gt 0 ]; do
@@ -74,14 +81,49 @@ HOST="${2:?брокерийн хаяг}"
 
 LAST_OK=""          # хамгийн сүүлд амжилттай дуусгасан шат
 
-have_docker() { command -v docker >/dev/null 2>&1; }
+# Docker демон ажиллаж байвал дүрсээр, эс бөгөөс PATH дахь emqtt_bench-ээр.
+# USE_DOCKER=0 гэж өгвөл заавал бэлэн binary ашиглана.
+have_docker() {
+  [ "${USE_DOCKER:-auto}" != "0" ] && command -v docker >/dev/null 2>&1 \
+    && docker info >/dev/null 2>&1
+}
+
+BENCH_NAME="cnc302-bench-$$"
 
 run_bench() {
   if have_docker; then
-    docker run --rm --network host "$IMAGE" "$@"
+    docker run --rm --name "$BENCH_NAME" --network host \
+      --ulimit nofile=65535:65535 "$IMAGE" "$@"
   else
     emqtt_bench "$@"
   fi
+}
+
+# Шатыг хугацаатай ажиллуулна. Docker CLI-г timeout зогсоосны дараа
+# контейнер үлдсэн байвал заавал устгана.
+run_bench_for() {
+  local secs="$1"; shift
+  if have_docker; then
+    timeout "$secs" docker run --rm --name "$BENCH_NAME" --network host \
+      --ulimit nofile=65535:65535 "$IMAGE" "$@" || true
+    docker rm -f "$BENCH_NAME" >/dev/null 2>&1 || true
+  else
+    timeout "$secs" emqtt_bench "$@" || true
+  fi
+}
+
+# Нэг мессежийн утсан дээрх хэмжээг (байт) тооцоолно:
+#   MQTT 5.0 PUBLISH = 1 + RL(1–2) + 2 + сэдэв + 2 (QoS>0) + 1 (property len) + ачаалал
+#   TCP сегмент бүрт: TCP 20 + timestamps 12 + IPv4 20 + Ethernet толгой/FCS 18
+#   + преамбул/IFG 20 = 90 Б (MSS 1448 гэж үзэв). Олон мессеж нэг сегментэд
+#   нийлбэл бодит нэмэгдэл үүнээс бага — энэ нь ДЭЭД үнэлгээ.
+wire_bytes() {
+  local tlen="$1" size="$2" qos="$3"
+  local rem=$(( 2 + tlen + (qos > 0 ? 2 : 0) + 1 + size ))
+  local rl=1; [ "$rem" -ge 128 ] && rl=2; [ "$rem" -ge 16384 ] && rl=3
+  local mqtt=$(( 1 + rl + rem ))
+  local segs=$(( (mqtt + 1447) / 1448 ))
+  echo $(( mqtt + segs * 90 ))
 }
 
 # Брокер TCP түвшинд хариулж байна уу? Ханасан брокер шинэ холболт авахаа
@@ -109,9 +151,10 @@ report_last_good() {
   echo " ТАЙЛАНД БИЧИХ ЗҮЙЛ: аль нөөц ТҮРҮҮЛЖ ханасан бэ?"
   if [ "$TARGET" = "edge" ]; then
     echo "   · сул RAM (MiB)      → measure_stack.sh --role edge гаралт"
-    echo "   · уплинкийн Mbit     → docker stats-ийн NET I/O өсөлт"
+    echo "   · mosquitto MEM %    → docker stats (128 MiB хязгаарын хэдэн %)"
+    echo "   · өгсөх урсгал Mbit/с → Pi-гийн eth0 tx_bytes өсөлт"
     echo "   · CPU %              → 4×A53 ханасан эсэх"
-    echo "   Pi 3B дээр ихэвчлэн RAM эсвэл 100 Mbit уплинк түрүүлдэг, CPU биш."
+    echo "   Таамгаа (Хүснэгт 4.2) хэмжилттэй харьцуул."
   else
     echo "   · CPU %, RAM, файлын дескриптор (ulimit -n)"
   fi
@@ -146,9 +189,14 @@ case "$MODE" in
     N="${3:-100}"; RATE="${4:-1}"
     INTERVAL_MS=$(( 1000 / RATE ))
     echo "→ [$TARGET] $N нийтлэгч × ${RATE} мсж/с = $(( N * RATE )) мсж/с зорилтот"
+    TLEN=$(( ${#TOPIC} - 2 + ${#N} ))          # %i → хамгийн урт дугаар
+    WB=$(wire_bytes "$TLEN" "$PAYLOAD_SIZE" "$QOS")
+    awk -v n="$N" -v r="$RATE" -v s="$PAYLOAD_SIZE" -v w="$WB" 'BEGIN {
+      printf "  Зөвхөн ачаалал : %.2f Mbit/с  (%d Б × 8)\n", n*r*s*8/1e6, s
+      printf "  Утсан дээр ≈    : %.2f Mbit/с  (%d Б/мсж: MQTT+TCP/IP+Ethernet)\n", n*r*w*8/1e6, w }'
     if [ "$TARGET" = "edge" ]; then
-      echo "  Санамж: $(( N * RATE * PAYLOAD_SIZE * 8 / 1000000 )) Mbit/с орчим"
-      echo "  ачаалал уплинк рүү очно (100 Mbit-ийн аль хэсэг вэ?)."
+      echo "  Сэдэв гүүрийн 'out' дүрэмд багтвал ижил хэмжээ Pi-гаас өгсөх урсгал"
+      echo "  (uplink)-аар үүл рүү дахин гарна (100 Mb/s-ийн аль хэсэг вэ?)."
     fi
     run_bench pub -h "$HOST" -p "$PORT" -c "$N" -i 10 -I "$INTERVAL_MS" \
       -t "$TOPIC" -s "$PAYLOAD_SIZE" -q "$QOS"
@@ -164,7 +212,7 @@ case "$MODE" in
     echo ""
     if [ "$TARGET" = "edge" ]; then
       echo " ⚠ ИРМЭГИЙН ЗОРИЛТ: хязгаар нь CPU БИШ байх магадлалтай."
-      echo "   Pi 3B-д 1 GB RAM, 100 Mbit (USB 2.0) уплинк байна."
+      echo "   Pi 3B: 1 GB RAM, 100 Mb/s Ethernet; mosquitto контейнер 128 MiB хязгаартай."
       echo "   АЛЬ НӨӨЦ ТҮРҮҮЛЖ ХАНАСАНЫГ заавал бүртгэ — энэ бол үнэлгээний"
       echo "   гол асуулт, зөвхөн 'хэдэн холболт даасан' гэдэг биш."
       echo ""
@@ -186,9 +234,9 @@ case "$MODE" in
     for N in $RUNGS; do
       echo ""
       echo "──────── ШАТ: $N төхөөрөмж, 1 мсж/с, ${STEP_SECONDS} сек ────────"
-      timeout "$STEP_SECONDS" docker run --rm --network host "$IMAGE" pub \
+      run_bench_for "$STEP_SECONDS" pub \
         -h "$HOST" -p "$PORT" -c "$N" -i 10 -I 1000 \
-        -t "$TOPIC" -s "$PAYLOAD_SIZE" -q "$QOS" || true
+        -t "$TOPIC" -s "$PAYLOAD_SIZE" -q "$QOS"
 
       # Шат дууссаны дараа брокер амьд үлдсэн эсэхийг шалгана.
       if ! broker_alive; then
@@ -206,7 +254,7 @@ case "$MODE" in
 
     echo ""
     echo "→ Бүх шат дууслаа. collect_metrics.py-г зогсоож CSV-г шинжилнэ."
-    echo "   python3 lab04/plot_scaling.py measurements/loadtest-ramp-*.csv"
+    echo "   python3 lab04/plot_scaling.py measurements/loadtest-${TARGET}-ramp-*.csv"
     report_last_good
     ;;
 

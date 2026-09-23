@@ -25,10 +25,10 @@ MiB
 \endhead
 \bottomrule
 \endlastfoot
-Нийт физик санах ой & 1024 & \\
-GPU-д (\texttt{gpu\_mem=16}) & −16 & анхдагч 64 → 48 MiB хэмнэнэ \\
-Цөм + firmware & \textasciitilde85 & \\
-\textbf{Системд харагдах (\texttt{MemTotal})} & \textbf{\textasciitilde925} & \texttt{free\ -m} энийг харуулна \\
+Нийт физик санах ой & 1024 & албан ёсны үзүүлэлт: 1 GB \\
+GPU-д (\texttt{gpu\_mem}) & −16\ldots−76 & 1 GB-тай загварт анхдагч \textbf{76}. \texttt{gpu\_mem} нь legacy тохиргоо --- Bookworm ба түүнээс хойш албан ёсоор дэмжигдэхгүй, тиймээс SETUP.md Б.3-т өмнө/дараа нь \textbf{хэмжинэ} \\
+Цөм + firmware & \textasciitilde85 & таамаг \\
+\textbf{Системд харагдах (\texttt{MemTotal})} & \textbf{\textasciitilde925} (хэмжинэ) & \texttt{free\ -m} энийг харуулна \\
 Pi OS Lite, headless, амарч байгаа & −90\ldots−130 & systemd, sshd, journald \\
 Docker демон & −60\ldots−80 & \texttt{dockerd} + \texttt{containerd} \\
 \textbf{Ажилд боломжтой} & \textbf{\textasciitilde720\ldots780} & \\
@@ -94,7 +94,7 @@ VS Code Remote сервер & --- & \textbf{150--250 MiB} & ⚠ хэмжилти
 swap \texttt{si/so} \textgreater{} 0 & аль хэдийн хязгаарт хүрсэн. Энэ нь \textbf{хэмжилт}, алдаа биш. \\
 \end{longtable}\endgroup
 
-\texttt{tools/\allowbreak{}measure\_stack.\allowbreak{}sh\ -\/\allowbreak{}-role\ edge} эдгээрийг автоматаар шалгана.
+\texttt{tools/\allowbreak{}measure\_\allowbreak{}stack.\allowbreak{}sh\ -\/\allowbreak{}-role\ edge} эдгээрийг автоматаар шалгана.
 
 \hypertarget{ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux4afux4afux43bux43dux438ux439-ux434ux430ux432ux445ux430ux440ux433ux430}{%
 \section{2. {[}ЗК{]} Зөөврийн компьютер --- үүлний давхарга}\label{ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux4afux4afux43bux43dux438ux439-ux434ux430ux432ux445ux430ux440ux433ux430}}
@@ -129,7 +129,7 @@ Compose хязгаар
 \texttt{dex} & app & 256 MiB & 30--60 MiB & \\
 \texttt{graphql-api} & app & 512 MiB & 80--150 MiB & Python/FastAPI \\
 \texttt{ollama} & ai & 4096 MiB & загвараас & qwen2.5:1.5b q4 ≈ 1.2--1.6 GiB + KV \\
-\texttt{thingsboard} & tb (сонголт) & 2500 MiB & 1200--1800 MiB & зөвхөн Лаб 2-ын харьцуулалт \\
+\texttt{thingsboard} & tb (сонголт) & 2500 MiB & 1200--1800 MiB & зөвхөн Лаб 2-ын харьцуулалт; албан ёсны заавар хөгжүүлэлтэд ч 4 GB RAM \\
 \end{longtable}\endgroup
 
 \hypertarget{ux43fux440ux43eux444ux430ux439ux43bux44bux43d-ux43dux438ux439ux43bux431ux44dux440}{%
@@ -149,41 +149,85 @@ core + pipeline + app & 4.2 GiB & 0.8--1.5 GiB & 4 GB \\
 core + tb (Лаб 2 сонголт) & 5.4 GiB & 1.8--2.9 GiB & \textbf{6 GB} \\
 \end{longtable}\endgroup
 
+"Практикт" ба "Хүлээгдэх хэрэглээ" багана нь \textbf{таамаг} --- \texttt{docker\ stats}-аар өөрсдөө хэмжинэ. Лаб 8-д үүн дээр K3s server VM (4 GB) нэмэгдэнэ → зөөврийн компьютерт \textbf{16 GB RAM тав тухтай} (§3).
+
 \begin{quote}
 \textbf{Харьцуулалт:} ThingsBoard ГАНЦААРАА 1.2--1.8 GiB эзэлнэ --- энэ нь Pi 3B-ийн НИЙТ санах ойноос \textbf{хоёр дахин их}. Лаб 2-ын хяналтын асуултад: "яагаад ирмэг дээр бүрэн платформ ажиллуулж болохгүй вэ?" гэдгийн тоон хариулт нь энэ.
 \end{quote}
 
-\hypertarget{pi-ux43bux430ux431-8-k3s-ux438ux439ux43d-ux441ux430ux43dux430ux445-ux43eux439ux43d-ux442ux4e9ux441ux4e9ux432}{%
-\section{3. {[}Pi{]} Лаб 8 --- K3s-ийн санах ойн төсөв}\label{pi-ux43bux430ux431-8-k3s-ux438ux439ux43d-ux441ux430ux43dux430ux445-ux43eux439ux43d-ux442ux4e9ux441ux4e9ux432}}
+\hypertarget{ux43bux430ux431-8-k3s-server-ux43dux44c-vm-ux434ux44dux44dux440-pi-ux43dux44c-agent}{%
+\section{3. Лаб 8 --- K3s: server нь VM дээр, Pi нь agent}\label{ux43bux430ux431-8-k3s-server-ux43dux44c-vm-ux434ux44dux44dux440-pi-ux43dux44c-agent}}
 
-Лаб 8-д Pi дээр \textbf{Docker-ийг зогсоож}, K3s-ийг ажиллуулна. Хоёуланг зэрэг ажиллуулах орон зай байхгүй.
+K3s-ийн албан ёсны доод шаардлага: \textbf{server 2 цөм / 2 GB}, \textbf{agent 1 цөм / 512 MB}. Тиймээс K3s \textbf{server} нь зөөврийн компьютер дээрх Ubuntu Server VM-д, Raspberry Pi 3B нь зөвхөн \textbf{agent} болж нэгдэнэ (дэлгэрэнгүй: \texttt{lab08/\allowbreak{}k3s/\allowbreak{}README.\allowbreak{}md}). Pi дээр Compose-ийн mosquitto ба Docker демоныг зогсооно --- хоёуланг зэрэг ажиллуулах орон зай байхгүй, мөн ижил client ID-тай хоёр гүүр \texttt{bridge/state}-ийг анивчуулна.
 
-\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\hypertarget{pi-pi-3b-agent}{%
+\subsection{3.1 {[}Pi{]} Pi 3B (agent)}\label{pi-pi-3b-agent}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
 \toprule
-Хэсэг & Requests & Бодит \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Хэсэг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+MiB
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Эх сурвалж / тэмдэглэл
+\end{minipage} \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
-k3s server (containerd + kubelet + API + sqlite) & --- & 250--350 MiB \\
-coredns & 70 MiB & \textasciitilde25 MiB \\
-metrics-server (HPA-д ЗААВАЛ) & 70 MiB & \textasciitilde30 MiB \\
-local-path-provisioner & --- & \textasciitilde10 MiB \\
-\texttt{mosquitto} pod & 64 MiB & 12--25 MiB \\
-\texttt{edge-agent} pod & 64 MiB & 45--70 MiB \\
-\textbf{Нийт requests} & \textbf{268 MiB} & \\
-\textbf{Бодит нийлбэр} & & \textbf{\textasciitilde400--510 MiB} \\
-Allocatable (925 − цөм − k3s үндэс) & \textasciitilde825 MiB & \\
+\texttt{MemTotal} & \textasciitilde925 & SETUP.md Б.3-т хэмжсэн утгаа бич \\
+OS (Lite, headless) & 90--130 & таамаг --- хэмжинэ \\
+k3s agent (containerd + kubelet + flannel) & \textbf{≈ 268} & K3s Resource Profiling-ийн \textbf{Pi 4B} хэмжилт (Pi 3B-д албан ёсны тоо алга) \\
+\textbf{Pod-уудад бодитоор үлдэх} & \textbf{≈ 525--565} & 925 − OS − agent \\
 \end{longtable}\endgroup
 
-\textbf{Дүгнэлт:} ажиллана, гэхдээ \texttt{traefik} ба \texttt{servicelb}-ийг заавал унтраана (тус бүр 60--90 MiB). HPA 2 хувь болтол өргөжиж чадна; 3 дахь хувь OOMKilled болно --- \textbf{энэ нь Лаб 8-ын гол ажиглалт}.
+Товлогч (scheduler) бодит RSS-ийг биш, \textbf{Allocatable} ба \texttt{requests}-ийн нийлбэрийг харьцуулна. K3s-ийн kubelet-д \textbf{reserved санах ой тавиагүй}, hard eviction нь зөвхөн дискний (\texttt{imagefs}/\allowbreak\texttt{nodefs} 5 \%) --- санах ойн босго \textbf{байхгүй} (K3s CIS Self-Assessment). Тиймээс \textbf{Allocatable ≈ Capacity ≈ 925 Mi}.
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\ExtensionTok{curl} \AttributeTok{{-}sfL}\NormalTok{ https://get.k3s.io }\KeywordTok{|} \FunctionTok{sh} \AttributeTok{{-}s} \AttributeTok{{-}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}{-}disable}\NormalTok{ traefik }\AttributeTok{{-}{-}disable}\NormalTok{ servicelb }\AttributeTok{{-}{-}write{-}kubeconfig{-}mode}\NormalTok{ 644}
-\end{Highlighting}
-\end{Shaded}
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+Pod & \texttt{requests} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\texttt{mosquitto} & 32 Mi \\
+\texttt{edge-agent} × N & 96 Mi × N (N = 1 → нийт \textbf{128 Mi}) \\
+\end{longtable}\endgroup
+
+\textbf{HPA-ийн гол зөрчил (Лаб 8):} товлогчийн тооцоогоор \texttt{32\ +\ 96·N\ ≤\ 925} → \textbf{N\_sched ≈ 9} хүртэл "багтана". Гэтэл бодит ≈ 545 MiB-д \textasciitilde110 MiB-ийн агент \textbf{N\_real ≈ 4--5}-аас илүү багтахгүй. Үр дүн нь \texttt{Pending} биш --- цөмийн OOM killer (\texttt{OOMKilled}) эсвэл swap дээр мөлхөх. Аль нь болсныг \texttt{kubectl\ top} + \texttt{free\ -m} + \texttt{vmstat}-аар хэмжиж нотолно.
+
+\hypertarget{vm-server-vm-ux431ux430-ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440}{%
+\subsection{3.2 {[}VM{]} Server VM ба {[}ЗК{]} зөөврийн компьютер}\label{vm-server-vm-ux431ux430-ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Хэсэг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Утга
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Эх сурвалж
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+K3s server + 1 agent (ачаалалгүй) & ≈ \textbf{1428 M} & K3s Resource Profiling (x86\_64) \\
+VM-ийн RAM & доод \textbf{2 GB}, санал \textbf{4 GB}; ≥ 2 vCPU & K3s Requirements \\
+Docker Desktop (үүлний стек + Ollama) & 6 GB & §2, SETUP.md А.2 \\
+\textbf{Зөөврийн компьютерт нийт} & 6 + 4 GB + хост OS → \textbf{16 GB} тав тухтай & \\
+\end{longtable}\endgroup
+
+\begin{quote}
+\texttt{traefik}/\allowbreak\texttt{servicelb}-ийг унтраах эсэх нь \textbf{server VM}-ийн суулгалтын асуудал (Pi биш) --- \texttt{lab08/\allowbreak{}k3s/\allowbreak{}README.\allowbreak{}md}.
+\end{quote}
 
 \hypertarget{ux441ux430ux43dux430ux43cux436}{%
 \section{4. Санамж}\label{ux441ux430ux43dux430ux43cux436}}
@@ -191,13 +235,46 @@ Allocatable (925 − цөм − k3s үндэс) & \textasciitilde825 MiB & \\
 \begin{itemize}
 \tightlist
 \item
-  \texttt{deploy.resources.limits} нь \textbf{хязгаар} л тавьдаг, нөөц \textbf{баталгаажуулдаггүй}. Pi дээр хязгаарыг давсан контейнерийг цөм OOM-оор устгана; лог нь \texttt{docker\ inspect\ \textless{}c\textgreater{}\ \textbar{}\ grep\ OOMKilled}.
+  \texttt{deploy.\allowbreak{}resources.\allowbreak{}limits} нь \textbf{хязгаар} л тавьдаг, нөөц \textbf{баталгаажуулдаггүй}. Pi дээр хязгаарыг давсан контейнерийг цөм OOM-оор устгана; лог нь \texttt{docker\ inspect\ \textless{}c\textgreater{}\ \textbar{}\ grep\ OOMKilled}.
 \item
-  \texttt{docker\ stats}-ын санах ойн тоо зөв гарахад \texttt{cgroup\_enable=memory} хэрэгтэй (SETUP.md Б.5).
+  Cgroup-ийн санах ойн хянагч (\texttt{cgroup\_\allowbreak{}memory=\allowbreak{}1\ cgroup\_\allowbreak{}enable=\allowbreak{}memory}) нь \texttt{docker\ stats}-ын санах ойн тоо ба K3s agent-д хэрэгтэй (SETUP.md Б.5).
 \item
-  Идэвхтэй хөргөлт байхгүй бол Pi 3B ачаалал дор 80 °C давж, давтамжаа бууруулна --- бүх хэмжилт гажина. \texttt{vcgencmd\ get\_throttled} нь \textbf{\texttt{0x0}} байх ёстой.
+  Идэвхтэй хөргөлт байхгүй бол Pi 3B ачаалал дор 80--85 °C-д хүрч давтамжаа бууруулна --- бүх хэмжилт гажина. \texttt{vcgencmd\ get\_\allowbreak{}throttled} нь \textbf{\texttt{0x0}} байх ёстой.
 \item
-  microSD-гийн бичих хурд (10--25 MB/s) нь InfluxDB, mosquitto persistence, swap гурвыг зэрэг хязгаарлана. Лаб 5-д үүнийг бодитоор хэмжинэ.
+  microSD-гийн бичих хурд нь mosquitto persistence ба swap-ыг зэрэг хязгаарлана. Лаб 5-д үүнийг бодитоор хэмжинэ.
 \item
-  Хэмжилтийн өмнө \textbf{VS Code Remote серверийг таслах}: \texttt{pkill\ -f\ vscode-server}. 150--250 MiB ялгаа гарна.
+  Хэмжилтийн өмнө \textbf{VS Code Remote серверийг таслах}: \texttt{pkill\ -f\ vscode-server}. VS Code-ийн баримтаар Remote-SSH-ийн хостод 1 GB RAM \emph{шаардлагатай} --- Pi 3B-д энэ бол том зардал; ялгааг Лаб 1-д хэмж.
 \end{itemize}
+
+\hypertarget{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}{%
+\section{Эх сурвалж}\label{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Эх сурвалж
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Юуг баталгаажуулсан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хандсан
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & \href{https://www.raspberrypi.com/documentation/computers/legacy_config_txt.html}{Legacy config.\allowbreak{}txt --- gpu\_\allowbreak{}mem} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/legacy_config_txt/legacy.adoc}{эх 1}, \href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/legacy_config_txt/memory.adoc}{эх 2}) & 1 GB-д анхдагч 76; legacy, Bookworm+ дээр дэмжигдэхгүй & 2026-09 \\
+2 & \href{https://docs.k3s.io/installation/requirements}{K3s --- Requirements} & server 2 цөм/2 GB, agent 1 цөм/512 MB; Raspberry Pi-гийн cgroup & 2026-09 \\
+3 & \href{https://docs.k3s.io/reference/resource-profiling}{K3s --- Resource Profiling} & agent (Pi 4B) ≈ 268 M; server + 1 agent (x86\_64) ≈ 1428 M & 2026-09 \\
+4 & \href{https://docs.k3s.io/security/self-assessment-1.12}{K3s --- CIS 1.\allowbreak{}12 Self-Assessment} & kubelet: reserved алга, \texttt{evictionHard} зөвхөн imagefs/nodefs & 2026-09 \\
+5 & \href{https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/}{Kubernetes --- Reserve Compute Resources}, \href{https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/}{Resource Management for Pods} & Allocatable = Capacity − reserved − eviction; товлогч \texttt{requests}-ээр шийднэ & 2026-09 \\
+6 & \href{https://thingsboard.io/docs/installation/docker/}{ThingsBoard CE --- Docker} & PoC-д 4 GB RAM & 2026-09 \\
+7 & \href{https://docs.docker.com/reference/compose-file/deploy/}{Compose Deploy Specification --- resources} & \texttt{limits} нь платформ хуваарилахыг хориглох дээд хязгаар, \texttt{reservations} нь баталгаа & 2026-09 \\
+8 & \href{https://code.visualstudio.com/docs/remote/ssh}{VS Code --- Remote Development using SSH} & алсын хостод 1 GB RAM шаардлагатай & 2026-09 \\
+9 & \href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html\#frequency-management-and-thermal-control}{Frequency management and thermal control} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/raspberry-pi/frequency-management.adoc}{эх}) & 80--85 °C throttle & 2026-09 \\
+\end{longtable}\endgroup

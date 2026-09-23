@@ -12,6 +12,14 @@ web:
 
 oauth2:
   skipApprovalScreen: true
+  # password grant (Лаб 7-ын curl туршилт) нь passwordConnector-оос гадна
+  # grantTypes жагсаалтад "password" байхыг шаардана. Жагсаалтыг өгвөл анхдагч
+  # утгыг ДАРНА — тиймээс authorization_code, refresh_token-ыг ч бичив.
+  # https://dexidp.io/docs/configuration/oauth2/
+  grantTypes:
+    - authorization_code
+    - refresh_token
+    - password
   passwordConnector: local
 
 staticClients:
@@ -25,19 +33,20 @@ staticClients:
 
 enablePasswordDB: true
 
-# bcrypt hash-ууд: бүгд нууц үг = "cnc302"
+# bcrypt hash-ууд: бүгд нууц үг = "cnc302" (python bcrypt.checkpw-ээр шалгасан)
 # Өөрөө үүсгэх:  htpasswd -bnBC 10 "" cnc302 | tr -d ':\n'
+#   эсвэл:       python3 -c 'import bcrypt;print(bcrypt.hashpw(b"cnc302",bcrypt.gensalt(10)).decode())'
 staticPasswords:
   - email: "viewer@cnc302.mn"
-    hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+    hash: "$2a$10$bp9pMnvDB0B9/BBeEr567e/ciCOZybqOPQfCb6YvhSItNoEKLKAc2"
     username: "viewer"
     userID: "11111111-1111-1111-1111-111111111111"
   - email: "operator@cnc302.mn"
-    hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+    hash: "$2a$10$bp9pMnvDB0B9/BBeEr567e/ciCOZybqOPQfCb6YvhSItNoEKLKAc2"
     username: "operator"
     userID: "22222222-2222-2222-2222-222222222222"
   - email: "admin@cnc302.mn"
-    hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+    hash: "$2a$10$bp9pMnvDB0B9/BBeEr567e/ciCOZybqOPQfCb6YvhSItNoEKLKAc2"
     username: "admin"
     userID: "33333333-3333-3333-3333-333333333333"
 

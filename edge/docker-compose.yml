@@ -1,6 +1,7 @@
 # CNC302 — ИРМЭГИЙН ДАВХАРГА  (RASPBERRY PI 3B дээр ажиллана)
 #
-# Pi 3B: 1 GB RAM, 4×Cortex-A53 @1.2 GHz, 100 Mbit (USB 2.0 дээр), microSD.
+# Pi 3B: 1 GB LPDDR2, 4×Cortex-A53 @1.2 GHz, 100 Mb/s Ethernet, 4×USB 2.0, microSD
+# (албан ёсны үзүүлэлт).
 # Тиймээс энд ЗӨВХӨН хөнгөн үйлчилгээ ажиллана. Бүх хүнд үйлчилгээ
 # (EMQX, InfluxDB, Grafana, Ollama) зөөврийн компьютер дээр — ../stack/.
 #
@@ -8,8 +9,8 @@
 #   make up          mosquitto-г асаана
 #   make agent       ирмэгийн агентыг ажиллуулна (venv, контейнер биш)
 #
-# Санах ойн төсөв: mosquitto ~15 MiB + агент ~45 MiB + дүгнэлт ~120 MiB
-#                  = ~180 MiB / 880 MiB боломжтой
+# Санах ойн төсөв (ТААМАГ — Лаб 1-д өөрсдөө хэмжинэ, ../docs/resource-budget.md):
+#   mosquitto ~15 MiB + агент ~45 MiB + дүгнэлт ~120 MiB ≈ 180 MiB
 
 name: cnc302-edge
 
@@ -25,10 +26,16 @@ services:
   # Үүрэг:
   #   1. Төхөөрөмжүүд Pi рүү нийтэлнэ (үүл унасан ч ажиллана)
   #   2. Үүл рүү ГҮҮР (bridge) татаж мессежийг дамжуулна
-  #   3. Үүл унасан үед мессежийг ДИСКЭНД хадгална (store-and-forward)
-  #      → Лаб 5-д үүнийг хэмжинэ
+  #   3. Үүл унасан үед мессежийг дараалалд хадгална (store-and-forward).
+  #      Дараалал САНАХ ОЙД байна; диск рүү зөвхөн autosave_interval (60 с)
+  #      тутам, зөв зогсоох (SIGTERM) эсвэл SIGUSR1 үед бичигдэнэ
+  #      → Лаб 5-д үүнийг хэмжинэ (mosquitto/mosquitto.conf)
   mosquitto:
-    image: eclipse-mosquitto:2.0.20
+    # 2.0.20 → 2.0.22: ижил 2.0 салбарын засвар. 2.0.21 нь аюулгүй байдлын
+    # засвар (SUBSCRIBE-ээр санах ой алдагдах, CVE-2023-28366-ийн нэмэлт засвар)
+    # ба healthcheck-ийн ашигладаг `mosquitto_sub -W`-ийн deadlock-ийг засав.
+    # https://mosquitto.org/ChangeLog.txt  (2.1.x-д шилжээгүй: зан төлөв өөрчлөгдсөн)
+    image: eclipse-mosquitto:2.0.22
     container_name: cnc302-mosquitto
     restart: unless-stopped
     logging: *default-logging
@@ -49,11 +56,12 @@ services:
     deploy:
       resources:
         limits:
+          # mosquitto.conf-ийн max_queued_messages-ийг энэ хязгаартай тулга
           memory: 128m
 
   # ───────────── Ирмэгийн дүгнэлт (Лаб 6, СОНГОЛТОТ профайл) ─────────────
-  # Контейнерт биш, native venv-ээр ажиллуулах нь Pi 3B дээр 60–80 MiB хэмнэнэ.
-  # Гэхдээ Лаб 8-д K3s руу шилжүүлэхийн тулд дүрс хэрэгтэй болно.
+  # Анхдагчаар агентыг контейнерт биш, venv-ээр ажиллуулна (make agent).
+  # Лаб 8-д K3s agent-д оруулахын тулд дүрс хэрэгтэй (agent/Dockerfile).
   edge-agent:
     build:
       context: ./agent

@@ -40,6 +40,8 @@ bridge: $(ENV)
 	    -e "s|__AREA__|$$AREA|g" \
 	    -e "s|__LINE__|$$LINE|g" \
 	    -e "s|__DEVICE_ID__|$$DEVICE_ID|g" \
+	    -e "s|__CLOUD_USER__|$${CLOUD_MQTT_USERNAME:-}|g" \
+	    -e "s|__CLOUD_PASS__|$${CLOUD_MQTT_PASSWORD:-}|g" \
 	    $(TPL) > $(OUT); \
 	echo "✓ $(OUT) үүслээ  →  $$CLOUD_HOST:$$CLOUD_PORT"
 
@@ -88,8 +90,8 @@ check:
 	@printf 'docker      '; docker --version >/dev/null 2>&1 && echo OK || echo '✗'
 	@printf 'mosquitto   '; docker compose ps --status running 2>/dev/null | grep -q mosquitto && echo OK || echo '✗'
 	@printf 'bridge.conf '; test -f $(OUT) && echo OK || echo '✗ (make bridge)'
-	@printf 'swap        '; free -m | awk '/Swap/{if ($$2>=1900) print "OK (" $$2 " MB)"; else print "✗ " $$2 " MB — SETUP.md Б.4"}'
-	@printf 'cgroup      '; grep -q '^memory.*1$$' /proc/cgroups && echo OK || echo '✗ — SETUP.md Б.4'
+	@printf 'swap        '; free -m | awk '/Swap/{if ($$2>=1900) print "OK (" $$2 " MB)"; else print "✗ " $$2 " MB — SETUP.md Б.5"}'
+	@printf 'cgroup mem  '; { grep -qw memory /sys/fs/cgroup/cgroup.controllers 2>/dev/null || grep -q '^memory.*1$$' /proc/cgroups 2>/dev/null; } && echo OK || echo '✗ — SETUP.md Б.5'
 	@printf 'NTP         '; timedatectl show -p NTPSynchronized --value | grep -q yes && echo OK || echo '✗'
 	@printf 'үлдэгдэл    '; free -m | awk '/Mem:/{print $$7 " MB available"}'
 

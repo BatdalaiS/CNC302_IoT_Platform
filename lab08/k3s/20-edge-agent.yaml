@@ -1,19 +1,32 @@
 # Ирмэгийн агент — edge/agent/edge_agent.py-ийн контейнер хувилбар.
 #
-# ⚠ ДҮРСИЙГ PI ДЭЭР ӨӨРӨӨ БАРИНА. Docker Hub дээр `cnc302/edge-agent`
-#   гэж байхгүй тул K3s татах гэж оролдоод ErrImagePull өгнө. Тиймээс:
+# ⚠ ДҮРС НЬ ЗӨВХӨН PI ДЭЭР БАЙНА. Docker Hub дээр `cnc302/edge-agent` гэж
+#   байхгүй. Дүрсийг ЗӨӨВРИЙН КОМПЬЮТЕР дээр linux/arm64-д зориулж бариад,
+#   tar хэлбэрээр Pi-гийн K3s containerd руу импортолно (README §4):
 #
-#     cd ~/cnc302/edge/agent
-#     docker build -t cnc302/edge-agent:v1 .            # Pi 3B дээр 3–6 мин
-#     docker save cnc302/edge-agent:v1 | sudo k3s ctr images import -
-#     sudo k3s ctr images ls | grep edge-agent          # шалгах
+#     # 💻 зөөврийн компьютер (Docker Desktop, QEMU эмуляц суусан)
+#     docker build --platform linux/arm64 -t cnc302/edge-agent:v1 edge/agent
+#     docker save --platform linux/arm64 -o edge-agent-v1-arm64.tar cnc302/edge-agent:v1
+#     scp edge-agent-v1-arm64.tar cnc302@<pi-IP>:/tmp/
+#     # 🥧 Pi — автомат импортын хавтас (https://docs.k3s.io/add-ons/import-images)
+#     sudo mkdir -p /var/lib/rancher/k3s/agent/images
+#     sudo cp /tmp/edge-agent-v1-arm64.tar /var/lib/rancher/k3s/agent/images/
+#     sudo k3s ctr images ls | grep edge-agent
 #
-#   `imagePullPolicy: IfNotPresent` нь "локал дүрс байвал ТАТАХГҮЙ" гэсэн
-#   утгатай — импортолсон дүрсийг ашиглах цорын ганц арга. `Always` бол
-#   бүх зүйл ажиллахгүй болно.
+# `imagePullPolicy: Never` — kubelet ХЭЗЭЭ Ч татахгүй, зөвхөн зангилаан
+#   дээр байгаа дүрсийг ашиглана. K3s-ийн баримт: "Pre-importing images onto
+#   the node is essential if you configure imagePullPolicy as Never".
+#   Дүрс зангилаан дээр байхгүй бол "startup fails" (kubernetes.io, Images):
+#   pod эхлэхгүй бөгөөд шалтгаан нь `kubectl describe pod`-ийн Events-д шууд
+#   харагдана — Docker Hub-аас хайх гэж хугацаа алдахгүй.
+#   (`IfNotPresent` бол kubelet docker.io/cnc302/edge-agent-ийг татах гэж
+#   оролдоно — хэн нэгэн тэр нэрээр дүрс нийтэлбэл ТАНИХГҮЙ код
+#   таны ирмэг дээр ажиллана: нийлүүлэлтийн гинжин хэлхээний эрсдэл.)
 #
-#   Зөөврийн компьютер дээр (amd64) барьсан дүрс Pi дээр АЖИЛЛАХГҮЙ
-#   (arm64/armhf). Тиймээс барилтыг Pi дээр хийнэ.
+# ⚠ Энэ pod ЗААВАЛ Pi дээр ажиллана (nodeSelector):
+#   1. Дүрс нь arm64 бөгөөд зөвхөн Pi-гийн containerd-д импортлогдсон.
+#   2. Агент Pi-гийн БОДИТ төмрийг уншина (/sys/class/thermal — hostPath).
+#      VM дээр ажиллавал VM-ийн температурыг "Pi-гийнх" гэж нийтэлнэ.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -28,24 +41,27 @@ spec:
     metadata:
       labels: {app: edge-agent}
     spec:
-      # Pod бүр өөрийн DEVICE_ID-тай байх ёстой (UNS-д давхардвал хоёр
-      # агент нэг сэдэв рүү бичнэ). HPA 2 хувь болгоход энэ асуудал
-      # ГАРЧ ИРНЭ — Лаб 8-ын хяналтын асуултын нэг нь яг энэ:
-      # "Stateful ирмэгийн ажлыг Deployment-ээр хувилахад юу эвдрэх вэ?"
+      nodeSelector:
+        kubernetes.io/arch: arm64      # kubelet бөглөдөг (runtime.GOARCH)
+        cnc302/layer: edge             # kubectl label nodes <pi> cnc302/layer=edge
+      # ⚠ STATEFUL ирмэгийн ажил. Бүх хувь ИЖИЛ DEVICE_ID-тай (ConfigMap-аас)
+      #   тул HPA 2+ хувь болгоход тэд НЭГ UNS сэдэв рүү давхар нийтэлж,
+      #   retained `status`-ыг ээлжлэн дарж бичнэ. Доорх POD_NAME-ийг
+      #   edge_agent.py ОДООГООР уншдаггүй — энэ бол хяналтын асуултын нэг:
+      #   "Stateful ирмэгийн ажлыг Deployment-ээр хувилахад юу эвдрэх вэ?"
       containers:
         - name: agent
           image: cnc302/edge-agent:v1
-          imagePullPolicy: IfNotPresent        # ← локал импорт (дээрхийг үз)
+          imagePullPolicy: Never               # ← зөвхөн импортолсон дүрс
           envFrom:
             - configMapRef: {name: cnc302-config}
           env:
-            # Pod бүрийн нэрийг дагасан давтагдашгүй суффикс —
-            # HPA хувилахад UNS сэдэв мөргөлдөхгүй.
             - name: POD_NAME
               valueFrom: {fieldRef: {fieldPath: metadata.name}}
-          # Хэмжсэн утга: paho + numpy ~55 MiB, TFLite дүгнэлттэй ~110 MiB.
-          # requests нь ТОВЛОГЧид зориулсан баталгаа, limits нь дээд хязгаар.
-          # limits хэтэрвэл контейнер OOMKilled болно (README-г үз).
+          # Курсын хэмжилт: paho + numpy ~55 MiB, TFLite дүгнэлттэй ~110 MiB.
+          # requests нь ТОВЛОГЧИД өгөх амлалт (HPA-гийн CPU хувийг ч үүнээс
+          # тооцно), limits нь дээд хана — санах ойн limit-ийг давбал цөмийн
+          # OOM дэд систем процессыг зогсооно (OOMKilled, Exit 137).
           resources:
             requests: {memory: "96Mi", cpu: "100m"}
             limits:   {memory: "160Mi", cpu: "800m"}

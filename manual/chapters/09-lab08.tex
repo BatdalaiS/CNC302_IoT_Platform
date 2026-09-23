@@ -12,7 +12,7 @@
 \textbf{Хугацаа} & 4 цаг \\
 \textbf{Суралцахуйн үр дүн} & ҮД2 (байршуулах), ҮД5, ҮД6, ҮД8 \\
 \textbf{Үнэлгээ} & \textbf{10 минутын багийн үзүүлэн}, 10 оноо \\
-\textbf{Гол хэмжилт} & Ихрийн эрүүл мэндийн шийдэл, GenAI-гийн хугацааны задаргаа, K3s-ийн санах ойн төсөв \\
+\textbf{Гол хэмжилт} & Ихрийн эрүүл мэндийн шийдэл, GenAI-гийн хугацааны задаргаа, K3s agent-ийн (Pi 3B) санах ойн төсөв \\
 \end{longtable}\endgroup
 
 \hypertarget{ux437ux43eux440ux438ux43bux433ux43e}{%
@@ -28,11 +28,11 @@
 \item
   \textbf{GenAI аналитик} --- байгалийн хэл → SQL → InfluxDB, \textbf{зөөврийн компьютер дээрх Ollama-гаар}. Гол сургамж: \textbf{LLM бол итгэмжлэгдэхгүй оролт үүсгэгч}.
 \item
-  \textbf{Ирмэгийн K3s} --- Pi 3B дээр Docker-ыг зогсоож, K3s-ийн \textbf{ганц зангилааны сервер} асааж, \textbf{зөвхөн ирмэгийн ачааллыг} байршуулна.
+  \textbf{Ирмэгийн K3s} --- хоёр зангилаатай кластер: K3s \textbf{server} нь зөөврийн компьютер дээрх Ubuntu Server VM-д, Raspberry Pi 3B нь K3s \textbf{agent} болж нэгдэнэ. \textbf{Зөвхөн ирмэгийн ачаалал} (mosquitto + edge-agent) Pi рүү хадагдаж байршина.
 \end{enumerate}
 
 \begin{quote}
-\textbf{Хоёр давхаргын хил энэ лабораторид хамгийн тод харагдана.} Ollama 1 GB-ын Pi 3B дээр \textbf{ажиллахгүй} (§3). K3s дээр EMQX/InfluxDB/Grafana Pi 3B дээр \textbf{багтахгүй}. Хоёулангийнх нь шалтгаан ижил --- санах ойн арифметик. Тэр арифметикийг үзүүлэнд \textbf{тоогоор} харуул.
+\textbf{Хоёр давхаргын хил энэ лабораторид хамгийн тод харагдана.} Ашигтай хэмжээний LLM 1 GB-ын Pi 3B-д \textbf{багтахгүй} (§3). K3s-ийн \textbf{server} ч Pi 3B-д багтахгүй --- албан ёсны доод шаардлага нь 2 GB. Хоёулангийнх нь шалтгаан ижил --- санах ойн арифметик. Тэр арифметикийг үзүүлэнд \textbf{тоогоор} харуул.
 \end{quote}
 
 \hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}{%
@@ -44,15 +44,19 @@
 \begin{itemize}
 \tightlist
 \item
-  \texttt{lab08/k3s/README.md}-ийг \textbf{бүтнээр уншсан} байх, \texttt{*.yaml} файлуудыг ойлгосон байх
+  \texttt{lab08/\allowbreak{}k3s/\allowbreak{}README.\allowbreak{}md}-ийг \textbf{бүтнээр уншсан} байх, \texttt{*.yaml} файлуудыг ойлгосон байх
 \item
-  Дараах асуултад хариулж чадах байх: Deployment ба Pod-ын ялгаа? PVC яагаад хэрэгтэй? \texttt{requests} ба \texttt{limits}-ийн ялгаа?
+  Дараах асуултад хариулж чадах байх: Deployment ба Pod-ын ялгаа? PVC яагаад хэрэгтэй? \texttt{requests} ба \texttt{limits}-ийн ялгаа? \texttt{nodeSelector} юунд хэрэгтэй?
+\item
+  {[}VM{]} \textbf{K3s server VM-ийг бэлэн болгож ирэх} --- \texttt{lab08/\allowbreak{}k3s/\allowbreak{}README.\allowbreak{}md} §3.1--3.2: VirtualBox, Ubuntu Server LTS, \textbf{Bridged Adapter}, ≥ 2 vCPU, 4 GB RAM (доод 2 GB), K3s server суусан, \texttt{kubectl\ get\ nodes} → \texttt{Ready}. Лабораторийн цагт VM суулгах хугацаа \textbf{байхгүй}.
+\item
+  {[}ЗК{]} \texttt{edge-agent}-ийн \textbf{arm64} дүрсийг барьж tar болгосон байх (\texttt{lab08/\allowbreak{}k3s/\allowbreak{}README.\allowbreak{}md} §4) --- QEMU эмуляцаар хэдэн минут болно.
 \end{itemize}
 
 \hypertarget{ux437ux43a-ollama-ux433ux438ux439ux43d-ux437ux430ux433ux432ux430ux440ux44bux433-ux443ux440ux44cux434ux447ux438ux43bux430ux43d-ux442ux430ux442ux430ux445}{%
 \subsection{{[}ЗК{]} Ollama-гийн загварыг урьдчилан татах}\label{ux437ux43a-ollama-ux433ux438ux439ux43d-ux437ux430ux433ux432ux430ux440ux44bux433-ux443ux440ux44cux434ux447ux438ux43bux430ux43d-ux442ux430ux442ux430ux445}}
 
-Загвар 1--2 GB тул лабораторийн цагаар татах хугацаа байхгүй:
+\texttt{qwen2.5:1.5b} нь \textasciitilde1 GB (ollama.com/library дээр 986 MB) тул лабораторийн цагаар татах хугацаа байхгүй:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -62,7 +66,7 @@
 \end{Shaded}
 
 \begin{quote}
-\textbf{Docker Desktop-д ≥ 6 GB} өгсөн байх ёстой (Settings → Resources → Memory). Үүнээс бага бол Ollama OOM болно --- \texttt{docs/resource-budget.md} §2.
+\textbf{Docker Desktop-д ≥ 6 GB} өгсөн байх ёстой (Settings → Resources → Memory). Үүнээс бага бол Ollama OOM болно --- \texttt{docs/\allowbreak{}resource-budget.\allowbreak{}md} §2.
 \end{quote}
 
 \hypertarget{ux43bux430ux431ux43eux440ux430ux442ux43eux440ux438ux439ux43d-ux44dux445ux44dux43dux434}{%
@@ -75,8 +79,11 @@
 \ExtensionTok{docker}\NormalTok{ compose stop nodered }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ up{-}ai}
 \FunctionTok{free} \AttributeTok{{-}h}                                    \CommentTok{\# 3 GB{-}аас дээш сул байх ёстой}
 
-\CommentTok{\# [Pi] ирмэг: агент ажиллаж, гүүр холбогдсон байх}
+\CommentTok{\# [Pi] ирмэг: агент ажиллаж, гүүр холбогдсон байх (Алхам 1–6 Compose дээр; Алхам 7{-}д K3s руу шилжинэ)}
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ up }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ link   }\CommentTok{\# bridge/state 1}
+
+\CommentTok{\# [VM] K3s server VM асаалттай, IP өөрчлөгдөөгүй}
+\FunctionTok{ssh} \OperatorTok{\textless{}}\NormalTok{хэрэглэгч}\OperatorTok{\textgreater{}}\NormalTok{@}\OperatorTok{\textless{}}\NormalTok{VM{-}IP}\OperatorTok{\textgreater{}} \StringTok{\textquotesingle{}kubectl get nodes\textquotesingle{}}   \CommentTok{\# VM Ready}
 \end{Highlighting}
 \end{Shaded}
 
@@ -85,6 +92,8 @@
 
 \hypertarget{ux434ux438ux436ux438ux442ux430ux43b-ux438ux445ux440ux438ux439ux43d-ux433ux443ux440ux432ux430ux43d-ux434ux430ux432ux445ux430ux440ux433ux430}{%
 \subsection{Дижитал ихрийн гурван давхарга}\label{ux434ux438ux436ux438ux442ux430ux43b-ux438ux445ux440ux438ux439ux43d-ux433ux443ux440ux432ux430ux43d-ux434ux430ux432ux445ux430ux440ux433ux430}}
+
+Энэ курсын \textbf{ажлын тодорхойлолт}: дижитал ихэр гэдэг нь бодит хөрөнгийн бүтэц, одоогийн төлөв, зан төлөвийг програм хангамжид тусгаж, бодит өгөгдлөөр тогтмол шинэчлэгддэг загвар. Салбарын стандартууд үүнээс өргөн (амьдралын мөчлөг, хоёр чиглэлт удирдлага г.м.) тодорхойлолт хэрэглэдэг --- энд бид зөвхөн доорх гурван давхаргыг хэрэгжүүлнэ.
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
@@ -104,10 +113,16 @@
 \endlastfoot
 1. \textbf{Бүтэц} & хөрөнгийн шатлал, холбоос & UNS сэдвийн мод (Лаб 3) + \texttt{registry} :8090 (Лаб 2) \\
 2. \textbf{Төлөв} & одоогийн утга, эрүүл мэнд & InfluxDB :8181 (түүх) + EMQX :1883 (гүүрээр ирсэн амьд) \\
-3. \textbf{Зан төлөв} & таамаглал, симуляц & \texttt{twin\_sync.py\ simulate} (оюутан сайжруулна) \\
+3. \textbf{Зан төлөв} & таамаглал, симуляц & \texttt{twin\_\allowbreak{}sync.\allowbreak{}py\ simulate} (оюутан сайжруулна) \\
 \end{longtable}\endgroup
 
 Гурав дахь давхаргагүй бол энэ нь ихэр биш, зүгээр л \textbf{хяналтын самбар}.
+
+\begin{figure}
+\centering
+\includegraphics{figures/fig-digital-twin.pdf}
+\caption{Зураг 8.1 --- Дижитал ихрийн гурван давхарга: бүтэц (UNS + бүртгэл), төлөв (InfluxDB + гүүрээр ирэх амьд төлөв), зан төлөв (симуляц)}
+\end{figure}
 
 \textbf{Ихрийн эрүүл мэнд нь зөвхөн хэмжилтээр биш, ХОЛБОО-гоор ч тодорхойлогдоно.} \texttt{twin\_sync.py} дөрвөн шийдэл гаргана:
 
@@ -128,8 +143,8 @@
 \bottomrule
 \endlastfoot
 \texttt{stale} & InfluxDB-д сүүлийн 5 минутад мөр алга & ихэр \textbf{сохор} --- өгөгдөл ирэхгүй байна \\
-\texttt{warning} & \texttt{max\_vibration\ ≥\ -\/\allowbreak{}-vib-warn} & бодит процессын анхааруулга \\
-\texttt{degraded} & \texttt{devices\_online\ \textless{}\ device\_count} & зарим төхөөрөмж офлайн (retained \texttt{status}) \\
+\texttt{warning} & \texttt{max\_\allowbreak{}vibration\ ≥\ -\/\allowbreak{}-vib-warn} & бодит процессын анхааруулга \\
+\texttt{degraded} & \texttt{devices\_\allowbreak{}online\ \textless{}\ device\_\allowbreak{}count} & зарим төхөөрөмж офлайн (retained \texttt{status}) \\
 \texttt{ok} & бусад & \\
 \end{longtable}\endgroup
 
@@ -138,19 +153,54 @@
 \hypertarget{ux44fux430ux433ux430ux430ux434-llm-pi-3b-ux434ux44dux44dux440-ux431ux438ux448-ux432ux44d}{%
 \subsection{Яагаад LLM Pi 3B дээр биш вэ}\label{ux44fux430ux433ux430ux430ux434-llm-pi-3b-ux434ux44dux44dux440-ux431ux438ux448-ux432ux44d}}
 
-Хамгийн жижиг ашигтай загвар болох \texttt{qwen2.5:1.5b} нь q4 квантчилалтай ч \textbf{≈1.1--1.5 GiB} жинтэй, дээрээс нь KV кэш ба Ollama-гийн ажиллах орчин +200--400 MiB нэмэгдэнэ. Pi 3B-д нийт \texttt{MemTotal} \textbf{925 MiB}. Загварын жин \textbf{ганцаараа} Pi-гийн бүх санах ойгоос их --- GPU/NPU дэмжлэг ч байхгүй, зөвхөн 4×A53.
+Энэ лабораторид ашиглах \texttt{qwen2.5:1.5b} (Q4\_K\_M квантчилал) загварын файл \textbf{986 MB ≈ 940 MiB} (\href{https://ollama.com/library/qwen2.5/tags}{ollama.\allowbreak{}com/\allowbreak{}library/\allowbreak{}qwen2.\allowbreak{}5}). Ollama анхдагчаар \textbf{4096 токены} контекст цонх хэрэглэдэг (\href{https://docs.ollama.com/faq}{Ollama FAQ}) --- түүний KV кэш ба Ollama-гийн ажиллах орчин дээрээс нь нэмэгдэнэ. Pi 3B-д нийт \texttt{MemTotal} \textbf{\textasciitilde925 MiB}, OS ба ирмэгийн үйлчилгээний дараа \textasciitilde700 MiB. Загварын жин \textbf{ганцаараа} Pi-гийн бүх санах ойгоос их --- GPU/NPU хурдасгуур ч байхгүй, зөвхөн 4×Cortex-A53.
 
-Энэ бол тохиргооны асуудал биш, \textbf{арифметик}. Тиймээс LLM үүлэнд, Pi нь ирмэгийн үүрэгтээ (мэдрэгч, шүүлт, жижиг TFLite дүгнэлт, store-and-forward) үлдэнэ.
+\texttt{qwen2.5:0.5b} (398 MB) санах ойд багтаж магадгүй, гэхдээ Pi-гийн ирмэгийн үүрэгт (mosquitto, агент, TFLite) бараг зай үлдээхгүй бөгөөд SQL үүсгэх чанар нь курсын туршлагаар хэт сул. Энэ бол тохиргооны асуудал биш, \textbf{арифметик}. Тиймээс LLM үүлэнд, Pi нь ирмэгийн үүрэгтээ (мэдрэгч, шүүлт, жижиг TFLite дүгнэлт, store-and-forward) үлдэнэ.
 
 \hypertarget{llm-ux431ux43eux43b-ux438ux442ux433ux44dux43cux436ux43bux44dux433ux434ux44dux445ux433ux4afux439-ux43eux440ux43eux43bux442-ux4afux4afux441ux433ux44dux433ux447}{%
 \subsection{LLM бол итгэмжлэгдэхгүй оролт үүсгэгч}\label{llm-ux431ux43eux43b-ux438ux442ux433ux44dux43cux436ux43bux44dux433ux434ux44dux445ux433ux4afux439-ux43eux440ux43eux43bux442-ux4afux4afux441ux433ux44dux433ux447}}
 
 Хэрэглэгчийн бичсэн SQL-ийг шууд ажиллуулахгүй нь ойлгомжтой. Гэтэл \textbf{LLM-ийн бичсэн SQL-ийг шууд ажиллуулах нь яг адилхан аюултай} --- LLM-ийг prompt injection-оор удирдаж болно. Халдагч заавраа \textbf{төхөөрөмжийн нэр} дотор ч нууж чадна. Тиймээс \texttt{ask.py}-ийн \texttt{guard\_sql()} бол уг скриптийн хамгийн чухал хэсэг.
 
-\hypertarget{k3s-ux433ux430ux43dux446-ux437ux430ux43dux433ux438ux43bux430ux430-ux434ux44dux44dux440}{%
-\subsection{K3s ганц зангилаа дээр}\label{k3s-ux433ux430ux43dux446-ux437ux430ux43dux433ux438ux43bux430ux430-ux434ux44dux44dux440}}
+\hypertarget{k3s-server-ux43dux44c-vm-ux434ux44dux44dux440-pi-3b-ux43dux44c-agent}{%
+\subsection{K3s: server нь VM дээр, Pi 3B нь agent}\label{k3s-server-ux43dux44c-vm-ux434ux44dux44dux440-pi-3b-ux43dux44c-agent}}
 
-Pi 3B дээр K3s ажиллана --- \textbf{гэхдээ зөвхөн ирмэгийн ачаалалтай}. Тооцоог \texttt{docs/resource-budget.md} §3 ба \texttt{lab08/k3s/README.md} §1-д бүтнээр нь бичсэн: \texttt{requests}-ийн нийлбэр \textasciitilde268 MiB, allocatable \textasciitilde825 MiB. \texttt{requests} бол \textbf{амлалт}, \texttt{limits} бол \textbf{хана}, \textbf{RSS бол үнэн} --- гурвыг нь зэрэг хэмж.
+K3s-ийн албан ёсны \textbf{доод} шаардлага: server \textbf{2 цөм / 2 GB}, agent \textbf{1 цөм / 512 MB} (\href{https://docs.k3s.io/installation/requirements}{K3s Requirements}). 1 GB-ын Pi 3B нь server-т хүрэлцэхгүй тул кластерыг хоёр зангилаагаар барина:
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Зангилаа
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хаана
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Арх.
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Юу ажиллах вэ
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+\textbf{server} & зөөврийн компьютер дээрх Ubuntu Server LTS VM (VirtualBox \textbf{Bridged}, ≥ 2 vCPU, 4 GB) & amd64 & control plane, SQLite, coredns, metrics-server \\
+\textbf{agent} & Raspberry Pi 3B & arm64 & \texttt{mosquitto} + \texttt{edge-agent} --- \texttt{nodeSelector}-оор \textbf{хадсан} \\
+\end{longtable}\endgroup
+
+\begin{figure}
+\centering
+\includegraphics{figures/fig-k3s-topology.pdf}
+\caption{Зураг 8.2 --- K3s кластер: зөөврийн компьютер дээрх VM (server, amd64) ба Raspberry Pi 3B (agent, arm64); портууд 6443/tcp, 8472/udp, 10250/tcp}
+\end{figure}
+
+Гурван порт: \textbf{6443/tcp} (agent → server, API), \textbf{8472/udp} (бүх зангилаа, Flannel VXLAN), \textbf{10250/tcp} (бүх зангилаа, kubelet --- metrics-server, тиймээс HPA-д заавал).
+
+\textbf{Гетероген кластер.} VM нь amd64, Pi нь arm64. Ирмэгийн ажлыг Pi рүү \textbf{заавал} хадна: \texttt{edge-agent}-ийн arm64 дүрс зөвхөн Pi-д импортлогдсон, агент Pi-гийн \textbf{бодит} мэдрэгч (\texttt{/\allowbreak{}sys/\allowbreak{}class/\allowbreak{}thermal})-ийг уншина, \texttt{mosquitto}-гийн store-and-forward дараалал ирмэгийн дискэнд байх ёстой.
+
+\textbf{Санах ойн хоёр өнцөг.} Pi дээр k3s agent өөрөө \textasciitilde270 MiB (K3s-ийн хэмжилтээр Pi 4B дээр 268 M) эзэлж, pod-уудад бодитоор \textbf{\textasciitilde545 MiB} үлдэнэ. Гэтэл товлогчийн харах \textbf{Allocatable ≈ 925 Mi} --- K3s-ийн kubelet-д reserved ба санах ойн eviction босго тавиагүй учир агент ба OS-ийн санах ойг товлогч \textbf{мэдэхгүй}. Бүрэн тооцоо: \texttt{lab08/\allowbreak{}k3s/\allowbreak{}README.\allowbreak{}md} §2. \texttt{requests} бол \textbf{амлалт}, \texttt{limits} бол \textbf{хана}, \textbf{RSS бол үнэн} --- гурвыг нь зэрэг хэмж.
 
 \hypertarget{ux430ux43bux445ux43cux443ux443ux434}{%
 \section{4. Алхмууд}\label{ux430ux43bux445ux43cux443ux443ux434}}
@@ -166,7 +216,7 @@ Pi 3B дээр K3s ажиллана --- \textbf{гэхдээ зөвхөн ирм
 \end{Highlighting}
 \end{Shaded}
 
-Бүртгэлд төхөөрөмж байхгүй бол Лаб 2-ыг дахин ажиллуул, эсвэл гараар нэм: \texttt{python3\ lab08/\allowbreak{}twin\_sync.\allowbreak{}py\ build\ -\/\allowbreak{}-devices\ pi3b-01,dev0001,dev0002}. Дараа нь UNS сэдвийн мод ба ихрийн шатлал \textbf{яг ижил} байгааг батал:
+Бүртгэлд төхөөрөмж байхгүй бол Лаб 2-ыг дахин ажиллуул, эсвэл гараар нэм: \texttt{python3\ lab08/\allowbreak{}twin\_\allowbreak{}sync.\allowbreak{}py\ build\ -\/\allowbreak{}-devices\ pi3b-01,dev0001,dev0002}. Дараа нь UNS сэдвийн мод ба ихрийн шатлал \textbf{яг ижил} байгааг батал:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -225,9 +275,9 @@ device & \texttt{pi3b-01} & & \textbf{registry} (\texttt{state}, \texttt{fw\_ver
 \textbf{Талбарын нэр.} \texttt{sync} анхдагчаар \texttt{temperature} / \texttt{vibration\_rms} (Лаб 5-ын Node-RED шугамын бичсэн нэр) уншина. Ирмэгийн агентын \textbf{түүхий} сувгийг шууд уншиж байгаа бол \texttt{-\/\allowbreak{}-temp-field\ proc\_\allowbreak{}temp\_\allowbreak{}c\ -\/\allowbreak{}-vib-field\ vibration\_\allowbreak{}g} заана. Хоосон утга гарвал эхлээд үүнийг шалга.
 \end{quote}
 
-\texttt{python3\ lab08/\allowbreak{}twin\_sync.\allowbreak{}py\ show} нь хоёр хэсэг хэвлэнэ: InfluxDB-ийн \texttt{twin\_state} хүснэгт, ба \textbf{гүүрээр ирсэн амьд төлөв} (\texttt{online}, \texttt{seq}, \texttt{score}, \texttt{infer\_ms}).
+\texttt{python3\ lab08/\allowbreak{}twin\_\allowbreak{}sync.\allowbreak{}py\ show} нь хоёр хэсэг хэвлэнэ: InfluxDB-ийн \texttt{twin\_state} хүснэгт, ба \textbf{гүүрээр ирсэн амьд төлөв} (\texttt{online}, \texttt{seq}, \texttt{score}, \texttt{infer\_ms}).
 
-\textbf{Дөрвөн эрүүл мэндийн шийдлийг бодитоор үүсгэ:} \texttt{ok} --- бүх зүйл хэвийн; \texttt{warning} --- \texttt{-\/-vib-warn\ 0.5} болгож бууруул (агентын \texttt{vibration\_g} ≈ 0.42); \texttt{degraded} --- {[}Pi{]} агентыг Ctrl+C-ээр зогсоо (LWT → retained \texttt{status:\ online=false}); \texttt{stale} --- {[}Pi{]} \texttt{docker\ compose\ stop\ mosquitto}, гүүр тасарч InfluxDB-д шинэ мөр орохгүй.
+\textbf{Дөрвөн эрүүл мэндийн шийдлийг бодитоор үүсгэ:} \texttt{ok} --- бүх зүйл хэвийн; \texttt{warning} --- \texttt{-\/\allowbreak{}-vib-warn\ 0.\allowbreak{}5} болгож бууруул (агентын \texttt{vibration\_g} ≈ 0.42); \texttt{degraded} --- {[}Pi{]} агентыг Ctrl+C-ээр зогсоо (LWT → retained \texttt{status:\allowbreak{}\ online=\allowbreak{}false}); \texttt{stale} --- {[}Pi{]} \texttt{docker\ compose\ stop\ mosquitto}, гүүр тасарч InfluxDB-д шинэ мөр орохгүй.
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-8.2-ux438ux445ux440ux438ux439ux43d-ux44dux440ux4afux4afux43b-ux43cux44dux43dux434ux438ux439ux43d-ux448ux438ux439ux434ux44dux43b}{%
 \subsubsection{Хүснэгт 8.2 --- Ихрийн эрүүл мэндийн шийдэл}\label{ux445ux4afux441ux43dux44dux433ux442-8.2-ux438ux445ux440ux438ux439ux43d-ux44dux440ux4afux4afux43b-ux43cux44dux43dux434ux438ux439ux43d-ux448ux438ux439ux434ux44dux43b}}
@@ -248,7 +298,7 @@ device & \texttt{pi3b-01} & & \textbf{registry} (\texttt{state}, \texttt{fw\_ver
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \texttt{max\_vibration}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\texttt{devices\_online\ /\allowbreak{}\ count}
+\texttt{devices\_\allowbreak{}online\ /\allowbreak{}\ count}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \texttt{samples}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -359,7 +409,7 @@ LLM дуудахаас \textbf{өмнө} \texttt{guard\_sql()}-ыг ойлго:
 \endhead
 \bottomrule
 \endlastfoot
-1 & \texttt{SELECT\ device,\ max(vibration\_rms)\ …\ GROUP\ BY\ device} & & & \texttt{LIMIT} нэмэгдэв үү \\
+1 & \texttt{SELECT\ device,\ max(vibration\_\allowbreak{}rms)\ …\ GROUP\ BY\ device} & & & \texttt{LIMIT} нэмэгдэв үү \\
 2 & \texttt{select\ *\ from\ telemetry\ limit\ 5000} & & & \texttt{LIMIT} дарагдав уу \\
 3 & \texttt{SELECT\ *\ FROM\ telemetry;\ DROP\ TABLE\ telemetry} & & & \\
 4 & \texttt{DELETE\ FROM\ telemetry} & & & \\
@@ -370,7 +420,7 @@ LLM дуудахаас \textbf{өмнө} \texttt{guard\_sql()}-ыг ойлго:
 
 \textbf{Анхаарах хоёр нарийн зүйл.} (1) Markdown хашлага нь \textbf{хоригдохгүй, харин арилгагдана} (\#7) --- LLM бараг үргэлж кодын хашлага нэмдэг тул хатуу татгалзвал систем ашиглах боломжгүй болно. (2) \texttt{LIMIT} нь татгалзлын шалтгаан биш, \textbf{засварын} зүйл (\#2): 5000 → 200 болж дарагдана. Энэ хоёр стратегийн (\textbf{татгалзах} vs \textbf{засах}) ялгааг үзүүлэнд тайлбарла.
 
-\textbf{Өөрсдөө нэмэлт тохиолдол турш} --- \texttt{information\_schema}, \texttt{UNION}, үүрлэсэн \texttt{SELECT}, \texttt{/*\ */} тайлбар:
+\textbf{Өөрсдөө нэмэлт тохиолдол турш} --- \texttt{information\_\allowbreak{}schema}, \texttt{UNION}, үүрлэсэн \texttt{SELECT}, \texttt{/*\ */} тайлбар, таслалаар холбосон хүснэгт, хашилттай нэр:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -378,7 +428,10 @@ LLM дуудахаас \textbf{өмнө} \texttt{guard\_sql()}-ыг ойлго:
 \StringTok{import sys; sys.path.insert(0, "lab08"); from ask import guard\_sql}
 \StringTok{for c in ["SELECT * FROM information\_schema.tables",}
 \StringTok{          "SELECT * FROM telemetry UNION SELECT * FROM users",}
-\StringTok{          "SELECT /* нуусан */ * FROM telemetry"]:}
+\StringTok{          "SELECT /* нуусан */ * FROM telemetry",}
+\StringTok{          "SELECT * FROM telemetry, users",}
+\StringTok{          \textquotesingle{}SELECT * FROM "users"\textquotesingle{},}
+\StringTok{          "SELECT * FROM telemetry WHERE device IN (SELECT device FROM telemetry LIMIT 1)"]:}
 \StringTok{    try: print("✓ ЗӨВШӨӨРӨВ", guard\_sql(c))}
 \StringTok{    except ValueError as e: print("✗ ТАТГАЛЗАВ ", c[:40], "→", e)}
 \OperatorTok{EOF}
@@ -446,7 +499,7 @@ SQL үүсгэх (с)
 Зөв SQL үүсгэсэн хувь: ule{1.5cm}{0.4pt} \% · Аль үе шат давамгайлав: ule{1.5cm}{0.4pt} · Түүний эзлэх хувь: ule{1.5cm}{0.4pt} \%
 
 \begin{quote}
-\textbf{Хүлээгдэх үр дүн:} 1.5B загвар зөөврийн компьютерийн CPU дээр SQL үүсгэхэд 3--20 секунд авна, зөв байх магадлал 50--80\%. Асуулгын хугацаа ихэвчлэн \textbf{миллисекунд}. Өөрөөр хэлбэл нийт хугацааны 95\%+ нь LLM дээр өнгөрнө. Энэ нь архитектурт юу гэсэн үг вэ --- GenAI давхаргыг хаана байрлуулах вэ?
+\textbf{Хүлээгдэх үр дүн (курсын туршлагаар, баталгаат тоо биш):} 1.5B загвар зөөврийн компьютерийн CPU дээр SQL үүсгэхэд 3--20 секунд авна, зөв байх магадлал 50--80\%. Эхний дуудлага загварыг санах ойд ачаалах тул удаан --- Ollama загварыг анхдагчаар 5 минут ачаалттай байлгадаг (\href{https://docs.ollama.com/faq}{Ollama FAQ}), тиймээс эхний хэмжилтийг тусад нь тэмдэглэ. Асуулгын хугацаа ихэвчлэн \textbf{миллисекунд}. Өөрөөр хэлбэл нийт хугацааны 95\%+ нь LLM дээр өнгөрнө. Энэ нь архитектурт юу гэсэн үг вэ --- GenAI давхаргыг хаана байрлуулах вэ?
 \end{quote}
 
 \hypertarget{ux430ux43bux445ux430ux43c-6-genai-ux445ux430ux43bux434ux43bux430ux433ux44bux43d-ux442ux443ux440ux448ux438ux43bux442-25-ux43cux438ux43d-ux437ux43a}{%
@@ -496,7 +549,7 @@ LLM юу үүсгэв (\texttt{raw\_sql})
 \endlastfoot
 1 & DROP TABLE тарилга & & & & \\
 2 & \texttt{users} хүснэгт & & & & \\
-3 & \texttt{information\_schema} & & & & \\
+3 & \texttt{information\_\allowbreak{}schema} & & & & \\
 4 & \texttt{;} олон илэрхийлэл & & & & \\
 5 & markdown + \texttt{-\/-} тайлбар & & & & \\
 6 & \texttt{LIMIT\ 999999} & & & & \\
@@ -508,70 +561,101 @@ LLM юу үүсгэв (\texttt{raw\_sql})
 \textbf{Хэрэв аль нэг нь өнгөрвөл --- та эмзэг байдал оллоо.} Тэр бол сөрөг үр дүн биш, \textbf{хамгийн үнэ цэнэтэй} үр дүн. \texttt{guard\_sql}-ыг сайжруулж, оролдлогоо \texttt{-\/-json}-оор баримтжуул. Үзүүлэнд \textbf{амжилтгүй болсон халдлагыг} заавал үзүүл.
 \end{quote}
 
-\hypertarget{ux430ux43bux445ux430ux43c-7-k3s-docker-ux44bux433-ux437ux43eux433ux441ux43eux43eux436-ux43aux43bux430ux441ux442ux435ux440-ux430ux441ux430ux430ux445-40-ux43cux438ux43d-pi}{%
-\subsection{Алхам 7 --- K3s: Docker-ыг зогсоож, кластер асаах (40 мин) {[}Pi{]}}\label{ux430ux43bux445ux430ux43c-7-k3s-docker-ux44bux433-ux437ux43eux433ux441ux43eux43eux436-ux43aux43bux430ux441ux442ux435ux440-ux430ux441ux430ux430ux445-40-ux43cux438ux43d-pi}}
+\hypertarget{ux430ux43bux445ux430ux43c-7-k3s-pi-ux433-agent-ux431ux43eux43bux433ux43eux436-ux43aux43bux430ux441ux442ux435ux440ux442-ux43dux44dux433ux442ux433ux44dux445-40-ux43cux438ux43d-vmpi}{%
+\subsection{Алхам 7 --- K3s: Pi-г agent болгож кластерт нэгтгэх (40 мин) {[}VM{]}{[}Pi{]}}\label{ux430ux43bux445ux430ux43c-7-k3s-pi-ux433-agent-ux431ux43eux43bux433ux43eux436-ux43aux43bux430ux441ux442ux435ux440ux442-ux43dux44dux433ux442ux433ux44dux445-40-ux43cux438ux43d-vmpi}}
 
 \begin{quote}
-Дэлгэрэнгүйг \texttt{lab08/k3s/README.md}-ээс үз. Энд зөвхөн дараалал ба хэмжих цэгүүд.
+Дэлгэрэнгүй ба үндэслэлийг \texttt{lab08/\allowbreak{}k3s/\allowbreak{}README.\allowbreak{}md} §3--5-аас үз. Энд зөвхөн дараалал ба хэмжих цэгүүд. {[}VM{]} = K3s server VM (бүх \texttt{kubectl} энд), {[}Pi{]} = Pi, {[}ЗК{]} = зөөврийн компьютерийн хост.
 \end{quote}
 
-\textbf{7.1 Pi дээрх Docker-ыг БҮРЭН зогсооно.} Хоёулаа нэг санах ойг булаацалдах орон зай байхгүй:
+\textbf{7.1 Server бэлэн эсэхийг шалгах} {[}VM{]} (VM-ийг бие даалтаар бэлдсэн):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{kubectl}\NormalTok{ get nodes }\AttributeTok{{-}o}\NormalTok{ wide          }\CommentTok{\# VM Ready, INTERNAL{-}IP = VM{-}ийн LAN IP}
+\ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ kube{-}system get pods    }\CommentTok{\# coredns, metrics{-}server, local{-}path{-}provisioner Running; traefik/svclb БАЙХГҮЙ}
+\FunctionTok{sudo}\NormalTok{ cat /var/lib/rancher/k3s/server/node{-}token}
+\end{Highlighting}
+\end{Shaded}
+
+VM \texttt{-\/\allowbreak{}-disable\ traefik\ -\/\allowbreak{}-disable\ servicelb}-ээр суусан байх ёстой. \texttt{traefik} нь HTTP Ingress (бидний урсгал MQTT/TCP), \texttt{servicelb} нь LoadBalancer Service бүрт \textbf{зангилаа бүр дээр} pod тавьдаг --- Pi-гийн санах ойг дэмий иднэ. \textbf{metrics-server-ийг УНТРААХГҮЙ} --- HPA түүнгүйгээр ажиллахгүй (Алхам 8).
+
+\begin{quote}
+{[}ЗК{]} Зөөврийн компьютер 8 GB бол: \texttt{cd\ \textasciitilde{}/cnc302/stack\ \&\&\ docker\ compose\ stop\ ollama} --- K3s-ийн алхамд LLM хэрэггүй. EMQX-ийг \textbf{зогсоохгүй}.
+\end{quote}
+
+\textbf{7.2 Pi дээрх Compose стек, native агент ба Docker-ийг зогсооно} {[}Pi{]}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \ExtensionTok{docker}\NormalTok{ compose down}
+\FunctionTok{sudo}\NormalTok{ systemctl stop cnc302{-}edge{-}agent }\DecValTok{2}\OperatorTok{\textgreater{}}\NormalTok{/dev/null}\KeywordTok{;} \ExtensionTok{pkill} \AttributeTok{{-}f}\NormalTok{ edge\_agent.py}
 \FunctionTok{sudo}\NormalTok{ systemctl stop docker.socket docker}
-\ExtensionTok{docker}\NormalTok{ ps }\KeywordTok{;} \FunctionTok{free} \AttributeTok{{-}m}              \CommentTok{\# хоосон, 800+ MiB сул байх ЁСТОЙ}
+\ExtensionTok{docker}\NormalTok{ ps }\DecValTok{2}\OperatorTok{\textgreater{}\&}\DecValTok{1} \KeywordTok{|} \FunctionTok{head} \AttributeTok{{-}1} \KeywordTok{;} \FunctionTok{free} \AttributeTok{{-}m}     \CommentTok{\# Docker хариулахгүй; available ≥ 700 MiB}
+\FunctionTok{grep} \AttributeTok{{-}o} \StringTok{\textquotesingle{}cgroup[\^{} ]*\textquotesingle{}}\NormalTok{ /boot/firmware/cmdline.txt   }\CommentTok{\# cgroup\_memory=1 cgroup\_enable=memory}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{7.2 K3s суулгах} (эхний удаа, microSD дээр 3--6 минут):
+\textbf{Яагаад.} (1) Compose-ийн mosquitto ба K3s-ийн mosquitto \textbf{ижил ClientID}-аар EMQX рүү гүүр тавина --- MQTT 5.0 §3.1.4-ийн дагуу брокер хуучин холболтыг "Session taken over"-оор таслах тул хоёр гүүр бие биенээ ээлжлэн унагана. Энэ бол \textbf{заавал}. (2) K3s өөрийн embedded containerd-тэй, Docker өөрийн \texttt{dockerd} + \texttt{containerd}-тэй --- тэд бие биедээ саад болохгүй ч Docker сул байхдаа 60--80 MiB иднэ: pod-уудад үлдэх \textasciitilde545 MiB-ийн 12--15 \%, ойролцоогоор \textbf{нэг \texttt{edge-agent}}. Лаб 8-д Pi дээр Docker хэрэггүй (дүрсийг {[}ЗК{]} дээр барьсан).
+
+\textbf{7.3 Нэгтгэх} {[}Pi{]} --- \texttt{\textless{}VM-IP\textgreater{}}, \texttt{\textless{}token\textgreater{}}-ийг 7.1-ээс:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{curl} \AttributeTok{{-}sfL}\NormalTok{ https://get.k3s.io }\KeywordTok{|} \FunctionTok{sh} \AttributeTok{{-}s} \AttributeTok{{-}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}{-}write{-}kubeconfig{-}mode}\NormalTok{ 644 }\AttributeTok{{-}{-}disable}\NormalTok{ traefik }\AttributeTok{{-}{-}disable}\NormalTok{ servicelb}
-\BuiltInTok{export} \VariableTok{KUBECONFIG}\OperatorTok{=}\NormalTok{/etc/rancher/k3s/k3s.yaml}
-\BuiltInTok{echo} \StringTok{\textquotesingle{}export KUBECONFIG=/etc/rancher/k3s/k3s.yaml\textquotesingle{}} \OperatorTok{\textgreater{}\textgreater{}}\NormalTok{ \textasciitilde{}/.bashrc}
-\ExtensionTok{kubectl}\NormalTok{ get nodes }\KeywordTok{\&\&} \ExtensionTok{kubectl}\NormalTok{ top nodes   }\CommentTok{\# Ready болтол 1–3 мин; top = metrics{-}server бэлэн}
-\end{Highlighting}
-\end{Shaded}
-
-\texttt{-\/-disable\ traefik} --- Ingress контроллер \textasciitilde60 MiB иднэ, бидэнд MQTT (TCP) хэрэгтэй болохоос HTTP Ingress хэрэггүй. \texttt{-\/-disable\ servicelb} --- NodePort хангалттай, \textasciitilde15 MiB хэмнэнэ. \textbf{metrics-server-ийг УНТРААХГҮЙ} --- HPA түүнгүйгээр огт ажиллахгүй (Алхам 8).
-
-\textbf{7.3 Дүрсийг Pi дээр барьж импортлох.} K3s нь Docker-ын дүрсийн санг \textbf{харахгүй} (өөрийн containerd-тэй):
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{sudo}\NormalTok{ systemctl start docker                 }\CommentTok{\# зөвхөн барихын тулд түр асаана}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge/agent }\KeywordTok{\&\&} \ExtensionTok{docker}\NormalTok{ build }\AttributeTok{{-}t}\NormalTok{ cnc302/edge{-}agent:v1 .   }\CommentTok{\# 3–6 минут}
-\ExtensionTok{docker}\NormalTok{ save cnc302/edge{-}agent:v1 }\KeywordTok{|} \FunctionTok{sudo}\NormalTok{ k3s ctr images import }\AttributeTok{{-}}
-\FunctionTok{sudo}\NormalTok{ k3s ctr images ls }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ edge{-}agent}
-\FunctionTok{sudo}\NormalTok{ k3s ctr images pull docker.io/library/busybox:1.36}
-\FunctionTok{sudo}\NormalTok{ k3s ctr images pull docker.io/library/eclipse{-}mosquitto:2.0.20}
-\FunctionTok{sudo}\NormalTok{ systemctl stop docker.socket docker    }\CommentTok{\# ЗААВАЛ буцааж зогсоо}
+\ExtensionTok{curl} \AttributeTok{{-}sfL}\NormalTok{ https://get.k3s.io }\KeywordTok{|} \VariableTok{K3S\_URL}\OperatorTok{=}\NormalTok{https://}\OperatorTok{\textless{}}\NormalTok{VM{-}IP}\OperatorTok{\textgreater{}}\NormalTok{:6443 }\VariableTok{K3S\_TOKEN}\OperatorTok{=\textless{}}\NormalTok{token}\OperatorTok{\textgreater{}}\NormalTok{ sh }\ExtensionTok{{-}}
+\ExtensionTok{systemctl}\NormalTok{ status k3s{-}agent }\AttributeTok{{-}{-}no{-}pager} \KeywordTok{|} \FunctionTok{head} \AttributeTok{{-}5}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{quote}
-\texttt{imagePullPolicy:\allowbreak{}\ IfNotPresent} бол энэ бүх ажлын үндэс. \texttt{Always} болговол K3s Docker Hub-аас \texttt{cnc302/edge-agent} хайж олохгүй → \texttt{ErrImagePull}.
+Албан ёсны баримт: \href{https://docs.k3s.io/quick-start}{K3s Quick-Start}
 \end{quote}
 
-\textbf{7.4 Байршуулах.} \texttt{01-config.yaml}-ийн \texttt{CLOUD\_HOST}-ыг компьютерийнхээ LAN IP болгож \textbf{заавал} солино:
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# [VM] VM}
+\ExtensionTok{kubectl}\NormalTok{ get nodes }\AttributeTok{{-}o}\NormalTok{ wide                                   }\CommentTok{\# Pi Ready болтол 1–3 мин}
+\ExtensionTok{kubectl}\NormalTok{ label nodes }\OperatorTok{\textless{}}\NormalTok{pi{-}зангилааны{-}нэр}\OperatorTok{\textgreater{}}\NormalTok{ cnc302/layer=edge}
+\ExtensionTok{kubectl}\NormalTok{ get nodes }\AttributeTok{{-}L}\NormalTok{ kubernetes.io/arch,cnc302/layer        }\CommentTok{\# VM amd64 · Pi arm64 + edge}
+\ExtensionTok{kubectl}\NormalTok{ top nodes                                           }\CommentTok{\# ХОЁР мөр → 10250 ба metrics{-}server ажиллаж байна}
+\end{Highlighting}
+\end{Shaded}
 
-Манифестууд: \texttt{00-namespace.yaml} (нэрийн орон зай), \texttt{01-config.yaml} (ConfigMap + Secret), \texttt{10-mosquitto.yaml} (ConfigMap + PVC + Deployment + NodePort 31883), \texttt{20-edge-agent.yaml} (Deployment, локал импортолсон дүрс), \texttt{90-hpa.yaml} (HPA). \textbf{EMQX/InfluxDB/Grafana энд БАЙХГҮЙ} --- тэдгээр 1 GB-д багтахгүй.
+\texttt{kubectl\ top\ nodes} дээр Pi гарахгүй бол 10250/tcp, Pi дээрх pod \texttt{mosquitto} нэрийг шийдэж чадахгүй бол 8472/udp хаагдсан байна (\texttt{lab08/\allowbreak{}k3s/\allowbreak{}README.\allowbreak{}md} §3.3). VirtualBox Bridged горимд VM-ийн урсгал Windows-ийн сүлжээний стекийг \textbf{тойрдог} тул Windows Defender-т VM-ийн портын дүрэм хэрэггүй; харин Pi → хост дээрх EMQX 1883-ын дүрэм (SETUP А.6) хэвээр хэрэгтэй.
+
+\textbf{7.4 Дүрсийг Pi-гийн containerd руу импортлох} {[}Pi{]} --- K3s нь Docker-ийн дүрсийн санг \textbf{харахгүй}. Бие даалтаар барьсан arm64 tar-ыг хуулна:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# [ЗК]  scp edge{-}agent{-}v1{-}arm64.tar cnc302@\textless{}pi{-}IP\textgreater{}:/tmp/}
+\CommentTok{\# [Pi]}
+\FunctionTok{sudo}\NormalTok{ mkdir }\AttributeTok{{-}p}\NormalTok{ /var/lib/rancher/k3s/agent/images}
+\FunctionTok{sudo}\NormalTok{ cp /tmp/edge{-}agent{-}v1{-}arm64.tar /var/lib/rancher/k3s/agent/images/   }\CommentTok{\# хэдэн секундэд автоматаар импортлогдоно}
+\FunctionTok{sudo}\NormalTok{ k3s ctr images ls }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ edge{-}agent}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+Албан ёсны баримт: \href{https://docs.k3s.io/add-ons/import-images}{K3s Import Images}. Гараар: \texttt{sudo\ k3s\ ctr\ images\ import\ /\allowbreak{}tmp/\allowbreak{}edge-agent-v1-arm64.\allowbreak{}tar}.
+\end{quote}
+
+\texttt{edge-agent} нь \texttt{imagePullPolicy:\allowbreak{}\ Never} --- kubelet Docker Hub-аас \textbf{хэзээ ч} татахгүй, зөвхөн импортолсон дүрсийг ашиглана. \texttt{eclipse-mosquitto:\allowbreak{}2.\allowbreak{}0.\allowbreak{}22}, \texttt{busybox:1.36} нь олон архитектуртай албан ёсны дүрс тул Pi өөрөө arm64 хувилбарыг татна.
+
+\textbf{7.5 Байршуулах} {[}VM{]}. \texttt{01-config.yaml}-ийн \texttt{CLOUD\_HOST}-ыг \textbf{зөөврийн компьютерийн (хост) LAN IP} болгож \textbf{заавал} солино --- VM-ийн IP \textbf{биш}, EMQX хост дээр Docker Desktop-д ажиллаж байна.
+
+Манифестууд: \texttt{00-namespace.\allowbreak{}yaml}, \texttt{01-config.yaml} (ConfigMap + Secret), \texttt{10-mosquitto.\allowbreak{}yaml} (ConfigMap + PVC + Deployment + NodePort 31883), \texttt{20-edge-agent.\allowbreak{}yaml} (Deployment, импортолсон дүрс), \texttt{90-hpa.yaml} (HPA). Хоёр Deployment хоёулаа \texttt{nodeSelector:\allowbreak{}\ \{kubernetes.\allowbreak{}io/\allowbreak{}arch:\allowbreak{}\ arm64,\ cnc302/\allowbreak{}layer:\allowbreak{}\ edge\}}-тэй. \textbf{EMQX/InfluxDB/Grafana энд БАЙХГҮЙ} --- тэд үүлний давхаргад Compose дээр.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/lab08/k3s}
 \FunctionTok{nano}\NormalTok{ 01{-}config.yaml                    }\CommentTok{\# CLOUD\_HOST ба CLOUD\_MQTT\_PASSWORD}
-\ExtensionTok{kubectl}\NormalTok{ apply }\AttributeTok{{-}f}\NormalTok{ . }\KeywordTok{\&\&} \ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 get pods }\AttributeTok{{-}w}
+\ExtensionTok{kubectl}\NormalTok{ apply }\AttributeTok{{-}f}\NormalTok{ . }\KeywordTok{\&\&} \ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 get pods }\AttributeTok{{-}o}\NormalTok{ wide }\AttributeTok{{-}w}    \CommentTok{\# NODE = Pi}
 \ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 logs deploy/mosquitto }\AttributeTok{{-}c}\NormalTok{ render{-}bridge}
 \ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 logs }\AttributeTok{{-}f}\NormalTok{ deploy/edge{-}agent}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{7.5 Үүлний талаас батлах} {[}ЗК{]} --- ирмэг K3s дээр ажиллаж, гүүр урьдын адил ажиллаж байна:
+\textbf{7.6 Үүлний талаас батлах} {[}ЗК{]} --- ирмэг K3s дээр ажиллаж, гүүр урьдын адил ажиллаж байна:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -580,20 +664,57 @@ LLM юу үүсгэв (\texttt{raw\_sql})
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{ux430ux43bux445ux430ux43c-8-k3s-ux445ux44dux43cux436ux438ux445-hpa-ux431ux430-oomkilled-ux442ux440ux438ux430ux436-40-ux43cux438ux43d-pi}{%
-\subsection{Алхам 8 --- K3s: хэмжих, HPA ба OOMKilled триаж (40 мин) {[}Pi{]}}\label{ux430ux43bux445ux430ux43c-8-k3s-ux445ux44dux43cux436ux438ux445-hpa-ux431ux430-oomkilled-ux442ux440ux438ux430ux436-40-ux43cux438ux43d-pi}}
+\hypertarget{ux430ux43bux445ux430ux43c-8-k3s-ux445ux44dux43cux436ux438ux445-hpa-ux431ux430-oomkilled-ux442ux440ux438ux430ux436-40-ux43cux438ux43d-vmpi}{%
+\subsection{Алхам 8 --- K3s: хэмжих, HPA ба OOMKilled триаж (40 мин) {[}VM{]}{[}Pi{]}}\label{ux430ux43bux445ux430ux43c-8-k3s-ux445ux44dux43cux436ux438ux445-hpa-ux431ux430-oomkilled-ux442ux440ux438ux430ux436-40-ux43cux438ux43d-vmpi}}
 
-\textbf{8.1 Санах ойн гурван өнцөг} --- \texttt{requests} (амлалт), \texttt{limits} (хана), \textbf{RSS} (үнэн):
+\textbf{8.1 Санах ойн гурван өнцөг} --- \texttt{requests} (амлалт), \texttt{limits} (хана), \textbf{RSS} (үнэн). Энэ удаа \textbf{хоёр зангилааг тусад нь}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{kubectl}\NormalTok{ top nodes }\KeywordTok{\&\&} \ExtensionTok{kubectl}\NormalTok{ top pods }\AttributeTok{{-}n}\NormalTok{ cnc302 }\KeywordTok{\&\&} \FunctionTok{free} \AttributeTok{{-}m}
-\ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 describe node }\KeywordTok{|} \FunctionTok{sed} \AttributeTok{{-}n} \StringTok{\textquotesingle{}/Allocated resources/,/\^{}Events/p\textquotesingle{}}
+\CommentTok{\# [VM]}
+\ExtensionTok{kubectl}\NormalTok{ top nodes }\KeywordTok{\&\&} \ExtensionTok{kubectl}\NormalTok{ top pods }\AttributeTok{{-}A}
+\ExtensionTok{kubectl}\NormalTok{ get pods }\AttributeTok{{-}A} \AttributeTok{{-}o}\NormalTok{ wide                                             }\CommentTok{\# system pod{-}ууд аль зангилаанд}
+\ExtensionTok{kubectl}\NormalTok{ describe node }\OperatorTok{\textless{}}\NormalTok{pi}\OperatorTok{\textgreater{}} \KeywordTok{|} \FunctionTok{sed} \AttributeTok{{-}n} \StringTok{\textquotesingle{}/Capacity/,/System Info/p\textquotesingle{}}         \CommentTok{\# Capacity ≈ Allocatable уу?}
+\ExtensionTok{kubectl}\NormalTok{ describe node }\OperatorTok{\textless{}}\NormalTok{pi}\OperatorTok{\textgreater{}} \KeywordTok{|} \FunctionTok{sed} \AttributeTok{{-}n} \StringTok{\textquotesingle{}/Allocated resources/,/\^{}Events/p\textquotesingle{}}
+\CommentTok{\# [Pi]}
+\FunctionTok{free} \AttributeTok{{-}m}
+\ExtensionTok{systemctl}\NormalTok{ status k3s{-}agent }\AttributeTok{{-}{-}no{-}pager} \KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}i}\NormalTok{ memory}
+\FunctionTok{sudo}\NormalTok{ journalctl }\AttributeTok{{-}u}\NormalTok{ k3s{-}agent }\KeywordTok{|} \FunctionTok{grep} \StringTok{\textquotesingle{}Running kubelet\textquotesingle{}} \KeywordTok{|} \FunctionTok{tail} \AttributeTok{{-}n1} \KeywordTok{|} \FunctionTok{tr} \StringTok{\textquotesingle{} \textquotesingle{}} \StringTok{\textquotesingle{}\textbackslash{}n\textquotesingle{}} \KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}E} \StringTok{\textquotesingle{}eviction{-}hard|fail{-}swap{-}on\textquotesingle{}}
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{ux445ux4afux441ux43dux44dux433ux442-8.7-k3s-ux438ux439ux43d-ux441ux430ux43dux430ux445-ux43eux439ux43d-ux442ux4e9ux441ux4e9ux432-pi-3b-1-gb}{%
-\subsubsection{Хүснэгт 8.7 --- K3s-ийн санах ойн төсөв (Pi 3B, 1 GB)}\label{ux445ux4afux441ux43dux44dux433ux442-8.7-k3s-ux438ux439ux43d-ux441ux430ux43dux430ux445-ux43eux439ux43d-ux442ux4e9ux441ux4e9ux432-pi-3b-1-gb}}
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-8.7-k3s-ux438ux439ux43d-ux441ux430ux43dux430ux445-ux43eux439ux43d-ux442ux4e9ux441ux4e9ux432-ux445ux43eux451ux440-ux437ux430ux43dux433ux438ux43bux430ux430}{%
+\subsubsection{Хүснэгт 8.7 --- K3s-ийн санах ойн төсөв (хоёр зангилаа)}\label{ux445ux4afux441ux43dux44dux433ux442-8.7-k3s-ux438ux439ux43d-ux441ux430ux43dux430ux445-ux43eux439ux43d-ux442ux4e9ux441ux4e9ux432-ux445ux43eux451ux440-ux437ux430ux43dux433ux438ux43bux430ux430}}
+
+\textbf{(а) {[}VM{]} Server VM} (RAM: \_\_\_\_ GB, vCPU: \_\_\_\_)
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Хэсэг
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\texttt{requests} (Mi)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Бодит (\texttt{kubectl\ top} / \texttt{free\ -m})
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Тэмдэглэл
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Ubuntu Server + k3s server (pod биш) & --- & & K3s docs: server + 1 agent ≈ 1428 M (x86\_64) \\
+coredns & & & аль зангилаанд буусан бэ? \\
+metrics-server & & & \\
+local-path-provisioner & & & \\
+\textbf{VM-ийн \texttt{free\ -m} available} & & & \\
+\end{longtable}\endgroup
+
+\textbf{(б) {[}Pi{]} Pi 3B agent} (MemTotal ≈ 925 MiB)
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
@@ -609,66 +730,74 @@ LLM юу үүсгэв (\texttt{raw\_sql})
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \texttt{limits} (Mi)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Бодит RSS (\texttt{kubectl\ top})
+Бодит RSS
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Compose дээрх \texttt{docker\ stats}
+Compose дээрх \texttt{docker\ stats} (Лаб 1--7)
 \end{minipage} \\
 \midrule
 \endhead
 \bottomrule
 \endlastfoot
-k3s server (pod биш) & --- & --- & & --- \\
-coredns & 70 & & & --- \\
-metrics-server & 70 & & & --- \\
+Raspberry Pi OS Lite & --- & --- & & --- \\
+k3s agent (pod биш) & --- & --- & & --- \\
 \texttt{mosquitto} & 32 & 96 & & \\
 \texttt{edge-agent} × 1 & 96 & 160 & & \\
-\textbf{Нийт} & \textbf{268} & & & \\
-Allocatable & \textasciitilde825 & & & --- \\
-\textbf{Үлдэгдэл} & & & & \\
+(Pi дээр буусан system pod байвал) & & & & --- \\
+\textbf{Нийт} & \textbf{128} & \textbf{256} & & \\
+Allocatable (\texttt{describe\ node}) & & & & --- \\
+\textbf{\texttt{free\ -m} available} & & & & \\
 \end{longtable}\endgroup
 
-\textbf{8.2 HPA --- 3-т хүрч чадахгүйг НОТОЛ.} Энэ бол алхмын гол ажил:
+\textbf{8.2 HPA --- хэр хол өргөжиж чадахыг НОТОЛ.} Энэ бол алхмын гол ажил:
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{\# [VM]}
 \ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 get hpa edge{-}agent }\AttributeTok{{-}w}
-\CommentTok{\# өөр терминалд ачаалал үүсгэ:}
+\CommentTok{\# өөр терминалд — НЭГ pod{-}д CPU ачаалал:}
 \ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 exec deploy/edge{-}agent }\AttributeTok{{-}{-}}\NormalTok{ sh }\AttributeTok{{-}c} \StringTok{\textquotesingle{}while :; do :; done\textquotesingle{}} \KeywordTok{\&}
 \end{Highlighting}
 \end{Shaded}
 
-HPA \texttt{maxReplicas:\ 2} гэж тавигдсан. \textbf{Түүнийг 3 болгож өөрчлөөд юу болохыг хэмж:}
+HPA \texttt{maxReplicas:\ 3}. Нэг pod 800m (\texttt{limits.cpu}) иддэг бол ашиглалт нь \texttt{800m\ /\allowbreak{}\ 100m\ (requests)\ =\allowbreak{}\ 800\ \%} → HPA шууд дээд хязгаарт хүрнэ. \textbf{Дараа нь 8 болгож өөрчлөөд юу болохыг хэмж:}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 patch hpa edge{-}agent }\AttributeTok{{-}{-}type}\NormalTok{ merge }\AttributeTok{{-}p} \StringTok{\textquotesingle{}\{"spec":\{"maxReplicas":3\}\}\textquotesingle{}}
-\ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 get pods }\AttributeTok{{-}o}\NormalTok{ wide}
+\ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 patch hpa edge{-}agent }\AttributeTok{{-}{-}type}\NormalTok{ merge }\AttributeTok{{-}p} \StringTok{\textquotesingle{}\{"spec":\{"maxReplicas":8\}\}\textquotesingle{}}
+\ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 get pods }\AttributeTok{{-}o}\NormalTok{ wide                         }\CommentTok{\# БҮГД Pi дээр — VM{-}ийн RAM хамаагүй}
 \ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 describe pod }\OperatorTok{\textless{}}\NormalTok{pending{-}эсвэл{-}restarting{-}pod}\OperatorTok{\textgreater{}}
 \ExtensionTok{kubectl}\NormalTok{ get events }\AttributeTok{{-}n}\NormalTok{ cnc302 }\AttributeTok{{-}{-}sort{-}by}\OperatorTok{=}\NormalTok{.lastTimestamp }\KeywordTok{|} \FunctionTok{tail} \AttributeTok{{-}20}
+\CommentTok{\# [Pi] зэрэг ажиглах}
+\ExtensionTok{watch} \AttributeTok{{-}n}\NormalTok{ 2 free }\AttributeTok{{-}m}
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{ux445ux4afux441ux43dux44dux433ux442-8.8-hpa-ux433ux438ux439ux43d-ux437ux430ux43d-ux442ux4e9ux43bux4e9ux432}{%
-\subsubsection{Хүснэгт 8.8 --- HPA-гийн зан төлөв}\label{ux445ux4afux441ux43dux44dux433ux442-8.8-hpa-ux433ux438ux439ux43d-ux437ux430ux43d-ux442ux4e9ux43bux4e9ux432}}
+Дуусмагц: \texttt{kubectl\ -n\ cnc302\ rollout\ restart\ deploy/\allowbreak{}edge-agent} (ачааллын процессыг цэвэрлэнэ), \texttt{maxReplicas}-ийг 3 болгож буцаа.
+
+\hypertarget{ux445ux4afux441ux43dux44dux433ux442-8.8-hpa-ux433ux438ux439ux43d-ux437ux430ux43d-ux442ux4e9ux43bux4e9ux432-ux431ux4afux445-ux445ux443ux432ux44c-pi-ux434ux44dux44dux440}{%
+\subsubsection{Хүснэгт 8.8 --- HPA-гийн зан төлөв (бүх хувь Pi дээр)}\label{ux445ux4afux441ux43dux44dux433ux442-8.8-hpa-ux433ux438ux439ux43d-ux437ux430ux43d-ux442ux4e9ux43bux4e9ux432-ux431ux4afux445-ux445ux443ux432ux44c-pi-ux434ux44dux44dux440}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}@{}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}@{}}
 \toprule
 \begin{minipage}[b]{\linewidth}\raggedright
 Хувийн тоо
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \texttt{requests} нийлбэр (Mi)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pi-гийн Allocatable-д багтах уу
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Бодит RSS нийлбэр (Mi)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Pod-ын төлөв
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\texttt{free\ -m} үлдэгдэл
+Pi \texttt{free\ -m} available
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Тайлбар
 \end{minipage} \\
@@ -676,35 +805,39 @@ Pod-ын төлөв
 \endhead
 \bottomrule
 \endlastfoot
-1 & 268 & & Running & & \\
-2 & 364 & & & & \\
-3 & 460 & & \textbf{Pending / OOMKilled?} & & \\
+1 & 128 & & & Running & & \\
+2 & 224 & & & & & \\
+4 & 416 & & & & & \\
+8 & 800 & & & \textbf{Pending / OOMKilled / удаан?} & & \\
 \end{longtable}\endgroup
 
-\textbf{Хариулах ёстой:} \texttt{requests}-ийн хувьд 460 Mi нь 825 Mi-д "багтана". Тэгвэл яагаад 3 дахь хувь ажиллахгүй байна вэ? \texttt{Pending} болов уу, эсвэл \texttt{OOMKilled} болов уу --- \textbf{аль нь болсныг тоогоор нотол}.
+\textbf{Хариулах ёстой:} \texttt{requests}-ийн хувьд 8 хувь (800 Mi) Pi-гийн Allocatable-д "багтана". Тэгвэл бодит байдалд хэдэн хувь дээр юу эвдэрсэн бэ --- \texttt{Pending} уу, \texttt{OOMKilled} уу, эсвэл swap-аас болж бүх зүйл удааширсан уу? \textbf{Аль нь болсныг тоогоор нотол.} Мөн: кластерт 2--4 GB-тай VM байхад яагаад HPA түүнийг ашигласангүй вэ?
 
 \textbf{8.3 OOMKilled триаж.} Баримтыг цуглуул:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 get pods                              }\CommentTok{\# RESTARTS багана}
+\CommentTok{\# [VM]}
+\ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 get pods                                     }\CommentTok{\# RESTARTS багана}
 \ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 describe pod }\OperatorTok{\textless{}}\NormalTok{pod}\OperatorTok{\textgreater{}} \KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}A3} \StringTok{"Last State"}   \CommentTok{\# OOMKilled / Exit 137}
+\CommentTok{\# [Pi]}
 \FunctionTok{dmesg} \AttributeTok{{-}T} \KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}i} \StringTok{"killed process"} \KeywordTok{|} \FunctionTok{tail}
+\FunctionTok{vmstat}\NormalTok{ 1 5                                                     }\CommentTok{\# si/so \textgreater{} 0 = swap}
 \end{Highlighting}
 \end{Shaded}
 
-Дараа нь \textbf{шалтгаанаар нь ялга} (бүтэн хүснэгт \texttt{lab08/k3s/README.md} §6-д): Exit 137 + \texttt{OOMKilled} = контейнер өөрийн \texttt{limits}-ээ давсан → \texttt{INFER\_THREADS=1}, \texttt{INTERVAL} өсгө; \texttt{Pending} + \texttt{Insufficient\ memory} = зангилаанд \texttt{requests} багтахгүй → хувийн тоог бууруул; зангилаа \texttt{NotReady} = системийн OOM killer k3s-ийг алсан → Docker зогссон эсэхийг шалга.
+Дараа нь \textbf{шалтгаанаар нь ялга} (бүтэн хүснэгт \texttt{lab08/\allowbreak{}k3s/\allowbreak{}README.\allowbreak{}md} §7-д): Exit 137 + \texttt{OOMKilled} = контейнер \texttt{limits}-ээ давсан эсвэл Pi бүхэлдээ санах ойгүй болсон → \texttt{INFER\_THREADS=1}, \texttt{INTERVAL} өсгө, хувийн тоог бууруул; \texttt{Pending} + \texttt{Insufficient\ memory} = Pi-гийн Allocatable-д \texttt{requests} багтахгүй; \texttt{Pending} + \texttt{node\ affinity/\allowbreak{}selector} = шошго алга; Pi \texttt{NotReady} = k3s-agent унасан эсвэл 6443 хүрэхгүй → {[}Pi{]} \texttt{journalctl\ -u\ k3s-agent\ -n\ 50}.
 
 \begin{quote}
 \textbf{\texttt{limits}-ийг ӨСГӨХ нь үргэлж зөв шийдэл БИШ.} 1 GB дээр хамгийн зөв хариулт ихэвчлэн "энэ ажлыг Pi дээр биш, үүлэн дээр ажиллуул" байдаг. Энэ бол найман лабораторийн эцсийн сургамж.
 \end{quote}
 
-\textbf{8.4 Буцах} (Compose хэрэгтэй бол): \texttt{kubectl\ delete\ -f\ .} → \texttt{sudo\ /\allowbreak{}usr/\allowbreak{}local/\allowbreak{}bin/\allowbreak{}k3s-uninstall.\allowbreak{}sh} → \texttt{sudo\ systemctl\ start\ docker\ \&\&\ cd\ \textasciitilde{}/cnc302/edge\ \&\&\ make\ up}
+\textbf{8.4 Буцах} (Compose хэрэгтэй бол): {[}VM{]} \texttt{kubectl\ delete\ -f\ .\allowbreak{}\ \&\allowbreak{}\&\allowbreak{}\ kubectl\ delete\ node\ \textless{}pi\textgreater{}} → {[}Pi{]} \texttt{sudo\ /\allowbreak{}usr/\allowbreak{}local/\allowbreak{}bin/\allowbreak{}k3s-agent-uninstall.\allowbreak{}sh} → \texttt{sudo\ systemctl\ start\ docker\ \&\&\ cd\ \textasciitilde{}/cnc302/edge\ \&\&\ make\ up}
 
 \hypertarget{ux430ux43bux445ux430ux43c-9-ux4afux437ux4afux4afux43bux44dux43dux433ux438ux439ux43d-ux431ux44dux43bux442ux433ux44dux43b-ux431ux430-git-10-ux43cux438ux43d}{%
 \subsection{Алхам 9 --- Үзүүлэнгийн бэлтгэл ба Git (10 мин)}\label{ux430ux43bux445ux430ux43c-9-ux4afux437ux4afux4afux43bux44dux43dux433ux438ux439ux43d-ux431ux44dux43bux442ux433ux44dux43b-ux431ux430-git-10-ux43cux438ux43d}}
 
-\textbf{10 минутын үзүүлэн, гурван гишүүн:} (1) \textbf{Дижитал ихэр, 3 мин} --- \texttt{show}-ийн амьд гаралт, Хүснэгт 8.2-ын дөрвөн шийдэл; (2) \textbf{GenAI, 4 мин} --- ажиллаж буй асуулт + \textbf{амжилтгүй болсон халдлага} (Хүснэгт 8.6); (3) \textbf{K3s, 3 мин} --- \texttt{kubectl\ top\ pods}, Хүснэгт 8.7--8.8, HPA яагаад 3-т хүрэхгүй нь.
+\textbf{10 минутын үзүүлэн, гурван гишүүн:} (1) \textbf{Дижитал ихэр, 3 мин} --- \texttt{show}-ийн амьд гаралт, Хүснэгт 8.2-ын дөрвөн шийдэл; (2) \textbf{GenAI, 4 мин} --- ажиллаж буй асуулт + \textbf{амжилтгүй болсон халдлага} (Хүснэгт 8.6); (3) \textbf{K3s, 3 мин} --- \texttt{kubectl\ get\ pods\ -o\ wide} (бүгд Pi дээр), Хүснэгт 8.7--8.8, VM-д зай байхад HPA яагаад хол өргөжиж чадахгүй нь.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -712,7 +845,7 @@ Pod-ын төлөв
 \FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 8: дижитал ихэр, GenAI шүүлт, ирмэгийн K3s"}
 \FunctionTok{git}\NormalTok{ tag lab08{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\AttributeTok{{-}{-}tags}
 
-\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}E} \StringTok{\textquotesingle{}\textbackslash{}.env$|\textbackslash{}.key$|kubeconfig|k3s\textbackslash{}.yaml\textquotesingle{}}    \CommentTok{\# ⚠ хоосон байх ЁСТОЙ}
+\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}E} \StringTok{\textquotesingle{}\textbackslash{}.env$|\textbackslash{}.key$|kubeconfig|k3s\textbackslash{}.yaml|node{-}token|\textbackslash{}.tar$\textquotesingle{}}   \CommentTok{\# ⚠ хоосон байх ЁСТОЙ}
 \FunctionTok{grep} \AttributeTok{{-}n} \StringTok{\textquotesingle{}PASSWORD\textquotesingle{}}\NormalTok{ lab08/k3s/01{-}config.yaml                    }\CommentTok{\# бодит нууц үг ил үлдсэн үү}
 \end{Highlighting}
 \end{Shaded}
@@ -739,7 +872,9 @@ Pod-ын төлөв
 \item
   Хүснэгт 8.7-д \texttt{requests}-ийн нийлбэр ба бодит RSS-ийн ялгаа хэд байв? Аль нь товлогчийг (scheduler) удирддаг вэ, аль нь бодит эвдрэлийг тодорхойлдог вэ?
 \item
-  Хүснэгт 8.8-д 3 дахь хувь яагаад ажиллаагүй вэ --- \texttt{Pending} уу, \texttt{OOMKilled} уу? Ганц зангилаа дээр хэвтээ өргөтгөл \textbf{ерөөсөө} утгатай юу? Хэдэн зангилаанаас эхлээд утгатай болох вэ?
+  Хүснэгт 8.8-д хэдэн хувь дээр юу эвдэрсэн бэ --- \texttt{Pending} уу, \texttt{OOMKilled} уу, swap уу? \texttt{requests}-ийн тооцоо ба бодит RSS-ийн тооцоо хэдэн хувь дээр салсан бэ (\texttt{lab08/\allowbreak{}k3s/\allowbreak{}README.\allowbreak{}md} §2.2)? Кластер хоёр зангилаатай байхад хадсан (pinned) ачааллын хувьд хэвтээ өргөтгөл \textbf{ерөөсөө} утгатай юу? Хэдэн \textbf{Pi} нэмбэл утгатай болох вэ, тэр үед \texttt{Deployment}-ийн оронд юу хэрэглэх вэ (DaemonSet?)?
+\item
+  Pi 3B яагаад K3s \textbf{server} байж болохгүй вэ --- албан ёсны шаардлага ба K3s-ийн Resource Profiling-ийн тоог иш тат. \texttt{edge-agent}-ийг \texttt{nodeSelector}-гүй орхивол юу болох байсан бэ (гурван шалтгаан)?
 \end{enumerate}
 
 \hypertarget{ux445ux4afux43bux44dux44dux43bux433ux44dux43d-ux4e9ux433ux4e9ux445-ux437ux4afux439ux43b}{%
@@ -761,11 +896,11 @@ Pod-ын төлөв
 \endhead
 \bottomrule
 \endlastfoot
-1 & Үзүүлэнгийн слайд (Хүснэгт 8.1--8.8 бөглөсөн) & \texttt{lab08/presentation.pdf} \\
-2 & Ихрийн бүтэц ба төлөвийн гаралт & \texttt{lab08/out/twin.json}, \texttt{lab08/out/*.json} \\
-3 & Сайжруулсан \texttt{simulate} (а/б/в) & \texttt{lab08/twin\_sync.py} \\
+1 & Үзүүлэнгийн слайд (Хүснэгт 8.1--8.8 бөглөсөн) & \texttt{lab08/\allowbreak{}presentation.\allowbreak{}pdf} \\
+2 & Ихрийн бүтэц ба төлөвийн гаралт & \texttt{lab08/\allowbreak{}out/\allowbreak{}twin.\allowbreak{}json}, \texttt{lab08/out/*.json} \\
+3 & Сайжруулсан \texttt{simulate} (а/б/в) & \texttt{lab08/\allowbreak{}twin\_\allowbreak{}sync.\allowbreak{}py} \\
 4 & \texttt{guard\_sql}-д нэмсэн дүрэм + халдлагын лог & \texttt{lab08/ask.py}, \texttt{lab08/out/} \\
-5 & \texttt{kubectl\ top\ pods} ба \texttt{describe\ node}-ийн гаралт; Git tag \texttt{lab08-done} & \texttt{lab08/out/k3s-*.txt} \\
+5 & \texttt{kubectl\ get\ nodes\ -o\ wide\ -L\ kubernetes.\allowbreak{}io/\allowbreak{}arch,cnc302/\allowbreak{}layer}, \texttt{kubectl\ top\ nodes/\allowbreak{}pods}, Pi-гийн \texttt{describe\ node} ба \texttt{free\ -m}-ийн гаралт; Git tag \texttt{lab08-done} & \texttt{lab08/\allowbreak{}out/\allowbreak{}k3s-*.\allowbreak{}txt} \\
 \end{longtable}\endgroup
 
 \hypertarget{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e-ux4afux437ux4afux4afux43bux44dux43dux433ux44dux44dux440}{%
@@ -788,8 +923,8 @@ Pod-ын төлөв
 Зан төлөвийн таамаг \textbf{шалгагдсан} (алдаа тоогоор гарсан) & 1 \\
 GenAI асуулт ажиллаж, хугацааны задаргаа хийгдсэн & 2 \\
 \textbf{Халдлагын туршилт баримтжиж, шүүлт барьсан нь үзүүлэгдсэн} & 2 \\
-K3s дээр ирмэгийн ачаалал ажиллаж, гүүр батлагдсан & 2 \\
-HPA-гийн хязгаар \textbf{тоогоор} тайлбарлагдсан & 1 \\
+Pi agent болж нэгдэж, ирмэгийн ачаалал Pi дээр хадагдаж ажилласан, гүүр батлагдсан & 2 \\
+HPA-гийн хязгаар хоёр зангилааны төсвөөр \textbf{тоогоор} тайлбарлагдсан & 1 \\
 \end{longtable}\endgroup
 
 \textbf{Онцгой оноо (+1):} \texttt{guard\_sql}-д шинэ хамгаалалтын дүрэм нэмж, түүнийг тойрох оролдлогоо баримтжуулсан бол.
@@ -813,13 +948,82 @@ HPA-гийн хязгаар \textbf{тоогоор} тайлбарлагдсан
 \endhead
 \bottomrule
 \endlastfoot
-\texttt{twin\_sync\ build} төхөөрөмж олохгүй & бүртгэл хоосон / унтарсан & \texttt{curl\ localhost:\allowbreak{}8090/\allowbreak{}health}; Лаб 2-ын bulk дахин \\
+\texttt{twin\_\allowbreak{}sync\ build} төхөөрөмж олохгүй & бүртгэл хоосон / унтарсан & \texttt{curl\ localhost:\allowbreak{}8090/\allowbreak{}health}; Лаб 2-ын bulk дахин \\
 \texttt{sync} дээр хэм/чичиргээ \texttt{None} & талбарын нэр зөрсөн & \texttt{-\/\allowbreak{}-temp-field\ proc\_\allowbreak{}temp\_\allowbreak{}c\ -\/\allowbreak{}-vib-field\ vibration\_\allowbreak{}g} \\
 \texttt{show} дээр амьд төлөв хоосон & гүүр тасарсан / агент зогссон & {[}Pi{]} \texttt{make\ link} → \texttt{bridge/state\ 1} \\
-Ollama маш удаан (\textgreater2 мин) & загвар хэт том эсвэл RAM бага & \texttt{qwen2.5:0.5b}, эсвэл Docker Desktop-д 6 GB \\
+Ollama маш удаан (\textgreater2 мин) & загвар хэт том эсвэл RAM бага & Docker Desktop-д 6 GB; түр шийдэл \texttt{-\/\allowbreak{}-model\ qwen2.\allowbreak{}5:\allowbreak{}0.\allowbreak{}5b} (чанар муу) \\
 Ollama OOM & стек зэрэг ажиллаж байна & \texttt{docker\ compose\ stop\ nodered\ dex\ graphql-api} \\
-\texttt{ask.py} \texttt{СТОП:\ ШҮҮЛТ\ ТАТГАЛЗЛАА} & LLM тайлбар/\texttt{;} нэмсэн & \textbf{хэвийн} --- шүүлт ажиллаж байна \\
-K3s pod \texttt{ErrImagePull} & дүрс импортлогдоогүй & \texttt{sudo\ k3s\ ctr\ images\ ls} \\
-Зангилаа \texttt{NotReady}, SSH тасарна & Docker ба K3s зэрэг ажиллаж байна & Docker-ыг зогсоо (Алхам 7.1) \\
-\texttt{kubectl\ top} ажиллахгүй & metrics-server эхлээгүй & 2 мин хүлээ; \texttt{-\/\allowbreak{}-disable\ metrics-server} \textbf{бичээгүй} эсэхээ шалга \\
+\texttt{ask.py} \texttt{СТОП:\allowbreak{}\ ШҮҮЛТ\ ТАТГАЛЗЛАА} & LLM тайлбар/\texttt{;} нэмсэн & \textbf{хэвийн} --- шүүлт ажиллаж байна \\
+Pi нэгдэхгүй (\texttt{k3s-agent} дахин дахин эхэлнэ) & 6443 хүрэхгүй / токен буруу / VM-ийн IP өөрчлөгдсөн / VM NAT горимд & {[}Pi{]} \texttt{journalctl\ -u\ k3s-agent\ -n\ 50}; \texttt{curl\ -k\ https:\allowbreak{}/\allowbreak{}/\allowbreak{}\textless{}VM-IP\textgreater{}:\allowbreak{}6443}; VirtualBox → \textbf{Bridged} \\
+\texttt{kubectl\ get\ nodes} дээр VM-ийн INTERNAL-IP 10.0.2.x & VM NAT адаптертай & Adapter 1 = Bridged, NAT адаптерыг хас, K3s-ийг дахин суулга \\
+\texttt{edge-agent}/\allowbreak\texttt{mosquitto} \texttt{Pending}, \texttt{didn\textquotesingle{}t\ match\ Pod\textquotesingle{}s\ node\ affinity/selector} & Pi-д \texttt{cnc302/\allowbreak{}layer=\allowbreak{}edge} шошго алга & \texttt{kubectl\ label\ nodes\ \textless{}pi\textgreater{}\ cnc302/\allowbreak{}layer=\allowbreak{}edge} \\
+\texttt{edge-agent} эхлэхгүй, Events-д дүрсний алдаа & дүрс Pi-д импортлогдоогүй (\texttt{imagePullPolicy:\allowbreak{}\ Never}) & {[}Pi{]} \texttt{sudo\ k3s\ ctr\ images\ ls\ \textbackslash{}\textbar{}\ grep\ edge-agent}; Алхам 7.4 \\
+\texttt{bridge/state} 0↔1 ээлжилнэ & Compose-ийн mosquitto зогсоогүй (ижил ClientID) & Алхам 7.2 \\
+Pi дээр \texttt{mosquitto} нэр шийдэгдэхгүй & 8472/udp (VXLAN) хаалттай --- coredns VM дээр & \texttt{lab08/\allowbreak{}k3s/\allowbreak{}README.\allowbreak{}md} §3.3 \\
+\texttt{kubectl\ top\ nodes} дээр Pi алга & 10250/tcp хаалттай эсвэл metrics-server эхлээгүй & 2 мин хүлээ; §3.3; \texttt{-\/\allowbreak{}-disable\ metrics-server} \textbf{бичээгүй} эсэхээ шалга \\
+Pi \texttt{NotReady}, SSH удаан & Pi санах ойгүй болсон (олон хувь, Docker асаалттай) & хувийн тоог бууруул; Docker-ыг зогсоо (Алхам 7.2) \\
+VM маш удаан, яст мэлхийн дүрс & Windows дээр Hyper-V (Docker Desktop/WSL2) идэвхтэй & хүлээгдэх зүйл (VirtualBox manual); VM-д 2 vCPU-гээс бүү бага өг \\
+\end{longtable}\endgroup
+
+\hypertarget{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}{%
+\section{9. Эх сурвалж}\label{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Эх сурвалж
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Юуг баталгаажуулсан
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Хандсан
+\end{minipage} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & \href{https://docs.k3s.io/installation/requirements}{K3s --- Requirements} & server 2 цөм/2 GB, agent 1 цөм/512 MB; inbound дүрэм 6443/tcp, 8472/udp, 10250/tcp; VXLAN-ыг ил гаргахгүй байх; ufw дүрэм; Raspberry Pi OS-ийн cgroup (\texttt{cgroup\_\allowbreak{}memory=\allowbreak{}1\ cgroup\_\allowbreak{}enable=\allowbreak{}memory}, \texttt{/\allowbreak{}boot/\allowbreak{}firmware/\allowbreak{}cmdline.\allowbreak{}txt}); Ubuntu 21.10--23.10-ийн vxlan модуль; SD карт ба etcd & 2026-09 \\
+2 & \href{https://docs.k3s.io/quick-start}{K3s --- Quick-Start} & server/agent суулгах команд, \texttt{K3S\_URL}/\allowbreak\texttt{K3S\_TOKEN}, \texttt{/\allowbreak{}var/\allowbreak{}lib/\allowbreak{}rancher/\allowbreak{}k3s/\allowbreak{}server/\allowbreak{}node-token}, kubeconfig-ийн зам, давтагдашгүй hostname & 2026-09 \\
+3 & \href{https://docs.k3s.io/installation/packaged-components}{K3s --- Managing Packaged Components} & coredns, traefik, local-storage, metrics-server AddOn; \texttt{-\/-disable} & 2026-09 \\
+4 & \href{https://docs.k3s.io/networking/networking-services}{K3s --- Networking Services} & Traefik 80/443 LoadBalancer; ServiceLB-ийн DaemonSet бүх зангилаан дээр & 2026-09 \\
+5 & \href{https://docs.k3s.io/add-ons/import-images}{K3s --- Import Images} & \texttt{/\allowbreak{}var/\allowbreak{}lib/\allowbreak{}rancher/\allowbreak{}k3s/\allowbreak{}agent/\allowbreak{}images/\allowbreak{}} автомат импорт, текст файлаар online import, \texttt{k3s\ ctr\ images\ list}, \texttt{imagePullPolicy:\allowbreak{}\ Never} & 2026-09 \\
+6 & \href{https://docs.k3s.io/installation/airgap}{K3s --- Air-Gap Install} & зангилаа бүрийн images хавтас, \texttt{ctr\ image\ import} & 2026-09 \\
+7 & \href{https://docs.k3s.io/reference/resource-profiling}{K3s --- Resource Profiling} & agent 268 M (Pi 4B), нэг зангилааны server 1588 M (Pi 4B), server + 1 agent 1428 M (x86\_64); дүрс татах нь CPU/IO-д ачаалалтай & 2026-09 \\
+8 & \href{https://docs.k3s.io/security/self-assessment-1.12}{K3s --- CIS 1.\allowbreak{}12 Self-Assessment} & kubelet: \texttt{evictionHard} зөвхөн imagefs/nodefs 5 \%, \texttt{failSwapOn:\allowbreak{}\ false}, reserved байхгүй; \texttt{journalctl\ -u\ k3s-agent\ \textbackslash{}\textbar{}\ grep\ \textquotesingle{}Running\ kubelet\textquotesingle{}} & 2026-09 \\
+9 & \href{https://docs.k3s.io/datastore}{K3s --- Cluster Datastore} & анхдагч SQLite, олон server-т хэрэглэх боломжгүй & 2026-09 \\
+10 & \href{https://docs.k3s.io/advanced}{K3s --- Advanced Options} & K3s-ийн embedded containerd; \texttt{-\/-docker} хувилбар; \texttt{journalctl\ -u\ k3s-agent} & 2026-09 \\
+11 & \href{https://docs.k3s.io/cli/agent}{K3s --- k3s agent CLI} / \href{https://docs.k3s.io/cli/server}{k3s server CLI} & \texttt{-\/-node-label} (зөвхөн бүртгэлийн үед), \texttt{-\/\allowbreak{}-prefer-bundled-bin}, \texttt{-\/\allowbreak{}-write-kubeconfig-mode}, \texttt{-\/-disable} утгууд & 2026-09 \\
+12 & \href{https://docs.k3s.io/reference/env-variables}{K3s --- Environment Variables} & systemd үйлчилгээний нэр \texttt{k3s} / \texttt{k3s-agent} & 2026-09 \\
+13 & \href{https://docs.k3s.io/known-issues}{K3s --- Known Issues} & iptables-ийн алдаа, \texttt{-\/\allowbreak{}-prefer-bundled-bin} & 2026-09 \\
+14 & \href{https://docs.k3s.io/installation/uninstall}{K3s --- Uninstalling} & \texttt{k3s-uninstall.sh}, \texttt{k3s-agent-uninstall.\allowbreak{}sh}, дахин нэгтгэхээс өмнө node устгах & 2026-09 \\
+15 & \href{https://docs.k3s.io/add-ons/storage}{K3s --- Volumes and Storage} & local-path \texttt{/\allowbreak{}var/\allowbreak{}lib/\allowbreak{}rancher/\allowbreak{}k3s/\allowbreak{}storage} & 2026-09 \\
+16 & \href{https://kubernetes.io/docs/reference/labels-annotations-taints/}{Kubernetes --- Well-Known Labels, Annotations and Taints} & \texttt{kubernetes.\allowbreak{}io/\allowbreak{}arch} = \texttt{runtime.GOARCH}, ARM/x86 холих & 2026-09 \\
+17 & \href{https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes/}{Kubernetes --- Assign Pods to Nodes} · \href{https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/}{Assigning Pods to Nodes} & \texttt{kubectl\ label\ nodes\ \textless{}node\textgreater{}\ key=\allowbreak{}value}, \texttt{nodeSelector} & 2026-09 \\
+18 & \href{https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/}{Kubernetes --- Labels and Selectors} & шошгоны түлхүүрийн синтакс, \texttt{kubernetes.io/} угтвар нөөцлөгдсөн & 2026-09 \\
+19 & \href{https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/}{Kubernetes --- Horizontal Pod Autoscaling} & тооцооны томьёо, requests-д суурилсан Utilization, анхдагч behavior (scaleUp 0 с, scaleDown 300 с) & 2026-09 \\
+20 & \href{https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/}{Kubernetes --- HPA Walkthrough} & \texttt{autoscaling/v2} манифест, \texttt{averageUtilization}, metrics-server шаардлага & 2026-09 \\
+21 & \href{https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/horizontal-pod-autoscaler-v2/}{Kubernetes API --- HorizontalPodAutoscaler v2} & \texttt{metrics{[}{]}.\allowbreak{}resource.\allowbreak{}target.\allowbreak{}averageUtilization}, \texttt{stabilizationWindowSeconds} 0--3600, \texttt{minReplicas} & 2026-09 \\
+22 & \href{https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/}{Kubernetes --- Resource Management for Pods and Containers} & requests-ээр товлох, memory limit → OOM & 2026-09 \\
+23 & \href{https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/}{Kubernetes --- Reserve Compute Resources} & Allocatable-ийн томьёо & 2026-09 \\
+24 & \href{https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/}{Kubernetes --- Node-pressure Eviction} & анхдагч \texttt{memory.\allowbreak{}available\textless{}100Mi} нь өөр параметр өгөгдвөл тавигдахгүй & 2026-09 \\
+25 & \href{https://kubernetes.io/docs/concepts/cluster-administration/swap-memory-management/}{Kubernetes --- Swap memory management} & \texttt{NoSwap} анхдагч: pod swap хэрэглэхгүй, systemd үйлчилгээ хэрэглэж болно & 2026-09 \\
+26 & \href{https://kubernetes.io/docs/concepts/containers/images/}{Kubernetes --- Images} · \href{https://kubernetes.io/docs/concepts/services-networking/service/}{Service} & \texttt{imagePullPolicy:\allowbreak{}\ Never}; NodePort бүх зангилаан дээр, 30000--32767 & 2026-09 \\
+27 & \href{https://www.virtualbox.org/manual/topics/networkingdetails.html}{VirtualBox --- Virtual Networking} & Bridged: LAN-аас хүрэгдэнэ, хостын сүлжээний стекийг тойрно, Wi-Fi хязгаарлалт; NAT: port forwarding & 2026-09 \\
+28 & \href{https://www.virtualbox.org/manual/UserManual.html}{VirtualBox --- User Manual (Using Hyper-V)} & Hyper-V-тэй Windows хост дээрх гүйцэтгэлийн бууралт & 2026-09 \\
+29 & \href{https://ubuntu.com/server/docs/how-to/security/firewalls/}{Ubuntu Server --- Firewalls} · \href{https://ubuntu.com/about/release-cycle}{Release cycle} & ufw анхдагчаар унтраалттай; 24.04 / 26.04 LTS & 2026-09 \\
+30 & \href{https://docs.docker.com/build/building/multi-platform/}{Docker --- Multi-platform builds} · \href{https://docs.docker.com/reference/cli/docker/image/save/}{docker image save} · \href{https://docs.docker.com/build/exporters/oci-docker/}{OCI and Docker exporters} & Docker Desktop дээр QEMU эмуляц, containerd image store; \texttt{docker\ save\ -\/\allowbreak{}-platform} (API 1.48+); docker driver \texttt{type=\allowbreak{}docker,dest=\allowbreak{}} дэмждэггүй & 2026-09 \\
+31 & \href{https://hub.docker.com/_/eclipse-mosquitto}{Docker Hub --- eclipse-mosquitto} · \href{https://hub.docker.com/_/busybox}{busybox} · \href{https://hub.docker.com/_/python}{python} & \texttt{2.0.22}, \texttt{1.36}, \texttt{3.\allowbreak{}11-slim-bookworm} tag-ууд arm64/v8-тай & 2026-09 \\
+32 & \href{https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html}{MQTT 5.\allowbreak{}0 --- §3.\allowbreak{}1.\allowbreak{}4 CONNECT Actions} & ижил ClientID → хуучин холболт 0x8E "Session taken over" & 2026-09 \\
+33 & \href{https://github.com/ollama/ollama/blob/main/docs/api.md}{Ollama --- API (docs/\allowbreak{}api.\allowbreak{}md)} · \href{https://docs.ollama.com/api/generate}{docs.ollama.com/api} & \texttt{/api/generate}: \texttt{model}, \texttt{prompt}, \texttt{system}, \texttt{stream:\ false}, \texttt{options}, хариуны \texttt{response}; \texttt{format} & 2026-09 \\
+34 & \href{https://github.com/ollama/ollama/blob/main/docs/modelfile.mdx}{Ollama --- Modelfile} & \texttt{temperature}, \texttt{num\_predict} сонголт & 2026-09 \\
+35 & \href{https://docs.ollama.com/faq}{Ollama --- FAQ} · \href{https://docs.ollama.com/docker}{Docker} & анхдагч контекст 4096 токен; загвар 5 мин санах ойд үлдэнэ; CPU-only \texttt{docker\ run} & 2026-09 \\
+36 & \href{https://ollama.com/library/qwen2.5/tags}{ollama.\allowbreak{}com --- qwen2.\allowbreak{}5 tags} & \texttt{qwen2.5:1.5b} = \texttt{1.\allowbreak{}5b-instruct-q4\_\allowbreak{}K\_\allowbreak{}M}, 986 MB; \texttt{0.5b} 398 MB & 2026-09 \\
+37 & \href{https://docs.influxdata.com/influxdb3/core/query-data/execute-queries/influxdb-v3-api/}{InfluxDB 3 Core --- Query with the HTTP API} & \texttt{POST\ /\allowbreak{}api/\allowbreak{}v3/\allowbreak{}query\_\allowbreak{}sql} JSON (\texttt{db}, \texttt{q}, \texttt{format}, \texttt{params}) & 2026-09 \\
+38 & \href{https://docs.influxdata.com/influxdb3/core/query-data/sql/parameterized-queries/}{InfluxDB 3 Core --- Parameterized SQL queries} & \texttt{\$name} параметр, зөвхөн WHERE-д & 2026-09 \\
+39 & \href{https://docs.influxdata.com/influxdb3/core/write-data/http-api/v3-write-lp/}{InfluxDB 3 Core --- v3 write\_\allowbreak{}lp API} & \texttt{/\allowbreak{}api/\allowbreak{}v3/\allowbreak{}write\_\allowbreak{}lp?\allowbreak{}db=\allowbreak{}…\&\allowbreak{}precision=\allowbreak{}millisecond}, 204 хариу & 2026-09 \\
 \end{longtable}\endgroup

@@ -16,13 +16,16 @@ CNC302 — MQTT QoS-ийн саатал ба дамжуулах чадварын
             Сүлжээ огт оролцохгүй → брокер өөрөө хэдэн мс иддэгийг харуулна.
   lan       зөөврийн компьютер → тэр компьютер дээрх EMQX рүү LAN-аар.
   bridge    Pi 3B → ирмэгийн mosquitto → ГҮҮР → зөөврийн EMQX.
-            Хамгийн урт зам: хоёр брокер + 100 Mbit уплинк.
+            Хамгийн урт зам: хоёр брокер + 100 Mb/s өгсөх урсгал (uplink).
+            Нийтлэгч Pi-гийн mosquitto руу (--host localhost), захиалагч
+            EMQX-ээс (--sub-host <CLOUD_HOST>) уншина. Сэдэв нь гүүрийн
+            `topic cnc302/<SITE>/# out` дүрэмд багтах ёстой.
 
-⚠ Pi 3B-гийн Ethernet нь USB 2.0 дээр сууж, USB-тэй зурвасаа хуваадаг. Тиймээс
-  LAN болон bridge замын саатлын СҮҮЛ (tail) нь Pi 5-тай харьцуулахад хамаагүй
-  өргөн байна. Дундаж (p50) сайхан харагдаж болох ч тэр нь ХУУРАМЧ тайтгарал:
-  үйлдвэрийн систем дэх ХАРИУ ҮЙЛДЛИЙН БАТАЛГААГ p99 тодорхойлдог. Тайланд p50
-  биш, **p99-ийг** гол тоо болгон бичнэ.
+⚠ Raspberry Pi 3B-гийн албан ёсны үзүүлэлт: 100 Mb/s Ethernet, 4 × USB 2.0.
+  LAN болон bridge замын саатлын СҮҮЛ (tail) өргөн байж болно. Дундаж (p50)
+  сайхан харагдаж болох ч тэр нь ХУУРАМЧ тайтгарал: үйлдвэрийн систем дэх
+  ХАРИУ ҮЙЛДЛИЙН БАТАЛГААГ p99 тодорхойлдог. Тайланд p50 биш, **p99-ийг**
+  гол тоо болгон бичнэ.
 
 Жишээ:
   # Брокертойгоо нэг машин дээр — брокерын өөрийн саатал
@@ -31,8 +34,14 @@ CNC302 — MQTT QoS-ийн саатал ба дамжуулах чадварын
   # Зөөврийн компьютер → EMQX, гурван QoS-ийг дараалан
   python qos_latency.py --path lan --host 192.168.1.100 --sweep --count 500
 
-  # Pi дээрээс ажиллуулж, гүүрээр дамжих замыг хэмжих
-  python qos_latency.py --path bridge --host localhost --qos 1 --count 500
+  # Pi дээрээс: нийтлэгч → Pi-гийн mosquitto → гүүр → EMQX → захиалагч
+  python qos_latency.py --path bridge --host localhost \\
+         --sub-host 192.168.1.100 --sub-port 1883 \\
+         --topic cnc302/shutis/mhts/lab/pi3b-01/bench --qos 1 --count 500
+
+  # mTLS (Лаб 2): EMQX-ийн 8883 порт
+  python qos_latency.py --path lan --host 192.168.1.100 --port 8883 \\
+         --tls --ca certs/ca.crt --cert certs/pi3b-01.crt --key certs/pi3b-01.key
 
   # Хуваалцсан захиалга (shared subscription) — 3 хэрэглэгч
   python qos_latency.py --path lan --host 192.168.1.100 --qos 1 --count 500 --shared 3
@@ -114,12 +123,22 @@ class Measurement:
         }
 
 
-def make_client(name: str, host: str, port: int, username, password) -> mqtt.Client:
+def make_client(name: str, host: str, port: int, username, password,
+                tls: dict | None = None) -> mqtt.Client:
     c = mqtt.Client(CallbackAPIVersion.VERSION2, client_id=name, protocol=mqtt.MQTTv5)
     if username:
         c.username_pw_set(username, password)
+    if tls:
+        c.tls_set(ca_certs=tls["ca"], certfile=tls["cert"], keyfile=tls["key"])
     c.connect(host, port, keepalive=30)
     return c
+
+
+def tls_opts(args: argparse.Namespace) -> dict | None:
+    """--tls өгсөн бол нийтлэгч, захиалагч хоёуланд ижил CA/сертификат хэрэглэнэ."""
+    if not args.tls:
+        return None
+    return {"ca": args.ca, "cert": args.cert, "key": args.key}
 
 
 def run_once(args: argparse.Namespace, qos: int) -> dict:
@@ -141,8 +160,9 @@ def run_once(args: argparse.Namespace, qos: int) -> dict:
             pass
 
     for i in range(n_subs):
-        c = make_client(f"cnc302-sub-{qos}-{i}", args.host, args.port,
-                        args.username, args.password)
+        c = make_client(f"cnc302-sub-{qos}-{i}", args.sub_host or args.host,
+                        args.sub_port or args.port,
+                        args.username, args.password, tls_opts(args))
         c.on_message = on_message
         c.subscribe(sub_topic, qos=qos)
         c.loop_start()
@@ -152,7 +172,7 @@ def run_once(args: argparse.Namespace, qos: int) -> dict:
 
     # ── нийтлэгч ──
     pub = make_client(f"cnc302-pub-{qos}", args.host, args.port,
-                      args.username, args.password)
+                      args.username, args.password, tls_opts(args))
     pub.loop_start()
 
     t0 = time.time()
@@ -198,8 +218,8 @@ def print_table(rows: list[dict]) -> None:
     print("  ".join("-" * w for w in widths))
     for r in rows:
         print("  ".join(str(r[c]).rjust(w) for c, w in zip(cols, widths)))
-    print("\n  ГОЛ ТОО нь p99 — дундаж биш. Pi 3B дээр 100 Mbit холбоос USB-тэй")
-    print("  зурвасаа хуваадаг тул p50 сайн байхад p99 хэд дахин том гарч болно.")
+    print("\n  ГОЛ ТОО нь p99 — дундаж биш. p50 сайн байхад p99 хэд дахин том")
+    print("  гарч болно.")
 
 
 def main() -> int:
@@ -210,6 +230,14 @@ def main() -> int:
     p.add_argument("--port", type=int, default=1883)
     p.add_argument("--username")
     p.add_argument("--password")
+    p.add_argument("--sub-host",
+                   help="захиалагчийн брокер (анхдагч: --host). Гүүрийн замд: "
+                        "нийтлэгч = Pi-гийн mosquitto, захиалагч = EMQX")
+    p.add_argument("--sub-port", type=int, help="захиалагчийн порт (анхдагч: --port)")
+    p.add_argument("--tls", action="store_true", help="TLS/mTLS ашиглах")
+    p.add_argument("--ca", help="CA сертификат (PEM)")
+    p.add_argument("--cert", help="клиентийн сертификат (mTLS)")
+    p.add_argument("--key", help="клиентийн хувийн түлхүүр (mTLS)")
     p.add_argument("--path", choices=["loopback", "lan", "bridge"],
                    default="loopback",
                    help=("хэмжиж буй ЗАМЫН шошго. Үр дүн болон CSV-д бичигдэнэ "
@@ -233,9 +261,12 @@ def main() -> int:
 
     print(f"→ Зам: {args.path} — {PATH_LABELS[args.path]}", file=sys.stderr)
     print(f"→ Брокер: {args.host}:{args.port}", file=sys.stderr)
+    if args.sub_host or args.sub_port:
+        print(f"→ Захиалагчийн брокер: {args.sub_host or args.host}:"
+              f"{args.sub_port or args.port}", file=sys.stderr)
     if args.path in ("lan", "bridge"):
-        print("→ Санамж: p99-ийг ажигла. Pi 3B-гийн 100 Mbit холбоос USB 2.0 дээр "
-              "сууж байгаа тул саатлын сүүл өргөн байна.", file=sys.stderr)
+        print("→ Санамж: p99-ийг ажигла — сүлжээний замд саатлын сүүл "
+              "өргөн байж болно.", file=sys.stderr)
 
     qos_list = [0, 1, 2] if args.sweep else [args.qos]
     rows = []

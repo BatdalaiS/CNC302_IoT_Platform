@@ -89,14 +89,13 @@ def decode_token(token: str) -> Principal:
 
     # ⚠ САНААТАЙ ЭМЗЭГ БАЙДАЛ (Лаб 7-д засна) #1:
     #   гарын үсгийг ШАЛГАХГҮЙ, `exp`-ийг ч шалгахгүй. Хэн ч дурын
-    #   claims бичээд admin болно. Алхам 4-т үүнийг халдлагаар нотолж,
-    #   дараа нь заслаа.
+    #   claims бичээд admin болно. Лаб 7-ын Алхам 6-д үүнийг халдлагаар
+    #   нотолж, Алхам 7.1-д засна.
     #
-    # TODO(оюутан): Dex-ийн JWKS-ээр гарын үсгийг шалгах
-    #   from jose import jwt
-    #   jwks = httpx.get(f"{OIDC_ISSUER}/keys").json()
-    #   claims = jwt.decode(token, jwks, algorithms=["RS256"],
-    #                       audience="cnc302", issuer=OIDC_ISSUER)
+    # TODO(оюутан): Dex-ийн JWKS-ээр гарын үсгийг шалгах (README 7.1):
+    #   jwks_uri-г {OIDC_ISSUER}/.well-known/openid-configuration-оос ав,
+    #   jwt.decode(token, jwks, algorithms=["RS256"], audience="cnc302",
+    #              issuer=OIDC_ISSUER, options={...})
     """
     from jose import jwt
     claims = jwt.get_unverified_claims(token)   # ← ЭМЗЭГ
@@ -284,8 +283,9 @@ class Mutation:
 #   introspection НЭЭЛТТЭЙ, асуулгын гүн/нийлмэл байдлын ХЯЗГААР БАЙХГҮЙ.
 #   Нэг хүсэлтэд 200 давхар нэрлэсэн (alias) талбар бичээд серверийг
 #   ачаалж болно — REST-д боломжгүй DoS вектор.
-#   Засварын чиглэл: strawberry-ийн QueryDepthLimiter / cost analysis
-#   өргөтгөл нэмэх, introspection-ыг зөвхөн нэвтэрсэн хэрэглэгчид нээх.
+#   Засварын чиглэл (README 7.2): strawberry.extensions-ийн
+#   MaxAliasesLimiter, MaxTokensLimiter, QueryDepthLimiter,
+#   DisableIntrospection.
 schema = strawberry.Schema(query=Query, mutation=Mutation)
 
 

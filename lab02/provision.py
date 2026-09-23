@@ -110,10 +110,11 @@ def cmd_list(a) -> int:
 
 def cmd_revoke(a) -> int:
     res = api(a.url, "DELETE", f"/devices/{a.device_id}")
-    print(f"✓ {res['id']} хүчингүй боллоо (EMQX: {res['emqx']})")
-    print("  Одоо тухайн төхөөрөмж дахин холбогдож чадахгүй.")
-    print("  ХЯНАЛТЫН АСУУЛТ: аль хэдийн ХОЛБОГДСОН session яах вэ?")
-    print("  (EMQX самбар → Clients → тухайн клиентийг гараар таслах шаардлагатай)")
+    print(f"✓ {res['id']} хүчингүй боллоо (EMQX хэрэглэгч: {res['emqx']})")
+    print(f"  Хөөсөн идэвхтэй холболт: {res.get('kicked')}")
+    print("  EMQX authenticator идэвхтэй бол шинэ холболт татгалзагдана.")
+    print("  ХЯНАЛТЫН АСУУЛТ: хэрэглэгчийг устгах нь яагаад ХОЛБОГДСОН session-ыг")
+    print("  таслахгүй вэ? (Санамж: нэвтрэлтийг CONNECT пакетын үед л шалгадаг.)")
     return 0
 
 

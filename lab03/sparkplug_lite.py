@@ -2,10 +2,29 @@
 """
 CNC302 Лаб 3 — Sparkplug B-ийн ҮЗЭЛ БАРИМТЛАЛЫН хялбаршуулсан хувилбар
 
-⚠ ЭНЭ БОЛ ЖИНХЭНЭ SPARKPLUG B БИШ.
-Жинхэнэ Sparkplug B нь Google Protocol Buffers ашигладаг. Энд бид уншихад
-хялбар байлгах үүднээс JSON ашиглав. Сэдвийн бүтэц, төлөвийн машин,
-дарааллын дугаар (seq), метрикийн alias — эдгээр нь стандартын дагуу.
+⚠ ЭНЭ БОЛ ЖИНХЭНЭ SPARKPLUG B БИШ — сургалтын хялбаршуулалт.
+Эх сурвалж: Eclipse Sparkplug Specification v3.0.0 (2022-11-16)
+  https://sparkplug.eclipse.org/specification/version/3.0/documents/sparkplug-specification-3.0.0.pdf
+
+Стандартын дагуу хийсэн хэсэг:
+  · сэдвийн бүтэц spBv1.0/<group_id>/<message_type>/<edge_node_id>[/<device_id>]
+  · NBIRTH seq=0, дараагийн мессеж бүрт +1, 255-ын дараа 0
+  · NDEATH-д seq БАЙХГҮЙ; NDEATH нь MQTT Will (QoS 1, retain=false)
+  · NDEATH-ийн bdSeq нь NBIRTH-ийн bdSeq-тэй ИЖИЛ
+  · BIRTH-д нэр + alias, DATA-д ЗӨВХӨН alias (нэр оруулахгүй)
+  · Clean Start = true, Session Expiry = 0 (paho-гийн анхдагч)
+  · Зөв салалтад MQTT 5.0 DISCONNECT reason code 0x04 (Disconnect with
+    Will Message) — брокер NDEATH-ийг өөрөө нийтэлнэ
+
+Стандартыг ЗӨРЧИЖ буй хэсэг (жинхэнэ системд ийм байж БОЛОХГҮЙ):
+  1. Ачаалал JSON — стандарт нь Google Protocol Buffers (§6.2, sparkplug_b.proto)
+     кодчилол шаарддаг. Тиймээс энэ скриптийн мессежийг жинхэнэ Sparkplug
+     Host Application (Ignition гэх мэт) уншиж чадахгүй.
+  2. dataType нь текст ("Double") — стандартад protobuf-ийн тоон enum.
+  3. bdSeq үргэлж 0-ээс эхэлнэ — стандартаар CONNECT бүрт 1-ээр нэмэгдэж,
+     дахин асахад ч хадгалагдах ёстой.
+  4. Зангилаа NCMD/DCMD-д захиалдаггүй, Node Control/Rebirth-д хариулдаггүй.
+  5. Primary Host-ийн STATE (spBv1.0/STATE/<host_id>)-ийг хүлээдэггүй.
 
 Sparkplug B яагаад хэрэгтэй вэ? Энгийн MQTT нь "хэн ямар өгөгдөл нийтэлж
 байгааг" тодорхойлдоггүй. Sparkplug B гурван зүйлийг нэмнэ:
@@ -22,7 +41,7 @@ Sparkplug B яагаад хэрэгтэй вэ? Энгийн MQTT нь "хэн �
 
   3. ДАРААЛЛЫН ДУГААР (seq 0..255)
      Хэрэглэгч мессеж алдсан эсэхээ шууд мэдэж, шаардвал дахин BIRTH
-     хүсэх боломжтой. Энгийн MQTT-д үүнийг мэдэх арга байхгүй.
+     хүсэх боломжтой. Энгийн MQTT-д ийм тоолуур протоколд байхгүй.
 
 Жишээ:
   # Зангилаа (edge node) ажиллуулах
@@ -45,6 +64,8 @@ import time
 
 import paho.mqtt.client as mqtt
 from paho.mqtt.enums import CallbackAPIVersion
+from paho.mqtt.packettypes import PacketTypes
+from paho.mqtt.reasoncodes import ReasonCode
 
 NS = "spBv1.0"
 STOP = False
@@ -81,8 +102,9 @@ def run_node(a) -> None:
 
     # NDEATH нь Last Will — зангилаа гэнэт унтарвал брокер өөрөө нийтэлнэ.
     # Энэ бол Sparkplug-ийн гол санаа: "үхлийн гэрчилгээ" урьдчилан бүртгэгддэг.
+    # Стандарт: Will QoS 1, retain=false, seq БАЙХГҮЙ, bdSeq = NBIRTH-ийнхтэй ижил.
     ndeath = {"timestamp": int(time.time() * 1000),
-              "metrics": [metric("bdSeq", 0, bd_seq, "Int64")], "seq": None}
+              "metrics": [metric("bdSeq", 0, bd_seq, "Int64")]}
     c.will_set(topic(group, "NDEATH", node), json.dumps(ndeath), qos=1, retain=False)
 
     c.connect(a.host, a.port, keepalive=30)
@@ -124,7 +146,9 @@ def run_node(a) -> None:
             vals = {"temperature": round(24 + random.gauss(0, 1.2), 2),
                     "humidity": round(45 + random.gauss(0, 2.0), 1),
                     "vibration": round(0.35 + abs(random.gauss(0, 0.05)), 3)}
-            changed = [metric("", aliases[k], v)
+            # DATA мессежид ЗӨВХӨН alias — нэрийг оруулахгүй (стандартын шаардлага)
+            changed = [{k2: v2 for k2, v2 in metric("", aliases[k], v).items()
+                        if k2 != "name"}
                        for k, v in vals.items()
                        if abs(v - last[d].get(k, -999)) > a.deadband]
             last[d] = vals
@@ -141,15 +165,15 @@ def run_node(a) -> None:
             sent += 1
         time.sleep(a.interval)
 
-    # ── Зөв салалт: NDEATH-ийг өөрөө нийтэлнэ ──
-    bd_seq += 1
-    c.publish(topic(group, "NDEATH", node),
-              json.dumps({"timestamp": int(time.time() * 1000),
-                          "metrics": [metric("bdSeq", 0, bd_seq, "Int64")]}), qos=1)
-    print(f"\n→ NDEATH  (зөв салалт).  Нийт {sent} DDATA илгээв.")
+    # ── Зөв салалт ──
+    # MQTT 5.0 дээр стандарт нь DISCONNECT-ийг reason code 0x04 (Disconnect
+    # with Will Message)-тай илгээхийг шаардана: брокер бүртгэлтэй Will буюу
+    # NDEATH-ийг (bdSeq нь NBIRTH-ийнхтэй ИЖИЛ) шууд нийтэлнэ. Normal
+    # disconnection (0x00) илгээвэл брокер Will-ийг устгаж, NDEATH гарахгүй.
+    print(f"\n→ DISCONNECT 0x04 → брокер NDEATH нийтэлнэ.  Нийт {sent} DDATA илгээв.")
+    c.disconnect(reasoncode=ReasonCode(PacketTypes.DISCONNECT, identifier=4))
     time.sleep(0.5)
     c.loop_stop()
-    c.disconnect()
 
 
 # ─────────────────────────── MONITOR ───────────────────────────
@@ -226,8 +250,9 @@ def run_monitor(a) -> None:
         print(f"\n  ⚠ {len(gaps)} дарааллын тасалдал илэрлээ:")
         for g in gaps:
             print(f"    {g}")
-        print("\n  Жинхэнэ системд платформ энэ үед 'Node Control/Rebirth' "
-              "метрикийг True болгож зангилаанаас NBIRTH-ийг дахин хүснэ.")
+        print("\n  Жинхэнэ системд Host Application энэ үед NCMD мессежээр "
+              "'Node Control/Rebirth' = true илгээж зангилаанаас NBIRTH-ийг "
+              "дахин хүснэ (энэ скрипт NCMD-г хэрэгжүүлээгүй).")
     else:
         print("\n  ✓ Дарааллын тасалдал илрээгүй.")
 

@@ -27,10 +27,10 @@
 \endhead
 \bottomrule
 \endlastfoot
-1 & Pi үүлийг харж байна уу & \texttt{ping\ -c3\ \$CLOUD\_HOST} & хариу ирнэ \\
-2 & 1883 порт нээлттэй юу & \texttt{nc\ -vz\ \$CLOUD\_HOST\ 1883} & succeeded \\
+1 & Pi үүлийг харж байна уу & \texttt{ping\ -c3\ \$CLOUD\_\allowbreak{}HOST} & хариу ирнэ \\
+2 & 1883 порт нээлттэй юу & \texttt{nc\ -vz\ \$CLOUD\_\allowbreak{}HOST\ 1883} & succeeded \\
 3 & Гүүрний лог & \texttt{docker\ compose\ logs\ mosquitto\ \textbackslash{}\textbar{}\ tail\ -20} & "Connecting bridge" \\
-4 & bridge.conf үүссэн үү & \texttt{cat\ mosquitto/\allowbreak{}conf.\allowbreak{}d/\allowbreak{}bridge.\allowbreak{}conf} & \texttt{address\ \textless{}IP\textgreater{}:1883} \\
+4 & bridge.conf үүссэн үү & \texttt{cat\ mosquitto/\allowbreak{}conf.\allowbreak{}d/\allowbreak{}bridge.\allowbreak{}conf} & \texttt{address\ \textless{}IP\textgreater{}:\allowbreak{}1883} \\
 \end{longtable}\endgroup
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
@@ -52,7 +52,7 @@
 \texttt{Connection\ refused} & EMQX асаагүй & {[}ЗК{]} \texttt{cd\ stack\ \&\allowbreak{}\&\allowbreak{}\ make\ up} \\
 \texttt{Broken\ pipe} дахин дахин & Галт хана хааж байна & {[}ЗК{]} SETUP.md А.6 \\
 \texttt{No\ route\ to\ host} & Өөр дэд сүлжээ & Хоёуланг нэг свичид кабелиар \\
-\texttt{Error:\allowbreak{}\ Unknown\ configuration\ variable} & Тохиргооны түлхүүр буруу & \texttt{make\ bridge} дахин ажиллуул \\
+\texttt{Error:\allowbreak{}\ Unknown\ configuration\ variable} & Тохиргооны түлхүүр буруу (эсвэл глобал түлхүүрийг bridge хэсэгт бичсэн) & \texttt{mosquitto.\allowbreak{}conf(5)}-тай тулга; \texttt{make\ bridge} дахин ажиллуул \\
 \texttt{address\ 192.\allowbreak{}168.\allowbreak{}1.\allowbreak{}100:\allowbreak{}1883} & \texttt{.env} засаагүй & \texttt{nano\ .env} → CLOUD\_HOST \\
 \end{longtable}\endgroup
 
@@ -63,7 +63,7 @@
 \hypertarget{ux433ux4afux4afux440-ux445ux43eux43bux431ux43eux433ux434ux441ux43eux43d-ux447-ux43cux435ux441ux441ux435ux436-ux4afux4afux43bux44dux43dux434-ux445ux4afux440ux44dux445ux433ux4afux439}{%
 \section{2. Гүүр холбогдсон ч мессеж үүлэнд хүрэхгүй}\label{ux433ux4afux4afux440-ux445ux43eux43bux431ux43eux433ux434ux441ux43eux43d-ux447-ux43cux435ux441ux441ux435ux436-ux4afux4afux43bux44dux43dux434-ux445ux4afux440ux44dux445ux433ux4afux439}}
 
-Бараг үргэлж \textbf{сэдвийн угтвар зөрсөн}. Гүүр зөвхөн \texttt{cnc302/\textless{}SITE\textgreater{}/\#}-ийг дамжуулна.
+Бараг үргэлж \textbf{сэдвийн угтвар зөрсөн}. Гүүр зөвхөн \texttt{cnc302/\allowbreak{}\textless{}SITE\textgreater{}/\allowbreak{}\#}-ийг дамжуулна.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -107,7 +107,7 @@
 \bottomrule
 \endlastfoot
 Swap тохируулаагүй & SETUP.md Б.5 \\
-\texttt{gpu\_mem} 64 хэвээр & SETUP.md Б.3 → 48 MiB чөлөөлнө \\
+\texttt{MemTotal} хүлээснээс бага & SETUP.md Б.3 --- \texttt{gpu\_mem}-ийн нөлөөг хэмж (legacy тохиргоо, үр дүн баталгаагүй) \\
 VS Code сервер ажиллаж байна & \texttt{pkill\ -f\ vscode-server} \\
 Ширээний орчинтой OS суулгасан & Lite (64-bit) дахин суулга \\
 Үүлний үйлчилгээг Pi дээр асаах гэсэн & СТОП: Битгий. \texttt{stack/} нь \textbf{компьютер дээр}. \\
@@ -121,7 +121,7 @@ Pi 3B нь \textbf{arm64}. 32-bit OS суулгасан бол олон дүрс
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{uname} \AttributeTok{{-}m}          \CommentTok{\# aarch64 байх ЁСТОЙ. armv7l бол 64{-}bit OS дахин суулга.}
-\ExtensionTok{docker}\NormalTok{ manifest inspect eclipse{-}mosquitto:2.0.20 }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}A2}\NormalTok{ arm64}
+\ExtensionTok{docker}\NormalTok{ manifest inspect eclipse{-}mosquitto:2.0.22 }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}A2}\NormalTok{ arm64}
 \end{Highlighting}
 \end{Shaded}
 
@@ -152,9 +152,10 @@ Pi 3B нь \textbf{arm64}. 32-bit OS суулгасан бол олон дүрс
 \bottomrule
 \endlastfoot
 \texttt{0x0} & хэвийн & цааш үргэлжлүүл \\
-\texttt{0x50000} & ӨМНӨ НЬ throttling болсон & хөргөөд дахин асаа, дахин хэмж \\
-\texttt{0x50005} & ЯГ ОДОО хүчдэл дутуу + throttling & тэжээлээ соль (5 V / 2.5 A) \\
-темп \textgreater{} 75 °C & хязгаарт ойрхон & хөргөгч, сэнс тавь \\
+\texttt{0x50000} & ӨМНӨ НЬ хүчдэл дутсан (бит 16) + throttling болсон (бит 18) & тэжээлийг шалга, дахин асаагаад дахин хэмж \\
+\texttt{0x50005} & ЯГ ОДОО хүчдэл дутуу (бит 0) + throttled (бит 2), өмнө нь ч мөн & тэжээлээ соль (5 V / 2.5 A) \\
+\texttt{0x40000} / \texttt{0x4} & өмнө нь / одоо throttled (хүчдэл биш) & хөргөгч, сэнс тавь \\
+темп \textgreater{} 80 °C & албан ёсны баримтаар 80--85 °C-д давтамж буурна & хөргөгч, сэнс тавь \\
 \end{longtable}\endgroup
 
 \textbf{Throttling эхэлсэн хэмжилтийг тайланд бичиж болохгүй.} Хаяад дахин хий.
@@ -201,11 +202,13 @@ InfluxDB 2.7-д API өөр: \texttt{/\allowbreak{}api/\allowbreak{}v2/\allowbrea
 \end{Highlighting}
 \end{Shaded}
 
-\texttt{numpy} барих гэж оролдоод удаж байвал (Pi 3B дээр эх кодоос барих нь 20+ минут):
+\texttt{numpy} эсвэл \texttt{ai-edge-litert}-ийг эх кодоос барих гэж оролдвол (удаан) эсвэл \texttt{No\ matching\ distribution} гарвал OS 32-бит байна --- PyPI дээр хоёулаа зөвхөн \texttt{aarch64} wheel-тэй:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{.venv/bin/pip}\NormalTok{ install }\AttributeTok{{-}{-}index{-}url}\NormalTok{ https://www.piwheels.org/simple numpy}
+\FunctionTok{uname} \AttributeTok{{-}m}                      \CommentTok{\# aarch64 байх ЁСТОЙ}
+\ExtensionTok{.venv/bin/pip}\NormalTok{ install }\AttributeTok{{-}{-}upgrade}\NormalTok{ pip}
+\ExtensionTok{.venv/bin/pip}\NormalTok{ install }\AttributeTok{{-}{-}only{-}binary}\OperatorTok{=}\NormalTok{:all: }\AttributeTok{{-}r}\NormalTok{ agent/requirements.txt}
 \end{Highlighting}
 \end{Shaded}
 
@@ -218,7 +221,7 @@ InfluxDB 2.7-д API өөр: \texttt{/\allowbreak{}api/\allowbreak{}v2/\allowbrea
 \end{Highlighting}
 \end{Shaded}
 
-4 GB-аас бага бол → Settings → Resources → Memory → 6 GB → Apply \& Restart.
+4 GB-аас бага бол → Windows + WSL 2: \texttt{\%UserProfile\%\textbackslash{}.wslconfig}-д \texttt{{[}wsl2{]}} / \texttt{memory=6GB}, дараа нь \texttt{wsl\ -\/\allowbreak{}-shutdown}. macOS/Linux/Hyper-V: Settings → Resources → Advanced → Memory limit → 6 GB → Apply \& restart (SETUP.md А.2).
 
 Хүнд үйлчилгээг зогсооно:
 
@@ -230,22 +233,31 @@ InfluxDB 2.7-д API өөр: \texttt{/\allowbreak{}api/\allowbreak{}v2/\allowbrea
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{k3s-pod-pending-ux44dux441ux432ux44dux43b-oomkilled-ux43bux430ux431-8}{%
-\section{\texorpdfstring{10. K3s pod \texttt{Pending} эсвэл \texttt{OOMKilled} (Лаб 8)}{10. K3s pod Pending эсвэл OOMKilled (Лаб 8)}}\label{k3s-pod-pending-ux44dux441ux432ux44dux43b-oomkilled-ux43bux430ux431-8}}
+\hypertarget{k3s-pod-pending-oomkilled-ux44dux441ux432ux44dux43b-pi-ux43dux44dux433ux434ux44dux445ux433ux4afux439-ux43bux430ux431-8}{%
+\section{\texorpdfstring{10. K3s pod \texttt{Pending}, \texttt{OOMKilled} эсвэл Pi нэгдэхгүй (Лаб 8)}{10. K3s pod Pending, OOMKilled эсвэл Pi нэгдэхгүй (Лаб 8)}}\label{k3s-pod-pending-oomkilled-ux44dux441ux432ux44dux43b-pi-ux43dux44dux433ux434ux44dux445ux433ux4afux439-ux43bux430ux431-8}}
+
+K3s \textbf{server} нь зөөврийн компьютер дээрх VM, Pi нь \textbf{agent} (\texttt{lab08/\allowbreak{}k3s/\allowbreak{}README.\allowbreak{}md}).
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{\# [VM] VM дээр}
+\ExtensionTok{kubectl}\NormalTok{ get nodes }\AttributeTok{{-}o}\NormalTok{ wide }\AttributeTok{{-}L}\NormalTok{ kubernetes.io/arch,cnc302/layer}
 \ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 describe pod }\OperatorTok{\textless{}}\NormalTok{нэр}\OperatorTok{\textgreater{}} \KeywordTok{|} \FunctionTok{tail} \AttributeTok{{-}25}
 \ExtensionTok{kubectl}\NormalTok{ top nodes}
 \ExtensionTok{kubectl}\NormalTok{ top pods }\AttributeTok{{-}n}\NormalTok{ cnc302}
+\CommentTok{\# [Pi] Pi дээр}
+\FunctionTok{sudo}\NormalTok{ journalctl }\AttributeTok{{-}u}\NormalTok{ k3s{-}agent }\AttributeTok{{-}n}\NormalTok{ 50}
 \end{Highlighting}
 \end{Shaded}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
 \toprule
 \begin{minipage}[b]{\linewidth}\raggedright
+Шинж
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Шалтгаан
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Шийдэл
@@ -254,11 +266,15 @@ InfluxDB 2.7-д API өөр: \texttt{/\allowbreak{}api/\allowbreak{}v2/\allowbrea
 \endhead
 \bottomrule
 \endlastfoot
-Docker зэрэг ажиллаж байна & \texttt{sudo\ systemctl\ stop\ docker} \\
-traefik/servicelb асаалттай & K3s-ийг \texttt{-\/\allowbreak{}-disable\ traefik\ -\/\allowbreak{}-disable\ servicelb}-ээр дахин суулга \\
-\texttt{requests} хэт өндөр & \texttt{01-config.yaml}, манифестийн requests-ийг бага болго \\
-Дүрс олдохгүй (\texttt{ErrImagePull}) & \texttt{docker\ save\ cnc302/edge-agent:v1\ \textbackslash{}\textbar{}\ sudo\ k3s\ ctr\ images\ import\ -} \\
-metrics-server байхгүй → HPA \texttt{\textless{}unknown\textgreater{}} & metrics-server-ийг битгий унтраа \\
+Pod \texttt{Pending}, \texttt{didn\textquotesingle{}t\ match\ Pod\textquotesingle{}s\ node\ affinity/selector} & Pi-д \texttt{cnc302/layer} шошго алга & \texttt{kubectl\ label\ nodes\ \textless{}pi\textgreater{}\ cnc302/\allowbreak{}layer=\allowbreak{}edge} \\
+\texttt{edge-agent} эхлэхгүй, Events-д дүрсний алдаа & дүрс Pi-д импортлогдоогүй (\texttt{imagePullPolicy:\allowbreak{}\ Never}) & компьютер дээр \texttt{docker\ save\ -\/\allowbreak{}-platform\ linux/\allowbreak{}arm64\ -o\ edge-agent-v1-arm64.\allowbreak{}tar\ cnc302/\allowbreak{}edge-agent:\allowbreak{}v1} → Pi-гийн \texttt{/\allowbreak{}var/\allowbreak{}lib/\allowbreak{}rancher/\allowbreak{}k3s/\allowbreak{}agent/\allowbreak{}images/\allowbreak{}} руу хуул; \texttt{sudo\ k3s\ ctr\ images\ ls\ \textbackslash{}\textbar{}\ grep\ edge-agent} \\
+Pi дээрх pod DNS нэр шийдэж чадахгүй & VM ↔ Pi хооронд \textbf{8472/udp} (Flannel VXLAN) хаагдсан & галт ханаар 8472/udp нээ (зөвхөн LAN дотор) \\
+\texttt{kubectl\ top\ nodes} дээр Pi гарахгүй & \textbf{10250/tcp} (kubelet) хаагдсан & 10250/tcp нээ \\
+VM-ийн INTERNAL-IP \texttt{10.0.2.x}, Pi нэгдэхгүй & VM NAT адаптертай & VirtualBox → Adapter 1 = \textbf{Bridged}, NAT-ыг хас, K3s-ийг дахин суулга \\
+\texttt{bridge/state} 0/1 анивчина, EMQX-д ижил client ID & Pi дээр Compose-ийн mosquitto гүүр K3s-ийн pod-той зэрэг ажиллаж байна & {[}Pi{]} \texttt{cd\ \textasciitilde{}/cnc302/edge\ \&\&\ docker\ compose\ down} \\
+\texttt{OOMKilled} & Pi-д бодит сул RAM дууссан (reserved алга тул товлогч мэдэхгүй) & хувийн тоог бууруул; Docker-ийг зогсоо (\texttt{sudo\ systemctl\ stop\ docker.\allowbreak{}socket\ docker}) \\
+traefik/servicelb-ийг унтраах гэж "дахин суулгах" & Энэ бол \textbf{server VM}-ийн тохиргоо, Pi биш & Pi дээр юу ч хийхгүй --- \texttt{lab08/\allowbreak{}k3s/\allowbreak{}README.\allowbreak{}md} \\
+metrics-server байхгүй → HPA \texttt{\textless{}unknown\textgreater{}} & metrics-server унтарсан & metrics-server-ийг битгий унтраа \\
 \end{longtable}\endgroup
 
 \hypertarget{git-pi-ux431ux430-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux434ux44dux44dux440ux445-ux445ux443ux432ux438ux43bux431ux430ux440-ux437ux4e9ux440ux4e9ux432}{%

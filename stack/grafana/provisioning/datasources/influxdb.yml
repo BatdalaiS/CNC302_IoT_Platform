@@ -1,15 +1,29 @@
 # Grafana-гийн өгөгдлийн эх сурвалжийг автоматаар тохируулна (Лаб 5).
+#
+# Grafana 11.6-ийн албан ёсны "InfluxDB 3.x for SQL" provisioning жишээний
+# бүтцийг дагав: type influxdb + jsonData.version: SQL + dbName + insecureGrpc.
+#   https://grafana.com/docs/grafana/v11.6/datasources/influxdb/configure-influxdb-data-source/
+#   https://docs.influxdata.com/influxdb3/core/visualize-data/grafana/
+#
+# SQL горимд Grafana нь InfluxDB 3 руу Flight SQL (gRPC, HTTP/2)-ээр
+# холбогддог. Манай InfluxDB TLS-гүй тул insecureGrpc: true
+# (UI дээр "Insecure Connection" асаалттай) байх ёстой. Лаб 5-ын
+# панелиуд SQL + $__timeFilter(time) / $__dateBin(time) макро ашиглана.
 apiVersion: 1
 
 datasources:
   - name: InfluxDB3
     type: influxdb
     access: proxy
-    url: http://influxdb:8181
+    url: http://influxdb:8181      # compose сүлжээн дэх үйлчилгээний нэр
     jsonData:
       version: SQL
       dbName: cnc302
       httpMode: POST
       insecureGrpc: true
+    # InfluxDB `--without-auth` горимд ажиллаж байгаа тул токен шаардлагагүй.
+    # Нэвтрэлт асаавал (Лаб 7-ын Zero Trust хэлэлцүүлэг):
+    # secureJsonData:
+    #   token: '<influxdb3 create token --admin-ээр авсан токен>'
     isDefault: true
     editable: true

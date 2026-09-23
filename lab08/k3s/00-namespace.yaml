@@ -1,12 +1,19 @@
 # CNC302 Лаб 8 — K3s дээрх ИРМЭГИЙН ажлын ачаалал
 #
-# ⚠ Энэ манифестууд RASPBERRY PI 3B дээр ажиллана (1 GB RAM).
-#   Тиймээс энд ЗӨВХӨН ирмэгийн хоёр үйлчилгээ байна:
-#     mosquitto (гүүртэй брокер)  +  edge-agent (мэдрэгч ба дүгнэлт)
-#   EMQX, InfluxDB, Grafana нь ҮҮЛНИЙ давхаргад — зөөврийн компьютер
-#   дээр Docker Compose-оор (../../stack/docker-compose.yml). Тэдгээрийг
-#   Pi 3B-ийн K3s рүү оруулах гэж ОРОЛДОЖ БОЛОХГҮЙ: зөвхөн InfluxDB
-#   өөрөө 1 GB-ийг бүхэлд нь идэх болно.
+# Кластерын топологи (lab08/k3s/README.md §1):
+#   K3s SERVER — зөөврийн компьютер дээрх Ubuntu Server VM (amd64,
+#                VirtualBox Bridged Adapter, ≥2 vCPU, ≥2 GB, санал 4 GB)
+#   K3s AGENT  — Raspberry Pi 3B (arm64, 1 GB)
+#
+# K3s-ийн албан ёсны доод шаардлага: server 2 цөм / 2 GB, agent 1 цөм /
+# 512 MB (https://docs.k3s.io/installation/requirements). Тиймээс Pi 3B
+# зөвхөн AGENT байж чадна.
+#
+# Энд ЗӨВХӨН ирмэгийн хоёр үйлчилгээ байна — хоёулаа nodeSelector-оор
+# Pi рүү хадагдсан:
+#   mosquitto (гүүртэй брокер)  +  edge-agent (мэдрэгч ба дүгнэлт)
+# EMQX, InfluxDB, Grafana нь ҮҮЛНИЙ давхаргад — зөөврийн компьютерийн
+# Docker Compose дээр (../../stack/docker-compose.yml) хэвээр үлдэнэ.
 apiVersion: v1
 kind: Namespace
 metadata:

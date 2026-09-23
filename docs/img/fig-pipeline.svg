@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="400" viewBox="0 0 900 400" font-family="DejaVu Sans, Arial, sans-serif">
+<title>Өгөгдлийн шугам</title>
+<defs><marker id="a374151" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#374151"/></marker><marker id="aB91C1C" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#B91C1C"/></marker></defs>
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<rect x="20" y="70" width="125" height="70" rx="6" fill="#EAF0FA" stroke="#2E5496" stroke-width="1.4"/>
+<text x="82.5" y="94.375" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">EMQX</text>
+<text x="82.5" y="113.775" font-family="DejaVu Sans Mono, monospace" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">cnc302/+/+/+/+/</text>
+<text x="82.5" y="128.625" font-family="DejaVu Sans Mono, monospace" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">telemetry</text>
+<rect x="165" y="30" width="530" height="235" rx="10" fill="#FBFBFD" stroke="#5B6474" stroke-width="2"/>
+<text x="179" y="52" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#5B6474" text-anchor="start" font-weight="bold">Node-RED 4.0 (зөөврийн компьютер)</text>
+<rect x="180" y="70" width="95" height="70" rx="6" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.4"/>
+<text x="227.5" y="101.8" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">mqtt in</text>
+<text x="227.5" y="121.19999999999999" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">QoS 1</text>
+<rect x="290" y="70" width="145" height="70" rx="6" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.4"/>
+<text x="362.5" y="94.05000000000001" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" fill="#1F2937" text-anchor="middle" font-weight="bold">задлан шинжлэх</text>
+<text x="362.5" y="113.10000000000002" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">JSON · UNS · муж</text>
+<text x="362.5" y="127.95000000000002" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">3 гаралт</text>
+<rect x="450" y="60" width="110" height="44" rx="6" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.4"/>
+<text x="505.0" y="85.7375" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" fill="#1F2937" text-anchor="middle" font-weight="bold">line protocol</text>
+<rect x="450" y="112" width="110" height="44" rx="6" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.4"/>
+<text x="505.0" y="130.3125" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" fill="#1F2937" text-anchor="middle" font-weight="bold">integrity</text>
+<text x="505.0" y="149.1875" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">seq, rx_ms</text>
+<rect x="575" y="70" width="105" height="70" rx="6" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.4"/>
+<text x="627.5" y="94.05000000000001" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" fill="#1F2937" text-anchor="middle" font-weight="bold">http request</text>
+<text x="627.5" y="113.10000000000002" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">POST</text>
+<text x="627.5" y="127.95000000000002" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">write_lp</text>
+<rect x="575" y="175" width="105" height="70" rx="6" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.4"/>
+<text x="627.5" y="206.79999999999998" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">шалгах</text>
+<text x="627.5" y="226.2" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">2xx биш →</text>
+<rect x="290" y="175" width="145" height="70" rx="6" fill="#FDECEC" stroke="#B91C1C" stroke-width="1.4"/>
+<text x="362.5" y="199.375" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">dead-letter</text>
+<text x="362.5" y="218.775" font-family="DejaVu Sans Mono, monospace" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">/data/</text>
+<text x="362.5" y="233.625" font-family="DejaVu Sans Mono, monospace" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">deadletter.jsonl</text>
+<rect x="720" y="60" width="160" height="90" rx="6" fill="#EAF0FA" stroke="#2E5496" stroke-width="1.4"/>
+<text x="800.0" y="86.94999999999999" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">InfluxDB 3 Core</text>
+<text x="800.0" y="106.35" font-family="DejaVu Sans Mono, monospace" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">/api/v3/write_lp</text>
+<text x="800.0" y="121.19999999999999" font-family="DejaVu Sans Mono, monospace" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">?db=cnc302</text>
+<text x="800.0" y="136.04999999999998" font-family="DejaVu Sans Mono, monospace" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">&amp;precision=millisecond</text>
+<rect x="720" y="190" width="160" height="70" rx="6" fill="#EAF0FA" stroke="#2E5496" stroke-width="1.4"/>
+<text x="800.0" y="214.375" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">Grafana</text>
+<text x="800.0" y="233.775" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">SQL · $__dateBin(time)</text>
+<text x="800.0" y="248.625" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">Flight SQL</text>
+<line x1="145" y1="105" x2="180" y2="105" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<line x1="275" y1="105" x2="290" y2="105" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<line x1="435" y1="92" x2="450" y2="82" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<line x1="435" y1="118" x2="450" y2="132" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<line x1="560" y1="82" x2="575" y2="95" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<line x1="560" y1="132" x2="575" y2="118" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<line x1="680" y1="105" x2="720" y2="105" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<line x1="627" y1="140" x2="627" y2="175" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<line x1="575" y1="210" x2="435" y2="210" stroke="#B91C1C" stroke-width="1.6" marker-end="url(#aB91C1C)"/>
+<text x="505.0" y="203.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#B91C1C" text-anchor="middle" font-weight="normal">бичилт унасан</text>
+<line x1="362" y1="140" x2="362" y2="175" stroke="#B91C1C" stroke-width="1.6" marker-end="url(#aB91C1C)"/>
+<text x="354" y="163" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.5" fill="#B91C1C" text-anchor="end" font-weight="normal">буруу JSON / сэдэв</text>
+<line x1="800" y1="150" x2="800" y2="190" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
+<text x="20" y="305" font-family="DejaVu Sans, Arial, sans-serif" font-size="12.5" fill="#1F2937" text-anchor="start" font-weight="bold">Тэмдэглэл</text>
+<text x="20" y="327.0" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" fill="#1F2937" text-anchor="start" font-weight="normal">• Dead-letter мөр бүр алдааны шалтгаан ба line protocol текстийг (lp) хадгална → дараа нь дахин бичиж болно.</text>
+<text x="20" y="342.525" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" fill="#1F2937" text-anchor="start" font-weight="normal">• InfluxDB 3: database анх бичихэд өөрөө үүснэ (schema-on-write); precision=millisecond (v3-ын утга).</text>
+<text x="20" y="358.05" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" fill="#1F2937" text-anchor="start" font-weight="normal">• http request: senderr=false — холбогдож чадахгүй үед ч мессеж шалгах зангилаа руу орж dead-letter-т бичигдэнэ.</text>
+</svg>

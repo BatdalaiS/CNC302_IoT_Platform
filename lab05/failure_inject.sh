@@ -3,22 +3,29 @@
 #
 # Стек хоёр хостод хуваагдсан тул эвдрэл ч хоёр газар үүснэ:
 #
-#   RASPBERRY PI 3B ДЭЭР :  uplink-down | uplink-up | broker | cpu | disk
+#   RASPBERRY PI 3B ДЭЭР :  uplink-down | uplink-up | broker | broker-kill | cpu | disk
 #   ЗӨӨВРИЙН КОМПЬЮТЕР   :  influx
 #   Хаана ч             :  restore   (өөрийн үүсгэсэн бүхнийг буцаана)
 #
 # ── ХАМГИЙН ЧУХАЛ ЭВДРЭЛ: uplink-down ───────────────────────────────────────
 # Pi → зөөврийн компьютер хоорондын 1883 портыг таслана. Ирмэгийн mosquitto
-# ажилласаар байх ба гүүр (bridge) нь мессежийг ДИСКЭНД дараалуулна
-# (store-and-forward). Уплинк сэргэхэд дараалал урсаж эхэлнэ. Store-and-forward
-# ажиллаж байгаа эсэхийг ЯГ ЭНЭ ГОРИМООР л хэмждэг.
+# ажилласаар байх ба гүүр (bridge) нь мессежийг САНАХ ОЙН дараалалд хадгална
+# (store-and-forward); дараалал mosquitto.db-д зөвхөн autosave_interval тутамд
+# ба хэвийн унтрахад бичигдэнэ. Өгсөх урсгал сэргэхэд дараалал урсаж эхэлнэ.
+# Store-and-forward ажиллаж байгаа эсэхийг ЯГ ЭНЭ ГОРИМООР л хэмждэг.
+#
+# Тасалдал бүрийн эхлэл/төгсгөлийг lab05/out/uplink-events.jsonl-д
+# {"ts":<мс>,"state":0|1} хэлбэрээр бичнэ → data_integrity.py verify --cut-log.
+# (Гүүр өөрөө тасралтыг keepalive_interval дуусаж байж л мэддэг тул
+#  bridge/state-ээс илүү найдвартай цаг.)
 #
 #   bash failure_inject.sh uplink-down 60   # 60 сек таслаад автоматаар сэргээнэ
 #   bash failure_inject.sh uplink-down 0    # тасалж орхино (гараар uplink-up)
 #   bash failure_inject.sh uplink-up        # хаалтыг авна
-#   bash failure_inject.sh broker 30        # ирмэгийн mosquitto-г дахин асаана
+#   bash failure_inject.sh broker 30        # ирмэгийн mosquitto-г ХЭВИЙН зогсооно (SIGTERM → mosquitto.db хадгалагдана)
+#   bash failure_inject.sh broker-kill 30   # ирмэгийн mosquitto-г SIGKILL-ээр унагана (цахилгаан тасрахтай адил)
 #   bash failure_inject.sh cpu 45           # Pi-гийн 4 цөмийг ачаална
-#   bash failure_inject.sh disk 60          # диск дүүргэлт (АЮУЛГҮЙ, давталт)
+#   bash failure_inject.sh disk 60          # диск дүүргэлт (АЮУЛГҮЙ, RAM дээрх 64 MiB давталт)
 #   bash failure_inject.sh influx 30        # ҮҮЛ дээр: InfluxDB-г зогсооно
 #   bash failure_inject.sh network 30       # хуучин нэр = uplink-down
 #   bash failure_inject.sh restore          # БҮХ зүйлийг буцаана
@@ -27,9 +34,12 @@
 #   · Устгах үйлдэл бүр эхлэхээсээ ӨМНӨ юу хийхээ хэвлэнэ.
 #   · Бүх үйлдэл БУЦААХ БОЛОМЖТОЙ. `restore` нь бидний нэмсэн iptables/nft
 #     дүрмийг ч устгана.
-#   · `disk` горим нь microSD-гийн БОДИТ дискийг хэзээ ч дүүргэхгүй.
-#     512 MiB-ийн давталтын (loopback) файлын систем үүсгэж, түүнийг дүүргэнэ.
-#     Pi 3B-гийн microSD-г элээх нь хичээлийн зорилго БИШ.
+#   · `disk` горим нь microSD-гийн БОДИТ дискийг хэзээ ч дүүргэхгүй, бичихгүй.
+#     /dev/shm (RAM) дээр 64 MiB-ийн файл fallocate-аар үүсгэж, түүнийг
+#     давталтын (loop) төхөөрөмжөөр холбоод дүүргэнэ. Pi 3B-гийн microSD-г
+#     элээх нь хичээлийн зорилго БИШ. Энэ файлын системд ямар ч үйлчилгээ
+#     бичдэггүй тул энэ нь "диск дүүрэхэд df, бичилт юу харуулдаг вэ" гэсэн
+#     ҮЗҮҮЛЭН туршилт юм.
 
 set -u
 
@@ -43,17 +53,21 @@ CLOUD_COMPOSE="$REPO_DIR/stack/docker-compose.yml"
 EDGE_ENV="$REPO_DIR/edge/.env"
 
 LOOPDIR="/tmp/cnc302-smalldisk"
-LOOPIMG="/tmp/cnc302-smalldisk.img"
+LOOPIMG="/dev/shm/cnc302-smalldisk.img"   # RAM дээр — microSD-д бичихгүй
+LOOPMB=64
 OUTDIR="$REPO_DIR/lab05/out"
 LOG="$OUTDIR/failure-log.txt"
 STATE="$OUTDIR/.uplink-state"      # ямар хаалт тавьсныг санана: iptables|nft
+EVENTS="$OUTDIR/uplink-events.jsonl"   # verify --cut-log-д зориулсан бодит цаг
 
 mkdir -p "$OUTDIR"
 note() { echo "$(date -Is)  $*" | tee -a "$LOG"; }
+# {"ts":<Unix мс>,"state":0|1} — bridge.jsonl-тэй ижил хэлбэр
+event() { echo "{\"ts\":$(date +%s%3N),\"state\":$1}" >> "$EVENTS"; }
 announce() { echo ""; echo "  ┌─ ХИЙХ ГЭЖ БУЙ ҮЙЛДЭЛ ─────────────────────────"; \
              echo "  │ $*"; echo "  └───────────────────────────────────────────────"; }
 
-usage() { sed -n '2,32p' "$0"; }
+usage() { sed -n '2,44p' "$0"; }
 
 t0=$(date +%s)
 elapsed() { echo $(( $(date +%s) - t0 )); }
@@ -68,10 +82,10 @@ if [ -f "$EDGE_ENV" ]; then
 fi
 CLOUD_HOST="${CLOUD_HOST_OVERRIDE:-$CLOUD_HOST}"
 
-# ─────────────────────────── УПЛИНКИЙГ ТАСЛАХ ───────────────────────────
+# ─────────────────────────── ӨГСӨХ УРСГАЛЫГ ТАСЛАХ ───────────────────────────
 # Зорилго: Pi-гээс ҮҮЛ РҮҮ гарах 1883 холболтыг л таслах. Локал 1883
 # (төхөөрөмж → Pi, агент → Pi) ажилласаар байх ЁСТОЙ — эс бөгөөс энэ нь
-# "уплинк тасарсан" биш, "бүх зүйл унасан" туршилт болно.
+# "өгсөх урсгал тасарсан" биш, "бүх зүйл унасан" туршилт болно.
 
 iptables_ok() { command -v iptables >/dev/null 2>&1; }
 nft_ok()      { command -v nft >/dev/null 2>&1; }
@@ -87,19 +101,20 @@ uplink_down() {
     exit 1
   fi
   if [ -f "$STATE" ]; then
-    note "  (уплинк аль хэдийн тасарсан байна — давхар тавихгүй)"
+    note "  (өгсөх урсгал аль хэдийн тасарсан байна — давхар тавихгүй)"
     return 0
   fi
 
-  announce "Pi → ${CLOUD_HOST}:${CLOUD_PORT} чиглэлийн TCP-г ХААНА (уплинк тасрана).
+  announce "Pi → ${CLOUD_HOST}:${CLOUD_PORT} чиглэлийн TCP-г ХААНА (өгсөх урсгал тасрана).
   │ Локал 1883 хөндөгдөхгүй: төхөөрөмжүүд Pi рүү нийтэлсээр байна.
-  │ Гүүр мессежийг дискэнд дараалуулж эхлэх ёстой (store-and-forward).
+  │ Гүүр тасралтыг keepalive дуусахад илрүүлж, мессежийг санах ойн
+  │ дараалалд хадгалж эхэлнэ (store-and-forward).
   │ Буцаах:  bash $0 uplink-up   эсвэл   bash $0 restore"
 
   if iptables_ok && $SUDO iptables -I OUTPUT -p tcp -d "$CLOUD_HOST" \
        --dport "$CLOUD_PORT" -j DROP 2>/dev/null; then
-    echo "iptables" > "$STATE"
-    note "▼ Уплинк тасарлаа (iptables OUTPUT DROP → $CLOUD_HOST:$CLOUD_PORT)"
+    echo "iptables" > "$STATE"; event 0
+    note "▼ Өгсөх урсгал тасарлаа (iptables OUTPUT DROP → $CLOUD_HOST:$CLOUD_PORT)"
     return 0
   fi
 
@@ -109,13 +124,13 @@ uplink_down() {
           '{ type filter hook output priority 0 ; }' 2>/dev/null \
      && $SUDO nft add rule inet cnc302 out ip daddr "$CLOUD_HOST" \
           tcp dport "$CLOUD_PORT" drop 2>/dev/null; then
-    echo "nft" > "$STATE"
-    note "▼ Уплинк тасарлаа (nft inet cnc302 → $CLOUD_HOST:$CLOUD_PORT)"
+    echo "nft" > "$STATE"; event 0
+    note "▼ Өгсөх урсгал тасарлаа (nft inet cnc302 → $CLOUD_HOST:$CLOUD_PORT)"
     return 0
   fi
 
   echo "" >&2
-  echo "✗ УПЛИНКИЙГ ТАСЛАЖ ЧАДСАНГҮЙ." >&2
+  echo "✗ ӨГСӨХ УРСГАЛЫГ ТАСЛАЖ ЧАДСАНГҮЙ." >&2
   echo "  iptables ч, nft ч ажиллуулах эрх алга (эсвэл суугаагүй)." >&2
   echo "  Хийж болох зүйл:" >&2
   echo "    1) sudo эрхтэйгээр дахин ажиллуулна:  sudo bash $0 uplink-down $DUR" >&2
@@ -128,11 +143,11 @@ uplink_down() {
 
 uplink_up() {
   if [ ! -f "$STATE" ]; then
-    note "  (уплинкийн хаалт байхгүй — хийх зүйлгүй)"
+    note "  (өгсөх урсгалын хаалт байхгүй — хийх зүйлгүй)"
     return 0
   fi
   local kind; kind=$(cat "$STATE" 2>/dev/null || echo "")
-  announce "Уплинкийн хаалтыг АВНА ($kind). Гүүр дахин холбогдож,
+  announce "Өгсөх урсгалын хаалтыг АВНА ($kind). Гүүр дахин холбогдож,
   │ дараалалд хуримтлагдсан мессежээ үүл рүү урсгаж эхэлнэ."
   case "$kind" in
     iptables)
@@ -147,8 +162,8 @@ uplink_up() {
     *)
       note "  ⚠ Төлөвийн файл ойлгомжгүй: '$kind'" ;;
   esac
-  rm -f "$STATE"
-  note "▲ Уплинк сэргэлээ."
+  rm -f "$STATE"; event 1
+  note "▲ Өгсөх урсгал сэргэлээ."
   note "  Одоо шалга: mosquitto_sub -h localhost -t 'cnc302/+/+/+/+/bridge/state' -C 1"
   note "  (1 = гүүр холбогдсон)"
 }
@@ -195,6 +210,20 @@ case "$MODE" in
     note "▲ mosquitto сэргэлээ. Нийт: $(elapsed) сек"
     ;;
 
+  broker-kill)
+    announce "Ирмэгийн mosquitto-г SIGKILL-ээр ГЭНЭТ унагаж, ${DUR} сек дараа асаана.
+  │ Цахилгаан тасрахтай адил: mosquitto.db-г хадгалах боломж ОЛДОХГҮЙ.
+  │ Сүүлийн autosave-аас хойш дараалалд орсон мессеж АЛДАГДАНА.
+  │ Хамгийн их ялгааг харахын тулд uplink-down ажиллаж байх үед хэрэглэ.
+  │ Буцаах: энэ скрипт өөрөө дахин асаана; эс бөгөөс bash $0 restore"
+    note "▼ Ирмэгийн mosquitto SIGKILL (${DUR}s)"
+    docker kill --signal=KILL cnc302-mosquitto
+    sleep "$DUR"
+    note "▲ mosquitto-г сэргээж байна"
+    docker compose -f "$EDGE_COMPOSE" start mosquitto
+    note "▲ mosquitto асаалаа. Нийт: $(elapsed) сек"
+    ;;
+
   influx)
     if [ ! -f "$CLOUD_COMPOSE" ]; then
       echo "✗ $CLOUD_COMPOSE олдсонгүй." >&2; exit 1
@@ -219,31 +248,34 @@ case "$MODE" in
     ;;
 
   disk)
-    announce "АЮУЛГҮЙ дискний туршилт: 512 MiB-ийн ДАВТАЛТЫН файл үүсгэж,
-  │ ЗӨВХӨН түүнийг дүүргэнэ. Pi-гийн БОДИТ microSD хөндөгдөхгүй.
-  │ Үүсэх файлууд: $LOOPIMG  →  $LOOPDIR дээр холбогдоно.
+    announce "АЮУЛГҮЙ дискний туршилт: ${LOOPMB} MiB-ийн файлыг /dev/shm (RAM) дээр
+  │ үүсгэж, loop төхөөрөмжөөр холбоод ЗӨВХӨН түүнийг дүүргэнэ.
+  │ Pi-гийн БОДИТ microSD хөндөгдөхгүй. Үүсэх файл: $LOOPIMG → $LOOPDIR
   │ Буцаах: umount + файлыг устгана (энэ скрипт өөрөө хийнэ)."
-    note "▼ Дискний дүүргэлтийн туршилт (${DUR}s) — АЮУЛГҮЙ, 512 MiB давталт"
+    note "▼ Дискний дүүргэлтийн туршилт (${DUR}s) — АЮУЛГҮЙ, ${LOOPMB} MiB (RAM)"
     if [ ! -f "$LOOPIMG" ]; then
-      dd if=/dev/zero of="$LOOPIMG" bs=1M count=512 status=none
-      mkfs.ext4 -q "$LOOPIMG"
+      fallocate -l "${LOOPMB}M" "$LOOPIMG"
+      mkfs.ext4 -F -q "$LOOPIMG"
     fi
     $SUDO mkdir -p "$LOOPDIR"
     if ! $SUDO mount -o loop "$LOOPIMG" "$LOOPDIR"; then
       echo "✗ mount амжилтгүй (sudo эрх эсвэл loop модуль дутуу). Юу ч өөрчлөгдсөнгүй." >&2
+      rm -f "$LOOPIMG"
       exit 3
     fi
-    note "  512 MiB файлын систем холбогдлоо: $LOOPDIR"
+    note "  ${LOOPMB} MiB файлын систем холбогдлоо: $LOOPDIR"
     note "  дүүргэж байна…"
     $SUDO dd if=/dev/zero of="$LOOPDIR/filler" bs=1M status=none 2>/dev/null || true
     df -h "$LOOPDIR" | tee -a "$LOG"
-    note "  ⚠ Одоо Docker-ийн лог хязгаарыг шалга: docker inspect ... LogConfig"
+    note "  Бүтэн дискэнд бичих оролдлого (ENOSPC хүлээгдэнэ):"
+    $SUDO sh -c "echo test > '$LOOPDIR/one-more'" 2>&1 | tee -a "$LOG" || true
+    note "  ⚠ Бодит системд: docker inspect … LogConfig (лог хязгаар), df -h / шалга"
     note "  (Pi 3B дээр microSD дүүрэх нь хамгийн хортой эвдрэл — бүх давхарга нэгэн зэрэг унана)"
     sleep "$DUR"
     note "▲ Дискийг чөлөөлж байна"
-    $SUDO rm -f "$LOOPDIR/filler"
     $SUDO umount "$LOOPDIR" 2>/dev/null || true
-    note "▲ Сэргэлээ"
+    rm -f "$LOOPIMG"
+    note "▲ Сэргэлээ (RAM чөлөөлөгдлөө)"
     ;;
 
   cpu)
@@ -267,10 +299,10 @@ case "$MODE" in
 
   restore)
     announce "Энэ скриптийн үүсгэсэн БҮХ өөрчлөлтийг буцаана:
-  │  · уплинкийн iptables/nft хаалт
+  │  · өгсөх урсгалын iptables/nft хаалт
   │  · зогссон ирмэгийн mosquitto
   │  · зогссон үүлний InfluxDB (энэ хост дээр байгаа бол)
-  │  · давталтын дискний файл ба түүний холболт"
+  │  · давталтын дискний файл ба түүний холболт (/dev/shm)"
     note "▲ Бүх зүйлийг сэргээж байна"
     uplink_up
     docker compose -f "$EDGE_COMPOSE" start mosquitto 2>/dev/null || true

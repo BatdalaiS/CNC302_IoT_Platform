@@ -17,12 +17,16 @@ Wants=network-online.target
 Type=simple
 User=cnc302
 WorkingDirectory=/home/cnc302/cnc302/edge
+# systemd.exec(5): зөвхөн мөрийн ЭХЭНД байгаа # эсвэл ; нь тайлбар. .env-д
+# "KEY=утга  # тайлбар" гэж бичвэл тайлбар утганд орно (edge/.env.example-ийг үз).
 EnvironmentFile=/home/cnc302/cnc302/edge/.env
 ExecStart=/home/cnc302/cnc302/edge/.venv/bin/python agent/edge_agent.py
 Restart=always
 RestartSec=5
 
-# 1 GB RAM-ын хамгаалалт: агент 200 MiB давбал systemd үүнийг таслана
+# 1 GB RAM-ын хамгаалалт (systemd.resource-control(5)): unit-ийн санах ой
+# 200 MiB-д багтахгүй бол unit дотор OOM killer ажиллана → Restart=always.
+# M = 1024-ийн суурьтай мегабайт. Cgroup-ийн санах ойн хянагч хэрэгтэй (SETUP Б.5).
 MemoryMax=200M
 Nice=5
 

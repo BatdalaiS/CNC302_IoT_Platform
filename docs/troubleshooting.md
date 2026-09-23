@@ -20,7 +20,7 @@
 | `Connection refused` | EMQX асаагүй | 💻 `cd stack && make up` |
 | `Broken pipe` дахин дахин | Галт хана хааж байна | 💻 SETUP.md А.6 |
 | `No route to host` | Өөр дэд сүлжээ | Хоёуланг нэг свичид кабелиар |
-| `Error: Unknown configuration variable` | Тохиргооны түлхүүр буруу | `make bridge` дахин ажиллуул |
+| `Error: Unknown configuration variable` | Тохиргооны түлхүүр буруу (эсвэл глобал түлхүүрийг bridge хэсэгт бичсэн) | `mosquitto.conf(5)`-тай тулга; `make bridge` дахин ажиллуул |
 | `address 192.168.1.100:1883` | `.env` засаагүй | `nano .env` → CLOUD_HOST |
 
 > **`localhost` бичих нь хамгийн түгээмэл алдаа.** Pi дээрх `localhost` нь Pi өөрөө. Зөөврийн компьютерийн **LAN IP** хэрэгтэй.
@@ -59,7 +59,7 @@ free -m
 | Шалтгаан | Шийдэл |
 |---|---|
 | Swap тохируулаагүй | SETUP.md Б.5 |
-| `gpu_mem` 64 хэвээр | SETUP.md Б.3 → 48 MiB чөлөөлнө |
+| `MemTotal` хүлээснээс бага | SETUP.md Б.3 — `gpu_mem`-ийн нөлөөг хэмж (legacy тохиргоо, үр дүн баталгаагүй) |
 | VS Code сервер ажиллаж байна | `pkill -f vscode-server` |
 | Ширээний орчинтой OS суулгасан | Lite (64-bit) дахин суулга |
 | Үүлний үйлчилгээг Pi дээр асаах гэсэн | ⛔ Битгий. `stack/` нь **компьютер дээр**. |
@@ -72,7 +72,7 @@ Pi 3B нь **arm64**. 32-bit OS суулгасан бол олон дүрс ба
 
 ```bash
 uname -m          # aarch64 байх ЁСТОЙ. armv7l бол 64-bit OS дахин суулга.
-docker manifest inspect eclipse-mosquitto:2.0.20 | grep -A2 arm64
+docker manifest inspect eclipse-mosquitto:2.0.22 | grep -A2 arm64
 ```
 
 ---
@@ -87,9 +87,10 @@ vcgencmd measure_temp
 | Утга | Утга нь юу вэ | Үйлдэл |
 |---|---|---|
 | `0x0` | хэвийн | цааш үргэлжлүүл |
-| `0x50000` | ӨМНӨ НЬ throttling болсон | хөргөөд дахин асаа, дахин хэмж |
-| `0x50005` | ЯГ ОДОО хүчдэл дутуу + throttling | тэжээлээ соль (5 V / 2.5 A) |
-| темп > 75 °C | хязгаарт ойрхон | хөргөгч, сэнс тавь |
+| `0x50000` | ӨМНӨ НЬ хүчдэл дутсан (бит 16) + throttling болсон (бит 18) | тэжээлийг шалга, дахин асаагаад дахин хэмж |
+| `0x50005` | ЯГ ОДОО хүчдэл дутуу (бит 0) + throttled (бит 2), өмнө нь ч мөн | тэжээлээ соль (5 V / 2.5 A) |
+| `0x40000` / `0x4` | өмнө нь / одоо throttled (хүчдэл биш) | хөргөгч, сэнс тавь |
+| темп > 80 °C | албан ёсны баримтаар 80–85 °C-д давтамж буурна | хөргөгч, сэнс тавь |
 
 **Throttling эхэлсэн хэмжилтийг тайланд бичиж болохгүй.** Хаяад дахин хий.
 
@@ -132,9 +133,11 @@ cd edge && make venv        # .venv үүсгэж хамаарлыг суулга
 make agent
 ```
 
-`numpy` барих гэж оролдоод удаж байвал (Pi 3B дээр эх кодоос барих нь 20+ минут):
+`numpy` эсвэл `ai-edge-litert`-ийг эх кодоос барих гэж оролдвол (удаан) эсвэл `No matching distribution` гарвал OS 32-бит байна — PyPI дээр хоёулаа зөвхөн `aarch64` wheel-тэй:
 ```bash
-.venv/bin/pip install --index-url https://www.piwheels.org/simple numpy
+uname -m                      # aarch64 байх ЁСТОЙ
+.venv/bin/pip install --upgrade pip
+.venv/bin/pip install --only-binary=:all: -r agent/requirements.txt
 ```
 
 ---
@@ -144,7 +147,7 @@ make agent
 ```bash
 docker info --format '{{.MemTotal}}' | awk '{printf "%.1f GB\n", $1/1024/1024/1024}'
 ```
-4 GB-аас бага бол → Settings → Resources → Memory → 6 GB → Apply & Restart.
+4 GB-аас бага бол → Windows + WSL 2: `%UserProfile%\.wslconfig`-д `[wsl2]` / `memory=6GB`, дараа нь `wsl --shutdown`. macOS/Linux/Hyper-V: Settings → Resources → Advanced → Memory limit → 6 GB → Apply & restart (SETUP.md А.2).
 
 Хүнд үйлчилгээг зогсооно:
 ```bash
@@ -155,21 +158,31 @@ docker compose exec ollama ollama pull qwen2.5:1.5b
 
 ---
 
-## 10. K3s pod `Pending` эсвэл `OOMKilled` (Лаб 8)
+## 10. K3s pod `Pending`, `OOMKilled` эсвэл Pi нэгдэхгүй (Лаб 8)
+
+K3s **server** нь зөөврийн компьютер дээрх VM, Pi нь **agent** (`lab08/k3s/README.md`).
 
 ```bash
+# 🖥️ VM дээр
+kubectl get nodes -o wide -L kubernetes.io/arch,cnc302/layer
 kubectl -n cnc302 describe pod <нэр> | tail -25
 kubectl top nodes
 kubectl top pods -n cnc302
+# 🥧 Pi дээр
+sudo journalctl -u k3s-agent -n 50
 ```
 
-| Шалтгаан | Шийдэл |
-|---|---|
-| Docker зэрэг ажиллаж байна | `sudo systemctl stop docker` |
-| traefik/servicelb асаалттай | K3s-ийг `--disable traefik --disable servicelb`-ээр дахин суулга |
-| `requests` хэт өндөр | `01-config.yaml`, манифестийн requests-ийг бага болго |
-| Дүрс олдохгүй (`ErrImagePull`) | `docker save cnc302/edge-agent:v1 \| sudo k3s ctr images import -` |
-| metrics-server байхгүй → HPA `<unknown>` | metrics-server-ийг битгий унтраа |
+| Шинж | Шалтгаан | Шийдэл |
+|---|---|---|
+| Pod `Pending`, `didn't match Pod's node affinity/selector` | Pi-д `cnc302/layer` шошго алга | `kubectl label nodes <pi> cnc302/layer=edge` |
+| `edge-agent` эхлэхгүй, Events-д дүрсний алдаа | дүрс Pi-д импортлогдоогүй (`imagePullPolicy: Never`) | компьютер дээр `docker save --platform linux/arm64 -o edge-agent-v1-arm64.tar cnc302/edge-agent:v1` → Pi-гийн `/var/lib/rancher/k3s/agent/images/` руу хуул; `sudo k3s ctr images ls \| grep edge-agent` |
+| Pi дээрх pod DNS нэр шийдэж чадахгүй | VM ↔ Pi хооронд **8472/udp** (Flannel VXLAN) хаагдсан | галт ханаар 8472/udp нээ (зөвхөн LAN дотор) |
+| `kubectl top nodes` дээр Pi гарахгүй | **10250/tcp** (kubelet) хаагдсан | 10250/tcp нээ |
+| VM-ийн INTERNAL-IP `10.0.2.x`, Pi нэгдэхгүй | VM NAT адаптертай | VirtualBox → Adapter 1 = **Bridged**, NAT-ыг хас, K3s-ийг дахин суулга |
+| `bridge/state` 0/1 анивчина, EMQX-д ижил client ID | Pi дээр Compose-ийн mosquitto гүүр K3s-ийн pod-той зэрэг ажиллаж байна | 🥧 `cd ~/cnc302/edge && docker compose down` |
+| `OOMKilled` | Pi-д бодит сул RAM дууссан (reserved алга тул товлогч мэдэхгүй) | хувийн тоог бууруул; Docker-ийг зогсоо (`sudo systemctl stop docker.socket docker`) |
+| traefik/servicelb-ийг унтраах гэж "дахин суулгах" | Энэ бол **server VM**-ийн тохиргоо, Pi биш | Pi дээр юу ч хийхгүй — `lab08/k3s/README.md` |
+| metrics-server байхгүй → HPA `<unknown>` | metrics-server унтарсан | metrics-server-ийг битгий унтраа |
 
 ---
 

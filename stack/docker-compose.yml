@@ -23,6 +23,16 @@ services:
   # ─────────────────────────── MQTT брокер (үүл) ───────────────────────────
   # Pi дээрх mosquitto энэ брокер руу гүүр (bridge) татна.
   # 0.0.0.0 дээр сонсох ёстой — Pi нь LAN-аар холбогдоно.
+  #
+  # Хувилбар: 5.8.6-д ЗОРИУД үлдээв.
+  #   · Лаб 1–2-ын команд, тохиргоог энэ хувилбар дээр бодитоор туршсан.
+  #   · 5.8 нь LTS салбар (EOL 2027-08-27) бөгөөд Apache 2.0 лицензтэй.
+  #   · EMQX 5.9.0-ээс эхлэн Business Source License 1.1-д шилжсэн: нэг
+  #     зангилаа үнэгүй, кластерт арилжааны лиценз хэрэгтэй (академийн
+  #     арилжааны бус хэрэглээ чөлөөлөгдөнө). Лаборатори лицензийн нөхцөлөөс
+  #     хамааралгүй байхын тулд 5.8.x. Дараагийн засвар: 5.8.9 (туршаад солино).
+  #   https://www.emqx.com/en/content/license-faq
+  #   https://docs.emqx.com/en/emqx/latest/changes/eol-ee.html
   emqx:
     image: emqx/emqx:5.8.6
     container_name: cnc302-emqx
@@ -36,8 +46,17 @@ services:
       EMQX_DASHBOARD__DEFAULT_PASSWORD: "${EMQX_DASHBOARD_PASSWORD}"
       # Лаб 4-т энэ хязгаарыг өөрчилж туршина
       EMQX_LISTENERS__TCP__DEFAULT__MAX_CONNECTIONS: "10000"
-      # Лаб 2-т mTLS-ийг энд асаана
+      # Лаб 2-т mTLS-ийг энд асаана (.env: EMQX_TLS_ENABLE=true).
+      # ENABLE=false үед доорх файлууд байхгүй ч EMQX 5.8.6 асдаг (шалгасан):
+      # "Listener ssl:default is NOT started due to: disabled."
+      # EMQX-ийн 8883 анхдагчаар клиентийн сертификат ШААРДДАГГҮЙ — mTLS-д
+      # verify_peer + fail_if_no_peer_cert-ийг ил тавина.
       EMQX_LISTENERS__SSL__DEFAULT__ENABLE: "${EMQX_TLS_ENABLE:-false}"
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__CACERTFILE: '"/opt/emqx/etc/cnc302-certs/ca.crt"'
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__CERTFILE: '"/opt/emqx/etc/cnc302-certs/server.crt"'
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__KEYFILE: '"/opt/emqx/etc/cnc302-certs/server.key"'
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__VERIFY: verify_peer
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__FAIL_IF_NO_PEER_CERT: "true"
     ports:
       - "1883:1883"     # MQTT      ← Pi-гийн гүүр энд холбогдоно
       - "8883:8883"     # MQTT/TLS  (Лаб 2)
@@ -46,7 +65,10 @@ services:
     volumes:
       - emqx-data:/opt/emqx/data
       - emqx-log:/opt/emqx/log
-      - ./emqx/certs:/opt/emqx/etc/certs:ro   # Лаб 2
+      # Лаб 2. etc/certs-ийг ДАРЖ БОЛОХГҮЙ: тэнд EMQX-ийн өөрийн сертификат
+      # байдаг бөгөөд wss:8084 сонсогч түүнийг ашиглана; дарвал EMQX
+      # `no_cert` алдаагаар эхлэхгүй.
+      - ./emqx/certs:/opt/emqx/etc/cnc302-certs:ro
     healthcheck:
       test: ["CMD", "/opt/emqx/bin/emqx", "ctl", "status"]
       interval: 15s
@@ -61,6 +83,14 @@ services:
   # ─────────────────────── Цаг цувааны өгөгдлийн сан ───────────────────────
   # InfluxDB 3 Core. Ажиллахгүй бол:
   #   docker compose -f docker-compose.yml -f docker-compose.influx2.yml up -d
+  # Зургийн ENTRYPOINT нь /usr/bin/entrypoint.sh, CMD ["influxdb3","serve"];
+  # доорх `command` CMD-ийг бүхэлд нь солино.
+  # https://docs.influxdata.com/influxdb3/core/get-started/setup/
+  #
+  # Өгөгдлийн хавтас: процесс uid 1500 (influxdb3)-аар ажилладаг. Зурган дахь
+  # /var/lib/influxdb3 нь root-ынх тул named volume-ийг ТЭНД холбовол бичих
+  # эрхгүй болно. Иймээс influxdb3 хэрэглэгчийн өөрийн хавтсыг ашиглана
+  # (зургийн ENV INFLUXDB3_DATA_DIR=/home/influxdb3/.influxdb3).
   influxdb:
     image: influxdb:3.2-core
     container_name: cnc302-influxdb
@@ -72,14 +102,16 @@ services:
       - serve
       - --node-id=cnc302-node0
       - --object-store=file
-      - --data-dir=/var/lib/influxdb3
+      - --data-dir=/home/influxdb3/.influxdb3
       - --http-bind=0.0.0.0:8181
       - --without-auth          # ЗӨВХӨН ЛАБОРАТОРИД. Лаб 7-д үүнийг шүүмжилнэ.
     ports:
       - "8181:8181"
     volumes:
-      - influx-data:/var/lib/influxdb3
+      - influx-data:/home/influxdb3/.influxdb3
     healthcheck:
+      # /health нь анхдагчаар токен шаарддаг; --without-auth үед шаардахгүй.
+      # Нэвтрэлт асаавал serve-д --disable-authz=health нэмнэ.
       test: ["CMD", "curl", "-fsS", "http://localhost:8181/health"]
       interval: 15s
       timeout: 5s
@@ -92,7 +124,9 @@ services:
 
   # ─────────────────────────── Хяналтын самбар ───────────────────────────
   grafana:
-    image: grafana/grafana:11.6.0
+    # 11.6.0 → 11.6.16: ижил 11.6 салбарын засвар. 11.6.0-д CVE-2025-4123
+    # (high) ба CVE-2026-27876 (critical) нөлөөлдөг; 11.6.14+ засагдсан.
+    image: grafana/grafana:11.6.16
     container_name: cnc302-grafana
     profiles: [core]
     restart: unless-stopped
@@ -101,7 +135,9 @@ services:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_PASSWORD}"
       GF_USERS_ALLOW_SIGN_UP: "false"
-      GF_INSTALL_PLUGINS: "grafana-clock-panel"
+      # Нэмэлт plugin хэрэггүй (лабораториуд зөвхөн суулгаастай InfluxDB эх
+      # сурвалж ашиглана). Хэрэгтэй бол Grafana 11.6-д GF_PLUGINS_PREINSTALL
+      # (GF_INSTALL_PLUGINS нь одоо зөвхөн custom image-ийн build-arg).
     ports:
       - "3000:3000"
     volumes:
@@ -111,7 +147,7 @@ services:
       influxdb:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/api/health || exit 1"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:3000/api/health"]
       interval: 20s
       timeout: 5s
       retries: 10
@@ -138,6 +174,9 @@ services:
       EMQX_API_SECRET: "${EMQX_API_SECRET}"
       MQTT_HOST: "emqx"
       MQTT_PORT: "1883"
+      # Сонголттой: EMQX-ийн нэвтрэлтийг байнга асаасан үед л хэрэгтэй.
+      MQTT_USERNAME: "${REGISTRY_MQTT_USERNAME:-}"
+      MQTT_PASSWORD: "${REGISTRY_MQTT_PASSWORD:-}"
       DB_PATH: "/data/registry.db"
       FW_DIR: "/data/firmware"
     ports:
@@ -154,7 +193,7 @@ services:
 
   # ─────────────────────── Өгөгдлийн шугам (Лаб 5) ───────────────────────
   nodered:
-    image: nodered/node-red:4.0
+    image: nodered/node-red:4.0.9     # Лаб 5 энэ хувилбараар шалгагдсан
     container_name: cnc302-nodered
     profiles: [pipeline]
     restart: unless-stopped
