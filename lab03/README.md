@@ -174,7 +174,7 @@ curl -s -u "$EMQX_API_KEY:$EMQX_API_SECRET" \
   'http://localhost:18083/api/v5/metrics?aggregate=true' | python3 -m json.tool | grep '"bytes.received"'
 ```
 
-> Албан ёсны баримт: [mosquitto(8) — $SYS topics](https://mosquitto.org/man/mosquitto-8.html): `$SYS/broker/bytes/received` = брокер асснаас хойш хүлээн авсан нийт байт.
+> Албан ёсны баримт: [mosquitto(8) — \$SYS topics](https://mosquitto.org/man/mosquitto-8.html): `$SYS/broker/bytes/received` = брокер асснаас хойш хүлээн авсан нийт байт.
 
 #### Хүснэгт 3.3 — Topic Alias-ийн хэмнэлт
 

@@ -32,8 +32,8 @@ BAD_FILL, BAD = "#FDECEC", "#B91C1C"
 OK = "#15803D"
 VM_FILL, VM_STROKE = "#F3EEFA", "#6B4FA0"            # K3s server VM
 
-FONT = "DejaVu Sans, Arial, sans-serif"
-MONO = "DejaVu Sans Mono, monospace"
+FONT = "Liberation Serif, Times New Roman, Times, serif"
+MONO = "Liberation Mono, Courier New, monospace"
 
 
 def esc(s: str) -> str:

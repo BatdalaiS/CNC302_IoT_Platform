@@ -222,7 +222,7 @@ bash lab04/loadtest.sh --target edge ramp <PI-IP>
 
 > **Санамж:** `--target edge` үед CSV-ийн `broker_connections` ба `broker_msg_in_rate` нь ирмэгийн mosquitto-гийн `$SYS/broker/clients/connected` ба `$SYS/broker/publish/messages/received`-ээс ирнэ (mosquitto `sys_interval` тутам, анхдагч 10 с шинэчилнэ). Цуглуулагч өөрөө нэг холболт эзэлдэг — холболтын тоо шатнаас 1–2-оор их байна. `emqx_*` баганууд edge дээр хоосон (эсвэл `--emqx` өгвөл **үүлнийх**). Хэмжилтийн хэрэгсэл юуг хэмжиж байгааг үргэлж мэдэж бай.
 >
-> Албан ёсны баримт: [mosquitto(8) — $SYS topics](https://mosquitto.org/man/mosquitto-8.html).
+> Албан ёсны баримт: [mosquitto(8) — \$SYS topics](https://mosquitto.org/man/mosquitto-8.html).
 
 Шат бүрд `emqtt-bench`-ийн гаралт (илгээсэн хурд) ба Pi-гийн үзүүлэлтийг бичнэ:
 
@@ -497,7 +497,7 @@ git ls-files | grep -E '\.env$|bridge\.conf$|\.key$|\.crt$|devices\.csv'   # х�
 | Ачаалал өгсөн ч Pi дээр юу ч өөрчлөгдөхгүй | ачаалал үүлний EMQX рүү явж байна | `--target edge` ба `<PI-IP>`-ээ шалга |
 | Өгсөх урсгал (tx) огт ачаалагдахгүй | сэдэв `cnc302/<SITE>/` угтваргүй | Алхам 3.3-ын `TOPIC=` |
 | `collect_metrics.py` EMQX API алдаа `401` | EMQX 5-д самбарын нэр/нууц үгээр Basic auth хийхгүй; түлхүүр эсвэл нууц үг буруу | `EMQX_API_KEY`/`EMQX_API_SECRET` (stack/.env) эсвэл зөв `EMQX_DASHBOARD_PASSWORD`; эсвэл `--no-emqx` |
-| edge CSV-д `broker_connections` хоосон | mosquitto $SYS-д холбогдсонгүй, эсвэл 10 с хүлээгээгүй | `--mqtt-host`/`--mqtt-port`; `mosquitto_sub -t '$SYS/#' -C 5 -v` |
+| edge CSV-д `broker_connections` хоосон | mosquitto \$SYS-д холбогдсонгүй, эсвэл 10 с хүлээгээгүй | `--mqtt-host`/`--mqtt-port`; `mosquitto_sub -t '$SYS/#' -C 5 -v` |
 | mosquitto гэнэт дахин асав, холболтууд тасрав | контейнерийн 128 MiB хязгаар → OOM | `docker inspect -f '{{.State.OOMKilled}}' cnc302-mosquitto` → Хүснэгт 4.7-д **нотолгоо** болгон бич |
 | Pi гэнэт хариу өгөхөө болино | swap + microSD дүүрсэн | тэжээл унтраахаас өмнө 2 мин хүлээ; шатыг буулга |
 | CPU 400% харагдана | 4 цөмийн нийлбэр | 100% = нэг цөм, 400% = бүрэн ханалт |

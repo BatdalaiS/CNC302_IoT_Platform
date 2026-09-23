@@ -1,56 +1,56 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="440" viewBox="0 0 900 440" font-family="DejaVu Sans, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="440" viewBox="0 0 900 440" font-family="Liberation Serif, Times New Roman, Times, serif">
 <title>Ачааллын туршилт</title>
 <defs><marker id="a2E7D4F" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2E7D4F"/></marker><marker id="a374151" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#374151"/></marker><marker id="a5B6474" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5B6474"/></marker></defs>
 <rect width="100%" height="100%" fill="#FFFFFF"/>
 <rect x="20" y="40" width="400" height="360" rx="10" fill="#EAF0FA" stroke="#2E5496" stroke-width="2"/>
-<text x="34" y="62" font-family="DejaVu Sans, Arial, sans-serif" font-size="14" fill="#2E5496" text-anchor="start" font-weight="bold">Зөөврийн компьютер</text>
+<text x="34" y="62" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="14" fill="#2E5496" text-anchor="start" font-weight="bold">Зөөврийн компьютер</text>
 <rect x="40" y="75" width="170" height="70" rx="6" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.4"/>
-<text x="125.0" y="99.375" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">emqtt-bench</text>
-<text x="125.0" y="118.775" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">loadtest.sh</text>
-<text x="125.0" y="133.625" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">conn · sub · pub · ramp</text>
+<text x="125.0" y="99.375" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">emqtt-bench</text>
+<text x="125.0" y="118.775" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">loadtest.sh</text>
+<text x="125.0" y="133.625" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">conn · sub · pub · ramp</text>
 <rect x="230" y="75" width="170" height="70" rx="6" fill="#FFFFFF" stroke="#2E5496" stroke-width="1.4"/>
-<text x="315.0" y="99.375" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">EMQX 5.8</text>
-<text x="315.0" y="118.775" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">--target cloud</text>
-<text x="315.0" y="133.625" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">50 → 2000 холболт</text>
+<text x="315.0" y="99.375" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">EMQX 5.8</text>
+<text x="315.0" y="118.775" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">--target cloud</text>
+<text x="315.0" y="133.625" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">50 → 2000 холболт</text>
 <rect x="40" y="200" width="170" height="70" rx="6" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.4"/>
-<text x="125.0" y="231.79999999999998" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">collect_metrics.py</text>
-<text x="125.0" y="251.2" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">--target edge|cloud</text>
+<text x="125.0" y="231.79999999999998" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">collect_metrics.py</text>
+<text x="125.0" y="251.2" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">--target edge|cloud</text>
 <rect x="230" y="200" width="170" height="70" rx="6" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.4"/>
-<text x="315.0" y="224.375" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">EMQX REST API</text>
-<text x="315.0" y="243.775" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">API key / Bearer</text>
-<text x="315.0" y="258.625" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">/api/v5/…?aggregate</text>
+<text x="315.0" y="224.375" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">EMQX REST API</text>
+<text x="315.0" y="243.775" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">API key / Bearer</text>
+<text x="315.0" y="258.625" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">/api/v5/…?aggregate</text>
 <rect x="40" y="315" width="170" height="65" rx="6" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.4" stroke-dasharray="4 3"/>
-<text x="125.0" y="344.3" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">CSV</text>
-<text x="125.0" y="363.70000000000005" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">lab04/measurements/</text>
+<text x="125.0" y="344.3" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">CSV</text>
+<text x="125.0" y="363.70000000000005" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">lab04/measurements/</text>
 <rect x="230" y="315" width="170" height="65" rx="6" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.4"/>
-<text x="315.0" y="336.875" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">plot_scaling.py</text>
-<text x="315.0" y="356.27500000000003" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">ирмэг ба үүл</text>
-<text x="315.0" y="371.125" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">нэг тэнхлэг дээр</text>
+<text x="315.0" y="336.875" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">plot_scaling.py</text>
+<text x="315.0" y="356.27500000000003" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">ирмэг ба үүл</text>
+<text x="315.0" y="371.125" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">нэг тэнхлэг дээр</text>
 <rect x="500" y="40" width="380" height="360" rx="10" fill="#E8F4EC" stroke="#2E7D4F" stroke-width="2"/>
-<text x="514" y="62" font-family="DejaVu Sans, Arial, sans-serif" font-size="14" fill="#2E7D4F" text-anchor="start" font-weight="bold">Raspberry Pi 3B</text>
+<text x="514" y="62" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="14" fill="#2E7D4F" text-anchor="start" font-weight="bold">Raspberry Pi 3B</text>
 <rect x="530" y="75" width="320" height="70" rx="6" fill="#FFFFFF" stroke="#2E7D4F" stroke-width="1.4"/>
-<text x="690.0" y="99.375" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">Mosquitto (контейнер)</text>
-<text x="690.0" y="118.775" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">--target edge · 10 → 500 холболт</text>
-<text x="690.0" y="133.625" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">хязгаар: memory 128m</text>
+<text x="690.0" y="99.375" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">Mosquitto (контейнер)</text>
+<text x="690.0" y="118.775" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">--target edge · 10 → 500 холболт</text>
+<text x="690.0" y="133.625" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">хязгаар: memory 128m</text>
 <rect x="530" y="200" width="150" height="70" rx="6" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.4"/>
-<text x="605.0" y="224.375" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">$SYS</text>
-<text x="605.0" y="243.775" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">clients/connected</text>
-<text x="605.0" y="258.625" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">store/messages/count</text>
+<text x="605.0" y="224.375" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">$SYS</text>
+<text x="605.0" y="243.775" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">clients/connected</text>
+<text x="605.0" y="258.625" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">store/messages/count</text>
 <rect x="700" y="200" width="150" height="70" rx="6" fill="#FFFFFF" stroke="#8A94A6" stroke-width="1.4"/>
-<text x="775.0" y="224.375" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">/proc</text>
-<text x="775.0" y="243.775" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">RAM · swap si/so</text>
-<text x="775.0" y="258.625" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">net tx/rx</text>
+<text x="775.0" y="224.375" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">/proc</text>
+<text x="775.0" y="243.775" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">RAM · swap si/so</text>
+<text x="775.0" y="258.625" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">net tx/rx</text>
 <rect x="530" y="315" width="320" height="65" rx="6" fill="#FEF3E2" stroke="#B45309" stroke-width="1.4"/>
-<text x="690.0" y="344.3" font-family="DejaVu Sans, Arial, sans-serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">Аль нөөц ТҮРҮҮЛЖ ханав?</text>
-<text x="690.0" y="363.70000000000005" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">RAM (OOMKilled) · CPU · 100 Mb/s · microSD</text>
+<text x="690.0" y="344.3" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="bold">Аль нөөц ТҮРҮҮЛЖ ханав?</text>
+<text x="690.0" y="363.70000000000005" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="middle" font-weight="normal">RAM (OOMKilled) · CPU · 100 Mb/s · microSD</text>
 <line x1="210" y1="110" x2="230" y2="110" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
 <path d="M 125 145 L 125 170 L 690 170 L 690 145" fill="none" stroke="#2E7D4F" stroke-width="2.2" marker-end="url(#a2E7D4F)"/>
-<text x="460" y="188" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#2E7D4F" text-anchor="middle" font-weight="bold">ачаалал · LAN</text>
+<text x="460" y="188" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#2E7D4F" text-anchor="middle" font-weight="bold">ачаалал · LAN</text>
 <line x1="210" y1="235" x2="230" y2="235" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)" marker-start="url(#a374151)"/>
 <path d="M 170 270 L 170 292 L 480 292 L 480 235 L 530 235" fill="none" stroke="#5B6474" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#a5B6474)"/>
 <path d="M 480 292 L 775 292 L 775 270" fill="none" stroke="#5B6474" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#a5B6474)"/>
-<text x="325" y="308" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.5" fill="#5B6474" text-anchor="middle" font-weight="normal">хэмжүүр</text>
+<text x="325" y="308" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="10.5" fill="#5B6474" text-anchor="middle" font-weight="normal">хэмжүүр</text>
 <line x1="100" y1="270" x2="100" y2="315" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
 <line x1="210" y1="347" x2="230" y2="347" stroke="#374151" stroke-width="1.6" marker-end="url(#a374151)"/>
-<text x="450" y="428" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" fill="#B45309" text-anchor="middle" font-weight="normal">Swap идэвхжвэл (vmstat si/so &gt; 0) хязгаарт аль хэдийн хүрсэн — цааш шахвал Pi царцана.</text>
+<text x="450" y="428" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11.5" fill="#B45309" text-anchor="middle" font-weight="normal">Swap идэвхжвэл (vmstat si/so &gt; 0) хязгаарт аль хэдийн хүрсэн — цааш шахвал Pi царцана.</text>
 </svg>

@@ -1,69 +1,69 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="440" viewBox="0 0 900 440" font-family="DejaVu Sans, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="440" viewBox="0 0 900 440" font-family="Liberation Serif, Times New Roman, Times, serif">
 <title>Unified Namespace</title>
 <defs></defs>
 <rect width="100%" height="100%" fill="#FFFFFF"/>
-<text x="40" y="60" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="start" font-weight="normal">угтвар</text>
+<text x="40" y="60" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="start" font-weight="normal">угтвар</text>
 <rect x="110" y="40" width="72.8" height="30" rx="6" fill="#EAF0FA" stroke="#2E5496" stroke-width="1.4"/>
-<text x="146.4" y="60" font-family="DejaVu Sans Mono, monospace" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="normal">cnc302</text>
-<text x="76" y="118" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="start" font-weight="normal">site</text>
+<text x="146.4" y="60" font-family="Liberation Mono, Courier New, monospace" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="normal">cnc302</text>
+<text x="76" y="118" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="start" font-weight="normal">site</text>
 <rect x="146" y="98" width="72.8" height="30" rx="6" fill="#EAF0FA" stroke="#2E5496" stroke-width="1.4"/>
-<text x="182.4" y="118" font-family="DejaVu Sans Mono, monospace" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="normal">shutis</text>
+<text x="182.4" y="118" font-family="Liberation Mono, Courier New, monospace" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="normal">shutis</text>
 <path d="M 124 70 L 124 113 L 146 113" fill="none" stroke="#374151" stroke-width="1.6"/>
-<text x="112" y="176" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="start" font-weight="normal">area</text>
+<text x="112" y="176" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="start" font-weight="normal">area</text>
 <rect x="182" y="156" width="57.2" height="30" rx="6" fill="#EAF0FA" stroke="#2E5496" stroke-width="1.4"/>
-<text x="210.6" y="176" font-family="DejaVu Sans Mono, monospace" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="normal">mhts</text>
+<text x="210.6" y="176" font-family="Liberation Mono, Courier New, monospace" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="normal">mhts</text>
 <path d="M 160 128 L 160 171 L 182 171" fill="none" stroke="#374151" stroke-width="1.6"/>
-<text x="148" y="234" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="start" font-weight="normal">line</text>
+<text x="148" y="234" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="start" font-weight="normal">line</text>
 <rect x="218" y="214" width="49.4" height="30" rx="6" fill="#EAF0FA" stroke="#2E5496" stroke-width="1.4"/>
-<text x="242.7" y="234" font-family="DejaVu Sans Mono, monospace" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="normal">lab</text>
+<text x="242.7" y="234" font-family="Liberation Mono, Courier New, monospace" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="normal">lab</text>
 <path d="M 196 186 L 196 229 L 218 229" fill="none" stroke="#374151" stroke-width="1.6"/>
-<text x="184" y="292" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="start" font-weight="normal">device</text>
+<text x="184" y="292" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="start" font-weight="normal">device</text>
 <rect x="254" y="272" width="80.6" height="30" rx="6" fill="#E8F4EC" stroke="#2E7D4F" stroke-width="1.4"/>
-<text x="294.3" y="292" font-family="DejaVu Sans Mono, monospace" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="normal">pi3b-01</text>
+<text x="294.3" y="292" font-family="Liberation Mono, Courier New, monospace" font-size="13" fill="#1F2937" text-anchor="middle" font-weight="normal">pi3b-01</text>
 <path d="M 232 244 L 232 287 L 254 287" fill="none" stroke="#374151" stroke-width="1.6"/>
-<text x="470" y="30" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" fill="#5B6474" text-anchor="start" font-weight="bold">channel (суваг)</text>
+<text x="470" y="30" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="12" fill="#5B6474" text-anchor="start" font-weight="bold">channel (суваг)</text>
 <rect x="470" y="44" width="150" height="30" rx="6" fill="#FFFFFF" stroke="#2E7D4F" stroke-width="1.4"/>
-<text x="545" y="64" font-family="DejaVu Sans Mono, monospace" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="normal">telemetry</text>
-<text x="632" y="58" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#2E7D4F" text-anchor="start" font-weight="normal">ирмэг → үүл</text>
-<text x="632" y="72" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.5" fill="#5B6474" text-anchor="start" font-weight="normal">хэмжилт</text>
+<text x="545" y="64" font-family="Liberation Mono, Courier New, monospace" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="normal">telemetry</text>
+<text x="632" y="58" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#2E7D4F" text-anchor="start" font-weight="normal">ирмэг → үүл</text>
+<text x="632" y="72" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="10.5" fill="#5B6474" text-anchor="start" font-weight="normal">хэмжилт</text>
 <path d="M 268 302 L 268 314 L 440 314 L 440 59 L 470 59" fill="none" stroke="#D1D5DB" stroke-width="1.2"/>
 <rect x="470" y="88" width="150" height="30" rx="6" fill="#FFFFFF" stroke="#2E7D4F" stroke-width="1.4"/>
-<text x="545" y="108" font-family="DejaVu Sans Mono, monospace" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="normal">health</text>
-<text x="632" y="102" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#2E7D4F" text-anchor="start" font-weight="normal">ирмэг → үүл</text>
-<text x="632" y="116" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.5" fill="#5B6474" text-anchor="start" font-weight="normal">темп, RAM, throttle</text>
+<text x="545" y="108" font-family="Liberation Mono, Courier New, monospace" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="normal">health</text>
+<text x="632" y="102" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#2E7D4F" text-anchor="start" font-weight="normal">ирмэг → үүл</text>
+<text x="632" y="116" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="10.5" fill="#5B6474" text-anchor="start" font-weight="normal">темп, RAM, throttle</text>
 <path d="M 268 302 L 268 314 L 440 314 L 440 103 L 470 103" fill="none" stroke="#D1D5DB" stroke-width="1.2"/>
 <rect x="470" y="132" width="150" height="30" rx="6" fill="#FFFFFF" stroke="#2E7D4F" stroke-width="1.4"/>
-<text x="545" y="152" font-family="DejaVu Sans Mono, monospace" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="normal">status</text>
-<text x="632" y="146" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#2E7D4F" text-anchor="start" font-weight="normal">ирмэг → үүл</text>
-<text x="632" y="160" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.5" fill="#5B6474" text-anchor="start" font-weight="normal">retained · LWT</text>
+<text x="545" y="152" font-family="Liberation Mono, Courier New, monospace" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="normal">status</text>
+<text x="632" y="146" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#2E7D4F" text-anchor="start" font-weight="normal">ирмэг → үүл</text>
+<text x="632" y="160" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="10.5" fill="#5B6474" text-anchor="start" font-weight="normal">retained · LWT</text>
 <path d="M 268 302 L 268 314 L 440 314 L 440 147 L 470 147" fill="none" stroke="#D1D5DB" stroke-width="1.2"/>
 <rect x="470" y="176" width="150" height="30" rx="6" fill="#FFFFFF" stroke="#2E7D4F" stroke-width="1.4"/>
-<text x="545" y="196" font-family="DejaVu Sans Mono, monospace" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="normal">anomaly</text>
-<text x="632" y="190" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#2E7D4F" text-anchor="start" font-weight="normal">ирмэг → үүл</text>
-<text x="632" y="204" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.5" fill="#5B6474" text-anchor="start" font-weight="normal">зөвхөн онцгой</text>
+<text x="545" y="196" font-family="Liberation Mono, Courier New, monospace" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="normal">anomaly</text>
+<text x="632" y="190" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#2E7D4F" text-anchor="start" font-weight="normal">ирмэг → үүл</text>
+<text x="632" y="204" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="10.5" fill="#5B6474" text-anchor="start" font-weight="normal">зөвхөн онцгой</text>
 <path d="M 268 302 L 268 314 L 440 314 L 440 191 L 470 191" fill="none" stroke="#D1D5DB" stroke-width="1.2"/>
 <rect x="470" y="220" width="150" height="30" rx="6" fill="#FFFFFF" stroke="#2E7D4F" stroke-width="1.4"/>
-<text x="545" y="240" font-family="DejaVu Sans Mono, monospace" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="normal">bridge/state</text>
-<text x="632" y="234" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#2E7D4F" text-anchor="start" font-weight="normal">ирмэг → үүл</text>
-<text x="632" y="248" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.5" fill="#5B6474" text-anchor="start" font-weight="normal">1 / 0</text>
+<text x="545" y="240" font-family="Liberation Mono, Courier New, monospace" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="normal">bridge/state</text>
+<text x="632" y="234" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#2E7D4F" text-anchor="start" font-weight="normal">ирмэг → үүл</text>
+<text x="632" y="248" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="10.5" fill="#5B6474" text-anchor="start" font-weight="normal">1 / 0</text>
 <path d="M 268 302 L 268 314 L 440 314 L 440 235 L 470 235" fill="none" stroke="#D1D5DB" stroke-width="1.2"/>
 <rect x="470" y="264" width="150" height="30" rx="6" fill="#FFFFFF" stroke="#2E5496" stroke-width="1.4"/>
-<text x="545" y="284" font-family="DejaVu Sans Mono, monospace" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="normal">cmd</text>
-<text x="632" y="278" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#2E5496" text-anchor="start" font-weight="normal">үүл → ирмэг</text>
-<text x="632" y="292" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.5" fill="#5B6474" text-anchor="start" font-weight="normal">команд</text>
+<text x="545" y="284" font-family="Liberation Mono, Courier New, monospace" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="normal">cmd</text>
+<text x="632" y="278" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#2E5496" text-anchor="start" font-weight="normal">үүл → ирмэг</text>
+<text x="632" y="292" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="10.5" fill="#5B6474" text-anchor="start" font-weight="normal">команд</text>
 <path d="M 268 302 L 268 314 L 440 314 L 440 279 L 470 279" fill="none" stroke="#D1D5DB" stroke-width="1.2"/>
 <rect x="470" y="308" width="150" height="30" rx="6" fill="#FFFFFF" stroke="#2E5496" stroke-width="1.4"/>
-<text x="545" y="328" font-family="DejaVu Sans Mono, monospace" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="normal">config</text>
-<text x="632" y="322" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#2E5496" text-anchor="start" font-weight="normal">үүл → ирмэг</text>
-<text x="632" y="336" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.5" fill="#5B6474" text-anchor="start" font-weight="normal">тохиргоо</text>
+<text x="545" y="328" font-family="Liberation Mono, Courier New, monospace" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="normal">config</text>
+<text x="632" y="322" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#2E5496" text-anchor="start" font-weight="normal">үүл → ирмэг</text>
+<text x="632" y="336" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="10.5" fill="#5B6474" text-anchor="start" font-weight="normal">тохиргоо</text>
 <path d="M 268 302 L 268 314 L 440 314 L 440 323 L 470 323" fill="none" stroke="#D1D5DB" stroke-width="1.2"/>
 <rect x="470" y="352" width="150" height="30" rx="6" fill="#FFFFFF" stroke="#B45309" stroke-width="1.4"/>
-<text x="545" y="372" font-family="DejaVu Sans Mono, monospace" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="normal">ota/…</text>
-<text x="632" y="366" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#B45309" text-anchor="start" font-weight="normal">хоёр тал</text>
-<text x="632" y="380" font-family="DejaVu Sans, Arial, sans-serif" font-size="10.5" fill="#5B6474" text-anchor="start" font-weight="normal">Лаб 2</text>
+<text x="545" y="372" font-family="Liberation Mono, Courier New, monospace" font-size="12.5" fill="#1F2937" text-anchor="middle" font-weight="normal">ota/…</text>
+<text x="632" y="366" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#B45309" text-anchor="start" font-weight="normal">хоёр тал</text>
+<text x="632" y="380" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="10.5" fill="#5B6474" text-anchor="start" font-weight="normal">Лаб 2</text>
 <path d="M 268 302 L 268 314 L 440 314 L 440 367 L 470 367" fill="none" stroke="#D1D5DB" stroke-width="1.2"/>
-<text x="40" y="350" font-family="DejaVu Sans, Arial, sans-serif" font-size="12" fill="#1F2937" text-anchor="start" font-weight="bold">Жишээ сэдэв:</text>
-<text x="40" y="372" font-family="DejaVu Sans Mono, monospace" font-size="13" fill="#2E5496" text-anchor="start" font-weight="normal">cnc302/shutis/mhts/lab/pi3b-01/telemetry</text>
-<text x="40" y="398" font-family="DejaVu Sans, Arial, sans-serif" font-size="11.5" fill="#B45309" text-anchor="start" font-weight="normal">Гүүр зөвхөн cnc302/&lt;SITE&gt;/#-г дамжуулна — угтвар зөрвөл мессеж үүлэнд хүрэхгүй.</text>
-<text x="40" y="420" font-family="DejaVu Sans, Arial, sans-serif" font-size="11" fill="#5B6474" text-anchor="start" font-weight="normal">Шатлал нь ISA-95-аас санаа авсан курсын тохиролцоо; uns_tree.py --strict шалгана.</text>
+<text x="40" y="350" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="12" fill="#1F2937" text-anchor="start" font-weight="bold">Жишээ сэдэв:</text>
+<text x="40" y="372" font-family="Liberation Mono, Courier New, monospace" font-size="13" fill="#2E5496" text-anchor="start" font-weight="normal">cnc302/shutis/mhts/lab/pi3b-01/telemetry</text>
+<text x="40" y="398" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11.5" fill="#B45309" text-anchor="start" font-weight="normal">Гүүр зөвхөн cnc302/&lt;SITE&gt;/#-г дамжуулна — угтвар зөрвөл мессеж үүлэнд хүрэхгүй.</text>
+<text x="40" y="420" font-family="Liberation Serif, Times New Roman, Times, serif" font-size="11" fill="#5B6474" text-anchor="start" font-weight="normal">Шатлал нь ISA-95-аас санаа авсан курсын тохиролцоо; uns_tree.py --strict шалгана.</text>
 </svg>
