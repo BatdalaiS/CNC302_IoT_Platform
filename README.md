@@ -1,12 +1,3 @@
-<!-- GitHub толгой -->
-[![Гарын авлага хөрвүүлэх](https://github.com/BatdalaiS/CNC302_IoT_Platform/actions/workflows/build-manual.yml/badge.svg)](https://github.com/BatdalaiS/CNC302_IoT_Platform/actions/workflows/build-manual.yml)
-[![Код шалгах](https://github.com/BatdalaiS/CNC302_IoT_Platform/actions/workflows/lint.yml/badge.svg)](https://github.com/BatdalaiS/CNC302_IoT_Platform/actions/workflows/lint.yml)
-[![Лиценз: MIT + CC BY-SA 4.0](https://img.shields.io/badge/лиценз-MIT%20%2B%20CC%20BY--SA%204.0-informational)](LICENSE)
-
-> **Хэвлэмэл гарын авлага (139 хуудас):** Actions → *Гарын авлага хөрвүүлэх* →
-> сүүлийн ажиллуулалт → **Artifacts → cnc302-manual**.
-> Эсвэл өөрөө хөрвүүлэх: `cd manual && make`.
-
 # CNC302 — Юмсын интернэтийн платформ ба хэрэглээ
 ## Лабораторийн ажлын сан · Raspberry Pi 3B хувилбар
 
@@ -55,7 +46,7 @@ CNC302-labs/
 ├── SETUP.md               ← Лаб 1-ээс өмнө нэг удаа хийх бэлтгэл
 │
 ├── stack/                 💻 ҮҮЛ — зөөврийн компьютер дээр
-│   ├── docker-compose.yml       ← ЖИВЭЭ ФАЙЛ, лаборатори бүрт өснө
+│   ├── docker-compose.yml       ← ГОЛ АЖЛЫН ФАЙЛ, лаборатори бүрт өснө
 │   ├── docker-compose.tb.yml    ← ThingsBoard (сонголтот харьцуулалт)
 │   ├── docker-compose.influx2.yml  ← InfluxDB 2.7 нөөц хувилбар
 │   ├── .env.example
@@ -91,7 +82,7 @@ CNC302-labs/
 
 ### `stack/` ба `edge/` фолдерын дүрэм
 
-`stack/docker-compose.yml` болон `edge/docker-compose.yml` бол **таны багийн живээ файлууд**. Лаборатори бүрт та тэдгээр рүү үйлчилгээ нэмж, тохиргоо өөрчилнө. Эвдэрсэн бол Git-ийн түүхээс сэргээнэ:
+`stack/docker-compose.yml` болон `edge/docker-compose.yml` бол **таны багийн гол ажлын файлууд**. Лаборатори бүрт та тэдгээр рүү үйлчилгээ нэмж, тохиргоо өөрчилнө. Эвдэрсэн бол Git-ийн түүхээс сэргээнэ:
 
 ```bash
 git log --oneline -- stack/docker-compose.yml
