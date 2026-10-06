@@ -72,10 +72,14 @@ health:
 	@printf 'Registry  '; curl -s -o /dev/null -w '%{http_code}\n' http://localhost:8090/health || echo DOWN
 
 # Pi-гийн edge/.env файлд CLOUD_HOST= гэж бичих хаяг.
+# WSL дотор Windows-ийн ipconfig.exe-г ашиглана (WSL-ийн 172.x хаяг Pi-д БУРУУ).
 # Windows дээр ажиллахгүй бол:  ipconfig | findstr IPv4
 ip:
 	@echo "Pi-гийн edge/.env файлд бичих утга:"
-	@if command -v ip >/dev/null 2>&1; then \
+	@if grep -qi microsoft /proc/version 2>/dev/null; then \
+	   echo "  (WSL) Windows-ийн Wi-Fi эсвэл Ethernet адаптерийн IPv4-ийг сонго — vEthernet (WSL)-ийнхийг БИШ:"; \
+	   ipconfig.exe | tr -d '\r' | grep -a -E 'adapter|IPv4'; \
+	 elif command -v ip >/dev/null 2>&1; then \
 	   ip -4 addr show scope global | awk '/inet /{split($$2,a,"/"); print "  CLOUD_HOST=" a[1]}'; \
 	 elif command -v ipconfig >/dev/null 2>&1; then \
 	   ipconfig | grep -i 'IPv4' || ipconfig getifaddr en0; \
