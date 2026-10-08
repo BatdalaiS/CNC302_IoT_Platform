@@ -167,6 +167,7 @@ wsl --list --verbose
 ```
 
 ✅ **Шалгах:**
+
 - `wsl --version`-ийн эхний мөр: `WSL version: 2.x.x` — **2.1.5-аас бага биш** (Docker Desktop-ийн шаардлага).
 - `wsl --list --verbose`: `Ubuntu` мөрийн **VERSION** баганад `2`, нэрийн өмнө `*` (анхдагч distribution).
 
@@ -268,6 +269,7 @@ docker run --rm hello-world
 ```
 
 ✅ **Шалгах (хоёр терминал дээр хоёуланд нь):**
+
 - `docker version` нь **Client:** ба **Server:** гэсэн **хоёр** хэсэг хэвлэнэ.
 - `docker compose version` → `Docker Compose version v2.x.x`.
 - `hello-world` → `Hello from Docker!` гэсэн мөр гарна.
@@ -303,7 +305,7 @@ winget install --id thomasnordquist.MQTT-Explorer -e
 ```bash
 sudo apt update
 sudo apt upgrade -y
-sudo apt install -y git make curl python3-venv python3-pip mosquitto-clients
+sudo apt install -y git make curl bc jq python3-venv python3-pip mosquitto-clients
 ```
 
 Эхний команд Ubuntu-гийн нууц үгийг (А.1.3, Алхам 2) асууна.
@@ -476,6 +478,7 @@ make health
 ```
 
 ✅ **Шалгах:**
+
 - `make status`-ын **STATUS** баганад бүх контейнер `Up` эсвэл `Up (healthy)`. `starting` / `health: starting` бол 1 мин хүлээгээд дахин ажиллуул.
 - `make health` дөрвөн мөр **`200`** хэвлэнэ:
   ```
@@ -716,7 +719,7 @@ Are you sure you want to continue connecting (yes/no/[fingerprint])?
 ```bash
 sudo apt update
 sudo apt full-upgrade -y
-sudo apt install -y git curl jq htop iotop stress-ng mosquitto-clients \
+sudo apt install -y git curl jq bc htop iotop stress-ng mosquitto-clients \
                     netcat-openbsd python3-venv python3-dev
 sudo reboot
 ```
@@ -740,11 +743,11 @@ vcgencmd get_throttled
 
 | Команд | Байх ёстой | Өөр бол |
 |---|---|---|
-| `uname -m` | `aarch64` | `armv7l` → 32-bit OS бичсэн байна → Б.1-ийг дахин хий |
+| `uname -m` | `aarch64` | `armv7l` = 32-bit OS → Б.1 |
 | `dpkg --print-architecture` | `arm64` | дээрхтэй адил |
-| `PRETTY_NAME` | `Debian GNU/Linux 13 (trixie)` (эсвэл `12 (bookworm)`) | — |
+| `PRETTY_NAME` | `… 13 (trixie)` эсвэл `… 12 (bookworm)` | — |
 | `free -h` → Mem total | ≈ `900Mi` | — |
-| `get_throttled` | `throttled=0x0` | Тэжээл сул → Б.0, Д хэсэг |
+| `get_throttled` | `throttled=0x0` | Тэжээл сул → Б.0, Д |
 
 ### Б.3 GPU-гийн санах ой (`gpu_mem`) — хэмжиж шийднэ
 
@@ -853,6 +856,7 @@ systemctl is-enabled docker
 ```
 
 ✅ **Хүлээгдэх үр дүн:**
+
 - `Docker version 2x.x.x` ба `Docker Compose version v2.x.x` (**v2.20+**),
 - `Hello from Docker!`,
 - `enabled` (Pi асах бүрт Docker автоматаар асна).

@@ -17,24 +17,32 @@
 \caption{Зураг 0.1 --- Хоёр давхаргат архитектур: зөөврийн компьютер (үүл) ба Raspberry Pi 3B (ирмэг), хооронд нь MQTT гүүр}
 \end{figure}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Төхөөрөмж
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Үүрэг
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Юу ажиллах
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Төхөөрөмж\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Үүрэг\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Юу ажиллах\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{Оюутны зөөврийн компьютер}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{Үүлний давхарга} (IoT лавлах архитектурын 3-р давхарга)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+EMQX, InfluxDB, Grafana, төхөөрөмжийн бүртгэл, Node-RED, GraphQL API, Dex, Ollama\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{Raspberry Pi 3B}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{Ирмэгийн давхарга} (2--3-р давхаргын зааг)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Mosquitto брокер + үүл рүү гүүр, ирмэгийн агент, LiteRT (TFLite) дүгнэлт, Лаб 8-д K3s agent (server нь зөөврийн компьютер дээрх VM)\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\textbf{Оюутны зөөврийн компьютер} & \textbf{Үүлний давхарга} (IoT лавлах архитектурын 3-р давхарга) & EMQX, InfluxDB, Grafana, төхөөрөмжийн бүртгэл, Node-RED, GraphQL API, Dex, Ollama \\
-\textbf{Raspberry Pi 3B} & \textbf{Ирмэгийн давхарга} (2--3-р давхаргын зааг) & Mosquitto брокер + үүл рүү гүүр, ирмэгийн агент, LiteRT (TFLite) дүгнэлт, Лаб 8-д K3s agent (server нь зөөврийн компьютер дээрх VM) \\
 \end{longtable}\endgroup
 
 \hypertarget{ux44fux430ux433ux430ux430ux434-ux445ux443ux432ux430ux430ux441ux430ux43d-ux431ux44d}{%
@@ -42,27 +50,53 @@
 
 Raspberry Pi 3B-ийн албан ёсны техникийн үзүүлэлт ба үр дагавар:
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Үзүүлэлт
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Утга
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Үр дагавар
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Үзүүлэлт\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Утга\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Үр дагавар\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Санах ой\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{1 GB} (OS-д харагдах \texttt{MemTotal}-ийг Лаб 1-д хэмжинэ)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+ThingsBoard-ын албан ёсны заавар хөгжүүлэлтэд ч 4 GB RAM шаарддаг --- огт багтахгүй\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Процессор\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+BCM2837, 4 × Cortex-A53 (Armv8) @ 1.2 GHz\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+JVM-т суурилсан платформ хэт удаан\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Сүлжээ\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{100 Mb/s} Ethernet; 4 × USB 2.0\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Өгсөх урсгал (uplink) 100 Mb/s-ээр хязгаарлагдана\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Диск\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{зөвхөн microSD}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+persistence, swap бичилт удаан (Лаб 5-д хэмжинэ)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Өргөтгөл\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{PCIe байхгүй}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Raspberry Pi AI Kit (Hailo) нь Raspberry Pi 5-д зориулагдсан --- боломжгүй\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-Санах ой & \textbf{1 GB} (OS-д харагдах \texttt{MemTotal}-ийг Лаб 1-д хэмжинэ) & ThingsBoard-ын албан ёсны заавар хөгжүүлэлтэд ч 4 GB RAM шаарддаг --- огт багтахгүй \\
-Процессор & BCM2837, 4 × Cortex-A53 (Armv8) @ 1.2 GHz & JVM-т суурилсан платформ хэт удаан \\
-Сүлжээ & \textbf{100 Mb/s} Ethernet; 4 × USB 2.0 & Өгсөх урсгал (uplink) 100 Mb/s-ээр хязгаарлагдана \\
-Диск & \textbf{зөвхөн microSD} & persistence, swap бичилт удаан (Лаб 5-д хэмжинэ) \\
-Өргөтгөл & \textbf{PCIe байхгүй} & Raspberry Pi AI Kit (Hailo) нь Raspberry Pi 5-д зориулагдсан --- боломжгүй \\
 \end{longtable}\endgroup
 
 Гэхдээ энэ бол зөвхөн хязгаарлалт биш. Бодит үйлдвэрлэлийн IoT систем яг \textbf{ийм} байдаг: хүчирхэг үүл, сул ирмэг, хооронд нь найдваргүй холбоос. Pi 5 дээр бүгдийг нэг дор ажиллуулах нь илүү тохилог боловч \textbf{Edge--Fog--Cloud континуумыг заахгүй}. Pi 3B үүнийг заахаас өөр аргагүй болгоно:
@@ -90,7 +124,7 @@ CNC302-labs/
 ├── SETUP.md               ← Лаб 1-ээс өмнө нэг удаа хийх бэлтгэл
 │
 ├── stack/                 [ЗК] ҮҮЛ — зөөврийн компьютер дээр
-│   ├── docker-compose.yml       ← ЖИВЭЭ ФАЙЛ, лаборатори бүрт өснө
+│   ├── docker-compose.yml       ← ГОЛ АЖЛЫН ФАЙЛ, лаборатори бүрт өснө
 │   ├── docker-compose.tb.yml    ← ThingsBoard (сонголтот харьцуулалт)
 │   ├── docker-compose.influx2.yml  ← InfluxDB 2.7 нөөц хувилбар
 │   ├── .env.example
@@ -127,11 +161,11 @@ CNC302-labs/
 \hypertarget{stack-ux431ux430-edge-ux444ux43eux43bux434ux435ux440ux44bux43d-ux434ux4afux440ux44dux43c}{%
 \subsection{\texorpdfstring{\texttt{stack/} ба \texttt{edge/} фолдерын дүрэм}{stack/ ба edge/ фолдерын дүрэм}}\label{stack-ux431ux430-edge-ux444ux43eux43bux434ux435ux440ux44bux43d-ux434ux4afux440ux44dux43c}}
 
-\texttt{stack/\allowbreak{}docker-compose.\allowbreak{}yml} болон \texttt{edge/\allowbreak{}docker-compose.\allowbreak{}yml} бол \textbf{таны багийн живээ файлууд}. Лаборатори бүрт та тэдгээр рүү үйлчилгээ нэмж, тохиргоо өөрчилнө. Эвдэрсэн бол Git-ийн түүхээс сэргээнэ:
+\texttt{stack/\allowbreak{}docker-compose.\allowbreak{}yml} болон \texttt{edge/\allowbreak{}docker-compose.\allowbreak{}yml} бол \textbf{таны багийн гол ажлын файлууд}. Лаборатори бүрт та тэдгээр рүү үйлчилгээ нэмж, тохиргоо өөрчилнө. Эвдэрсэн бол Git-ийн түүхээс сэргээнэ:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{git}\NormalTok{ log }\AttributeTok{{-}{-}oneline} \AttributeTok{{-}{-}}\NormalTok{ stack/docker{-}compose.yml}
+\FunctionTok{git}\NormalTok{ log {-}{-}oneline {-}{-} stack/docker{-}compose.yml}
 \FunctionTok{git}\NormalTok{ checkout }\OperatorTok{\textless{}}\NormalTok{commit}\OperatorTok{\textgreater{}}\NormalTok{ {-}{-} stack/docker{-}compose.yml}
 \end{Highlighting}
 \end{Shaded}
@@ -144,39 +178,74 @@ CNC302-labs/
 \hypertarget{ux437ux43a-ux4afux4afux43b-stack}{%
 \subsection{\texorpdfstring{{[}ЗК{]} Үүл --- \texttt{stack/}}{{[}ЗК{]} Үүл --- stack/}}\label{ux437ux43a-ux4afux4afux43b-stack}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Профайл
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Үйлчилгээ
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хэзээ
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-RAM
-\end{minipage} \\
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+Профайл\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Үйлчилгээ\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хэзээ\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+RAM\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{core}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+emqx, influxdb, grafana, registry\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Лаб 1-ээс эхлэн үргэлж\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textasciitilde1.2 GB\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{pipeline}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
++ nodered\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Лаб 5-аас\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
++0.2 GB\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{app}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
++ dex, graphql-api\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Лаб 7-оос\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
++0.2 GB\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{ai}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
++ ollama\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Лаб 8\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
++2--3 GB\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{tb}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
++ thingsboard (хуучин \texttt{tb-postgres} загвар)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Лаб 2, зөвхөн харьцуулалт\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
++2 GB (албан ёсоор ≥ 4 GB)\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{core} & emqx, influxdb, grafana, registry & Лаб 1-ээс эхлэн үргэлж & \textasciitilde1.2 GB \\
-\texttt{pipeline} & + nodered & Лаб 5-аас & +0.2 GB \\
-\texttt{app} & + dex, graphql-api & Лаб 7-оос & +0.2 GB \\
-\texttt{ai} & + ollama & Лаб 8 & +2--3 GB \\
-\texttt{tb} & + thingsboard (хуучин \texttt{tb-postgres} загвар) & Лаб 2, зөвхөн харьцуулалт & +2 GB (албан ёсоор ≥ 4 GB) \\
 \end{longtable}\endgroup
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ stack}
-\FunctionTok{make}\NormalTok{ up              }\CommentTok{\# core}
-\FunctionTok{make}\NormalTok{ up{-}pipeline     }\CommentTok{\# + Node{-}RED}
-\FunctionTok{make}\NormalTok{ up{-}app          }\CommentTok{\# + Dex, GraphQL}
-\FunctionTok{make}\NormalTok{ up{-}ai           }\CommentTok{\# + Ollama}
+\FunctionTok{make}\NormalTok{ up              \# core}
+\FunctionTok{make}\NormalTok{ up{-}pipeline     \# + Node{-}RED}
+\FunctionTok{make}\NormalTok{ up{-}app          \# + Dex, GraphQL}
+\FunctionTok{make}\NormalTok{ up{-}ai           \# + Ollama}
 \end{Highlighting}
 \end{Shaded}
 
@@ -189,11 +258,11 @@ RAM
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ edge}
 \FunctionTok{cp}\NormalTok{ .env.example .env}
-\FunctionTok{nano}\NormalTok{ .env            }\CommentTok{\# CLOUD\_HOST = зөөврийн компьютерийн IP}
-\FunctionTok{make}\NormalTok{ bridge          }\CommentTok{\# bridge.conf үүсгэнэ}
-\FunctionTok{make}\NormalTok{ up              }\CommentTok{\# mosquitto}
-\FunctionTok{make}\NormalTok{ agent           }\CommentTok{\# ирмэгийн агент (өөр терминалд)}
-\FunctionTok{make}\NormalTok{ link            }\CommentTok{\# гүүр холбогдсон эсэх: 1 = тийм}
+\FunctionTok{nano}\NormalTok{ .env            \# CLOUD\_HOST = зөөврийн компьютерийн IP}
+\FunctionTok{make}\NormalTok{ bridge          \# bridge.conf үүсгэнэ}
+\FunctionTok{make}\NormalTok{ up              \# mosquitto}
+\FunctionTok{make}\NormalTok{ agent           \# ирмэгийн агент (өөр терминалд)}
+\FunctionTok{make}\NormalTok{ link            \# гүүр холбогдсон эсэх: 1 = тийм}
 \end{Highlighting}
 \end{Shaded}
 
@@ -211,18 +280,17 @@ cnc302/<site>/<area>/<line>/<device>/<channel>
 
 \begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-Суваг & Чиглэл & Агуулга \\
+Суваг & Чиглэл & Агуулга\tabularnewline
 \midrule
 \endhead
+\texttt{telemetry} & ирмэг → үүл & хэмжилтийн өгөгдөл\tabularnewline
+\texttt{health} & ирмэг → үүл & Pi-гийн температур, RAM, throttle\tabularnewline
+\texttt{status} & ирмэг → үүл & retained: онлайн/офлайн (LWT)\tabularnewline
+\texttt{anomaly} & ирмэг → үүл & зөвхөн онцгой тохиолдол\tabularnewline
+\texttt{bridge/state} & ирмэг → үүл & 1 = гүүр холбогдсон, 0 = тасарсан\tabularnewline
+\texttt{cmd}, \texttt{config} & үүл → ирмэг & команд, тохиргоо\tabularnewline
+\texttt{ota/\ldots{}} & хоёр тал & firmware шинэчлэлт (Лаб 2)\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{telemetry} & ирмэг → үүл & хэмжилтийн өгөгдөл \\
-\texttt{health} & ирмэг → үүл & Pi-гийн температур, RAM, throttle \\
-\texttt{status} & ирмэг → үүл & retained: онлайн/офлайн (LWT) \\
-\texttt{anomaly} & ирмэг → үүл & зөвхөн онцгой тохиолдол \\
-\texttt{bridge/state} & ирмэг → үүл & 1 = гүүр холбогдсон, 0 = тасарсан \\
-\texttt{cmd}, \texttt{config} & үүл → ирмэг & команд, тохиргоо \\
-\texttt{ota/…} & хоёр тал & firmware шинэчлэлт (Лаб 2) \\
 \end{longtable}\endgroup
 
 Гүүр нь \texttt{cnc302/\allowbreak{}\textless{}site\textgreater{}/\allowbreak{}\#} сэдвийг үүл рүү дамжуулна. \textbf{Тиймээс сэдвийн угтвар буруу бол мессеж үүлэнд хэзээ ч хүрэхгүй} --- Лаб 1-ийн хамгийн түгээмэл алдаа.
@@ -233,14 +301,14 @@ cnc302/<site>/<area>/<line>/<device>/<channel>
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# 1. Энэ санг үлгэр болгон хуулж авах (шууд clone биш — өөрийн түүх хэрэгтэй)}
-\FunctionTok{git}\NormalTok{ clone }\AttributeTok{{-}{-}depth}\NormalTok{ 1 }\OperatorTok{\textless{}}\NormalTok{багшийн{-}сангийн{-}хаяг}\OperatorTok{\textgreater{}}\NormalTok{ cnc302{-}labs{-}template}
-\FunctionTok{cp} \AttributeTok{{-}r}\NormalTok{ cnc302{-}labs{-}template }\OperatorTok{\textless{}}\NormalTok{багийн{-}нэр}\OperatorTok{\textgreater{}}\NormalTok{{-}cnc302}
+\FunctionTok{git}\NormalTok{ clone {-}{-}depth 1 }\OperatorTok{\textless{}}\NormalTok{багшийн{-}сангийн{-}хаяг}\OperatorTok{\textgreater{}}\NormalTok{ cnc302{-}labs{-}template}
+\FunctionTok{cp}\NormalTok{ {-}r cnc302{-}labs{-}template }\OperatorTok{\textless{}}\NormalTok{багийн{-}нэр}\OperatorTok{\textgreater{}}\NormalTok{{-}cnc302}
 \BuiltInTok{cd} \OperatorTok{\textless{}}\NormalTok{багийн{-}нэр}\OperatorTok{\textgreater{}}\NormalTok{{-}cnc302}
-\FunctionTok{rm} \AttributeTok{{-}rf}\NormalTok{ .git }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ init }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ add . }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 1: эхлэл"}
+\FunctionTok{rm}\NormalTok{ {-}rf .git }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ init }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ add . }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ commit {-}m }\StringTok{"Лаб 1: эхлэл"}
 
 \CommentTok{\# 2. Өөрийн алсын санг холбох (GitHub/GitLab, ХУВИЙН сан)}
 \FunctionTok{git}\NormalTok{ remote add origin }\OperatorTok{\textless{}}\NormalTok{таны{-}сангийн{-}хаяг}\OperatorTok{\textgreater{}}
-\FunctionTok{git}\NormalTok{ push }\AttributeTok{{-}u}\NormalTok{ origin main}
+\FunctionTok{git}\NormalTok{ push {-}u origin main}
 
 \CommentTok{\# 3. Багшид унших эрх өгөх}
 \end{Highlighting}
@@ -257,33 +325,92 @@ Pi дээр Git санг \textbf{клонлож} ажиллуулна. Коды�
 \hypertarget{ux43bux430ux431ux43eux440ux430ux442ux43eux440ux438ux439ux43d-ux436ux430ux433ux441ux430ux430ux43bux442}{%
 \section{6. Лабораторийн жагсаалт}\label{ux43bux430ux431ux43eux440ux430ux442ux43eux440ux438ux439ux43d-ux436ux430ux433ux441ux430ux430ux43bux442}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-№
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-7 хоног
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Нэр
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Гол хэмжилт
-\end{minipage} \\
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+№\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+7 хоног\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Нэр\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Гол хэмжилт\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+III\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Хоёр давхаргат платформ ба гүүр\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Гүүрний RTT, Pi-гийн үлдэгдэл RAM, эхлэх хугацаа\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+V\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Төхөөрөмжийн амьдралын мөчлөг ба OTA\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Бүртгэлийн хурд, OTA-гийн хугацаа ба амжилтын хувь\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+3\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+VII\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+MQTT 5.0, UNS ба гурван зам\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+QoS × зам: p50/p95/\textbf{p99}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+IX\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Багтаамжийн хязгаар: ирмэг ба үүл\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Аль нөөц ХАМГИЙН ТҮРҮҮНД ханав\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+5\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+XI\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Өгөгдлийн шугам ба холбоос тасрах\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Store-and-forward-ийн алдагдал, RPO ба MTTR\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+6\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+XII\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Ирмэгийн хиймэл оюун (CPU дээр)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Дүгнэлтийн саатал, RAM, шүүлтийн үр ашиг\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+7\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+XIV\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Хэрэглээний давхарга ба Zero Trust\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Аюулгүй байдлын 9 шалгалт\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+8\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+XV\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Дижитал ихэр, GenAI, ирмэгийн K3s\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+K3s-ийн санах ойн зардал, шилжүүлэлтийн үр дүн\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-1 & III & Хоёр давхаргат платформ ба гүүр & Гүүрний RTT, Pi-гийн үлдэгдэл RAM, эхлэх хугацаа \\
-2 & V & Төхөөрөмжийн амьдралын мөчлөг ба OTA & Бүртгэлийн хурд, OTA-гийн хугацаа ба амжилтын хувь \\
-3 & VII & MQTT 5.0, UNS ба гурван зам & QoS × зам: p50/p95/\textbf{p99} \\
-4 & IX & Багтаамжийн хязгаар: ирмэг ба үүл & Аль нөөц ХАМГИЙН ТҮРҮҮНД ханав \\
-5 & XI & Өгөгдлийн шугам ба холбоос тасрах & Store-and-forward-ийн алдагдал, RPO ба MTTR \\
-6 & XII & Ирмэгийн хиймэл оюун (CPU дээр) & Дүгнэлтийн саатал, RAM, шүүлтийн үр ашиг \\
-7 & XIV & Хэрэглээний давхарга ба Zero Trust & Аюулгүй байдлын 9 шалгалт \\
-8 & XV & Дижитал ихэр, GenAI, ирмэгийн K3s & K3s-ийн санах ойн зардал, шилжүүлэлтийн үр дүн \\
 \end{longtable}\endgroup
 
 \hypertarget{ux442ux430ux439ux43bux430ux43dux433ux438ux439ux43d-ux435ux440ux4e9ux43dux445ux438ux439-ux448ux430ux430ux440ux434ux43bux430ux433ux430}{%
@@ -321,16 +448,15 @@ Pi дээр Git санг \textbf{клонлож} ажиллуулна. Коды�
 
 \begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-Шалгуур & Оноо \\
+Шалгуур & Оноо\tabularnewline
 \midrule
 \endhead
+Ажиллагаатай үр дүн (систем ажиллаж байна) & 3\tabularnewline
+Хэмжилт бүрэн, зөв аргачлалаар хийгдсэн & 3\tabularnewline
+Дүгнэлт үндэслэлтэй, тоон баримтад тулгуурласан & 2\tabularnewline
+Git сан цэвэр, түүх ойлгомжтой & 1\tabularnewline
+Тайлангийн чанар, ойлгомжтой байдал & 1\tabularnewline
 \bottomrule
-\endlastfoot
-Ажиллагаатай үр дүн (систем ажиллаж байна) & 3 \\
-Хэмжилт бүрэн, зөв аргачлалаар хийгдсэн & 3 \\
-Дүгнэлт үндэслэлтэй, тоон баримтад тулгуурласан & 2 \\
-Git сан цэвэр, түүх ойлгомжтой & 1 \\
-Тайлангийн чанар, ойлгомжтой байдал & 1 \\
 \end{longtable}\endgroup
 
 Хугацаа хэтэрсэн тайлан өдөр тутам 10\% хасагдана.
@@ -347,7 +473,7 @@ Git сан цэвэр, түүх ойлгомжтой & 1 \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{vcgencmd}\NormalTok{ get\_throttled     }\CommentTok{\# 0x0 байх ЁСТОЙ}
+\ExtensionTok{vcgencmd}\NormalTok{ get\_throttled     \# 0x0 байх ЁСТОЙ}
 \end{Highlighting}
 \end{Shaded}
 
@@ -365,29 +491,67 @@ Git сан цэвэр, түүх ойлгомжтой & 1 \\
 
 Энэ сан дахь бүх дүрс (image) тодорхой хувилбарт \textbf{бэхлэгдсэн} (pinned). Нээлттэй эхийн төслүүд, ялангуяа \textbf{InfluxDB 3 Core} болон \textbf{Edge Impulse}-ийн CLI, тохиргоо түргэн өөрчлөгддөг. Лабораториудыг доорх хувилбараар шалгасан (2026-09):
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Дүрс
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хувилбар
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Яагаад энэ хувилбар
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Дүрс\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Хувилбар\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Яагаад энэ хувилбар\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{emqx/emqx}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{5.8.6}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Лаб 1--2-т бодитоор туршсан. 5.8 бол LTS салбар (EOL 2027-08-27) бөгөөд \textbf{Apache 2.0} лицензтэй. EMQX \textbf{5.9.0-ээс эхлэн Business Source License (BSL) 1.1}-д шилжсэн: нэг зангилааг үнэгүй ажиллуулж болох ч кластерт арилжааны лиценз хэрэгтэй (магадлан итгэмжлэгдсэн их сургууль арилжааны бус хэрэглээнд үл хамаарна). Лицензийн файл, нөхцөлийг оюутнуудад тайлбарлах шаардлагагүй байлгахын тулд 5.8.x-д үлдээв.\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{influxdb}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+3.2-core\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Лаб 5, 7-ийн команд энэ хувилбараар шалгагдсан (одоогийн Core 3.11)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{grafana/grafana}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+11.6.16\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+11.6.0-ийн аюулгүй байдлын засвар (CVE-2025-4123, CVE-2026-27876) бүхий 11.6 салбар\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{nodered/node-red}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+4.0.9\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Лаб 5\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{dexidp/dex}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+v2.41.1\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Лаб 7\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{eclipse-mosquitto}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+2.0.22\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+2.0 салбарын сүүлийн дүрс (2.0.21-ийн аюулгүй байдлын засвартай); 2.1 нь зан төлөвийн өөрчлөлттэй\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{ollama/ollama}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+0.5.13\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Лаб 8\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{emqx/emqx} & \textbf{5.8.6} & Лаб 1--2-т бодитоор туршсан. 5.8 бол LTS салбар (EOL 2027-08-27) бөгөөд \textbf{Apache 2.0} лицензтэй. EMQX \textbf{5.9.0-ээс эхлэн Business Source License (BSL) 1.1}-д шилжсэн: нэг зангилааг үнэгүй ажиллуулж болох ч кластерт арилжааны лиценз хэрэгтэй (магадлан итгэмжлэгдсэн их сургууль арилжааны бус хэрэглээнд үл хамаарна). Лицензийн файл, нөхцөлийг оюутнуудад тайлбарлах шаардлагагүй байлгахын тулд 5.8.x-д үлдээв. \\
-\texttt{influxdb} & 3.2-core & Лаб 5, 7-ийн команд энэ хувилбараар шалгагдсан (одоогийн Core 3.11) \\
-\texttt{grafana/grafana} & 11.6.16 & 11.6.0-ийн аюулгүй байдлын засвар (CVE-2025-4123, CVE-2026-27876) бүхий 11.6 салбар \\
-\texttt{nodered/node-red} & 4.0.9 & Лаб 5 \\
-\texttt{dexidp/dex} & v2.41.1 & Лаб 7 \\
-\texttt{eclipse-mosquitto} & 2.0.22 & 2.0 салбарын сүүлийн дүрс (2.0.21-ийн аюулгүй байдлын засвартай); 2.1 нь зан төлөвийн өөрчлөлттэй \\
-\texttt{ollama/ollama} & 0.5.13 & Лаб 8 \\
 \end{longtable}\endgroup
 
 \textbf{Багшид:} хичээлийн улирал эхлэхээс өмнө нэг Raspberry Pi 3B \textbf{ба} нэг зөөврийн компьютер дээр бүх найман лабыг эхнээс нь дуустал ажиллуулж шалгана уу. Хувилбар зөрчилдвөл:
@@ -407,36 +571,135 @@ Git сан цэвэр, түүх ойлгомжтой & 1 \\
 \hypertarget{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}{%
 \section{Эх сурвалж}\label{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-\#
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Эх сурвалж
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Юуг баталгаажуулсан
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хандсан
-\end{minipage} \\
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+\#\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Эх сурвалж\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Юуг баталгаажуулсан\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хандсан\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html}{Raspberry Pi hardware} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/raspberry-pi/introduction.adoc}{эх: GitHub}), \href{https://www.raspberrypi.com/documentation/computers/processors.html\#bcm2837}{BCM2837} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/processors/bcm2837.adoc}{эх})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Pi 3B: BCM2837, 4×Cortex-A53 @1.2 GHz, 1 GB, 100 Mb/s Ethernet, 4×USB 2.0\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html\#frequency-management-and-thermal-control}{Frequency management and thermal control} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/raspberry-pi/frequency-management.adoc}{эх})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+80--85 °C-д Arm цөм, 85 °C-д GPU throttle\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+3\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/os.html\#vcgencmd}{vcgencmd get\_\allowbreak{}throttled} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/os/graphics-utilities.adoc}{эх})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+бит 0 = undervoltage\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/getting-started.html}{Getting started --- power supply} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/getting-started/setting-up.adoc}{эх})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Pi 3: 5 V / 2.5 A\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+5\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/accessories/ai-kit.html}{AI Kit} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/accessories/ai-kit/about.adoc}{эх})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+M.2 HAT+ + Hailo, Raspberry Pi 5-д\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+6\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.emqx.com/en/content/license-faq}{EMQX Licensing FAQ}, \href{https://docs.emqx.com/en/emqx/latest/deploy/license.html}{EMQX --- License}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+5.9.0+ нь BSL 1.1, өмнөх нь Apache 2.0; нэг зангилаа үнэгүй; академийн арилжааны бус хэрэглээ\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+7\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.emqx.com/en/emqx/latest/changes/eol-ee.html}{EMQX Version Lifecycle (EOL)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+5.8 LTS, EOL 2027-08-27\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+8\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://grafana.com/blog/grafana-security-release-critical-and-high-severity-security-fixes-for-cve-2026-27876-and-cve-2026-27880/}{Grafana security release (CVE-2026-27876, CVE-2026-27880)}, \href{https://grafana.com/blog/grafana-security-release-high-severity-security-fix-for-cve-2025-4123/}{CVE-2025-4123}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+11.6.0 нөлөөлөлд өртсөн; 11.6.14 ба 11.6.1+security-01 засвартай\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+9\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://mosquitto.org/ChangeLog.txt}{Mosquitto ChangeLog}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2.0.21 аюулгүй байдлын засвар; 2.1.0 зан төлөвийн өөрчлөлт\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+10\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://thingsboard.io/docs/installation/docker/}{ThingsBoard CE --- Docker}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Хөгжүүлэлт/PoC-д 1 цөм, 4 GB RAM\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+11\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.docker.com/desktop/settings-and-maintenance/settings/}{Docker Desktop --- Settings}, \href{https://learn.microsoft.com/en-us/windows/wsl/wsl-config}{WSL config}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Анхдагч 50\%; WSL 2-т \texttt{.wslconfig}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+12\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.k3s.io/installation/requirements}{K3s --- Requirements}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+server 2 GB --- Pi 3B-д багтахгүй; agent 512 MB\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+13\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Docker Hub (\texttt{hub.\allowbreak{}docker.\allowbreak{}com/\allowbreak{}v2/\allowbreak{}repositories/\allowbreak{}\ldots{}/\allowbreak{}tags})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Бүх бэхэлсэн tag байгаа ба arm64 хувилбартай\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-1 & \href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html}{Raspberry Pi hardware} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/raspberry-pi/introduction.adoc}{эх: GitHub}), \href{https://www.raspberrypi.com/documentation/computers/processors.html\#bcm2837}{BCM2837} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/processors/bcm2837.adoc}{эх}) & Pi 3B: BCM2837, 4×Cortex-A53 @1.2 GHz, 1 GB, 100 Mb/s Ethernet, 4×USB 2.0 & 2026-09 \\
-2 & \href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html\#frequency-management-and-thermal-control}{Frequency management and thermal control} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/raspberry-pi/frequency-management.adoc}{эх}) & 80--85 °C-д Arm цөм, 85 °C-д GPU throttle & 2026-09 \\
-3 & \href{https://www.raspberrypi.com/documentation/computers/os.html\#vcgencmd}{vcgencmd get\_\allowbreak{}throttled} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/os/graphics-utilities.adoc}{эх}) & бит 0 = undervoltage & 2026-09 \\
-4 & \href{https://www.raspberrypi.com/documentation/computers/getting-started.html}{Getting started --- power supply} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/getting-started/setting-up.adoc}{эх}) & Pi 3: 5 V / 2.5 A & 2026-09 \\
-5 & \href{https://www.raspberrypi.com/documentation/accessories/ai-kit.html}{AI Kit} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/accessories/ai-kit/about.adoc}{эх}) & M.2 HAT+ + Hailo, Raspberry Pi 5-д & 2026-09 \\
-6 & \href{https://www.emqx.com/en/content/license-faq}{EMQX Licensing FAQ}, \href{https://docs.emqx.com/en/emqx/latest/deploy/license.html}{EMQX --- License} & 5.9.0+ нь BSL 1.1, өмнөх нь Apache 2.0; нэг зангилаа үнэгүй; академийн арилжааны бус хэрэглээ & 2026-09 \\
-7 & \href{https://docs.emqx.com/en/emqx/latest/changes/eol-ee.html}{EMQX Version Lifecycle (EOL)} & 5.8 LTS, EOL 2027-08-27 & 2026-09 \\
-8 & \href{https://grafana.com/blog/grafana-security-release-critical-and-high-severity-security-fixes-for-cve-2026-27876-and-cve-2026-27880/}{Grafana security release (CVE-2026-27876, CVE-2026-27880)}, \href{https://grafana.com/blog/grafana-security-release-high-severity-security-fix-for-cve-2025-4123/}{CVE-2025-4123} & 11.6.0 нөлөөлөлд өртсөн; 11.6.14 ба 11.6.1+security-01 засвартай & 2026-09 \\
-9 & \href{https://mosquitto.org/ChangeLog.txt}{Mosquitto ChangeLog} & 2.0.21 аюулгүй байдлын засвар; 2.1.0 зан төлөвийн өөрчлөлт & 2026-09 \\
-10 & \href{https://thingsboard.io/docs/installation/docker/}{ThingsBoard CE --- Docker} & Хөгжүүлэлт/PoC-д 1 цөм, 4 GB RAM & 2026-09 \\
-11 & \href{https://docs.docker.com/desktop/settings-and-maintenance/settings/}{Docker Desktop --- Settings}, \href{https://learn.microsoft.com/en-us/windows/wsl/wsl-config}{WSL config} & Анхдагч 50\%; WSL 2-т \texttt{.wslconfig} & 2026-09 \\
-12 & \href{https://docs.k3s.io/installation/requirements}{K3s --- Requirements} & server 2 GB --- Pi 3B-д багтахгүй; agent 512 MB & 2026-09 \\
-13 & Docker Hub (\texttt{hub.\allowbreak{}docker.\allowbreak{}com/\allowbreak{}v2/\allowbreak{}repositories/\allowbreak{}…/\allowbreak{}tags}) & Бүх бэхэлсэн tag байгаа ба arm64 хувилбартай & 2026-09 \\
 \end{longtable}\endgroup

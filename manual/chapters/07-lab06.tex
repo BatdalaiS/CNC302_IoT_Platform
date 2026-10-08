@@ -1,18 +1,15 @@
 % Автоматаар үүсгэсэн — эх файл: lab06/README.md
 \chapter{Лаб 6 — Ирмэгийн хиймэл оюун: CPU дээр}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
 \endhead
+\textbf{7 хоног} & XII\tabularnewline
+\textbf{Хугацаа} & 4 цаг\tabularnewline
+\textbf{Суралцахуйн үр дүн} & ҮД5 (шинжлэх), ҮД7 (хэмжих)\tabularnewline
+\textbf{Үнэлгээ} & Бичгийн тайлан, 10 оноо\tabularnewline
+\textbf{Гол хэмжилт} & Дүгнэлтийн саатал (p99), санах ой, ирмэгийн шүүлтийн үр ашиг\tabularnewline
 \bottomrule
-\endlastfoot
-\textbf{7 хоног} & XII \\
-\textbf{Хугацаа} & 4 цаг \\
-\textbf{Суралцахуйн үр дүн} & ҮД5 (шинжлэх), ҮД7 (хэмжих) \\
-\textbf{Үнэлгээ} & Бичгийн тайлан, 10 оноо \\
-\textbf{Гол хэмжилт} & Дүгнэлтийн саатал (p99), санах ой, ирмэгийн шүүлтийн үр ашиг \\
 \end{longtable}\endgroup
 
 \hypertarget{ux437ux43eux440ux438ux43bux433ux43e}{%
@@ -58,12 +55,12 @@
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [Pi] терминал 1 — агент, хэвийн ажиллагаа  (дараа нь {-}{-}anomaly{-}rate 1.0{-}оор давт)}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \ExtensionTok{.venv/bin/python}\NormalTok{ agent/edge\_agent.py }\AttributeTok{{-}{-}interval}\NormalTok{ 0.5 }\AttributeTok{{-}{-}anomaly{-}rate}\NormalTok{ 0.0}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \ExtensionTok{.venv/bin/python}\NormalTok{ agent/edge\_agent.py {-}{-}interval 0.5 {-}{-}anomaly{-}rate 0.0}
 
 \CommentTok{\# [Pi] терминал 2 — цуглуулагч (ирмэгийн брокероос)}
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\ExtensionTok{python3}\NormalTok{ lab06/collect\_data.py }\AttributeTok{{-}{-}label}\NormalTok{ normal  }\AttributeTok{{-}{-}seconds}\NormalTok{ 300 }\AttributeTok{{-}{-}device}\NormalTok{ pi3b{-}01}
-\ExtensionTok{python3}\NormalTok{ lab06/collect\_data.py }\AttributeTok{{-}{-}label}\NormalTok{ anomaly }\AttributeTok{{-}{-}seconds}\NormalTok{ 120 }\AttributeTok{{-}{-}device}\NormalTok{ pi3b{-}01}
+\ExtensionTok{python3}\NormalTok{ lab06/collect\_data.py {-}{-}label normal  {-}{-}seconds 300 {-}{-}device pi3b{-}01}
+\ExtensionTok{python3}\NormalTok{ lab06/collect\_data.py {-}{-}label anomaly {-}{-}seconds 120 {-}{-}device pi3b{-}01}
 \end{Highlighting}
 \end{Shaded}
 
@@ -79,8 +76,8 @@
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [ЗК] зөөврийн компьютер дээр (TensorFlow \textasciitilde{} хэдэн зуун MB)}
-\ExtensionTok{python3} \AttributeTok{{-}m}\NormalTok{ venv \textasciitilde{}/tf }\KeywordTok{\&\&} \ExtensionTok{\textasciitilde{}/tf/bin/pip}\NormalTok{ install tensorflow}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \ExtensionTok{\textasciitilde{}/tf/bin/python}\NormalTok{ lab06/train\_tiny\_model.py }\AttributeTok{{-}{-}data}\NormalTok{ lab06/data }\AttributeTok{{-}{-}out}\NormalTok{ lab06/models}
+\ExtensionTok{python3}\NormalTok{ {-}m venv \textasciitilde{}/tf }\KeywordTok{\&\&} \ExtensionTok{\textasciitilde{}/tf/bin/pip}\NormalTok{ install tensorflow}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \ExtensionTok{\textasciitilde{}/tf/bin/python}\NormalTok{ lab06/train\_tiny\_model.py {-}{-}data lab06/data {-}{-}out lab06/models}
 \CommentTok{\#   → lab06/models/model\_float32.tflite, lab06/models/model\_int8.tflite}
 \CommentTok{\#   float32 ба int8 validation нарийвчлалыг хэвлэнэ — Хүснэгт 6.2{-}т бич}
 \end{Highlighting}
@@ -109,7 +106,7 @@
 \item
   Edge Impulse-ийн албан ёсоор дэмждэг самбарын жагсаалтад Raspberry Pi \textbf{4} ба \textbf{5} байгаа, \textbf{Pi 3 байхгүй}. Linux CLI (\texttt{edge-impulse-linux}) нь Node.js \textbf{20+} ба 64-бит OS (\texttt{aarch64}) шаарддаг. Тиймээс \texttt{.eim} + \texttt{edge-impulse-linux-runner}-ийг Pi 3B дээр ажиллуулах нь \textbf{албан ёсны дэмжлэггүй} --- хийвэл өөрийн эрсдэлээр.
 \item
-  Агентад ашиглах бол impulse нь дээрх \texttt{{[}1,\ 3{]}} гэрээг хангах ёстой: TFLite экспортын оролтын хэлбэрийг \texttt{benchmark\_\allowbreak{}inference.\allowbreak{}py\ -\/\allowbreak{}-backend\ tflite} хэвлэдэг \texttt{оролт=(…)}-оор шалга. Хэрэв \texttt{(1,\ 3)} биш бол (жишээ нь Spectral Analysis блокийн шинж чанар хүлээж байвал) агент ачаалахгүй --- А замыг ашигла.
+  Агентад ашиглах бол impulse нь дээрх \texttt{{[}1,\ 3{]}} гэрээг хангах ёстой: TFLite экспортын оролтын хэлбэрийг \texttt{benchmark\_\allowbreak{}inference.\allowbreak{}py\ -\/\allowbreak{}-backend\ tflite} хэвлэдэг \texttt{оролт=(\ldots{})}-оор шалга. Хэрэв \texttt{(1,\ 3)} биш бол (жишээ нь Spectral Analysis блокийн шинж чанар хүлээж байвал) агент ачаалахгүй --- А замыг ашигла.
 \item
   Studio-гийн \textbf{Model testing} нарийвчлалыг Хүснэгт 6.2-т бичиж болно.
 \end{itemize}
@@ -122,8 +119,8 @@
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [ЗК] компьютер дээр (ImageNet жинг анх удаа \textasciitilde{}14 MB татна)}
-\ExtensionTok{\textasciitilde{}/tf/bin/python}\NormalTok{ lab06/train\_tiny\_model.py }\AttributeTok{{-}{-}skip{-}tiny} \AttributeTok{{-}{-}mobilenet} \AttributeTok{{-}{-}out}\NormalTok{ lab06/models}
-\FunctionTok{scp}\NormalTok{ lab06/models/}\PreprocessorTok{*}\NormalTok{.tflite }\OperatorTok{\textless{}}\NormalTok{хэрэглэгч}\OperatorTok{\textgreater{}}\NormalTok{@}\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{:\textasciitilde{}/cnc302/lab06/models/}
+\ExtensionTok{\textasciitilde{}/tf/bin/python}\NormalTok{ lab06/train\_tiny\_model.py {-}{-}skip{-}tiny {-}{-}mobilenet {-}{-}out lab06/models}
+\FunctionTok{scp}\NormalTok{ lab06/models/*.tflite }\OperatorTok{\textless{}}\NormalTok{хэрэглэгч}\OperatorTok{\textgreater{}}\NormalTok{@}\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{:\textasciitilde{}/cnc302/lab06/models/}
 \end{Highlighting}
 \end{Shaded}
 
@@ -136,9 +133,9 @@ Representative dataset нь санамсаргүй зураг тул энэ за
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ venv          }\CommentTok{\# .venv байхгүй бол үүсгэнэ}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ venv          \# .venv байхгүй бол үүсгэнэ}
 \ExtensionTok{.venv/bin/pip}\NormalTok{ install numpy ai{-}edge{-}litert}
-\ExtensionTok{.venv/bin/python} \AttributeTok{{-}c} \StringTok{"from ai\_edge\_litert.interpreter import Interpreter; print(\textquotesingle{}OK\textquotesingle{})"}
+\ExtensionTok{.venv/bin/python}\NormalTok{ {-}c }\StringTok{"from ai\_edge\_litert.interpreter import Interpreter; print(\textquotesingle{}OK\textquotesingle{})"}
 \end{Highlighting}
 \end{Shaded}
 
@@ -158,27 +155,53 @@ LiteRT бол TensorFlow Lite-ийн шинэ нэр; Python-ы interpreter ба
 \hypertarget{ux44fux430ux433ux430ux430ux434-ux445ux443ux440ux434ux430ux441ux433ux443ux443ux440-ux431ux430ux439ux445ux433ux4afux439-ux432ux44d}{%
 \subsection{Яагаад хурдасгуур байхгүй вэ}\label{ux44fux430ux433ux430ux430ux434-ux445ux443ux440ux434ux430ux441ux433ux443ux443ux440-ux431ux430ux439ux445ux433ux4afux439-ux432ux44d}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Үзүүлэлт
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Pi 3B (албан ёсны үзүүлэлт)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Үр дагавар
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Үзүүлэлт\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Pi 3B (албан ёсны үзүүлэлт)\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Үр дагавар\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Өргөтгөлийн шугам\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{PCIe холбогчгүй} (AI Kit нь Pi 5-ын PCIe 2.0-д зориулагдсан)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+AI Kit \textbf{боломжгүй}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+CPU\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Broadcom BCM2837, 4 цөм, 64-бит, 1.2 ГГц\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+бүх дүгнэлт эдгээр 4 цөм дээр\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+RAM\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+1 GB\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+загвар + буфер + бусад үйлчилгээ багтах ёстой\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Сүлжээ\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+100 Base Ethernet\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Алхам 7-гийн өгсөх урсгалын дээд хязгаар\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Тэжээл\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+micro USB, 2.5 A хүртэл\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+тэжээл сул бол хүчдэл дутаж throttling болно\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-Өргөтгөлийн шугам & \textbf{PCIe холбогчгүй} (AI Kit нь Pi 5-ын PCIe 2.0-д зориулагдсан) & AI Kit \textbf{боломжгүй} \\
-CPU & Broadcom BCM2837, 4 цөм, 64-бит, 1.2 ГГц & бүх дүгнэлт эдгээр 4 цөм дээр \\
-RAM & 1 GB & загвар + буфер + бусад үйлчилгээ багтах ёстой \\
-Сүлжээ & 100 Base Ethernet & Алхам 7-гийн өгсөх урсгалын дээд хязгаар \\
-Тэжээл & micro USB, 2.5 A хүртэл & тэжээл сул бол хүчдэл дутаж throttling болно \\
 \end{longtable}\endgroup
 
 Тиймээс энэ лабораторид Hailo-гийн мөр байх боловч зөвхөн \textbf{багшийн лавлагааны мөр} (тэнхимд Pi 5 + AI Kit байвал) --- өөрсдийн төмөр дээр ажиллуулах боломжгүй.
@@ -215,9 +238,9 @@ float32 жинг int8 болгоно. LiteRT-ийн баримтад бүрэн 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\ExtensionTok{pkill} \AttributeTok{{-}f}\NormalTok{ vscode{-}server              }\CommentTok{\# 150–250 MiB чөлөөлнө}
-\ExtensionTok{./tools/measure\_stack.sh} \AttributeTok{{-}{-}role}\NormalTok{ edge}
-\ExtensionTok{vcgencmd}\NormalTok{ get\_throttled              }\CommentTok{\# 0x0 байх ЁСТОЙ}
+\ExtensionTok{pkill}\NormalTok{ {-}f vscode{-}server              \# 150–250 MiB чөлөөлнө}
+\ExtensionTok{./tools/measure\_stack.sh}\NormalTok{ {-}{-}role edge}
+\ExtensionTok{vcgencmd}\NormalTok{ get\_throttled              \# 0x0 байх ЁСТОЙ}
 \end{Highlighting}
 \end{Shaded}
 
@@ -225,8 +248,8 @@ float32 жинг int8 болгоно. LiteRT-ийн баримтад бүрэн 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ synthetic }\AttributeTok{{-}{-}runs}\NormalTok{ 500 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}threads}\NormalTok{ 2 }\AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ synth{-}t2 }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py {-}{-}backend synthetic {-}{-}runs 500 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}threads}\NormalTok{ 2 {-}{-}device{-}label pi3b {-}{-}label synth{-}t2 {-}{-}csv lab06/out/bench.csv}
 \end{Highlighting}
 \end{Shaded}
 
@@ -234,10 +257,10 @@ float32 жинг int8 болгоно. LiteRT-ийн баримтад бүрэн 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ synthetic }\AttributeTok{{-}{-}runs}\NormalTok{ 200 }\AttributeTok{{-}{-}cold} \DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ synth{-}cold }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
-\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ synthetic }\AttributeTok{{-}{-}runs}\NormalTok{ 200 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ synth{-}warm }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py {-}{-}backend synthetic {-}{-}runs 200 {-}{-}cold }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}device{-}label}\NormalTok{ pi3b {-}{-}label synth{-}cold {-}{-}csv lab06/out/bench.csv}
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py {-}{-}backend synthetic {-}{-}runs 200 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}device{-}label}\NormalTok{ pi3b {-}{-}label synth{-}warm {-}{-}csv lab06/out/bench.csv}
 \end{Highlighting}
 \end{Shaded}
 
@@ -246,14 +269,13 @@ float32 жинг int8 болгоно. LiteRT-ийн баримтад бүрэн 
 
 \begingroup\scriptsize\begin{longtable}[]{@{}llllll@{}}
 \toprule
-Шошго & p50 (мс) & p99 (мс) & \textbf{max (мс)} & σ (мс) & Халаалт хийсэн \\
+Шошго & p50 (мс) & p99 (мс) & \textbf{max (мс)} & σ (мс) & Халаалт хийсэн\tabularnewline
 \midrule
 \endhead
+\texttt{synth-cold} (\texttt{-\/-cold}) & & & & & 0\tabularnewline
+\texttt{synth-warm} & & & & &\tabularnewline
+\textbf{max-ийн ялгаа (дахин)} & & & & &\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{synth-cold} (\texttt{-\/-cold}) & & & & & 0 \\
-\texttt{synth-warm} & & & & & \\
-\textbf{max-ийн ялгаа (дахин)} & & & & & \\
 \end{longtable}\endgroup
 
 \begin{quote}
@@ -265,44 +287,87 @@ float32 жинг int8 болгоно. LiteRT-ийн баримтад бүрэн 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ tflite }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}model}\NormalTok{ lab06/models/model\_float32.tflite }\AttributeTok{{-}{-}runs}\NormalTok{ 300 }\AttributeTok{{-}{-}threads}\NormalTok{ 1 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ f32{-}t1 }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py {-}{-}backend tflite }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}model}\NormalTok{ lab06/models/model\_float32.tflite {-}{-}runs 300 {-}{-}threads 1 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}device{-}label}\NormalTok{ pi3b {-}{-}label f32{-}t1 {-}{-}csv lab06/out/bench.csv}
 
-\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ tflite }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}model}\NormalTok{ lab06/models/model\_int8.tflite }\AttributeTok{{-}{-}runs}\NormalTok{ 300 }\AttributeTok{{-}{-}threads}\NormalTok{ 1 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ int8{-}t1 }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py {-}{-}backend tflite }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}model}\NormalTok{ lab06/models/model\_int8.tflite {-}{-}runs 300 {-}{-}threads 1 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}device{-}label}\NormalTok{ pi3b {-}{-}label int8{-}t1 {-}{-}csv lab06/out/bench.csv}
 \end{Highlighting}
 \end{Shaded}
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-6.2-ux437ux430ux433ux432ux430ux440ux44bux43d-ux43cux44dux434ux44dux44dux43bux44dux43b-ux431ux430-ux43aux432ux430ux43dux442ux447ux438ux43bux430ux43bux44bux43d-ux430ux448ux438ux433}{%
 \subsubsection{Хүснэгт 6.2 --- Загварын мэдээлэл ба квантчилалын ашиг}\label{ux445ux4afux441ux43dux44dux433ux442-6.2-ux437ux430ux433ux432ux430ux440ux44bux43d-ux43cux44dux434ux44dux44dux43bux44dux43b-ux431ux430-ux43aux432ux430ux43dux442ux447ux438ux43bux430ux43bux44bux43d-ux430ux448ux438ux433}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Үзүүлэлт
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-float32
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-int8
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Харьцаа
-\end{minipage} \\
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+Үзүүлэлт\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+float32\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+int8\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Харьцаа\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+Файлын хэмжээ (KiB, \texttt{model\_kib})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+Загварын санах ой (\texttt{mem\_\allowbreak{}model\_\allowbreak{}mib})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+p50 (мс)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{p99 (мс)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+Чадвар (дүгнэлт/с)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+Нарийвчлал (validation, \%: \texttt{train\_\allowbreak{}tiny\_\allowbreak{}model.\allowbreak{}py} эсвэл Studio-гийн Model testing)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-Файлын хэмжээ (KiB, \texttt{model\_kib}) & & & \\
-Загварын санах ой (\texttt{mem\_\allowbreak{}model\_\allowbreak{}mib}) & & & \\
-p50 (мс) & & & \\
-\textbf{p99 (мс)} & & & \\
-Чадвар (дүгнэлт/с) & & & \\
-Нарийвчлал (validation, \%: \texttt{train\_\allowbreak{}tiny\_\allowbreak{}model.\allowbreak{}py} эсвэл Studio-гийн Model testing) & & & \\
 \end{longtable}\endgroup
 
 Квантчилалын хурдны ашиг: ule{1.5cm}{0.4pt} × · Санах ойн ашиг: ule{1.5cm}{0.4pt} × · Нарийвчлалын алдагдал: ule{1.5cm}{0.4pt} \%
@@ -316,49 +381,83 @@ p50 (мс) & & & \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ControlFlowTok{for}\NormalTok{ T }\KeywordTok{in}\NormalTok{ 1 2 4}\KeywordTok{;} \ControlFlowTok{do}
-  \ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ tflite }\DataTypeTok{\textbackslash{}}
-      \AttributeTok{{-}{-}model}\NormalTok{ lab06/models/model\_int8.tflite }\AttributeTok{{-}{-}runs}\NormalTok{ 300 }\AttributeTok{{-}{-}threads} \VariableTok{$T} \DataTypeTok{\textbackslash{}}
-      \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ int8{-}t}\VariableTok{$T} \AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
-  \FunctionTok{sleep}\NormalTok{ 60          }\CommentTok{\# хооронд нь хөргөнө — эс тэгвээс throttling гажуулна}
-\ControlFlowTok{done}
+\KeywordTok{for} \ExtensionTok{T}\NormalTok{ in 1 2 4}\KeywordTok{;} \KeywordTok{do}
+  \ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py {-}{-}backend tflite }\KeywordTok{\textbackslash{}}
+      \ExtensionTok{{-}{-}model}\NormalTok{ lab06/models/model\_int8.tflite {-}{-}runs 300 {-}{-}threads }\VariableTok{$T} \KeywordTok{\textbackslash{}}
+      \ExtensionTok{{-}{-}device{-}label}\NormalTok{ pi3b {-}{-}label int8{-}t}\VariableTok{$T}\NormalTok{ {-}{-}csv lab06/out/bench.csv}
+  \FunctionTok{sleep}\NormalTok{ 60          \# хооронд нь хөргөнө — эс тэгвээс throttling гажуулна}
+\KeywordTok{done}
 \end{Highlighting}
 \end{Shaded}
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-6.3-ux443ux440ux441ux433ux430ux43bux44bux43d-ux442ux43eux43eux43dux44b-ux43dux4e9ux43bux4e9ux4e9-int8}{%
 \subsubsection{Хүснэгт 6.3 --- Урсгалын тооны нөлөө (int8)}\label{ux445ux4afux441ux43dux44dux433ux442-6.3-ux443ux440ux441ux433ux430ux43bux44bux43d-ux442ux43eux43eux43dux44b-ux43dux4e9ux43bux4e9ux4e9-int8}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lllllll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Урсгал
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-p50 (мс)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-p99 (мс)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Чадвар (дүгнэлт/с)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\texttt{cpu\_efficiency} (цөм)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хурдны ашиг vs t1
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Темп. өсөлт (°C)
-\end{minipage} \\
+\begin{minipage}[b]{0.12\columnwidth}\raggedright
+Урсгал\strut
+\end{minipage} & \begin{minipage}[b]{0.12\columnwidth}\raggedright
+p50 (мс)\strut
+\end{minipage} & \begin{minipage}[b]{0.12\columnwidth}\raggedright
+p99 (мс)\strut
+\end{minipage} & \begin{minipage}[b]{0.12\columnwidth}\raggedright
+Чадвар (дүгнэлт/с)\strut
+\end{minipage} & \begin{minipage}[b]{0.12\columnwidth}\raggedright
+\texttt{cpu\_efficiency} (цөм)\strut
+\end{minipage} & \begin{minipage}[b]{0.12\columnwidth}\raggedright
+Хурдны ашиг vs t1\strut
+\end{minipage} & \begin{minipage}[b]{0.12\columnwidth}\raggedright
+Темп. өсөлт (°C)\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.12\columnwidth}\raggedright
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+1.00×\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.12\columnwidth}\raggedright
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.12\columnwidth}\raggedright
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.12\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-1 & & & & & 1.00× & \\
-2 & & & & & & \\
-4 & & & & & & \\
 \end{longtable}\endgroup
 
 4 урсгал 4× хурдан болов уу: ule{1.5cm}{0.4pt} · Хамгийн сайн урсгалын тоо: ule{1.5cm}{0.4pt}
@@ -372,12 +471,12 @@ p99 (мс)
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [ЗК] компьютер дээр}
-\ExtensionTok{python3}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host} \OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{ {-}{-}devices 50 }\AttributeTok{{-}{-}interval}\NormalTok{ 1.0}
+\ExtensionTok{python3}\NormalTok{ tools/sim\_device.py {-}{-}host }\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{ {-}{-}devices 50 {-}{-}interval 1.0}
 
 \CommentTok{\# [Pi] зэрэгцүүлэн}
-\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ tflite }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}model}\NormalTok{ lab06/models/model\_int8.tflite }\AttributeTok{{-}{-}runs}\NormalTok{ 300 }\AttributeTok{{-}{-}threads}\NormalTok{ 2 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ int8{-}t2{-}loaded }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py {-}{-}backend tflite }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}model}\NormalTok{ lab06/models/model\_int8.tflite {-}{-}runs 300 {-}{-}threads 2 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}device{-}label}\NormalTok{ pi3b {-}{-}label int8{-}t2{-}loaded {-}{-}csv lab06/out/bench.csv}
 \end{Highlighting}
 \end{Shaded}
 
@@ -390,47 +489,32 @@ p99 (мс)
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ tflite }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}model}\NormalTok{ lab06/models/mobilenet\_224\_quant.tflite }\AttributeTok{{-}{-}runs}\NormalTok{ 30 }\AttributeTok{{-}{-}threads}\NormalTok{ 2 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ mnet{-}t2 }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py {-}{-}backend tflite }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}model}\NormalTok{ lab06/models/mobilenet\_224\_quant.tflite {-}{-}runs 30 {-}{-}threads 2 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}device{-}label}\NormalTok{ pi3b {-}{-}label mnet{-}t2 {-}{-}csv lab06/out/bench.csv}
 
-\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ tflite }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}model}\NormalTok{ lab06/models/mobilenet\_224\_quant.tflite }\AttributeTok{{-}{-}runs}\NormalTok{ 30 }\AttributeTok{{-}{-}threads}\NormalTok{ 4 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ mnet{-}t4 }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py {-}{-}backend tflite }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}model}\NormalTok{ lab06/models/mobilenet\_224\_quant.tflite {-}{-}runs 30 {-}{-}threads 4 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}device{-}label}\NormalTok{ pi3b {-}{-}label mnet{-}t4 {-}{-}csv lab06/out/bench.csv}
 \end{Highlighting}
 \end{Shaded}
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-6.4-ux436ux438ux436ux438ux433-ux433ux430ux436ux438ux43b-ux438ux43bux440ux4afux4afux43bux44dux433ux447-vs-ux437ux443ux440ux433ux430ux43d-ux437ux430ux433ux432ux430ux440}{%
 \subsubsection{Хүснэгт 6.4 --- Жижиг гажил илрүүлэгч vs зурган загвар}\label{ux445ux4afux441ux43dux44dux433ux442-6.4-ux436ux438ux436ux438ux433-ux433ux430ux436ux438ux43b-ux438ux43bux440ux4afux4afux43bux44dux433ux447-vs-ux437ux443ux440ux433ux430ux43d-ux437ux430ux433ux432ux430ux440}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lllll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-int8 гажил илрүүлэгч
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-MobileNet 224 (t2)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-MobileNet 224 (t4)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Харьцаа
-\end{minipage} \\
+& int8 гажил илрүүлэгч & MobileNet 224 (t2) & MobileNet 224 (t4) & Харьцаа\tabularnewline
 \midrule
 \endhead
+Загварын хэмжээ (KiB) / оролтын хэлбэр & & & &\tabularnewline
+p50 (мс) & & & &\tabularnewline
+\textbf{p99 (мс)} & & & &\tabularnewline
+Санах ой (MiB) & & & &\tabularnewline
+Чадвар (дүгнэлт/с) & & & &\tabularnewline
+100 Гц мэдрэгчид нийцэх үү & & & &\tabularnewline
+Хамгийн их боломжит давтамж (Гц) & & & &\tabularnewline
 \bottomrule
-\endlastfoot
-Загварын хэмжээ (KiB) / оролтын хэлбэр & & & & \\
-p50 (мс) & & & & \\
-\textbf{p99 (мс)} & & & & \\
-Санах ой (MiB) & & & & \\
-Чадвар (дүгнэлт/с) & & & & \\
-100 Гц мэдрэгчид нийцэх үү & & & & \\
-Хамгийн их боломжит давтамж (Гц) & & & & \\
 \end{longtable}\endgroup
 
 \textbf{Тооцоолол:} хэрэв нэг дүгнэлт \texttt{p99} мс авдаг бол секундэд хамгийн ихдээ \texttt{1000\ /\ p99} дүгнэлт хийнэ. MobileNet-ийн хувьд энэ тоо хэд вэ?
@@ -447,12 +531,12 @@ p50 (мс) & & & & \\
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [Pi] Pi 3B дээр (аль хэдийн хийсэн)}
-\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ synthetic }\AttributeTok{{-}{-}runs}\NormalTok{ 500 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}device{-}label}\NormalTok{ pi3b }\AttributeTok{{-}{-}label}\NormalTok{ xdev }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py {-}{-}backend synthetic {-}{-}runs 500 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}device{-}label}\NormalTok{ pi3b {-}{-}label xdev {-}{-}csv lab06/out/bench.csv}
 
 \CommentTok{\# [ЗК] зөөврийн компьютер дээр, ЯГ ижил комманд}
-\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py }\AttributeTok{{-}{-}backend}\NormalTok{ synthetic }\AttributeTok{{-}{-}runs}\NormalTok{ 500 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}device{-}label}\NormalTok{ laptop{-}cpu }\AttributeTok{{-}{-}label}\NormalTok{ xdev }\AttributeTok{{-}{-}csv}\NormalTok{ lab06/out/bench.csv}
+\ExtensionTok{python3}\NormalTok{ lab06/benchmark\_inference.py {-}{-}backend synthetic {-}{-}runs 500 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}device{-}label}\NormalTok{ laptop{-}cpu {-}{-}label xdev {-}{-}csv lab06/out/bench.csv}
 \end{Highlighting}
 \end{Shaded}
 
@@ -461,34 +545,63 @@ p50 (мс) & & & & \\
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-6.5-ux442ux4e9ux43cux440ux438ux439ux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442-ux438ux436ux438ux43b-ux437ux430ux433ux432ux430ux440-ux438ux436ux438ux43b---runs}{%
 \subsubsection{\texorpdfstring{Хүснэгт 6.5 --- Төмрийн харьцуулалт (ижил загвар, ижил \texttt{-\/-runs})}{Хүснэгт 6.5 --- Төмрийн харьцуулалт (ижил загвар, ижил -\/-runs)}}\label{ux445ux4afux441ux43dux44dux433ux442-6.5-ux442ux4e9ux43cux440ux438ux439ux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442-ux438ux436ux438ux43b-ux437ux430ux433ux432ux430ux440-ux438ux436ux438ux43b---runs}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llllll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Төмөр (\texttt{device\_label})
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-p50 (мс)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-p99 (мс)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Чадвар (дүгнэлт/с)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хурд vs Pi 3B
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Эх сурвалж
-\end{minipage} \\
+\begin{minipage}[b]{0.14\columnwidth}\raggedright
+Төмөр (\texttt{device\_label})\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+p50 (мс)\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+p99 (мс)\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+Чадвар (дүгнэлт/с)\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+Хурд vs Pi 3B\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+Эх сурвалж\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.14\columnwidth}\raggedright
+\texttt{pi3b} (4×A53 @1.2 ГГц)\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+1.00×\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+өөрсдийн хэмжилт\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright
+\texttt{laptop-cpu}\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+өөрсдийн хэмжилт\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright
+\texttt{reference} (Pi 5 + AI Kit)\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\textbf{багшийн лавлагаа}\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{pi3b} (4×A53 @1.2 ГГц) & & & & 1.00× & өөрсдийн хэмжилт \\
-\texttt{laptop-cpu} & & & & & өөрсдийн хэмжилт \\
-\texttt{reference} (Pi 5 + AI Kit) & & & & & \textbf{багшийн лавлагаа} \\
 \end{longtable}\endgroup
 
 \begin{quote}
@@ -510,7 +623,7 @@ p99 (мс)
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{cat}\NormalTok{ /sys/class/net/eth0/statistics/tx\_bytes      }\CommentTok{\# эхлэлийн утга}
+\FunctionTok{cat}\NormalTok{ /sys/class/net/eth0/statistics/tx\_bytes      \# эхлэлийн утга}
 \end{Highlighting}
 \end{Shaded}
 
@@ -519,11 +632,11 @@ p99 (мс)
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge}
-\VariableTok{TX0}\OperatorTok{=}\VariableTok{$(}\FunctionTok{cat}\NormalTok{ /sys/class/net/eth0/statistics/tx\_bytes}\VariableTok{)}
-\ExtensionTok{.venv/bin/python}\NormalTok{ agent/edge\_agent.py }\AttributeTok{{-}{-}detector}\NormalTok{ ../lab06/models/model\_int8.tflite }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}threads}\NormalTok{ 2 }\AttributeTok{{-}{-}interval}\NormalTok{ 0.5 }\AttributeTok{{-}{-}anomaly{-}rate}\NormalTok{ 0.05 }\AttributeTok{{-}{-}count}\NormalTok{ 600}
-\VariableTok{TX1}\OperatorTok{=}\VariableTok{$(}\FunctionTok{cat}\NormalTok{ /sys/class/net/eth0/statistics/tx\_bytes}\VariableTok{)}
-\BuiltInTok{echo} \StringTok{"шүүлтгүй tx = }\VariableTok{$((TX1}\OperatorTok{{-}}\VariableTok{TX0))}\StringTok{ байт"}
+\VariableTok{TX0=$(}\FunctionTok{cat}\NormalTok{ /sys/class/net/eth0/statistics/tx\_bytes}\VariableTok{)}
+\ExtensionTok{.venv/bin/python}\NormalTok{ agent/edge\_agent.py {-}{-}detector ../lab06/models/model\_int8.tflite }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}threads}\NormalTok{ 2 {-}{-}interval 0.5 {-}{-}anomaly{-}rate 0.05 {-}{-}count 600}
+\VariableTok{TX1=$(}\FunctionTok{cat}\NormalTok{ /sys/class/net/eth0/statistics/tx\_bytes}\VariableTok{)}
+\BuiltInTok{echo} \StringTok{"шүүлтгүй tx = }\VariableTok{$((}\NormalTok{TX1{-}TX0}\VariableTok{))}\StringTok{ байт"}
 \end{Highlighting}
 \end{Shaded}
 
@@ -533,12 +646,12 @@ p99 (мс)
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\VariableTok{TX0}\OperatorTok{=}\VariableTok{$(}\FunctionTok{cat}\NormalTok{ /sys/class/net/eth0/statistics/tx\_bytes}\VariableTok{)}
-\ExtensionTok{.venv/bin/python}\NormalTok{ agent/edge\_agent.py }\AttributeTok{{-}{-}detector}\NormalTok{ ../lab06/models/model\_int8.tflite }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}threads}\NormalTok{ 2 }\AttributeTok{{-}{-}interval}\NormalTok{ 0.5 }\AttributeTok{{-}{-}anomaly{-}rate}\NormalTok{ 0.05 }\AttributeTok{{-}{-}count}\NormalTok{ 600 }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}filter} \AttributeTok{{-}{-}health{-}every}\NormalTok{ 15}
-\VariableTok{TX1}\OperatorTok{=}\VariableTok{$(}\FunctionTok{cat}\NormalTok{ /sys/class/net/eth0/statistics/tx\_bytes}\VariableTok{)}
-\BuiltInTok{echo} \StringTok{"шүүлттэй tx = }\VariableTok{$((TX1}\OperatorTok{{-}}\VariableTok{TX0))}\StringTok{ байт"}
+\VariableTok{TX0=$(}\FunctionTok{cat}\NormalTok{ /sys/class/net/eth0/statistics/tx\_bytes}\VariableTok{)}
+\ExtensionTok{.venv/bin/python}\NormalTok{ agent/edge\_agent.py {-}{-}detector ../lab06/models/model\_int8.tflite }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}threads}\NormalTok{ 2 {-}{-}interval 0.5 {-}{-}anomaly{-}rate 0.05 {-}{-}count 600 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}filter}\NormalTok{ {-}{-}health{-}every 15}
+\VariableTok{TX1=$(}\FunctionTok{cat}\NormalTok{ /sys/class/net/eth0/statistics/tx\_bytes}\VariableTok{)}
+\BuiltInTok{echo} \StringTok{"шүүлттэй tx = }\VariableTok{$((}\NormalTok{TX1{-}TX0}\VariableTok{))}\StringTok{ байт"}
 \end{Highlighting}
 \end{Shaded}
 
@@ -546,8 +659,8 @@ p99 (мс)
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/pi3b{-}01/\#\textquotesingle{}} \AttributeTok{{-}v} \KeywordTok{|} \FunctionTok{tee}\NormalTok{ /tmp/f.log}
-\FunctionTok{wc} \AttributeTok{{-}l}\NormalTok{ /tmp/f.log }\KeywordTok{\&\&} \FunctionTok{wc} \AttributeTok{{-}c}\NormalTok{ /tmp/f.log}
+\ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/pi3b{-}01/\#\textquotesingle{}}\NormalTok{ {-}v }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ /tmp/f.log}
+\FunctionTok{wc}\NormalTok{ {-}l /tmp/f.log }\KeywordTok{\&\&} \FunctionTok{wc}\NormalTok{ {-}c /tmp/f.log}
 \end{Highlighting}
 \end{Shaded}
 
@@ -556,18 +669,17 @@ p99 (мс)
 
 \begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-Хэмжигдэхүүн & Шүүлтгүй & \texttt{-\/-filter}-тэй & Бууралт \% \\
+Хэмжигдэхүүн & Шүүлтгүй & \texttt{-\/-filter}-тэй & Бууралт \%\tabularnewline
 \midrule
 \endhead
+Илгээсэн мессеж (агентын \texttt{илгээсэн}) & 600 & &\tabularnewline
+Дарагдсан мессеж (\texttt{дарсан}) & 0 & & ---\tabularnewline
+\texttt{eth0} tx\_bytes (байт) & & &\tabularnewline
+Үүлэнд хүрсэн мөр (\texttt{wc\ -l}) & & &\tabularnewline
+Байт/секунд & & &\tabularnewline
+Дүгнэлтийн дундаж саатал (мс) & & & ---\tabularnewline
+Pi-гийн CPU \% (\texttt{make\ mem}, \texttt{top}) & & &\tabularnewline
 \bottomrule
-\endlastfoot
-Илгээсэн мессеж (агентын \texttt{илгээсэн}) & 600 & & \\
-Дарагдсан мессеж (\texttt{дарсан}) & 0 & & --- \\
-\texttt{eth0} tx\_bytes (байт) & & & \\
-Үүлэнд хүрсэн мөр (\texttt{wc\ -l}) & & & \\
-Байт/секунд & & & \\
-Дүгнэлтийн дундаж саатал (мс) & & & --- \\
-Pi-гийн CPU \% (\texttt{make\ mem}, \texttt{top}) & & & \\
 \end{longtable}\endgroup
 
 \begin{quote}
@@ -593,16 +705,15 @@ Pi-гийн CPU \% (\texttt{make\ mem}, \texttt{top}) & & & \\
 
 \begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-& Шүүлтгүй & \texttt{-\/-filter}-тэй & Ашиг (дахин) \\
+& Шүүлтгүй & \texttt{-\/-filter}-тэй & Ашиг (дахин)\tabularnewline
 \midrule
 \endhead
+Байт/секунд нэг төхөөрөмжид (Хүснэгт 6.6) & & &\tabularnewline
+Онолын дээд хязгаар (төх., 90 Mbit) & & &\tabularnewline
+50\% нөөцтэй практик хязгаар (төх.) & & &\tabularnewline
+Өдрийн трафик 100 төхөөрөмжөөс (MiB) & & &\tabularnewline
+Сарын трафик 100 төхөөрөмжөөс (GiB) & & &\tabularnewline
 \bottomrule
-\endlastfoot
-Байт/секунд нэг төхөөрөмжид (Хүснэгт 6.6) & & & \\
-Онолын дээд хязгаар (төх., 90 Mbit) & & & \\
-50\% нөөцтэй практик хязгаар (төх.) & & & \\
-Өдрийн трафик 100 төхөөрөмжөөс (MiB) & & & \\
-Сарын трафик 100 төхөөрөмжөөс (GiB) & & & \\
 \end{longtable}\endgroup
 
 \begin{quote}
@@ -616,14 +727,14 @@ Pi-гийн CPU \% (\texttt{make\ mem}, \texttt{top}) & & & \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python3} \AttributeTok{{-}} \OperatorTok{\textless{}\textless{}\textquotesingle{}EOF\textquotesingle{}}
-\StringTok{import csv}
-\StringTok{rows = list(csv.DictReader(open(\textquotesingle{}lab06/out/bench.csv\textquotesingle{})))}
-\StringTok{w = max(len(r[\textquotesingle{}label\textquotesingle{}]) for r in rows)}
-\StringTok{print(f"\{\textquotesingle{}label\textquotesingle{}:\textless{}\{w\}\} \{\textquotesingle{}төмөр\textquotesingle{}:\textgreater{}12\} \{\textquotesingle{}thr\textquotesingle{}:\textgreater{}4\} \{\textquotesingle{}p50\textquotesingle{}:\textgreater{}9\} \{\textquotesingle{}p99\textquotesingle{}:\textgreater{}9\} \{\textquotesingle{}инф/с\textquotesingle{}:\textgreater{}9\}")}
-\StringTok{for r in rows:}
-\StringTok{    print(f"\{r[\textquotesingle{}label\textquotesingle{}]:\textless{}\{w\}\} \{r[\textquotesingle{}device\_label\textquotesingle{}]:\textgreater{}12\} \{r[\textquotesingle{}threads\textquotesingle{}]:\textgreater{}4\} "}
-\StringTok{          f"\{r[\textquotesingle{}lat\_p50\_ms\textquotesingle{}]:\textgreater{}9\} \{r[\textquotesingle{}lat\_p99\_ms\textquotesingle{}]:\textgreater{}9\} \{r[\textquotesingle{}throughput\_infer\_s\textquotesingle{}]:\textgreater{}9\}")}
+\ExtensionTok{python3}\NormalTok{ {-} }\OperatorTok{\textless{}\textless{}\textquotesingle{}EOF\textquotesingle{}}
+\NormalTok{import csv}
+\NormalTok{rows = list(csv.DictReader(open(\textquotesingle{}lab06/out/bench.csv\textquotesingle{})))}
+\NormalTok{w = max(len(r[\textquotesingle{}label\textquotesingle{}]) for r in rows)}
+\NormalTok{print(f"\{\textquotesingle{}label\textquotesingle{}:\textless{}\{w\}\} \{\textquotesingle{}төмөр\textquotesingle{}:\textgreater{}12\} \{\textquotesingle{}thr\textquotesingle{}:\textgreater{}4\} \{\textquotesingle{}p50\textquotesingle{}:\textgreater{}9\} \{\textquotesingle{}p99\textquotesingle{}:\textgreater{}9\} \{\textquotesingle{}инф/с\textquotesingle{}:\textgreater{}9\}")}
+\NormalTok{for r in rows:}
+\NormalTok{    print(f"\{r[\textquotesingle{}label\textquotesingle{}]:\textless{}\{w\}\} \{r[\textquotesingle{}device\_label\textquotesingle{}]:\textgreater{}12\} \{r[\textquotesingle{}threads\textquotesingle{}]:\textgreater{}4\} "}
+\NormalTok{          f"\{r[\textquotesingle{}lat\_p50\_ms\textquotesingle{}]:\textgreater{}9\} \{r[\textquotesingle{}lat\_p99\_ms\textquotesingle{}]:\textgreater{}9\} \{r[\textquotesingle{}throughput\_infer\_s\textquotesingle{}]:\textgreater{}9\}")}
 \OperatorTok{EOF}
 \end{Highlighting}
 \end{Shaded}
@@ -632,9 +743,9 @@ Pi-гийн CPU \% (\texttt{make\ mem}, \texttt{top}) & & & \\
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
 \CommentTok{\# lab06/out/ нь .gitignore{-}д — bench.csv{-}г албадан нэмнэ}
-\FunctionTok{git}\NormalTok{ add lab06/report.md }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ add }\AttributeTok{{-}f}\NormalTok{ lab06/out/bench.csv}
-\FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 6: CPU дээрх ирмэгийн дүгнэлт, шүүлтийн үр ашиг"}
-\FunctionTok{git}\NormalTok{ tag lab06{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\AttributeTok{{-}{-}tags}
+\FunctionTok{git}\NormalTok{ add lab06/report.md }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ add {-}f lab06/out/bench.csv}
+\FunctionTok{git}\NormalTok{ commit {-}m }\StringTok{"Лаб 6: CPU дээрх ирмэгийн дүгнэлт, шүүлтийн үр ашиг"}
+\FunctionTok{git}\NormalTok{ tag lab06{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push {-}{-}tags}
 \end{Highlighting}
 \end{Shaded}
 
@@ -642,7 +753,7 @@ Pi-гийн CPU \% (\texttt{make\ mem}, \texttt{top}) & & & \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}E} \StringTok{\textquotesingle{}\textbackslash{}.tflite$|\textbackslash{}.eim$|lab06/data/|\textbackslash{}.env$\textquotesingle{}}   \CommentTok{\# хоосон байх ЁСТОЙ}
+\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}E }\StringTok{\textquotesingle{}\textbackslash{}.tflite$|\textbackslash{}.eim$|lab06/data/|\textbackslash{}.env$\textquotesingle{}}\NormalTok{   \# хоосон байх ЁСТОЙ}
 \end{Highlighting}
 \end{Shaded}
 
@@ -672,27 +783,53 @@ Pi-гийн CPU \% (\texttt{make\ mem}, \texttt{top}) & & & \\
 \hypertarget{ux445ux4afux43bux44dux44dux43bux433ux44dux43d-ux4e9ux433ux4e9ux445-ux437ux4afux439ux43b}{%
 \section{6. Хүлээлгэн өгөх зүйл}\label{ux445ux4afux43bux44dux44dux43bux433ux44dux43d-ux4e9ux433ux4e9ux445-ux437ux4afux439ux43b}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-\#
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Зүйл
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Байрлал
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+\#\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Зүйл\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Байрлал\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Тайлан (Хүснэгт 6.1--6.7 бөглөсөн)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{lab06/report.md} → PDF\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Бүх хэмжилтийн нэгдсэн CSV\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{lab06/\allowbreak{}out/\allowbreak{}bench.\allowbreak{}csv}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+3\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Edge Impulse төслийн холбоос эсвэл сургалтын кодын diff\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+тайлангийн хавсралт\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Шүүлттэй/шүүлтгүй агентын терминалын гаралт\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{lab06/out/*.log}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+5\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Git tag\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{lab06-done}\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-1 & Тайлан (Хүснэгт 6.1--6.7 бөглөсөн) & \texttt{lab06/report.md} → PDF \\
-2 & Бүх хэмжилтийн нэгдсэн CSV & \texttt{lab06/\allowbreak{}out/\allowbreak{}bench.\allowbreak{}csv} \\
-3 & Edge Impulse төслийн холбоос эсвэл сургалтын кодын diff & тайлангийн хавсралт \\
-4 & Шүүлттэй/шүүлтгүй агентын терминалын гаралт & \texttt{lab06/out/*.log} \\
-5 & Git tag & \texttt{lab06-done} \\
 \end{longtable}\endgroup
 
 СТОП: \texttt{.tflite}, \texttt{.eim}, \texttt{lab06/data/*.csv} Git-д \textbf{орохгүй}.
@@ -700,24 +837,17 @@ Pi-гийн CPU \% (\texttt{make\ mem}, \texttt{top}) & & & \\
 \hypertarget{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}{%
 \section{7. Үнэлгээний шалгуур (10 оноо)}\label{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Шалгуур
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Оноо
-\end{minipage} \\
+Шалгуур & Оноо\tabularnewline
 \midrule
 \endhead
+Загвар Pi дээр ачаалагдаж, дүгнэлт ажиллаж байна (амьд үзүүлнэ) & 2\tabularnewline
+Хүснэгт 6.1--6.5 бүрэн, throttling өмнө/дараа шалгагдсан & 3\tabularnewline
+\textbf{Ирмэгийн шүүлтийн үр ашиг хэмжигдэж, өгсөх урсгалын тооцоо хийгдсэн} & 3\tabularnewline
+MobileNet-ийн хэмжилт хийгдэж, шалтгаан нь тайлбарлагдсан & 1\tabularnewline
+Git цэвэр, загвар/өгөгдөл ороогүй & 1\tabularnewline
 \bottomrule
-\endlastfoot
-Загвар Pi дээр ачаалагдаж, дүгнэлт ажиллаж байна (амьд үзүүлнэ) & 2 \\
-Хүснэгт 6.1--6.5 бүрэн, throttling өмнө/дараа шалгагдсан & 3 \\
-\textbf{Ирмэгийн шүүлтийн үр ашиг хэмжигдэж, өгсөх урсгалын тооцоо хийгдсэн} & 3 \\
-MobileNet-ийн хэмжилт хийгдэж, шалтгаан нь тайлбарлагдсан & 1 \\
-Git цэвэр, загвар/өгөгдөл ороогүй & 1 \\
 \end{longtable}\endgroup
 
 \textbf{\texttt{-\/\allowbreak{}-backend\ synthetic}-ээр гүйцэтгэсэн бол} дээд тал нь 7 оноо.
@@ -725,69 +855,238 @@ Git цэвэр, загвар/өгөгдөл ороогүй & 1 \\
 \hypertarget{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}{%
 \section{8. Түгээмэл алдаа}\label{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Шинж
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шалтгаан
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шийдэл
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шинж\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шалтгаан\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шийдэл\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{TFLite\ орчин\ олдсонгүй}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+сан суулгаагүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+{[}Pi{]} \texttt{edge/\allowbreak{}.\allowbreak{}venv/\allowbreak{}bin/\allowbreak{}pip\ install\ ai-edge-litert}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{pip}: \texttt{No\ matching\ distribution\ found\ for\ ai-edge-litert}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+32-бит OS (\texttt{armv7l}) эсвэл дэмжигдээгүй Python\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{uname\ -m} → \texttt{aarch64} байх ёстой; 64-бит Raspberry Pi OS суулга\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Агент \texttt{{[}detector{]}\ ачаалж\ чадсангүй} / оролтын хэлбэр \texttt{(1,\ 3)} биш\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Edge Impulse-ийн DSP блоктой экспорт\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+А замаар (\texttt{train\_\allowbreak{}tiny\_\allowbreak{}model.\allowbreak{}py}) дахин гарга\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Скрипт гаралтын код 4 буцаав\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+ажиллалтын явцад throttling эхэлсэн\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+5 мин хөргөж, 5V/2.5A тэжээл шалгаад давт\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+int8 нь float32-оос удаан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+загвар хэт жижиг, де/квантчилалын зардал давамгайлав\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+хэвийн --- тайлбарла, алдаа биш\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Саатал маш хэлбэлзэлтэй (σ өндөр)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Pi дээр өөр ачаалал байна\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{pkill\ -f\ vscode-server}, \texttt{docker\ compose\ ps}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Санах ойн тоо 0\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{/\allowbreak{}proc/\allowbreak{}self/\allowbreak{}status} уншигдахгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+контейнер дотор биш, Pi дээр шууд ажиллуул\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{-\/-detector} заасан ч босго ашиглаж байна\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+зам буруу эсвэл \texttt{.tflite} ачаалагдсангүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+агентын \texttt{{[}detector{]}} мөрийг унш\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{-\/-filter}-тэй ч мессеж багасахгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{-\/-anomaly-rate} хэт өндөр\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+0.02--0.05 болго\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{eth0} олдохгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Wi-Fi ашиглаж байна\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{ls\ /\allowbreak{}sys/\allowbreak{}class/\allowbreak{}net/\allowbreak{}}; кабельд шилжих (Лаб 1)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{mobilenet} ажиллуулахад OOM\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+224×224×3 буфер + загвар\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{-\/-runs} 30 болго, Docker-ыг зогсоо\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{TFLite\ орчин\ олдсонгүй} & сан суулгаагүй & {[}Pi{]} \texttt{edge/\allowbreak{}.\allowbreak{}venv/\allowbreak{}bin/\allowbreak{}pip\ install\ ai-edge-litert} \\
-\texttt{pip}: \texttt{No\ matching\ distribution\ found\ for\ ai-edge-litert} & 32-бит OS (\texttt{armv7l}) эсвэл дэмжигдээгүй Python & \texttt{uname\ -m} → \texttt{aarch64} байх ёстой; 64-бит Raspberry Pi OS суулга \\
-Агент \texttt{{[}detector{]}\ ачаалж\ чадсангүй} / оролтын хэлбэр \texttt{(1,\ 3)} биш & Edge Impulse-ийн DSP блоктой экспорт & А замаар (\texttt{train\_\allowbreak{}tiny\_\allowbreak{}model.\allowbreak{}py}) дахин гарга \\
-Скрипт гаралтын код 4 буцаав & ажиллалтын явцад throttling эхэлсэн & 5 мин хөргөж, 5V/2.5A тэжээл шалгаад давт \\
-int8 нь float32-оос удаан & загвар хэт жижиг, де/квантчилалын зардал давамгайлав & хэвийн --- тайлбарла, алдаа биш \\
-Саатал маш хэлбэлзэлтэй (σ өндөр) & Pi дээр өөр ачаалал байна & \texttt{pkill\ -f\ vscode-server}, \texttt{docker\ compose\ ps} \\
-Санах ойн тоо 0 & \texttt{/\allowbreak{}proc/\allowbreak{}self/\allowbreak{}status} уншигдахгүй & контейнер дотор биш, Pi дээр шууд ажиллуул \\
-\texttt{-\/-detector} заасан ч босго ашиглаж байна & зам буруу эсвэл \texttt{.tflite} ачаалагдсангүй & агентын \texttt{{[}detector{]}} мөрийг унш \\
-\texttt{-\/-filter}-тэй ч мессеж багасахгүй & \texttt{-\/-anomaly-rate} хэт өндөр & 0.02--0.05 болго \\
-\texttt{eth0} олдохгүй & Wi-Fi ашиглаж байна & \texttt{ls\ /\allowbreak{}sys/\allowbreak{}class/\allowbreak{}net/\allowbreak{}}; кабельд шилжих (Лаб 1) \\
-\texttt{mobilenet} ажиллуулахад OOM & 224×224×3 буфер + загвар & \texttt{-\/-runs} 30 болго, Docker-ыг зогсоо \\
 \end{longtable}\endgroup
 
 \hypertarget{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}{%
 \section{9. Эх сурвалж}\label{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-\#
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Эх сурвалж
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Юуг баталгаажуулсан
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хандсан
-\end{minipage} \\
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+\#\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Эх сурвалж\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Юуг баталгаажуулсан\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хандсан\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://ai.google.dev/edge/litert/migration}{LiteRT --- Migrate to LiteRT}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{tflite-runtime} → \texttt{ai-edge-litert}, \texttt{from\ ai\_\allowbreak{}edge\_\allowbreak{}litert.\allowbreak{}interpreter\ import\ Interpreter}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://pypi.org/project/ai-edge-litert/}{pypi: ai-edge-litert}, \href{https://pypi.org/project/tflite-runtime/}{pypi: tflite-runtime}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+ai-edge-litert 2.2.0: cp311 \texttt{manylinux\_\allowbreak{}2\_\allowbreak{}27\_\allowbreak{}aarch64} wheel; tflite-runtime сүүлийн 2.14.0 (2023-10)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+3\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://ai.google.dev/edge/litert/microcontrollers/python}{LiteRT for Python (tflite\_\allowbreak{}runtime)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{Interpreter(model\_\allowbreak{}path=\allowbreak{}\ldots{})}, хуучин багцын платформ\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://ai.google.dev/edge/litert/conversion/tensorflow/quantization/post_training_quantization}{LiteRT --- Post-training quantization}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+full integer: \texttt{Optimize.DEFAULT}, \texttt{representative\_\allowbreak{}dataset}, \texttt{TFLITE\_\allowbreak{}BUILTINS\_\allowbreak{}INT8}, \texttt{inference\_\allowbreak{}input/\allowbreak{}output\_\allowbreak{}type}; "4x smaller, 3x+ speedup"\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+5\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://ai.google.dev/edge/litert/conversion/tensorflow/quantization/post_training_integer_quant}{LiteRT --- Post-training integer quantization}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{input\_\allowbreak{}details{[}"quantization"{]}} → (scale, zero\_point)-оор оролтыг квантчлах\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+6\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.tensorflow.org/api_docs/python/tf/keras/applications/MobileNetV2}{tf.\allowbreak{}keras.\allowbreak{}applications.\allowbreak{}MobileNetV2}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{input\_shape}, \texttt{weights=\textquotesingle{}imagenet\textquotesingle{}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+7\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://pypi.org/project/onnxruntime/}{pypi: onnxruntime}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+1.30.0, Python ≥3.11, \texttt{manylinux\_\allowbreak{}2\_\allowbreak{}28\_\allowbreak{}aarch64} wheel\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+8\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.edgeimpulse.com/hardware}{Edge Impulse --- Supported hardware}, \href{https://docs.edgeimpulse.com/hardware/boards/raspberry-pi-4}{Raspberry Pi 4}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+албан ёсны жагсаалтад Pi 4/5 (Pi 3 байхгүй); Node.js 20+, \texttt{npm\ install\ edge-impulse-linux\ -g\ -\/\allowbreak{}-unsafe-perm}, 64-бит OS\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+9\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.edgeimpulse.com/tools/libraries/sdks/inference/linux/python}{Edge Impulse --- Linux Python SDK}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{pip3\ install\ edge\_\allowbreak{}impulse\_\allowbreak{}linux}, \texttt{ImpulseRunner}, \texttt{runner.init()}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+10\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/products/raspberry-pi-3-model-b/}{Raspberry Pi 3 Model B (бүтээгдэхүүний хуудас)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+BCM2837 4 цөм 1.2 ГГц 64-бит, 1 GB RAM, 100 Base Ethernet, 2.5 A\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+11\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/products/ai-kit/}{Raspberry Pi AI Kit}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Pi 5, M.2 HAT+ → PCIe 2.0\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+12\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/os.html}{Raspberry Pi --- Raspberry Pi OS (vcgencmd)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{get\_throttled} битүүд, \texttt{measure\_temp}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+13\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html}{Raspberry Pi --- Raspberry Pi hardware}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+80--85 °C аажмаар, 85 °C-д Arm+GPU throttle; зөөлөн хязгаар 3B+-д\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+14\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.kernel.org/admin-guide/abi-testing.html}{Linux kernel ABI --- sysfs-class-net-statistics}, \href{https://docs.kernel.org/networking/statistics.html}{Interface statistics}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{tx\_bytes} = илгээсэн байт (драйверээс хамаарна)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-1 & \href{https://ai.google.dev/edge/litert/migration}{LiteRT --- Migrate to LiteRT} & \texttt{tflite-runtime} → \texttt{ai-edge-litert}, \texttt{from\ ai\_\allowbreak{}edge\_\allowbreak{}litert.\allowbreak{}interpreter\ import\ Interpreter} & 2026-09 \\
-2 & \href{https://pypi.org/project/ai-edge-litert/}{pypi: ai-edge-litert}, \href{https://pypi.org/project/tflite-runtime/}{pypi: tflite-runtime} & ai-edge-litert 2.2.0: cp311 \texttt{manylinux\_\allowbreak{}2\_\allowbreak{}27\_\allowbreak{}aarch64} wheel; tflite-runtime сүүлийн 2.14.0 (2023-10) & 2026-09 \\
-3 & \href{https://ai.google.dev/edge/litert/microcontrollers/python}{LiteRT for Python (tflite\_\allowbreak{}runtime)} & \texttt{Interpreter(model\_\allowbreak{}path=\allowbreak{}…)}, хуучин багцын платформ & 2026-09 \\
-4 & \href{https://ai.google.dev/edge/litert/conversion/tensorflow/quantization/post_training_quantization}{LiteRT --- Post-training quantization} & full integer: \texttt{Optimize.DEFAULT}, \texttt{representative\_\allowbreak{}dataset}, \texttt{TFLITE\_\allowbreak{}BUILTINS\_\allowbreak{}INT8}, \texttt{inference\_\allowbreak{}input/\allowbreak{}output\_\allowbreak{}type}; "4x smaller, 3x+ speedup" & 2026-09 \\
-5 & \href{https://ai.google.dev/edge/litert/conversion/tensorflow/quantization/post_training_integer_quant}{LiteRT --- Post-training integer quantization} & \texttt{input\_\allowbreak{}details{[}"quantization"{]}} → (scale, zero\_point)-оор оролтыг квантчлах & 2026-09 \\
-6 & \href{https://www.tensorflow.org/api_docs/python/tf/keras/applications/MobileNetV2}{tf.\allowbreak{}keras.\allowbreak{}applications.\allowbreak{}MobileNetV2} & \texttt{input\_shape}, \texttt{weights=\textquotesingle{}imagenet\textquotesingle{}} & 2026-09 \\
-7 & \href{https://pypi.org/project/onnxruntime/}{pypi: onnxruntime} & 1.30.0, Python ≥3.11, \texttt{manylinux\_\allowbreak{}2\_\allowbreak{}28\_\allowbreak{}aarch64} wheel & 2026-09 \\
-8 & \href{https://docs.edgeimpulse.com/hardware}{Edge Impulse --- Supported hardware}, \href{https://docs.edgeimpulse.com/hardware/boards/raspberry-pi-4}{Raspberry Pi 4} & албан ёсны жагсаалтад Pi 4/5 (Pi 3 байхгүй); Node.js 20+, \texttt{npm\ install\ edge-impulse-linux\ -g\ -\/\allowbreak{}-unsafe-perm}, 64-бит OS & 2026-09 \\
-9 & \href{https://docs.edgeimpulse.com/tools/libraries/sdks/inference/linux/python}{Edge Impulse --- Linux Python SDK} & \texttt{pip3\ install\ edge\_\allowbreak{}impulse\_\allowbreak{}linux}, \texttt{ImpulseRunner}, \texttt{runner.init()} & 2026-09 \\
-10 & \href{https://www.raspberrypi.com/products/raspberry-pi-3-model-b/}{Raspberry Pi 3 Model B (бүтээгдэхүүний хуудас)} & BCM2837 4 цөм 1.2 ГГц 64-бит, 1 GB RAM, 100 Base Ethernet, 2.5 A & 2026-09 \\
-11 & \href{https://www.raspberrypi.com/products/ai-kit/}{Raspberry Pi AI Kit} & Pi 5, M.2 HAT+ → PCIe 2.0 & 2026-09 \\
-12 & \href{https://www.raspberrypi.com/documentation/computers/os.html}{Raspberry Pi --- Raspberry Pi OS (vcgencmd)} & \texttt{get\_throttled} битүүд, \texttt{measure\_temp} & 2026-09 \\
-13 & \href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html}{Raspberry Pi --- Raspberry Pi hardware} & 80--85 °C аажмаар, 85 °C-д Arm+GPU throttle; зөөлөн хязгаар 3B+-д & 2026-09 \\
-14 & \href{https://docs.kernel.org/admin-guide/abi-testing.html}{Linux kernel ABI --- sysfs-class-net-statistics}, \href{https://docs.kernel.org/networking/statistics.html}{Interface statistics} & \texttt{tx\_bytes} = илгээсэн байт (драйверээс хамаарна) & 2026-09 \\
 \end{longtable}\endgroup

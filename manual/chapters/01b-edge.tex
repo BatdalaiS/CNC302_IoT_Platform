@@ -13,40 +13,67 @@ Pi 3B (албан ёсны үзүүлэлт): \textbf{1 GB RAM}, 4×Cortex-A53 @
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{cp}\NormalTok{ .env.example .env}
-\FunctionTok{nano}\NormalTok{ .env            }\CommentTok{\# CLOUD\_HOST = зөөврийн компьютерийн LAN IP (localhost БИШ)}
-\FunctionTok{make}\NormalTok{ bridge          }\CommentTok{\# .env → mosquitto/conf.d/bridge.conf}
-\FunctionTok{make}\NormalTok{ up              }\CommentTok{\# mosquitto асаана}
-\FunctionTok{make}\NormalTok{ link            }\CommentTok{\# → bridge/state 1 гарвал холбогдсон}
-\FunctionTok{make}\NormalTok{ agent           }\CommentTok{\# ирмэгийн агент (өөр терминалд)}
+\FunctionTok{nano}\NormalTok{ .env            \# CLOUD\_HOST = зөөврийн компьютерийн LAN IP (localhost БИШ)}
+\FunctionTok{make}\NormalTok{ bridge          \# .env → mosquitto/conf.d/bridge.conf}
+\FunctionTok{make}\NormalTok{ up              \# mosquitto асаана}
+\FunctionTok{make}\NormalTok{ link            \# → bridge/state 1 гарвал холбогдсон}
+\FunctionTok{make}\NormalTok{ agent           \# ирмэгийн агент (өөр терминалд)}
 \end{Highlighting}
 \end{Shaded}
 
 \hypertarget{ux44eux443-ux44dux43dux434-ux430ux436ux438ux43bux43bux430ux445-ux432ux44d}{%
 \section{Юу энд ажиллах вэ}\label{ux44eux443-ux44dux43dux434-ux430ux436ux438ux43bux43bux430ux445-ux432ux44d}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Хэсэг
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хэрхэн
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-RAM
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Үүрэг
-\end{minipage} \\
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хэсэг\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хэрхэн\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+RAM\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Үүрэг\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{mosquitto}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Docker\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+12--25 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+локал брокер + үүл рүү гүүр + дараалал (RAM-д; диск рүү autosave-аар)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+ирмэгийн агент\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+venv (Docker биш)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+45--70 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Pi-гийн бодит хэмжүүр + процессын дохио → UNS\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+LiteRT (TFLite) дүгнэлт\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+агентын дотор\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
++40--90 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Лаб 6: локал аномали илрүүлэлт\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+K3s \textbf{agent}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Лаб 8\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+≈ 268 MiB (K3s-ийн Pi 4B хэмжилт)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+server нь зөөврийн компьютер дээрх VM; Pi дээр Docker-ийг \textbf{зогсоож} ажиллуулна\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{mosquitto} & Docker & 12--25 MiB & локал брокер + үүл рүү гүүр + дараалал (RAM-д; диск рүү autosave-аар) \\
-ирмэгийн агент & venv (Docker биш) & 45--70 MiB & Pi-гийн бодит хэмжүүр + процессын дохио → UNS \\
-LiteRT (TFLite) дүгнэлт & агентын дотор & +40--90 MiB & Лаб 6: локал аномали илрүүлэлт \\
-K3s \textbf{agent} & Лаб 8 & ≈ 268 MiB (K3s-ийн Pi 4B хэмжилт) & server нь зөөврийн компьютер дээрх VM; Pi дээр Docker-ийг \textbf{зогсоож} ажиллуулна \\
 \end{longtable}\endgroup
 
 RAM-ын тоо бол \textbf{таамаг} --- Лаб 1-д өөрсдөө хэмжинэ. Агентыг Docker-т биш \textbf{venv-д} ажиллуулж байгаа шалтгаан: Docker демон ба контейнерийн давхаргын зардлыг хэмнэх, мөн кодыг засаад шууд дахин ажиллуулах нь хурдан. Лаб 8-д K3s agent-д оруулахдаа \texttt{agent/Dockerfile}-ээр дүрсийг \textbf{зөөврийн компьютер дээр} arm64-д барьж, Pi-д хуулна (Dockerfile-ийн толгой хэсэг).
@@ -54,29 +81,22 @@ RAM-ын тоо бол \textbf{таамаг} --- Лаб 1-д өөрсдөө хэ
 \hypertarget{make-ux43aux43eux43cux430ux43dux434ux443ux443ux434}{%
 \section{\texorpdfstring{\texttt{make} командууд}{make командууд}}\label{make-ux43aux43eux43cux430ux43dux434ux443ux443ux434}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Комманд
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Үйлдэл
-\end{minipage} \\
+Комманд & Үйлдэл\tabularnewline
 \midrule
 \endhead
+\texttt{make\ bridge} & \texttt{.env}-ээс \texttt{conf.\allowbreak{}d/\allowbreak{}bridge.\allowbreak{}conf} үүсгэнэ (\textbf{эхлээд энэ})\tabularnewline
+\texttt{make\ up} & \texttt{bridge} + mosquitto асаана\tabularnewline
+\texttt{make\ link} & гүүрний төлөв сонсоно (1 = холбогдсон)\tabularnewline
+\texttt{make\ agent} & ирмэгийн агент (venv байхгүй бол өөрөө үүсгэнэ)\tabularnewline
+\texttt{make\ mem} & санах ой, throttle, температур, ачаалал\tabularnewline
+\texttt{make\ check} & бэлэн байдлын шалгалт (swap, cgroup, NTP, bridge.conf)\tabularnewline
+\texttt{make\ logs} & mosquitto-гийн лог\tabularnewline
+\texttt{make\ ps} & контейнер + \texttt{docker\ stats}\tabularnewline
+\texttt{make\ down} & зогсоох (өгөгдөл үлдэнэ)\tabularnewline
+\texttt{make\ clean} & зогсоох + volume + \texttt{bridge.conf} устгах\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{make\ bridge} & \texttt{.env}-ээс \texttt{conf.\allowbreak{}d/\allowbreak{}bridge.\allowbreak{}conf} үүсгэнэ (\textbf{эхлээд энэ}) \\
-\texttt{make\ up} & \texttt{bridge} + mosquitto асаана \\
-\texttt{make\ link} & гүүрний төлөв сонсоно (1 = холбогдсон) \\
-\texttt{make\ agent} & ирмэгийн агент (venv байхгүй бол өөрөө үүсгэнэ) \\
-\texttt{make\ mem} & санах ой, throttle, температур, ачаалал \\
-\texttt{make\ check} & бэлэн байдлын шалгалт (swap, cgroup, NTP, bridge.conf) \\
-\texttt{make\ logs} & mosquitto-гийн лог \\
-\texttt{make\ ps} & контейнер + \texttt{docker\ stats} \\
-\texttt{make\ down} & зогсоох (өгөгдөл үлдэнэ) \\
-\texttt{make\ clean} & зогсоох + volume + \texttt{bridge.conf} устгах \\
 \end{longtable}\endgroup
 
 \hypertarget{ux444ux430ux439ux43bux443ux443ux434}{%
@@ -104,31 +124,60 @@ edge/
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{.venv/bin/python}\NormalTok{ agent/edge\_agent.py }\AttributeTok{{-}{-}help}
+\ExtensionTok{.venv/bin/python}\NormalTok{ agent/edge\_agent.py {-}{-}help}
 \end{Highlighting}
 \end{Shaded}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Тохиргоо
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Утга
-\end{minipage} \\
+\begin{minipage}[b]{0.47\columnwidth}\raggedright
+Тохиргоо\strut
+\end{minipage} & \begin{minipage}[b]{0.47\columnwidth}\raggedright
+Утга\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{-\/-dry-run}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+брокергүйгээр зөвхөн хэвлэнэ (SETUP-д шалгахад)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{-\/\allowbreak{}-interval\ 2.\allowbreak{}0}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+телеметрийн үе (сек)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{-\/-qos\ 0\textbackslash{}\textbar{}1\textbackslash{}\textbar{}2}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+нийтлэх QoS\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{-\/\allowbreak{}-anomaly-rate\ 0.\allowbreak{}02}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+санамсаргүй аномали оруулах магадлал\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{-\/\allowbreak{}-detector\ \textless{}model\textgreater{}}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+TFLite (LiteRT) загвар (Лаб 6). Байхгүй бол босгын горим\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{-\/-threads\ 2}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+дүгнэлтийн урсгал. 4×A53-д 4 нь ихэвчлэн 2-оос \textbf{удаан}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{-\/-filter}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+зөвхөн аномали + үе үе хураангуй илгээнэ (өгсөх урсгалыг (uplink) хэмнэнэ)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{-\/\allowbreak{}-health-every\ 15}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+хэдэн мөчлөг тутам эрүүл мэндийн мессеж\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{-\/-dry-run} & брокергүйгээр зөвхөн хэвлэнэ (SETUP-д шалгахад) \\
-\texttt{-\/\allowbreak{}-interval\ 2.\allowbreak{}0} & телеметрийн үе (сек) \\
-\texttt{-\/-qos\ 0\textbackslash{}\textbar{}1\textbackslash{}\textbar{}2} & нийтлэх QoS \\
-\texttt{-\/\allowbreak{}-anomaly-rate\ 0.\allowbreak{}02} & санамсаргүй аномали оруулах магадлал \\
-\texttt{-\/\allowbreak{}-detector\ \textless{}model\textgreater{}} & TFLite (LiteRT) загвар (Лаб 6). Байхгүй бол босгын горим \\
-\texttt{-\/-threads\ 2} & дүгнэлтийн урсгал. 4×A53-д 4 нь ихэвчлэн 2-оос \textbf{удаан} \\
-\texttt{-\/-filter} & зөвхөн аномали + үе үе хураангуй илгээнэ (өгсөх урсгалыг (uplink) хэмнэнэ) \\
-\texttt{-\/\allowbreak{}-health-every\ 15} & хэдэн мөчлөг тутам эрүүл мэндийн мессеж \\
 \end{longtable}\endgroup
 
 Дохио нь \texttt{DEVICE\_ID}-аар seed хийгдсэн тул \textbf{давтагдана} --- нэг Pi үргэлж ижил цуваа өгнө. Лаб 6-д загвар харьцуулахад зайлшгүй.
@@ -140,8 +189,8 @@ edge/
 \begin{Highlighting}[]
 \FunctionTok{sudo}\NormalTok{ cp agent/cnc302{-}edge{-}agent.service /etc/systemd/system/}
 \FunctionTok{sudo}\NormalTok{ systemctl daemon{-}reload}
-\FunctionTok{sudo}\NormalTok{ systemctl enable }\AttributeTok{{-}{-}now}\NormalTok{ cnc302{-}edge{-}agent}
-\ExtensionTok{journalctl} \AttributeTok{{-}u}\NormalTok{ cnc302{-}edge{-}agent }\AttributeTok{{-}f}
+\FunctionTok{sudo}\NormalTok{ systemctl enable {-}{-}now cnc302{-}edge{-}agent}
+\ExtensionTok{journalctl}\NormalTok{ {-}u cnc302{-}edge{-}agent {-}f}
 \end{Highlighting}
 \end{Shaded}
 
@@ -152,9 +201,9 @@ edge/
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{pkill} \AttributeTok{{-}f}\NormalTok{ vscode{-}server        }\CommentTok{\# VS Code Remote сервер ихээхэн RAM иднэ — хэмжээг Лаб 1{-}д хэмж}
-\ExtensionTok{vcgencmd}\NormalTok{ get\_throttled        }\CommentTok{\# 0x0 байх ЁСТОЙ}
-\FunctionTok{free} \AttributeTok{{-}m} \KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}/Mem:/\{print $7 " MiB available"\}\textquotesingle{}}
+\ExtensionTok{pkill}\NormalTok{ {-}f vscode{-}server        \# VS Code Remote сервер ихээхэн RAM иднэ — хэмжээг Лаб 1{-}д хэмж}
+\ExtensionTok{vcgencmd}\NormalTok{ get\_throttled        \# 0x0 байх ЁСТОЙ}
+\FunctionTok{free}\NormalTok{ {-}m }\KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}/Mem:/\{print $7 " MiB available"\}\textquotesingle{}}
 \end{Highlighting}
 \end{Shaded}
 
@@ -163,26 +212,51 @@ edge/
 \hypertarget{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}{%
 \section{Түгээмэл алдаа}\label{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Шинж
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шийдэл
-\end{minipage} \\
+\begin{minipage}[b]{0.47\columnwidth}\raggedright
+Шинж\strut
+\end{minipage} & \begin{minipage}[b]{0.47\columnwidth}\raggedright
+Шийдэл\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{bridge/state\ 0}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{CLOUD\_HOST} буруу, эсвэл компьютерийн галт хана (SETUP.md А.6)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+Гүүр холбогдсон ч мессеж алга\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{SITE} нь \texttt{.env} ба \texttt{bridge.conf}-д зөрсөн → \texttt{make\ bridge\ \&\allowbreak{}\&\allowbreak{}\ make\ restart}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{.env\ олдсонгүй}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{cp\ .\allowbreak{}env.\allowbreak{}example\ .\allowbreak{}env}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{paho-mqtt\ суулгаагүй}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{make\ venv}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+Контейнер дахин дахин эхэлнэ\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+OOM. \texttt{docker\ inspect\ \ldots{}\ OOMKilled}, \texttt{free\ -m}, swap шалга\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{exec\ format\ error}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+32-bit OS. \texttt{uname\ -m} → \texttt{aarch64} байх ёстой\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+Лаб 8-д \texttt{bridge/state} анивчина\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+Compose-ийн mosquitto K3s-ийн pod-той зэрэг ажиллаж байна (ижил client ID) → \texttt{docker\ compose\ down}\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{bridge/state\ 0} & \texttt{CLOUD\_HOST} буруу, эсвэл компьютерийн галт хана (SETUP.md А.6) \\
-Гүүр холбогдсон ч мессеж алга & \texttt{SITE} нь \texttt{.env} ба \texttt{bridge.conf}-д зөрсөн → \texttt{make\ bridge\ \&\allowbreak{}\&\allowbreak{}\ make\ restart} \\
-\texttt{.env\ олдсонгүй} & \texttt{cp\ .\allowbreak{}env.\allowbreak{}example\ .\allowbreak{}env} \\
-\texttt{paho-mqtt\ суулгаагүй} & \texttt{make\ venv} \\
-Контейнер дахин дахин эхэлнэ & OOM. \texttt{docker\ inspect\ …\ OOMKilled}, \texttt{free\ -m}, swap шалга \\
-\texttt{exec\ format\ error} & 32-bit OS. \texttt{uname\ -m} → \texttt{aarch64} байх ёстой \\
-Лаб 8-д \texttt{bridge/state} анивчина & Compose-ийн mosquitto K3s-ийн pod-той зэрэг ажиллаж байна (ижил client ID) → \texttt{docker\ compose\ down} \\
 \end{longtable}\endgroup
 
 Дэлгэрэнгүйг \texttt{.\allowbreak{}.\allowbreak{}/\allowbreak{}docs/\allowbreak{}troubleshooting.\allowbreak{}md}-ээс.
@@ -190,31 +264,90 @@ edge/
 \hypertarget{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}{%
 \section{Эх сурвалж}\label{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-\#
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Эх сурвалж
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Юуг баталгаажуулсан
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хандсан
-\end{minipage} \\
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+\#\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Эх сурвалж\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Юуг баталгаажуулсан\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хандсан\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://mosquitto.org/man/mosquitto-conf-5.html}{mosquitto.conf(5)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Бүх тохиргооны түлхүүр ба хамрах хүрээ (глобал / listener / bridge); \texttt{keepalive\_\allowbreak{}interval} (анхдагч 60, доод 5); \texttt{notification\_\allowbreak{}topic}-ийн анхдагч \texttt{\$SYS/\allowbreak{}broker/\allowbreak{}connection/\allowbreak{}\textless{}remote\_\allowbreak{}clientid\textgreater{}/\allowbreak{}state}; persistence нь autosave / зогсоох / SIGUSR1 үед бичигдэнэ\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://mosquitto.org/ChangeLog.txt}{Mosquitto ChangeLog}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2.0.20 → 2.0.22 засварууд\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+3\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://man7.org/linux/man-pages/man5/systemd.exec.5.html}{systemd.exec(5)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{EnvironmentFile=}: зөвхөн мөрийн эхний \texttt{\#}/\allowbreak\texttt{;} тайлбар, мөрийн доторх хоосон зай хадгалагдана\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://man7.org/linux/man-pages/man5/systemd.resource-control.5.html}{systemd.\allowbreak{}resource-control(5)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{MemoryMax=} --- хязгаар давбал unit дотор OOM killer; K/M/G утга 1024 суурьтай\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+5\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.docker.com/reference/cli/docker/image/save/}{docker image save}, \href{https://docs.docker.com/build/building/multi-platform/}{Multi-platform builds}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{-\/-platform} (API 1.48+), \texttt{-o}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+6\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.k3s.io/add-ons/import-images}{K3s --- Import Images}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{/\allowbreak{}var/\allowbreak{}lib/\allowbreak{}rancher/\allowbreak{}k3s/\allowbreak{}agent/\allowbreak{}images/\allowbreak{}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+7\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.k3s.io/reference/resource-profiling}{K3s --- Resource Profiling}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+K3s agent (Pi 4B) ≈ 268 M\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+8\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html}{Raspberry Pi hardware} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/raspberry-pi/introduction.adoc}{эх})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Pi 3B-ийн үзүүлэлт\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-1 & \href{https://mosquitto.org/man/mosquitto-conf-5.html}{mosquitto.conf(5)} & Бүх тохиргооны түлхүүр ба хамрах хүрээ (глобал / listener / bridge); \texttt{keepalive\_\allowbreak{}interval} (анхдагч 60, доод 5); \texttt{notification\_\allowbreak{}topic}-ийн анхдагч \texttt{\$SYS/\allowbreak{}broker/\allowbreak{}connection/\allowbreak{}\textless{}remote\_\allowbreak{}clientid\textgreater{}/\allowbreak{}state}; persistence нь autosave / зогсоох / SIGUSR1 үед бичигдэнэ & 2026-09 \\
-2 & \href{https://mosquitto.org/ChangeLog.txt}{Mosquitto ChangeLog} & 2.0.20 → 2.0.22 засварууд & 2026-09 \\
-3 & \href{https://man7.org/linux/man-pages/man5/systemd.exec.5.html}{systemd.exec(5)} & \texttt{EnvironmentFile=}: зөвхөн мөрийн эхний \texttt{\#}/\allowbreak\texttt{;} тайлбар, мөрийн доторх хоосон зай хадгалагдана & 2026-09 \\
-4 & \href{https://man7.org/linux/man-pages/man5/systemd.resource-control.5.html}{systemd.\allowbreak{}resource-control(5)} & \texttt{MemoryMax=} --- хязгаар давбал unit дотор OOM killer; K/M/G утга 1024 суурьтай & 2026-09 \\
-5 & \href{https://docs.docker.com/reference/cli/docker/image/save/}{docker image save}, \href{https://docs.docker.com/build/building/multi-platform/}{Multi-platform builds} & \texttt{-\/-platform} (API 1.48+), \texttt{-o} & 2026-09 \\
-6 & \href{https://docs.k3s.io/add-ons/import-images}{K3s --- Import Images} & \texttt{/\allowbreak{}var/\allowbreak{}lib/\allowbreak{}rancher/\allowbreak{}k3s/\allowbreak{}agent/\allowbreak{}images/\allowbreak{}} & 2026-09 \\
-7 & \href{https://docs.k3s.io/reference/resource-profiling}{K3s --- Resource Profiling} & K3s agent (Pi 4B) ≈ 268 M & 2026-09 \\
-8 & \href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html}{Raspberry Pi hardware} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/raspberry-pi/introduction.adoc}{эх}) & Pi 3B-ийн үзүүлэлт & 2026-09 \\
 \end{longtable}\endgroup

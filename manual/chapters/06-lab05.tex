@@ -1,18 +1,15 @@
 % Автоматаар үүсгэсэн — эх файл: lab05/README.md
 \chapter{Лаб 5 — Өгөгдлийн шугам ба холбоос тасрах}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
 \endhead
+\textbf{7 хоног} & XI\tabularnewline
+\textbf{Хугацаа} & 4 цаг\tabularnewline
+\textbf{Суралцахуйн үр дүн} & ҮД4 (үнэлэх), ҮД6, ҮД7\tabularnewline
+\textbf{Үнэлгээ} & Бичгийн тайлан, 10 оноо\tabularnewline
+\textbf{Гол хэмжилт} & Store-and-forward-ийн алдагдал, \textbf{RPO} ба \textbf{MTTR} секундээр\tabularnewline
 \bottomrule
-\endlastfoot
-\textbf{7 хоног} & XI \\
-\textbf{Хугацаа} & 4 цаг \\
-\textbf{Суралцахуйн үр дүн} & ҮД4 (үнэлэх), ҮД6, ҮД7 \\
-\textbf{Үнэлгээ} & Бичгийн тайлан, 10 оноо \\
-\textbf{Гол хэмжилт} & Store-and-forward-ийн алдагдал, \textbf{RPO} ба \textbf{MTTR} секундээр \\
 \end{longtable}\endgroup
 
 \hypertarget{ux437ux43eux440ux438ux43bux433ux43e}{%
@@ -60,7 +57,7 @@
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ up{-}pipeline }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ health}
-\ExtensionTok{docker}\NormalTok{ compose ps       }\CommentTok{\# nodered "healthy" болтол 40 сек хүлээнэ}
+\ExtensionTok{docker}\NormalTok{ compose ps       \# nodered }\StringTok{"healthy"}\NormalTok{ болтол 40 сек хүлээнэ}
 \end{Highlighting}
 \end{Shaded}
 
@@ -87,26 +84,46 @@ QoS 2-оор илгээсэн мессеж брокерт баттай хүрн�
 \hypertarget{ux445ux430ux430ux43dux430-ux431ux443ux444ux435ux440ux43bux44dux433ux434ux44dux445-ux432ux44d}{%
 \subsection{Хаана буферлэгдэх вэ}\label{ux445ux430ux430ux43dux430-ux431ux443ux444ux435ux440ux43bux44dux433ux434ux44dux445-ux432ux44d}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Эвдрэл
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хэн буферлэдэг
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хязгаар
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Эвдрэл\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Хэн буферлэдэг\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Хязгаар\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{Өгсөх урсгал тасарсан}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+ирмэгийн mosquitto-гийн гүүрний дараалал (\textbf{RAM}, үе үе microSD руу хуулна)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{max\_\allowbreak{}queued\_\allowbreak{}messages} / \texttt{max\_\allowbreak{}queued\_\allowbreak{}bytes}, контейнерийн RAM (128 MiB)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Ирмэгийн брокер унтарсан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+төхөөрөмж өөрөө (кодлогдсон бол)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+төхөөрөмжийн RAM\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Node-RED/InfluxDB унтарсан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Node-RED-ийн dead-letter файл\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+диск\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Диск дүүрсэн\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{хэн ч үгүй}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+---\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\textbf{Өгсөх урсгал тасарсан} & ирмэгийн mosquitto-гийн гүүрний дараалал (\textbf{RAM}, үе үе microSD руу хуулна) & \texttt{max\_\allowbreak{}queued\_\allowbreak{}messages} / \texttt{max\_\allowbreak{}queued\_\allowbreak{}bytes}, контейнерийн RAM (128 MiB) \\
-Ирмэгийн брокер унтарсан & төхөөрөмж өөрөө (кодлогдсон бол) & төхөөрөмжийн RAM \\
-Node-RED/InfluxDB унтарсан & Node-RED-ийн dead-letter файл & диск \\
-Диск дүүрсэн & \textbf{хэн ч үгүй} & --- \\
 \end{longtable}\endgroup
 
 \hypertarget{store-and-forward-ux438ux439ux43d-ux433ux443ux440ux432ux430ux43d-ux442ux43eux445ux438ux440ux433ux43eux43e}{%
@@ -114,25 +131,39 @@ Node-RED/InfluxDB унтарсан & Node-RED-ийн dead-letter файл & ди
 
 \texttt{edge/\allowbreak{}mosquitto/\allowbreak{}mosquitto.\allowbreak{}conf} ба \texttt{conf.\allowbreak{}d/\allowbreak{}bridge.\allowbreak{}conf} дахь гурван мөр л энэ бүхнийг тодорхойлно:
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Тохиргоо
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хаана
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Үүрэг
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Тохиргоо\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Хаана\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Үүрэг\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{cleansession\ false}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+bridge.conf\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+тасрахад \textbf{алсын} (EMQX) талын захиалга, session хадгалагдана; \texttt{true} бол холбоос тасрахад алсын захиалга, мессеж цэвэрлэгдэнэ\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{local\_\allowbreak{}cleansession\ false}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+bridge.conf\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+гүүрний \textbf{локал} талын session (гүүрт зориулсан дараалал) хадгалагдана. Заагаагүй бол \texttt{cleansession}-ий утгыг авна\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{queue\_\allowbreak{}qos0\_\allowbreak{}messages\ true}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+mosquitto.conf (\textbf{глобал})\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+тогтвортой клиент (гүүр) тасарсан үед QoS 0 мессежийг ч дараалалд оруулна (MQTT стандарт биш сонголт); эдгээр нь \texttt{max\_\allowbreak{}queued\_\allowbreak{}messages}-д тоологдоно\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{cleansession\ false} & bridge.conf & тасрахад \textbf{алсын} (EMQX) талын захиалга, session хадгалагдана; \texttt{true} бол холбоос тасрахад алсын захиалга, мессеж цэвэрлэгдэнэ \\
-\texttt{local\_\allowbreak{}cleansession\ false} & bridge.conf & гүүрний \textbf{локал} талын session (гүүрт зориулсан дараалал) хадгалагдана. Заагаагүй бол \texttt{cleansession}-ий утгыг авна \\
-\texttt{queue\_\allowbreak{}qos0\_\allowbreak{}messages\ true} & mosquitto.conf (\textbf{глобал}) & тогтвортой клиент (гүүр) тасарсан үед QoS 0 мессежийг ч дараалалд оруулна (MQTT стандарт биш сонголт); эдгээр нь \texttt{max\_\allowbreak{}queued\_\allowbreak{}messages}-д тоологдоно \\
 \end{longtable}\endgroup
 
 \begin{figure}
@@ -155,7 +186,7 @@ Node-RED/InfluxDB унтарсан & Node-RED-ийн dead-letter файл & ди
 \item
   \textbf{QoS 0 ба илрүүлэх хугацаа.} Гүүр тасралтыг илрүүлэхээс өмнө TCP холболт руу бичигдсэн QoS 0 мессежийг дахин илгээх механизм байхгүй (QoS 0 = "хамгийн ихдээ нэг удаа"). Тиймээс \texttt{queue\_\allowbreak{}qos0\_\allowbreak{}messages\ true} байсан ч QoS 0-ийн алдагдал ≈ \emph{хурд × илрүүлэх хугацаа} байж болно. QoS 1 мессеж PUBACK авах хүртэл session-д үлдэж, дахин холбогдоход дахин илгээгдэнэ.
 \item
-  \textbf{Дараалал дүүрэхэд ШИНЭ мессеж хаягдана.} Албан ёсны баримтаар хязгаарт хүрсний дараах мессежүүд "чимээгүй хаягдана" --- хуучин нь үлдэнэ. mosquitto лог дээр \texttt{Outgoing\ messages\ are\ being\ dropped\ for\ client\ local.\allowbreak{}edge-…} гарна.
+  \textbf{Дараалал дүүрэхэд ШИНЭ мессеж хаягдана.} Албан ёсны баримтаар хязгаарт хүрсний дараах мессежүүд "чимээгүй хаягдана" --- хуучин нь үлдэнэ. mosquitto лог дээр \texttt{Outgoing\ messages\ are\ being\ dropped\ for\ client\ local.\allowbreak{}edge-\ldots{}} гарна.
 \item
   \textbf{Дараалал RAM-д байна.} \texttt{persistence\ true} үед санах ой дахь өгөгдөл \texttt{mosquitto.db} файлд зөвхөн (а) \texttt{autosave\_\allowbreak{}interval} тутамд, (б) mosquitto \textbf{хэвийн} унтрахад, (в) \texttt{SIGUSR1} дохиогоор бичигдэнэ. \texttt{autosave\_\allowbreak{}on\_\allowbreak{}changes\ false} тул манай тохиргоонд 60 секунд тутамд. \textbf{Цахилгаан гэнэт тасарвал} (эсвэл SIGKILL) сүүлийн хадгалалтаас хойш дараалалд орсон мессеж алдагдана --- энэ нь RPO-д шууд нэмэгдэнэ.
 \end{enumerate}
@@ -176,19 +207,19 @@ InfluxDB 3 нь \emph{schema-on-write}: анхны бичилт өгөгдлий
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}w} \StringTok{\textquotesingle{}  → HTTP \%\{http\_code\}\textbackslash{}n\textquotesingle{}} \AttributeTok{{-}X}\NormalTok{ POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/configure/database\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \AttributeTok{{-}d} \StringTok{\textquotesingle{}\{"db":"cnc302"\}\textquotesingle{}}
-\ExtensionTok{curl} \AttributeTok{{-}s} \StringTok{\textquotesingle{}http://localhost:8181/api/v3/configure/database?format=json\textquotesingle{}} \KeywordTok{|} \ExtensionTok{jq}
+\ExtensionTok{curl}\NormalTok{ {-}s {-}w }\StringTok{\textquotesingle{}  → HTTP \%\{http\_code\}\textbackslash{}n\textquotesingle{}}\NormalTok{ {-}X POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/configure/database\textquotesingle{}} \KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}}\NormalTok{ {-}d }\StringTok{\textquotesingle{}\{"db":"cnc302"\}\textquotesingle{}}
+\ExtensionTok{curl}\NormalTok{ {-}s }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/configure/database?format=json\textquotesingle{}} \KeywordTok{|} \ExtensionTok{jq}
 \CommentTok{\# Нэг мөр гараар бичиж, буцааж уншина}
-\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/write\_lp?db=cnc302\&precision=millisecond\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: text/plain\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}{-}data{-}binary} \StringTok{"telemetry,site=test,device=test0 temperature=24.5 }\VariableTok{$(}\FunctionTok{date}\NormalTok{ +\%s\%3N}\VariableTok{)}\StringTok{"}
+\ExtensionTok{curl}\NormalTok{ {-}s {-}X POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/write\_lp?db=cnc302\&precision=millisecond\textquotesingle{}} \KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: text/plain\textquotesingle{}} \KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}{-}data{-}binary} \StringTok{"telemetry,site=test,device=test0 temperature=24.5 }\VariableTok{$(}\FunctionTok{date}\NormalTok{ +\%s\%3N}\VariableTok{)}\StringTok{"}
 
-\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/query\_sql\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}d} \StringTok{\textquotesingle{}\{"db":"cnc302","q":"SELECT * FROM telemetry LIMIT 5","format":"json"\}\textquotesingle{}} \KeywordTok{|} \ExtensionTok{jq}
+\ExtensionTok{curl}\NormalTok{ {-}s {-}X POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/query\_sql\textquotesingle{}} \KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}d} \StringTok{\textquotesingle{}\{"db":"cnc302","q":"SELECT * FROM telemetry LIMIT 5","format":"json"\}\textquotesingle{}} \KeywordTok{|} \ExtensionTok{jq}
 \CommentTok{\# Ижил асуулга GET{-}ээр (URL{-}кодчилсон), мөр бүр тусдаа JSON (jsonl):}
-\ExtensionTok{curl} \AttributeTok{{-}s} \StringTok{\textquotesingle{}http://localhost:8181/api/v3/query\_sql?db=cnc302\&format=jsonl\&q=SELECT+*+FROM+telemetry+LIMIT+5\textquotesingle{}}
+\ExtensionTok{curl}\NormalTok{ {-}s }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/query\_sql?db=cnc302\&format=jsonl\&q=SELECT+*+FROM+telemetry+LIMIT+5\textquotesingle{}}
 \end{Highlighting}
 \end{Shaded}
 
@@ -201,7 +232,7 @@ InfluxDB 3 нь \emph{schema-on-write}: анхны бичилт өгөгдлий
 \item
   \texttt{query\_sql}-ийн \texttt{format}: \texttt{json} (анхдагч), \texttt{jsonl}, \texttt{csv}, \texttt{pretty}, \texttt{parquet}.
 \item
-  \textbf{Нэвтрэлт:} манай стек \texttt{-\/-without-auth}-аар ажилладаг (\textbf{зөвхөн лабораторид}). Бодит системд эхлээд \texttt{docker\ exec\ -it\ cnc302-influxdb\ influxdb3\ create\ token\ -\/\allowbreak{}-admin} гэж токен үүсгэж, бүх хүсэлтэд \texttt{-H\ "Authorization:\allowbreak{}\ Bearer\ \$TOKEN"} толгой нэмнэ (\texttt{data\_\allowbreak{}integrity.\allowbreak{}py\ verify\ -\/\allowbreak{}-auth-token\ …}).
+  \textbf{Нэвтрэлт:} манай стек \texttt{-\/-without-auth}-аар ажилладаг (\textbf{зөвхөн лабораторид}). Бодит системд эхлээд \texttt{docker\ exec\ -it\ cnc302-influxdb\ influxdb3\ create\ token\ -\/\allowbreak{}-admin} гэж токен үүсгэж, бүх хүсэлтэд \texttt{-H\ "Authorization:\allowbreak{}\ Bearer\ \$TOKEN"} толгой нэмнэ (\texttt{data\_\allowbreak{}integrity.\allowbreak{}py\ verify\ -\/\allowbreak{}-auth-token\ \ldots{}}).
 \end{itemize}
 
 \begin{quote}
@@ -212,10 +243,10 @@ InfluxDB 3 нь \emph{schema-on-write}: анхны бичилт өгөгдлий
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in}\NormalTok{ 1 2 3 4 5}\KeywordTok{;} \ControlFlowTok{do} \ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}o}\NormalTok{ /dev/null }\AttributeTok{{-}w} \StringTok{\textquotesingle{}\%\{time\_total\}\textbackslash{}n\textquotesingle{}} \AttributeTok{{-}X}\NormalTok{ POST }\DataTypeTok{\textbackslash{}}
-  \StringTok{\textquotesingle{}http://localhost:8181/api/v3/write\_lp?db=cnc302\&precision=millisecond\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: text/plain\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}{-}data{-}binary} \StringTok{"telemetry,site=test,device=test0 temperature=2}\VariableTok{$i}\StringTok{.0 }\VariableTok{$(}\FunctionTok{date}\NormalTok{ +\%s\%3N}\VariableTok{)}\StringTok{"}\KeywordTok{;} \ControlFlowTok{done}
+\KeywordTok{for} \ExtensionTok{i}\NormalTok{ in 1 2 3 4 5}\KeywordTok{;} \KeywordTok{do} \ExtensionTok{curl}\NormalTok{ {-}s {-}o /dev/null {-}w }\StringTok{\textquotesingle{}\%\{time\_total\}\textbackslash{}n\textquotesingle{}}\NormalTok{ {-}X POST }\KeywordTok{\textbackslash{}}
+  \StringTok{\textquotesingle{}http://localhost:8181/api/v3/write\_lp?db=cnc302\&precision=millisecond\textquotesingle{}} \KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: text/plain\textquotesingle{}} \KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}{-}data{-}binary} \StringTok{"telemetry,site=test,device=test0 temperature=2}\VariableTok{$i}\StringTok{.0 }\VariableTok{$(}\FunctionTok{date}\NormalTok{ +\%s\%3N}\VariableTok{)}\StringTok{"}\KeywordTok{;} \KeywordTok{done}
 \end{Highlighting}
 \end{Shaded}
 
@@ -224,15 +255,14 @@ InfluxDB 3 нь \emph{schema-on-write}: анхны бичилт өгөгдлий
 
 \begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-Хэмжигдэхүүн & Утга & Тэмдэглэл \\
+Хэмжигдэхүүн & Утга & Тэмдэглэл\tabularnewline
 \midrule
 \endhead
+\texttt{write\_lp} дундаж хугацаа (мс) & & 5 хэмжилтийн дундаж\tabularnewline
+\texttt{write\_lp} хамгийн удаан (мс) & &\tabularnewline
+Хариу код (амжилттай бичилт) & & 204 хүлээгдэнэ\tabularnewline
+\texttt{query\_sql} мөр буцаав уу & &\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{write\_lp} дундаж хугацаа (мс) & & 5 хэмжилтийн дундаж \\
-\texttt{write\_lp} хамгийн удаан (мс) & & \\
-Хариу код (амжилттай бичилт) & & 204 хүлээгдэнэ \\
-\texttt{query\_sql} мөр буцаав уу & & \\
 \end{longtable}\endgroup
 
 \begin{quote}
@@ -269,31 +299,45 @@ mqtt in ─▶ задлах + шалгах ─┬─(1)─▶ line protocol (tel
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \ExtensionTok{python3}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}target}\NormalTok{ cloud }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\AttributeTok{{-}{-}devices}\NormalTok{ 10 }\AttributeTok{{-}{-}interval}\NormalTok{ 1}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \ExtensionTok{python3}\NormalTok{ tools/sim\_device.py {-}{-}target cloud {-}{-}host localhost {-}{-}devices 10 {-}{-}interval 1}
 \end{Highlighting}
 \end{Shaded}
 
 \textbf{2.4 Задлах зангилааны гурван үүрэг} (кодыг нээж уншина):
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Үүрэг
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Код дотор
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Яагаад
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Үүрэг\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Код дотор\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Яагаад\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+UNS схемийн шалгалт\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{if\ (p.\allowbreak{}length\ !=\allowbreak{}=\allowbreak{}\ 6)}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+буруу нэршилтэй өгөгдөл санд орохгүй → dead-letter (\texttt{uns})\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Өгөгдлийн чанар\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{temperature} / \texttt{proc\_\allowbreak{}temp\_\allowbreak{}c} \texttt{\textless{}\ -60\ \textbackslash{}\textbar{}\textbackslash{}\textbar{}\ \textgreater{}\ 150}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+эвдэрсэн мэдрэгч нэгтгэлийг сүйтгэнэ → dead-letter (\texttt{range:\ldots{}})\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Шошго гаргах\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{msg.\allowbreak{}tags\ =\allowbreak{}\ \{site,\ area,\ line,\ device\}}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+InfluxDB-ийн tag (хэмжээс)\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-UNS схемийн шалгалт & \texttt{if\ (p.\allowbreak{}length\ !=\allowbreak{}=\allowbreak{}\ 6)} & буруу нэршилтэй өгөгдөл санд орохгүй → dead-letter (\texttt{uns}) \\
-Өгөгдлийн чанар & \texttt{temperature} / \texttt{proc\_\allowbreak{}temp\_\allowbreak{}c} \texttt{\textless{}\ -60\ \textbackslash{}\textbar{}\textbackslash{}\textbar{}\ \textgreater{}\ 150} & эвдэрсэн мэдрэгч нэгтгэлийг сүйтгэнэ → dead-letter (\texttt{range:…}) \\
-Шошго гаргах & \texttt{msg.\allowbreak{}tags\ =\allowbreak{}\ \{site,\ area,\ line,\ device\}} & InfluxDB-ийн tag (хэмжээс) \\
 \end{longtable}\endgroup
 
 Line protocol-д tag утгын \textbf{таслал, тэнцүүгийн тэмдэг, зай}-г \texttt{\textbackslash{}}-ээр escape хийдэг (\texttt{esc()} функц); цаг нь миллисекунд тул URL-д \texttt{precision=\allowbreak{}millisecond}. Ижил хүснэгт + tag set + цагтай хоёр мөр нэг цэг болж нийлдэг тул QoS 1-ийн давхар хүргэлт санд давхар мөр үүсгэхгүй.
@@ -303,33 +347,42 @@ Line protocol-д tag утгын \textbf{таслал, тэнцүүгийн тэ�
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [ЗК] хүрээнээс гарсан утга — санд ОРОХГҮЙ байх ёстой}
-\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/dev9999/telemetry\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}m} \StringTok{\textquotesingle{}\{"ts":\textquotesingle{}"}\VariableTok{$(}\FunctionTok{date}\NormalTok{ +\%s\%3N}\VariableTok{)}\StringTok{"\textquotesingle{},"temperature":9999,"humidity":50,"vibration\_rms":0.3\}\textquotesingle{}}
-\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/query\_sql\textquotesingle{}} \AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}d} \StringTok{\textquotesingle{}\{"db":"cnc302","q":"SELECT count(*) c FROM telemetry WHERE device=\textquotesingle{}"\textquotesingle{}"\textquotesingle{}dev9999\textquotesingle{}"\textquotesingle{}"\textquotesingle{}","format":"json"\}\textquotesingle{}}
-\ExtensionTok{docker}\NormalTok{ exec cnc302{-}nodered wc }\AttributeTok{{-}l}\NormalTok{ /data/deadletter.jsonl   }\CommentTok{\# dead{-}letter файлын урт}
-\ExtensionTok{docker}\NormalTok{ exec cnc302{-}nodered tail }\AttributeTok{{-}1}\NormalTok{ /data/deadletter.jsonl  }\CommentTok{\# \{"stage":"parse","reason":"range:temperature",…\}}
+\ExtensionTok{mosquitto\_pub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/dev9999/telemetry\textquotesingle{}} \KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}m} \StringTok{\textquotesingle{}\{"ts":\textquotesingle{}"}\VariableTok{$(}\FunctionTok{date}\NormalTok{ +\%s\%3N}\VariableTok{)}\StringTok{"\textquotesingle{},"temperature":9999,"humidity":50,"vibration\_rms":0.3\}\textquotesingle{}}
+\ExtensionTok{curl}\NormalTok{ {-}s {-}X POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/query\_sql\textquotesingle{}}\NormalTok{ {-}H }\StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}d} \StringTok{\textquotesingle{}\{"db":"cnc302","q":"SELECT count(*) c FROM telemetry WHERE device=\textquotesingle{}"\textquotesingle{}"\textquotesingle{}dev9999\textquotesingle{}"\textquotesingle{}"\textquotesingle{}","format":"json"\}\textquotesingle{}}
+\ExtensionTok{docker}\NormalTok{ exec cnc302{-}nodered wc {-}l /data/deadletter.jsonl   \# dead{-}letter файлын урт}
+\ExtensionTok{docker}\NormalTok{ exec cnc302{-}nodered tail {-}1 /data/deadletter.jsonl  \# }\DataTypeTok{\{"stage":"parse","reason":"range:temperature",…\}}
 \end{Highlighting}
 \end{Shaded}
 
 \textbf{2.6 Grafana самбар} (\texttt{:3000}, InfluxDB эх сурвалж аль хэдийн бүртгэгдсэн: query language \textbf{SQL}, database \texttt{cnc302}). SQL горимд Grafana нь InfluxDB 3 руу Flight SQL (gRPC)-ээр холбогддог тул TLS-гүй үед эх сурвалжийн \textbf{Insecure Connection} асаалттай байх ёстой. Гурван панель үүсгэж хадгална --- Алхам 4-д өгсөх урсгал тасрахад энэ график дээр \textbf{цоорхой} үүсэх ёстой (эсвэл үүсэхгүй; аль нь болохыг та хэмжинэ):
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Панель
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Асуулга
-\end{minipage} \\
+\begin{minipage}[b]{0.47\columnwidth}\raggedright
+Панель\strut
+\end{minipage} & \begin{minipage}[b]{0.47\columnwidth}\raggedright
+Асуулга\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+Температурын цуваа\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{SELECT\ time,\ temperature,\ device\ FROM\ telemetry\ WHERE\ \$\_\allowbreak{}\_\allowbreak{}timeFilter(time)\ ORDER\ BY\ time}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+Идэвхтэй төхөөрөмж (Stat)\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{SELECT\ count(DISTINCT\ device)\ AS\ devices\ FROM\ telemetry\ WHERE\ \$\_\allowbreak{}\_\allowbreak{}timeFilter(time)}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+Бичилтийн хурд\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{SELECT\ \$\_\allowbreak{}\_\allowbreak{}dateBin(time)\ AS\ time,\ count(*)\ AS\ points\ FROM\ telemetry\ WHERE\ \$\_\allowbreak{}\_\allowbreak{}timeFilter(time)\ GROUP\ BY\ 1\ ORDER\ BY\ 1}\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-Температурын цуваа & \texttt{SELECT\ time,\ temperature,\ device\ FROM\ telemetry\ WHERE\ \$\_\allowbreak{}\_\allowbreak{}timeFilter(time)\ ORDER\ BY\ time} \\
-Идэвхтэй төхөөрөмж (Stat) & \texttt{SELECT\ count(DISTINCT\ device)\ AS\ devices\ FROM\ telemetry\ WHERE\ \$\_\allowbreak{}\_\allowbreak{}timeFilter(time)} \\
-Бичилтийн хурд & \texttt{SELECT\ \$\_\allowbreak{}\_\allowbreak{}dateBin(time)\ AS\ time,\ count(*)\ AS\ points\ FROM\ telemetry\ WHERE\ \$\_\allowbreak{}\_\allowbreak{}timeFilter(time)\ GROUP\ BY\ 1\ ORDER\ BY\ 1} \\
 \end{longtable}\endgroup
 
 \texttt{\$\_\allowbreak{}\_\allowbreak{}timeFilter(time)} нь самбарын цагийн хүрээг, \texttt{\$\_\allowbreak{}\_\allowbreak{}dateBin(time)} нь \texttt{date\_bin()}-ийг Grafana-гийн \texttt{\$\_\allowbreak{}\_\allowbreak{}interval}-аар орлуулна. \texttt{GROUP\ BY\ time} (түүхий цагаар бүлэглэх) нь цэг бүрийг тусдаа бүлэг болгодог тул хурдыг харуулахгүй.
@@ -343,16 +396,15 @@ Line protocol-д tag утгын \textbf{таслал, тэнцүүгийн тэ�
 
 \begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-Хэмжигдэхүүн & Утга \\
+Хэмжигдэхүүн & Утга\tabularnewline
 \midrule
 \endhead
+\texttt{write\_ok} (2 минутын дараа) &\tabularnewline
+\texttt{write\_errors} &\tabularnewline
+Хүрээнээс гарсан утга санд оров уу &\tabularnewline
+\texttt{deadletter.jsonl}-ийн мөрийн тоо &\tabularnewline
+Grafana дээр өгөгдөл харагдав уу &\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{write\_ok} (2 минутын дараа) & \\
-\texttt{write\_errors} & \\
-Хүрээнээс гарсан утга санд оров уу & \\
-\texttt{deadletter.jsonl}-ийн мөрийн тоо & \\
-Grafana дээр өгөгдөл харагдав уу & \\
 \end{longtable}\endgroup
 
 \hypertarget{ux430ux43bux445ux430ux43c-3-ux441ux443ux443ux440ux44c-ux431ux4afux440ux44dux43d-ux431ux4afux442ux44dux43d-ux431ux430ux439ux434ux430ux43b-ux433ux4afux4afux440ux44dux44dux440-30-ux43cux438ux43d-piux437ux43a}{%
@@ -363,17 +415,17 @@ Grafana дээр өгөгдөл харагдав уу & \\
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [Pi] терминал 1 — гүүрний төлөвийг бичиж эхэлнэ (ЭНЭ ЦОНХЫГ ЭЦЭС ХҮРТЭЛ БҮҮ ХАА)}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \FunctionTok{mkdir} \AttributeTok{{-}p}\NormalTok{ lab05/out}
-\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}F} \StringTok{\textquotesingle{}\{"ts":\%U,"state":\%p\}\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}t} \StringTok{"cnc302/}\VariableTok{$SITE}\StringTok{/}\VariableTok{$AREA}\StringTok{/}\VariableTok{$LINE}\StringTok{/}\VariableTok{$DEVICE\_ID}\StringTok{/bridge/state"} \OperatorTok{\textgreater{}}\NormalTok{ lab05/out/bridge.jsonl}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \FunctionTok{mkdir}\NormalTok{ {-}p lab05/out}
+\ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}F }\StringTok{\textquotesingle{}\{"ts":\%U,"state":\%p\}\textquotesingle{}} \KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}t} \StringTok{"cnc302/}\VariableTok{$SITE}\StringTok{/}\VariableTok{$AREA}\StringTok{/}\VariableTok{$LINE}\StringTok{/}\VariableTok{$DEVICE\_ID}\StringTok{/bridge/state"} \OperatorTok{\textgreater{}}\NormalTok{ lab05/out/bridge.jsonl}
 
 \CommentTok{\# [Pi] терминал 2 — ирмэгийн брокер руу нийтэлнэ, гүүр үүл рүү дамжуулна}
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py publish }\AttributeTok{{-}{-}via}\NormalTok{ edge }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}rate}\NormalTok{ 10 }\AttributeTok{{-}{-}seconds}\NormalTok{ 180 }\AttributeTok{{-}{-}qos}\NormalTok{ 1 }\AttributeTok{{-}{-}run{-}id}\NormalTok{ base }\AttributeTok{{-}{-}outdir}\NormalTok{ lab05/out}
+\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py publish {-}{-}via edge {-}{-}host localhost }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}rate}\NormalTok{ 10 {-}{-}seconds 180 {-}{-}qos 1 {-}{-}run{-}id base {-}{-}outdir lab05/out}
 \CommentTok{\# дараа нь шалгана — InfluxDB нь ҮҮЛ дээр байгааг санаарай}
-\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py verify }\AttributeTok{{-}{-}influx} \StringTok{"http://}\VariableTok{$CLOUD\_HOST}\StringTok{:8181"} \DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}run{-}id}\NormalTok{ base }\AttributeTok{{-}{-}outdir}\NormalTok{ lab05/out}
+\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py verify {-}{-}influx }\StringTok{"http://}\VariableTok{$CLOUD\_HOST}\StringTok{:8181"} \KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}run{-}id}\NormalTok{ base {-}{-}outdir lab05/out}
 \end{Highlighting}
 \end{Shaded}
 
@@ -386,22 +438,21 @@ Grafana дээр өгөгдөл харагдав уу & \\
 
 \begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-Хэмжигдэхүүн & Утга \\
+Хэмжигдэхүүн & Утга\tabularnewline
 \midrule
 \endhead
+Илгээсэн (амжилттай) &\tabularnewline
+Санд олдсон &\tabularnewline
+Алдагдал \% & 0.0 байх ЁСТОЙ\tabularnewline
+Холболтын тасалдал &\tabularnewline
+Хамгийн урт тасалдал (мессеж / сек) & /\tabularnewline
 \bottomrule
-\endlastfoot
-Илгээсэн (амжилттай) & \\
-Санд олдсон & \\
-Алдагдал \% & 0.0 байх ЁСТОЙ \\
-Холболтын тасалдал & \\
-Хамгийн урт тасалдал (мессеж / сек) & / \\
 \end{longtable}\endgroup
 
 \hypertarget{ux430ux43bux445ux430ux43c-4-ux4e9ux433ux441ux4e9ux445-ux443ux440ux441ux433ux430ux43b-uplink-ux442ux430ux441ux440ux430ux445-rpo-ux431ux430-mttr-60-ux43cux438ux43d-piux437ux43a}{%
 \subsection{Алхам 4 --- ӨГСӨХ УРСГАЛ (UPLINK) ТАСРАХ: RPO ба MTTR (60 мин) {[}Pi{]}{[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-4-ux4e9ux433ux441ux4e9ux445-ux443ux440ux441ux433ux430ux43b-uplink-ux442ux430ux441ux440ux430ux445-rpo-ux431ux430-mttr-60-ux43cux438ux43d-piux437ux43a}}
 
-\textbf{Энэ бол лабораторийн гол хэсэг.} \texttt{uplink-down} нь Pi → үүл чиглэлийн 1883 портыг л хаана (iptables \texttt{OUTPUT\ …\ -j\ DROP}, iptables байхгүй бол nft \texttt{inet\ cnc302} хүснэгт): ирмэгийн mosquitto ажилласаар, төхөөрөмжүүд Pi руу нийтэлсээр байна. Энэ нь "бүх зүйл унасан" биш, яг \textbf{өгсөх урсгал тасарсан} туршилт.
+\textbf{Энэ бол лабораторийн гол хэсэг.} \texttt{uplink-down} нь Pi → үүл чиглэлийн 1883 портыг л хаана (iptables \texttt{OUTPUT\ \ldots{}\ -j\ DROP}, iptables байхгүй бол nft \texttt{inet\ cnc302} хүснэгт): ирмэгийн mosquitto ажилласаар, төхөөрөмжүүд Pi руу нийтэлсээр байна. Энэ нь "бүх зүйл унасан" биш, яг \textbf{өгсөх урсгал тасарсан} туршилт.
 
 \textbf{4.1 QoS 1, 60 секундын тасалдал.} Гурван терминал зэрэг:
 
@@ -410,8 +461,8 @@ Grafana дээр өгөгдөл харагдав уу & \\
 \CommentTok{\# [Pi] терминал 1 — bridge.jsonl бичсээр байна (Алхам 3{-}аас үргэлжилнэ)}
 \CommentTok{\# [Pi] терминал 2 — 5 минут нийтэлнэ}
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py publish }\AttributeTok{{-}{-}via}\NormalTok{ edge }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}rate}\NormalTok{ 10 }\AttributeTok{{-}{-}seconds}\NormalTok{ 300 }\AttributeTok{{-}{-}qos}\NormalTok{ 1 }\AttributeTok{{-}{-}run{-}id}\NormalTok{ uplink60 }\AttributeTok{{-}{-}outdir}\NormalTok{ lab05/out}
+\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py publish {-}{-}via edge {-}{-}host localhost }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}rate}\NormalTok{ 10 {-}{-}seconds 300 {-}{-}qos 1 {-}{-}run{-}id uplink60 {-}{-}outdir lab05/out}
 \CommentTok{\# [Pi] терминал 3 — 60 секундын дараа өгсөх урсгалыг 60 секунд таслана}
 \FunctionTok{sleep}\NormalTok{ 60 }\KeywordTok{\&\&} \FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh uplink{-}down 60}
 \end{Highlighting}
@@ -425,8 +476,8 @@ Grafana дээр өгөгдөл харагдав уу & \\
 \begin{Highlighting}[]
 \CommentTok{\# хадгалагдсан мессежийн тоо (retained + тогтвортой клиентийн дараалал);}
 \CommentTok{\# sys\_interval (анхдагч 10 с) тутам шинэчлэгдэнэ. Хуучин нэр нь $SYS/broker/messages/stored}
-\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}t} \StringTok{\textquotesingle{}$SYS/broker/store/messages/count\textquotesingle{}} \AttributeTok{{-}C}\NormalTok{ 1}
-\ExtensionTok{docker}\NormalTok{ stats }\AttributeTok{{-}{-}no{-}stream}\NormalTok{ cnc302{-}mosquitto        }\CommentTok{\# RAM өсөж байна уу}
+\ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}$SYS/broker/store/messages/count\textquotesingle{}}\NormalTok{ {-}C 1}
+\ExtensionTok{docker}\NormalTok{ stats {-}{-}no{-}stream cnc302{-}mosquitto        \# RAM өсөж байна уу}
 \end{Highlighting}
 \end{Shaded}
 
@@ -441,9 +492,9 @@ Grafana дээр өгөгдөл харагдав уу & \\
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [Pi] publish дуусмагц (сэргэхийг 30 сек хүлээгээд)}
-\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py verify }\AttributeTok{{-}{-}influx} \StringTok{"http://}\VariableTok{$CLOUD\_HOST}\StringTok{:8181"} \DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}run{-}id}\NormalTok{ uplink60 }\AttributeTok{{-}{-}outdir}\NormalTok{ lab05/out }\AttributeTok{{-}{-}bridge{-}log}\NormalTok{ lab05/out/bridge.jsonl }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}cut{-}log}\NormalTok{ lab05/out/uplink{-}events.jsonl}
+\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py verify {-}{-}influx }\StringTok{"http://}\VariableTok{$CLOUD\_HOST}\StringTok{:8181"} \KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}run{-}id}\NormalTok{ uplink60 {-}{-}outdir lab05/out {-}{-}bridge{-}log lab05/out/bridge.jsonl }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}cut{-}log}\NormalTok{ lab05/out/uplink{-}events.jsonl}
 \end{Highlighting}
 \end{Shaded}
 
@@ -453,12 +504,12 @@ Grafana дээр өгөгдөл харагдав уу & \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py publish }\AttributeTok{{-}{-}via}\NormalTok{ edge }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}rate}\NormalTok{ 10 }\AttributeTok{{-}{-}seconds}\NormalTok{ 300 }\AttributeTok{{-}{-}qos}\NormalTok{ 0 }\AttributeTok{{-}{-}run{-}id}\NormalTok{ uplink60q0 }\AttributeTok{{-}{-}outdir}\NormalTok{ lab05/out}
+\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py publish {-}{-}via edge {-}{-}host localhost }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}rate}\NormalTok{ 10 {-}{-}seconds 300 {-}{-}qos 0 {-}{-}run{-}id uplink60q0 {-}{-}outdir lab05/out}
 \CommentTok{\# 60 сек дараа: bash lab05/failure\_inject.sh uplink{-}down 60 ; дараа нь:}
-\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py verify }\AttributeTok{{-}{-}influx} \StringTok{"http://}\VariableTok{$CLOUD\_HOST}\StringTok{:8181"} \DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}run{-}id}\NormalTok{ uplink60q0 }\AttributeTok{{-}{-}outdir}\NormalTok{ lab05/out }\AttributeTok{{-}{-}bridge{-}log}\NormalTok{ lab05/out/bridge.jsonl }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}cut{-}log}\NormalTok{ lab05/out/uplink{-}events.jsonl}
+\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py verify {-}{-}influx }\StringTok{"http://}\VariableTok{$CLOUD\_HOST}\StringTok{:8181"} \KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}run{-}id}\NormalTok{ uplink60q0 {-}{-}outdir lab05/out {-}{-}bridge{-}log lab05/out/bridge.jsonl }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}cut{-}log}\NormalTok{ lab05/out/uplink{-}events.jsonl}
 \end{Highlighting}
 \end{Shaded}
 
@@ -467,43 +518,87 @@ Grafana дээр өгөгдөл харагдав уу & \\
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-5.4-ux4e9ux433ux441ux4e9ux445-ux443ux440ux441ux433ux430ux43b-ux442ux430ux441ux440ux430ux445-rpo-ux431ux430-mttr}{%
 \subsubsection{Хүснэгт 5.4 --- Өгсөх урсгал тасрах: RPO ба MTTR}\label{ux445ux4afux441ux43dux44dux433ux442-5.4-ux4e9ux433ux441ux4e9ux445-ux443ux440ux441ux433ux430ux43b-ux442ux430ux441ux440ux430ux445-rpo-ux431ux430-mttr}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1111}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lllllllll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Ажиллалт
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-QoS
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Тасалдал (с)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Илгээсэн
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Санд хүрсэн
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Алдагдал \%
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\textbf{RPO (с)}
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\textbf{MTTR (с)}
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Гүүр дахин холбогдох хугацаа (с)
-\end{minipage} \\
+\begin{minipage}[b]{0.08\columnwidth}\raggedright
+Ажиллалт\strut
+\end{minipage} & \begin{minipage}[b]{0.08\columnwidth}\raggedright
+QoS\strut
+\end{minipage} & \begin{minipage}[b]{0.08\columnwidth}\raggedright
+Тасалдал (с)\strut
+\end{minipage} & \begin{minipage}[b]{0.08\columnwidth}\raggedright
+Илгээсэн\strut
+\end{minipage} & \begin{minipage}[b]{0.08\columnwidth}\raggedright
+Санд хүрсэн\strut
+\end{minipage} & \begin{minipage}[b]{0.08\columnwidth}\raggedright
+Алдагдал \%\strut
+\end{minipage} & \begin{minipage}[b]{0.08\columnwidth}\raggedright
+\textbf{RPO (с)}\strut
+\end{minipage} & \begin{minipage}[b]{0.08\columnwidth}\raggedright
+\textbf{MTTR (с)}\strut
+\end{minipage} & \begin{minipage}[b]{0.08\columnwidth}\raggedright
+Гүүр дахин холбогдох хугацаа (с)\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.08\columnwidth}\raggedright
+\texttt{uplink60}\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+60\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright
+\texttt{uplink60q0}\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+0\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+60\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.08\columnwidth}\raggedright
+\texttt{uplink180}\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+180\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.08\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{uplink60} & 1 & 60 & & & & & & \\
-\texttt{uplink60q0} & 0 & 60 & & & & & & \\
-\texttt{uplink180} & 1 & 180 & & & & & & \\
 \end{longtable}\endgroup
 
 \begin{itemize}
@@ -519,34 +614,63 @@ QoS
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-5.5-ux431ux43eux434ux438ux442-ux442ux430ux441ux430ux43bux434ux430ux43b-ux431ux430-ux433ux4afux4afux440ux438ux439ux43d-ux43cux44dux434ux44dux44dux43bux441ux44dux43d-ux442ux4e9ux43bux4e9ux432ux4e9ux4e9ux440-ux445ux443ux432ux430ux430ux441ux430ux43d-ux430ux43bux434ux430ux433ux434ux430ux43b---cut-log---bridge-log}{%
 \subsubsection{\texorpdfstring{Хүснэгт 5.5 --- Бодит тасалдал ба гүүрийн мэдээлсэн төлөвөөр хуваасан алдагдал (\texttt{-\/-cut-log}, \texttt{-\/-bridge-log})}{Хүснэгт 5.5 --- Бодит тасалдал ба гүүрийн мэдээлсэн төлөвөөр хуваасан алдагдал (-\/-cut-log, -\/-bridge-log)}}\label{ux445ux4afux441ux43dux44dux433ux442-5.5-ux431ux43eux434ux438ux442-ux442ux430ux441ux430ux43bux434ux430ux43b-ux431ux430-ux433ux4afux4afux440ux438ux439ux43d-ux43cux44dux434ux44dux44dux43bux441ux44dux43d-ux442ux4e9ux43bux4e9ux432ux4e9ux4e9ux440-ux445ux443ux432ux430ux430ux441ux430ux43d-ux430ux43bux434ux430ux433ux434ux430ux43b---cut-log---bridge-log}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llllll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Ажиллалт
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Бодит тасалдал (с, \texttt{-\/-cut-log})
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Гүүрийн мэдээлсэн тасалдал (с, \texttt{-\/-bridge-log})
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Илрүүлэх хугацаа (с)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Бодит тасалдлын үед: илгээсэн / алдагдсан / \%
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Ажиллаж байхад: илгээсэн / алдагдсан / \%
-\end{minipage} \\
+\begin{minipage}[b]{0.14\columnwidth}\raggedright
+Ажиллалт\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+Бодит тасалдал (с, \texttt{-\/-cut-log})\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+Гүүрийн мэдээлсэн тасалдал (с, \texttt{-\/-bridge-log})\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+Илрүүлэх хугацаа (с)\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+Бодит тасалдлын үед: илгээсэн / алдагдсан / \%\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+Ажиллаж байхад: илгээсэн / алдагдсан / \%\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.14\columnwidth}\raggedright
+\texttt{uplink60} (QoS 1)\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+/ /\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+/ /\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright
+\texttt{uplink60q0} (QoS 0)\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+/ /\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+/ /\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright
+\texttt{uplink180} (QoS 1)\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+/ /\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+/ /\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{uplink60} (QoS 1) & & & & / / & / / \\
-\texttt{uplink60q0} (QoS 0) & & & & / / & / / \\
-\texttt{uplink180} (QoS 1) & & & & / / & / / \\
 \end{longtable}\endgroup
 
 \begin{quote}
@@ -564,8 +688,8 @@ QoS
 \CommentTok{\# (а) зөвхөн алсын тал цэвэр:  cleansession true,  local\_cleansession false  → {-}{-}run{-}id uplink60clean}
 \CommentTok{\# (б) хоёр тал цэвэр:          cleansession true,  local\_cleansession true   → {-}{-}run{-}id uplink60cleanboth}
 \FunctionTok{nano}\NormalTok{ mosquitto/conf.d/bridge.conf}
-\ExtensionTok{docker}\NormalTok{ compose restart mosquitto      }\CommentTok{\# ⚠ \textasciigrave{}make restart\textasciigrave{} БИШ!}
-\ExtensionTok{docker}\NormalTok{ compose logs }\AttributeTok{{-}{-}tail}\OperatorTok{=}\NormalTok{20 mosquitto }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}i}\NormalTok{ bridge}
+\ExtensionTok{docker}\NormalTok{ compose restart mosquitto      \# ⚠ }\KeywordTok{\textasciigrave{}}\FunctionTok{make}\NormalTok{ restart}\KeywordTok{\textasciigrave{}}\NormalTok{ БИШ!}
+\ExtensionTok{docker}\NormalTok{ compose logs {-}{-}tail=20 mosquitto }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}i bridge}
 \end{Highlighting}
 \end{Shaded}
 
@@ -591,17 +715,17 @@ Pi-гийн боломжтой RAM (Лаб 4, Хүснэгт 4.1) = ______ MiB
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge}
-\FunctionTok{sed} \AttributeTok{{-}i} \StringTok{\textquotesingle{}s/\^{}max\_queued\_messages .*/max\_queued\_messages 500/\textquotesingle{}}\NormalTok{ mosquitto/mosquitto.conf}
+\FunctionTok{sed}\NormalTok{ {-}i }\StringTok{\textquotesingle{}s/\^{}max\_queued\_messages .*/max\_queued\_messages 500/\textquotesingle{}}\NormalTok{ mosquitto/mosquitto.conf}
 \ExtensionTok{docker}\NormalTok{ compose restart mosquitto}
 \CommentTok{\# [Pi] өөр терминалд: 120 сек тасалж, 10 мсж/с илгээнэ → 1200 мессеж \textgreater{} 500 дараалал}
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py publish }\AttributeTok{{-}{-}via}\NormalTok{ edge }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}rate}\NormalTok{ 10 }\AttributeTok{{-}{-}seconds}\NormalTok{ 240 }\AttributeTok{{-}{-}qos}\NormalTok{ 1 }\AttributeTok{{-}{-}run{-}id}\NormalTok{ qfull }\AttributeTok{{-}{-}outdir}\NormalTok{ lab05/out}
+\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py publish {-}{-}via edge {-}{-}host localhost }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}rate}\NormalTok{ 10 {-}{-}seconds 240 {-}{-}qos 1 {-}{-}run{-}id qfull {-}{-}outdir lab05/out}
 \CommentTok{\# 30 сек дараа: bash lab05/failure\_inject.sh uplink{-}down 120 ; дараа нь:}
-\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py verify }\AttributeTok{{-}{-}influx} \StringTok{"http://}\VariableTok{$CLOUD\_HOST}\StringTok{:8181"} \DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}run{-}id}\NormalTok{ qfull }\AttributeTok{{-}{-}outdir}\NormalTok{ lab05/out }\AttributeTok{{-}{-}bridge{-}log}\NormalTok{ lab05/out/bridge.jsonl }\DataTypeTok{\textbackslash{}}
-    \AttributeTok{{-}{-}cut{-}log}\NormalTok{ lab05/out/uplink{-}events.jsonl}
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}f}\NormalTok{ \textasciitilde{}/cnc302/edge/docker{-}compose.yml logs mosquitto }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}i} \StringTok{"dropped"}
+\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py verify {-}{-}influx }\StringTok{"http://}\VariableTok{$CLOUD\_HOST}\StringTok{:8181"} \KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}run{-}id}\NormalTok{ qfull {-}{-}outdir lab05/out {-}{-}bridge{-}log lab05/out/bridge.jsonl }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}cut{-}log}\NormalTok{ lab05/out/uplink{-}events.jsonl}
+\ExtensionTok{docker}\NormalTok{ compose {-}f \textasciitilde{}/cnc302/edge/docker{-}compose.yml logs mosquitto }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}i }\StringTok{"dropped"}
 \CommentTok{\# Дуусаад БУЦААЖ 100000 болгоод дахин асаана}
 \end{Highlighting}
 \end{Shaded}
@@ -611,32 +735,66 @@ Pi-гийн боломжтой RAM (Лаб 4, Хүснэгт 4.1) = ______ MiB
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-5.6-cleansession-ux431ux430-ux434ux430ux440ux430ux430ux43bux43bux44bux43d-ux445ux44fux437ux433ux430ux430ux440ux44bux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442}{%
 \subsubsection{\texorpdfstring{Хүснэгт 5.6 --- \texttt{cleansession} ба дарааллын хязгаарын харьцуулалт}{Хүснэгт 5.6 --- cleansession ба дарааллын хязгаарын харьцуулалт}}\label{ux445ux4afux441ux43dux44dux433ux442-5.6-cleansession-ux431ux430-ux434ux430ux440ux430ux430ux43bux43bux44bux43d-ux445ux44fux437ux433ux430ux430ux440ux44bux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lllll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Тохиргоо
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Гүүр унасан үед илгээсэн
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Алдагдсан
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Алдагдал \%
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Дараалал хадгалагдав уу
-\end{minipage} \\
+\begin{minipage}[b]{0.17\columnwidth}\raggedright
+Тохиргоо\strut
+\end{minipage} & \begin{minipage}[b]{0.17\columnwidth}\raggedright
+Гүүр унасан үед илгээсэн\strut
+\end{minipage} & \begin{minipage}[b]{0.17\columnwidth}\raggedright
+Алдагдсан\strut
+\end{minipage} & \begin{minipage}[b]{0.17\columnwidth}\raggedright
+Алдагдал \%\strut
+\end{minipage} & \begin{minipage}[b]{0.17\columnwidth}\raggedright
+Дараалал хадгалагдав уу\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.17\columnwidth}\raggedright
+\texttt{cleansession\ false}, \texttt{local\_\allowbreak{}cleansession\ false}, дараалал 100000 (үндсэн)\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright
+\texttt{cleansession\ true}, \texttt{local\_\allowbreak{}cleansession\ false}, дараалал 100000\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright
+\texttt{cleansession\ true}, \texttt{local\_\allowbreak{}cleansession\ true}, дараалал 100000\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright
+\texttt{cleansession\ false}, дараалал 500\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{cleansession\ false}, \texttt{local\_\allowbreak{}cleansession\ false}, дараалал 100000 (үндсэн) & & & & \\
-\texttt{cleansession\ true}, \texttt{local\_\allowbreak{}cleansession\ false}, дараалал 100000 & & & & \\
-\texttt{cleansession\ true}, \texttt{local\_\allowbreak{}cleansession\ true}, дараалал 100000 & & & & \\
-\texttt{cleansession\ false}, дараалал 500 & & & & \\
 \end{longtable}\endgroup
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-5.7-ux434ux430ux440ux430ux430ux43bux43bux44bux43d-ux43dux4e9ux4e9ux446ux438ux439ux43d-ux437ux430ux440ux434ux430ux43b}{%
@@ -644,24 +802,23 @@ Pi-гийн боломжтой RAM (Лаб 4, Хүснэгт 4.1) = ______ MiB
 
 \begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-Асуулт & Хариулт \\
+Асуулт & Хариулт\tabularnewline
 \midrule
 \endhead
+Нэг мессежийн бодит хэмжээ (Б) &\tabularnewline
+100 000 мессежийн RAM (MiB) &\tabularnewline
+Дараалал дүүрэх хугацаа таны хурдаар (с) &\tabularnewline
+Дараалал өсөх үед mosquitto-гийн RAM хэдээр өсөв (MiB) &\tabularnewline
+Дараалал халихад аль мессеж хаягдав (хуучин уу, шинэ үү) &\tabularnewline
 \bottomrule
-\endlastfoot
-Нэг мессежийн бодит хэмжээ (Б) & \\
-100 000 мессежийн RAM (MiB) & \\
-Дараалал дүүрэх хугацаа таны хурдаар (с) & \\
-Дараалал өсөх үед mosquitto-гийн RAM хэдээр өсөв (MiB) & \\
-Дараалал халихад аль мессеж хаягдав (хуучин уу, шинэ үү) & \\
 \end{longtable}\endgroup
 
 \textbf{5.4 microSD-гийн бичих саатал.} mosquitto-гийн persistence ба InfluxDB хоёулаа диск рүү бичдэг. Pi-гийн картыг хэмж (4 KiB × 2000 синхрон бичилт):
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{dd}\NormalTok{ if=/dev/zero of=\textasciitilde{}/cnc302/sdtest bs=4k count=2000 oflag=dsync }\DecValTok{2}\OperatorTok{\textgreater{}\&}\DecValTok{1} \KeywordTok{|} \FunctionTok{tail} \AttributeTok{{-}1}
-\FunctionTok{rm}\NormalTok{ \textasciitilde{}/cnc302/sdtest }\KeywordTok{\&\&} \FunctionTok{vmstat}\NormalTok{ 1 5      }\CommentTok{\# \textasciigrave{}wa\textasciigrave{} = I/O хүлээлт}
+\FunctionTok{dd}\NormalTok{ if=/dev/zero of=\textasciitilde{}/cnc302/sdtest bs=4k count=2000 oflag=dsync }\OperatorTok{2\textgreater{}\&1} \KeywordTok{|} \FunctionTok{tail}\NormalTok{ {-}1}
+\FunctionTok{rm}\NormalTok{ \textasciitilde{}/cnc302/sdtest }\KeywordTok{\&\&} \FunctionTok{vmstat}\NormalTok{ 1 5      \# }\KeywordTok{\textasciigrave{}}\ExtensionTok{wa}\KeywordTok{\textasciigrave{}}\NormalTok{ = I/O хүлээлт}
 \end{Highlighting}
 \end{Shaded}
 
@@ -681,7 +838,7 @@ Pi-гийн боломжтой RAM (Лаб 4, Хүснэгт 4.1) = ______ MiB
 \FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh broker{-}kill 20}
 \CommentTok{\# [ЗК] ҮҮЛ дээр: InfluxDB унана. Брокер, гүүр ажилласаар байна!}
 \FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh influx 30}
-\ExtensionTok{docker}\NormalTok{ exec cnc302{-}nodered wc }\AttributeTok{{-}l}\NormalTok{ /data/deadletter.jsonl    }\CommentTok{\# dead{-}letter ажиллав уу}
+\ExtensionTok{docker}\NormalTok{ exec cnc302{-}nodered wc {-}l /data/deadletter.jsonl    \# dead{-}letter ажиллав уу}
 \CommentTok{\# [Pi] CPU ханалт (дулааны төсөв ч мөн шалгагдана)}
 \FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh cpu 45}
 \CommentTok{\# [Pi] АЮУЛГҮЙ дискний туршилт — /dev/shm (RAM) дээрх 64 MiB loop файл, бодит microSD хөндөгдөхгүй}
@@ -698,54 +855,263 @@ Pi-гийн боломжтой RAM (Лаб 4, Хүснэгт 4.1) = ______ MiB
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-5.8-ux44dux432ux434ux440ux44dux43bux438ux439ux43d-ux43cux430ux442ux440ux438ux446}{%
 \subsubsection{Хүснэгт 5.8 --- ЭВДРЭЛИЙН МАТРИЦ}\label{ux445ux4afux441ux43dux44dux433ux442-5.8-ux44dux432ux434ux440ux44dux43bux438ux439ux43d-ux43cux430ux442ux440ux438ux446}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1000}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llllllllll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-\#
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Эвдрэл
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Үргэлжлэл (с)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шинж тэмдэг
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Илгээсэн
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Санд хүрсэн
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Алдагдал \%
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-RPO (с)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-MTTR (с)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Автоматаар сэргэв үү
-\end{minipage} \\
+\begin{minipage}[b]{0.07\columnwidth}\raggedright
+\#\strut
+\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright
+Эвдрэл\strut
+\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright
+Үргэлжлэл (с)\strut
+\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright
+Шинж тэмдэг\strut
+\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright
+Илгээсэн\strut
+\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright
+Санд хүрсэн\strut
+\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright
+Алдагдал \%\strut
+\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright
+RPO (с)\strut
+\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright
+MTTR (с)\strut
+\end{minipage} & \begin{minipage}[b]{0.07\columnwidth}\raggedright
+Автоматаар сэргэв үү\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.07\columnwidth}\raggedright
+0\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+Суурь (эвдрэлгүй)\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+---\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.07\columnwidth}\raggedright
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\texttt{uplink-down}, QoS 1\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+60\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.07\columnwidth}\raggedright
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\texttt{uplink-down}, QoS 0\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+60\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.07\columnwidth}\raggedright
+3\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\texttt{uplink-down}, QoS 1\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+180\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.07\columnwidth}\raggedright
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\texttt{cleansession\ true} (+ \texttt{local\_\allowbreak{}cleansession\ true})\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+60\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.07\columnwidth}\raggedright
+5\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+Дараалал 500 (халилт)\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+120\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.07\columnwidth}\raggedright
+6\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\texttt{broker} (ирмэгийн mosquitto, SIGTERM)\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+30\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.07\columnwidth}\raggedright
+6б\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\texttt{broker-kill} өгсөх урсгал тасарсан үед (SIGKILL)\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+20\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.07\columnwidth}\raggedright
+7\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\texttt{influx} (үүлний сан)\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+30\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.07\columnwidth}\raggedright
+8\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\texttt{cpu}\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+45\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.07\columnwidth}\raggedright
+9\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\texttt{disk}\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+60\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.07\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-0 & Суурь (эвдрэлгүй) & --- & & & & & & & \\
-1 & \texttt{uplink-down}, QoS 1 & 60 & & & & & & & \\
-2 & \texttt{uplink-down}, QoS 0 & 60 & & & & & & & \\
-3 & \texttt{uplink-down}, QoS 1 & 180 & & & & & & & \\
-4 & \texttt{cleansession\ true} (+ \texttt{local\_\allowbreak{}cleansession\ true}) & 60 & & & & & & & \\
-5 & Дараалал 500 (халилт) & 120 & & & & & & & \\
-6 & \texttt{broker} (ирмэгийн mosquitto, SIGTERM) & 30 & & & & & & & \\
-6б & \texttt{broker-kill} өгсөх урсгал тасарсан үед (SIGKILL) & 20 & & & & & & & \\
-7 & \texttt{influx} (үүлний сан) & 30 & & & & & & & \\
-8 & \texttt{cpu} & 45 & & & & & & & \\
-9 & \texttt{disk} & 60 & & & & & & & \\
 \end{longtable}\endgroup
 
 \hypertarget{ux430ux43bux445ux430ux43c-7-ux434ux4afux433ux43dux44dux43bux442-ux431ux430-commit-15-ux43cux438ux43d-piux437ux43a}{%
@@ -755,16 +1121,16 @@ MTTR (с)
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh restore     }\CommentTok{\# бүх зүйл хэвийн эсэхийг батал}
-\KeywordTok{(}\BuiltInTok{cd}\NormalTok{ edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ bridge }\KeywordTok{\&\&} \ExtensionTok{docker}\NormalTok{ compose restart mosquitto}\KeywordTok{)}   \CommentTok{\# анхны тохиргоо}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh restore     \# бүх зүйл хэвийн эсэхийг батал}
+\KeywordTok{(}\BuiltInTok{cd}\NormalTok{ edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ bridge }\KeywordTok{\&\&} \ExtensionTok{docker}\NormalTok{ compose restart mosquitto}\KeywordTok{)}\NormalTok{   \# анхны тохиргоо}
 \FunctionTok{git}\NormalTok{ add lab05/}
 \CommentTok{\# lab05/out/ нь .gitignore{-}д — зөвхөн үр дүнгийн JSON{-}г албадан нэмнэ (лог, jsonl{-}ыг БИШ)}
-\FunctionTok{git}\NormalTok{ add }\AttributeTok{{-}f}\NormalTok{ lab05/out/}\PreprocessorTok{*}\NormalTok{{-}result.json}
-\FunctionTok{git}\NormalTok{ status }\AttributeTok{{-}{-}short}
-\FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 5: өгөгдлийн шугам, өгсөх урсгал тасрах, RPO/MTTR"}
-\FunctionTok{git}\NormalTok{ tag lab05{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\AttributeTok{{-}{-}tags}
+\FunctionTok{git}\NormalTok{ add {-}f lab05/out/*{-}result.json}
+\FunctionTok{git}\NormalTok{ status {-}{-}short}
+\FunctionTok{git}\NormalTok{ commit {-}m }\StringTok{"Лаб 5: өгөгдлийн шугам, өгсөх урсгал тасрах, RPO/MTTR"}
+\FunctionTok{git}\NormalTok{ tag lab05{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push {-}{-}tags}
 \CommentTok{\# Нууц файл ороогүйг ЗААВАЛ шалга}
-\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}E} \StringTok{\textquotesingle{}\textbackslash{}.env$|bridge\textbackslash{}.conf$|\textbackslash{}.key$|\textbackslash{}.crt$|devices\textbackslash{}.csv\textquotesingle{}}   \CommentTok{\# хоосон байх ЁСТОЙ}
+\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}E }\StringTok{\textquotesingle{}\textbackslash{}.env$|bridge\textbackslash{}.conf$|\textbackslash{}.key$|\textbackslash{}.crt$|devices\textbackslash{}.csv\textquotesingle{}}\NormalTok{   \# хоосон байх ЁСТОЙ}
 \end{Highlighting}
 \end{Shaded}
 
@@ -786,7 +1152,7 @@ MTTR (с)
 \item
   \texttt{influx} эвдрэлийн үед төхөөрөмж юу ч анзаарсангүй. Хүснэгт 5.8-ын 7-р мөрөнд хэдэн мессеж алдагдав, dead-letter-т хэдэн мөр орсон бэ? Ийм "чимээгүй" эвдрэлийг хэдэн секундын дотор илрүүлэх систем хэрхэн барих вэ?
 \item
-  \texttt{dd\ …\ oflag=\allowbreak{}dsync} хэмжилтэд microSD хэдэн MB/с, нэг бичилт дунджаар хэдэн мс байв? Энэ тоо mosquitto-гийн \texttt{autosave\_\allowbreak{}interval\ 60} ба InfluxDB-ийн бичилтэд хэрхэн нөлөөлж байна вэ? Хүснэгт 5.8-ын 6 ба 6б мөрийн ялгааг \texttt{autosave\_\allowbreak{}interval}-аар тайлбарла.
+  \texttt{dd\ \ldots{}\ oflag=\allowbreak{}dsync} хэмжилтэд microSD хэдэн MB/с, нэг бичилт дунджаар хэдэн мс байв? Энэ тоо mosquitto-гийн \texttt{autosave\_\allowbreak{}interval\ 60} ба InfluxDB-ийн бичилтэд хэрхэн нөлөөлж байна вэ? Хүснэгт 5.8-ын 6 ба 6б мөрийн ялгааг \texttt{autosave\_\allowbreak{}interval}-аар тайлбарла.
 \item
   Хүснэгт 5.5-д гүүр тасралтыг хэдэн секундын дараа илрүүлэв? \texttt{keepalive\_\allowbreak{}interval}-ийг 60-аас 15 болговол RPO (QoS 0) ба MTTR хэрхэн өөрчлөгдөх вэ, ямар зардалтай вэ?
 \end{enumerate}
@@ -794,51 +1160,34 @@ MTTR (с)
 \hypertarget{ux445ux4afux43bux44dux44dux43bux433ux44dux43d-ux4e9ux433ux4e9ux445-ux437ux4afux439ux43b}{%
 \section{6. Хүлээлгэн өгөх зүйл}\label{ux445ux4afux43bux44dux44dux43bux433ux44dux43d-ux4e9ux433ux4e9ux445-ux437ux4afux439ux43b}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-\#
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Зүйл
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Байрлал
-\end{minipage} \\
+\# & Зүйл & Байрлал\tabularnewline
 \midrule
 \endhead
+1 & Тайлан (Хүснэгт 5.1--5.8 бөглөсөн) & \texttt{lab05/report.md} → PDF\tabularnewline
+2 & \texttt{verify}-ийн үр дүнгийн JSON файлууд & \texttt{lab05/\allowbreak{}out/\allowbreak{}*-result.\allowbreak{}json}\tabularnewline
+3 & Node-RED урсгалын экспорт (өөрчилсөн бол) & \texttt{lab05/flows/}\tabularnewline
+4 & Grafana самбар --- тасалдлын цоорхой харагдсан зураг & тайлангийн хавсралт\tabularnewline
+5 & Багийн найдвартай байдлын паспорт (RPO/MTTR зорилт) & тайлангийн хавсралт\tabularnewline
+6 & Git tag & \texttt{lab05-done}\tabularnewline
 \bottomrule
-\endlastfoot
-1 & Тайлан (Хүснэгт 5.1--5.8 бөглөсөн) & \texttt{lab05/report.md} → PDF \\
-2 & \texttt{verify}-ийн үр дүнгийн JSON файлууд & \texttt{lab05/\allowbreak{}out/\allowbreak{}*-result.\allowbreak{}json} \\
-3 & Node-RED урсгалын экспорт (өөрчилсөн бол) & \texttt{lab05/flows/} \\
-4 & Grafana самбар --- тасалдлын цоорхой харагдсан зураг & тайлангийн хавсралт \\
-5 & Багийн найдвартай байдлын паспорт (RPO/MTTR зорилт) & тайлангийн хавсралт \\
-6 & Git tag & \texttt{lab05-done} \\
 \end{longtable}\endgroup
 
 \hypertarget{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}{%
 \section{7. Үнэлгээний шалгуур (10 оноо)}\label{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Шалгуур
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Оноо
-\end{minipage} \\
+Шалгуур & Оноо\tabularnewline
 \midrule
 \endhead
+Шугам бүрэн ажиллаж, чанарын шүүлт ба dead-letter баталгаажсан & 2\tabularnewline
+Өгсөх урсгалын тасалдлын гурван ажиллалт хийгдэж, Хүснэгт 5.4--5.5 бүрэн & 3\tabularnewline
+\textbf{RPO ба MTTR тоогоор, InfluxDB-ийн нотолгоотойгоор} гаргасан & 2\tabularnewline
+\texttt{cleansession} ба дарааллын хязгаарын харьцуулалт (5.6--5.7) & 2\tabularnewline
+Эвдрэлийн матриц бүрэн, систем цэвэр сэргээгдсэн & 1\tabularnewline
 \bottomrule
-\endlastfoot
-Шугам бүрэн ажиллаж, чанарын шүүлт ба dead-letter баталгаажсан & 2 \\
-Өгсөх урсгалын тасалдлын гурван ажиллалт хийгдэж, Хүснэгт 5.4--5.5 бүрэн & 3 \\
-\textbf{RPO ба MTTR тоогоор, InfluxDB-ийн нотолгоотойгоор} гаргасан & 2 \\
-\texttt{cleansession} ба дарааллын хязгаарын харьцуулалт (5.6--5.7) & 2 \\
-Эвдрэлийн матриц бүрэн, систем цэвэр сэргээгдсэн & 1 \\
 \end{longtable}\endgroup
 
 \textbf{Онцгой оноо (+1):} дахин илгээлтийг тогтвортой session-тэй захиалагчаар (эсвэл өөр аргаар) InfluxDB-ээс гадна бие даан баталсан бол.
@@ -846,74 +1195,279 @@ MTTR (с)
 \hypertarget{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}{%
 \section{8. Түгээмэл алдаа}\label{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Шинж
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шалтгаан
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шийдэл
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шинж\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шалтгаан\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шийдэл\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Дахин илгээлт "харагдахгүй"\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{mosquitto\_sub} тэсрэлтийн ДАРАА асаасан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+InfluxDB-ээс шалга (§1-ийн урхи)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+mosquitto огт эхлэхгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{bridge\_\allowbreak{}queue\_\allowbreak{}qos0\_\allowbreak{}messages} гэж бичсэн\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+глобал \texttt{queue\_\allowbreak{}qos0\_\allowbreak{}messages}-ыг ашигла\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Node-RED \texttt{400} буцаана\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+line protocol буруу эсвэл баганын төрөл зөрчигдсөн (жишээ: нэг талбарт тоо, дараа нь текст)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{deadletter.jsonl}-ийн \texttt{error} ба \texttt{lp}-г хар\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{write\_errors} өсөж, код нь \texttt{ECONNREFUSED}/\allowbreak\texttt{ENOTFOUND}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+InfluxDB унтарсан эсвэл хаяг буруу\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{docker\ compose\ ps\ influxdb}, URL \texttt{http:\allowbreak{}/\allowbreak{}/\allowbreak{}influxdb:\allowbreak{}8181}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+InfluxDB унтарсан ч dead-letter хоосон\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{http\ request}-ийн "Only send non-2xx responses to Catch node" асаалттай\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+сонголтыг унтраа (§2.2)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{bridge.jsonl}-д \texttt{0} гарсангүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+тасалдал \texttt{keepalive\_\allowbreak{}interval}-аас богино\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{-\/-cut-log}-оор шалга (§3)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{verify} 0 мөр олно\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+буруу \texttt{-\/-influx} эсвэл \texttt{-\/-db}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{SELECT\ *\ FROM\ integrity\ LIMIT\ 5}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Суурь тестэд аль хэдийн алдагдал\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+сэдвийн угтвар \texttt{SITE}-тай зөрсөн\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+troubleshooting §2\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{uplink-down} → эрхийн алдаа\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+iptables/nft-д sudo эрх хэрэгтэй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{sudo\ bash\ lab05/\allowbreak{}failure\_\allowbreak{}inject.\allowbreak{}sh\ uplink-down\ 60}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{bridge.conf} засвар алга болов\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{make\ restart} загвараас дахин үүсгэсэн\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{docker\ compose\ restart\ mosquitto} ашигла\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{disk} горим \texttt{mount} алдаа\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+sudo эрхгүй эсвэл loop модуль алга\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+эхлээд \texttt{sudo\ -v}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Сэргэсний дараа гүүр удаан холбогдоно\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{restart\_\allowbreak{}timeout\ 5\ 60} backoff\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+60 секунд хүртэл хүлээ, \texttt{make\ link}-ээр хар\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{verify}: \texttt{table\ \textquotesingle{}integrity\textquotesingle{}\ not\ found}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+урсгалын хуучин хувилбар импортлогдсон (integrity салаагүй)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{lab05/\allowbreak{}flows/\allowbreak{}nodered-pipeline.\allowbreak{}json}-ийг дахин импортло\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-Дахин илгээлт "харагдахгүй" & \texttt{mosquitto\_sub} тэсрэлтийн ДАРАА асаасан & InfluxDB-ээс шалга (§1-ийн урхи) \\
-mosquitto огт эхлэхгүй & \texttt{bridge\_\allowbreak{}queue\_\allowbreak{}qos0\_\allowbreak{}messages} гэж бичсэн & глобал \texttt{queue\_\allowbreak{}qos0\_\allowbreak{}messages}-ыг ашигла \\
-Node-RED \texttt{400} буцаана & line protocol буруу эсвэл баганын төрөл зөрчигдсөн (жишээ: нэг талбарт тоо, дараа нь текст) & \texttt{deadletter.jsonl}-ийн \texttt{error} ба \texttt{lp}-г хар \\
-\texttt{write\_errors} өсөж, код нь \texttt{ECONNREFUSED}/\allowbreak\texttt{ENOTFOUND} & InfluxDB унтарсан эсвэл хаяг буруу & \texttt{docker\ compose\ ps\ influxdb}, URL \texttt{http:\allowbreak{}/\allowbreak{}/\allowbreak{}influxdb:\allowbreak{}8181} \\
-InfluxDB унтарсан ч dead-letter хоосон & \texttt{http\ request}-ийн "Only send non-2xx responses to Catch node" асаалттай & сонголтыг унтраа (§2.2) \\
-\texttt{bridge.jsonl}-д \texttt{0} гарсангүй & тасалдал \texttt{keepalive\_\allowbreak{}interval}-аас богино & \texttt{-\/-cut-log}-оор шалга (§3) \\
-\texttt{verify} 0 мөр олно & буруу \texttt{-\/-influx} эсвэл \texttt{-\/-db} & \texttt{SELECT\ *\ FROM\ integrity\ LIMIT\ 5} \\
-Суурь тестэд аль хэдийн алдагдал & сэдвийн угтвар \texttt{SITE}-тай зөрсөн & troubleshooting §2 \\
-\texttt{uplink-down} → эрхийн алдаа & iptables/nft-д sudo эрх хэрэгтэй & \texttt{sudo\ bash\ lab05/\allowbreak{}failure\_\allowbreak{}inject.\allowbreak{}sh\ uplink-down\ 60} \\
-\texttt{bridge.conf} засвар алга болов & \texttt{make\ restart} загвараас дахин үүсгэсэн & \texttt{docker\ compose\ restart\ mosquitto} ашигла \\
-\texttt{disk} горим \texttt{mount} алдаа & sudo эрхгүй эсвэл loop модуль алга & эхлээд \texttt{sudo\ -v} \\
-Сэргэсний дараа гүүр удаан холбогдоно & \texttt{restart\_\allowbreak{}timeout\ 5\ 60} backoff & 60 секунд хүртэл хүлээ, \texttt{make\ link}-ээр хар \\
-\texttt{verify}: \texttt{table\ \textquotesingle{}integrity\textquotesingle{}\ not\ found} & урсгалын хуучин хувилбар импортлогдсон (integrity салаагүй) & \texttt{lab05/\allowbreak{}flows/\allowbreak{}nodered-pipeline.\allowbreak{}json}-ийг дахин импортло \\
 \end{longtable}\endgroup
 
 \hypertarget{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}{%
 \section{9. Эх сурвалж}\label{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-\#
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Эх сурвалж
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Юуг баталгаажуулсан
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хандсан
-\end{minipage} \\
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+\#\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Эх сурвалж\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Юуг баталгаажуулсан\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хандсан\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://mosquitto.org/man/mosquitto-conf-5.html}{mosquitto.conf(5)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{persistence}, \texttt{autosave\_\allowbreak{}interval}, \texttt{autosave\_\allowbreak{}on\_\allowbreak{}changes} (зөвхөн autosave/унтрах/SIGUSR1 үед бичнэ), \texttt{max\_\allowbreak{}queued\_\allowbreak{}messages} (in-flight-аас гадна, анхдагч 1000), \texttt{max\_\allowbreak{}queued\_\allowbreak{}bytes} (хязгаарт хүрвэл дараагийн мессеж чимээгүй хаягдана), \texttt{queue\_\allowbreak{}qos0\_\allowbreak{}messages} (глобал, стандарт биш), \texttt{cleansession}, \texttt{local\_\allowbreak{}cleansession}, \texttt{keepalive\_\allowbreak{}interval} (анхдагч 60), \texttt{restart\_timeout} (base/cap, jitter), \texttt{notifications}, \texttt{notification\_\allowbreak{}topic}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://mosquitto.org/man/mosquitto-8.html}{mosquitto(8)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{\$SYS/\allowbreak{}broker/\allowbreak{}store/\allowbreak{}messages/\allowbreak{}count} (хуучин нэр \texttt{messages/stored}), \texttt{\$SYS/\allowbreak{}broker/\allowbreak{}connection/\allowbreak{}\#}, \texttt{sys\_interval}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+3\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://mosquitto.org/man/mosquitto_sub-1.html}{mosquitto\_sub(1)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{-F} формат, \texttt{\%U} (наносекундтэй Unix цаг), \texttt{\%p}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.influxdata.com/influxdb3/core/write-data/http-api/v3-write-lp/}{InfluxDB 3 Core --- Use the v3 write\_\allowbreak{}lp API}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{precision} утгууд (\texttt{auto}/\allowbreak\texttt{nanosecond}/\allowbreak\texttt{microsecond}/\allowbreak\texttt{millisecond}/\allowbreak\texttt{second}), \texttt{accept\_partial}, \texttt{no\_sync}, 204/400 хариу\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+5\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.influxdata.com/influxdb3/core/api/write-data/}{InfluxDB 3 Core API --- Write data}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+v1/v2/v3 precision харьцуулалт (\texttt{ms} зөвхөн v1/v2), 204/400/401/403/413\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+6\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.influxdata.com/influxdb3/core/query-data/execute-queries/influxdb-v3-api/}{InfluxDB 3 Core --- Use the v3 query API}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{/\allowbreak{}api/\allowbreak{}v3/\allowbreak{}query\_\allowbreak{}sql} GET/POST, \texttt{db}, \texttt{q}, \texttt{format} (json/jsonl/csv/pretty/parquet)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+7\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.influxdata.com/influxdb3/core/admin/databases/create/}{InfluxDB 3 Core --- Create a database}, \href{https://docs.influxdata.com/influxdb3/core/api/database/}{API --- Database}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{POST\ /\allowbreak{}api/\allowbreak{}v3/\allowbreak{}configure/\allowbreak{}database} (\texttt{\{"db":\ldots{}\}}, 200/409), \texttt{GET\ \ldots{}?\allowbreak{}format=\allowbreak{}json}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+8\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.influxdata.com/influxdb3/core/get-started/write/}{InfluxDB 3 Core --- Write data (get started)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+schema-on-write: сан, хүснэгт автоматаар үүснэ\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+9\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.influxdata.com/influxdb3/core/reference/line-protocol/}{InfluxDB 3 Core --- Line protocol}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+escape дүрэм (tag утга: таслал, \texttt{=}, зай), \texttt{i} бүхэл тоо, давхар цэг нийлэх\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+10\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.influxdata.com/influxdb3/core/reference/config-options/}{InfluxDB 3 Core --- Configuration options}, \href{https://docs.influxdata.com/influxdb3/core/get-started/setup/}{Set up Core}, \href{https://docs.influxdata.com/influxdb3/core/api/authentication/}{API authentication}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{-\/-without-auth}, \texttt{influxdb3\ create\ token\ -\/\allowbreak{}-admin}, \texttt{Authorization:\allowbreak{}\ Bearer}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+11\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://grafana.com/docs/grafana/latest/datasources/influxdb/query-editor/}{Grafana --- InfluxDB query editor}, \href{https://grafana.com/docs/grafana/latest/datasources/influxdb/configure/}{Configure the InfluxDB data source}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+SQL макро \texttt{\$\_\allowbreak{}\_\allowbreak{}timeFilter}, \texttt{\$\_\allowbreak{}\_\allowbreak{}dateBin}; SQL нь Flight SQL (gRPC), TLS-гүй үед Insecure Connection\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+12\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.influxdata.com/influxdb3/core/visualize-data/grafana/}{InfluxDB 3 Core --- Use Grafana}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+InfluxDB эх сурвалжийн SQL тохиргоо (database, token, insecure)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+13\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://nodered.org/docs/user-guide/editor/workspace/import-export}{Node-RED --- Importing and Exporting Flows}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Import цонх, \texttt{Ctrl-I}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+14\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://nodered.org/docs/getting-started/docker}{Node-RED --- Running under Docker}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{/data} хэрэглэгчийн хавтас, volume\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+15\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://nodered.org/docs/user-guide/handling-errors}{Node-RED --- Handling errors}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Catch зангилаа ба \texttt{node.error}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+16\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://man7.org/linux/man-pages/man8/iptables.8.html}{iptables(8)}, \href{https://www.netfilter.org/projects/nftables/manpage.html}{nft(8)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{-I}/\allowbreak\texttt{-D}/\allowbreak\texttt{-S}; \texttt{add\ table/\allowbreak{}chain\ \ldots{}\ hook\ output}, \texttt{delete\ table}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+17\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://man7.org/linux/man-pages/man8/mount.8.html}{mount(8)}, \href{https://man7.org/linux/man-pages/man1/fallocate.1.html}{fallocate(1)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{mount\ -o\ loop} файлаас loop төхөөрөмж үүсгэх; файлд зай урьдчилан хуваарилах\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-1 & \href{https://mosquitto.org/man/mosquitto-conf-5.html}{mosquitto.conf(5)} & \texttt{persistence}, \texttt{autosave\_\allowbreak{}interval}, \texttt{autosave\_\allowbreak{}on\_\allowbreak{}changes} (зөвхөн autosave/унтрах/SIGUSR1 үед бичнэ), \texttt{max\_\allowbreak{}queued\_\allowbreak{}messages} (in-flight-аас гадна, анхдагч 1000), \texttt{max\_\allowbreak{}queued\_\allowbreak{}bytes} (хязгаарт хүрвэл дараагийн мессеж чимээгүй хаягдана), \texttt{queue\_\allowbreak{}qos0\_\allowbreak{}messages} (глобал, стандарт биш), \texttt{cleansession}, \texttt{local\_\allowbreak{}cleansession}, \texttt{keepalive\_\allowbreak{}interval} (анхдагч 60), \texttt{restart\_timeout} (base/cap, jitter), \texttt{notifications}, \texttt{notification\_\allowbreak{}topic} & 2026-09 \\
-2 & \href{https://mosquitto.org/man/mosquitto-8.html}{mosquitto(8)} & \texttt{\$SYS/\allowbreak{}broker/\allowbreak{}store/\allowbreak{}messages/\allowbreak{}count} (хуучин нэр \texttt{messages/stored}), \texttt{\$SYS/\allowbreak{}broker/\allowbreak{}connection/\allowbreak{}\#}, \texttt{sys\_interval} & 2026-09 \\
-3 & \href{https://mosquitto.org/man/mosquitto_sub-1.html}{mosquitto\_sub(1)} & \texttt{-F} формат, \texttt{\%U} (наносекундтэй Unix цаг), \texttt{\%p} & 2026-09 \\
-4 & \href{https://docs.influxdata.com/influxdb3/core/write-data/http-api/v3-write-lp/}{InfluxDB 3 Core --- Use the v3 write\_\allowbreak{}lp API} & \texttt{precision} утгууд (\texttt{auto}/\allowbreak\texttt{nanosecond}/\allowbreak\texttt{microsecond}/\allowbreak\texttt{millisecond}/\allowbreak\texttt{second}), \texttt{accept\_partial}, \texttt{no\_sync}, 204/400 хариу & 2026-09 \\
-5 & \href{https://docs.influxdata.com/influxdb3/core/api/write-data/}{InfluxDB 3 Core API --- Write data} & v1/v2/v3 precision харьцуулалт (\texttt{ms} зөвхөн v1/v2), 204/400/401/403/413 & 2026-09 \\
-6 & \href{https://docs.influxdata.com/influxdb3/core/query-data/execute-queries/influxdb-v3-api/}{InfluxDB 3 Core --- Use the v3 query API} & \texttt{/\allowbreak{}api/\allowbreak{}v3/\allowbreak{}query\_\allowbreak{}sql} GET/POST, \texttt{db}, \texttt{q}, \texttt{format} (json/jsonl/csv/pretty/parquet) & 2026-09 \\
-7 & \href{https://docs.influxdata.com/influxdb3/core/admin/databases/create/}{InfluxDB 3 Core --- Create a database}, \href{https://docs.influxdata.com/influxdb3/core/api/database/}{API --- Database} & \texttt{POST\ /\allowbreak{}api/\allowbreak{}v3/\allowbreak{}configure/\allowbreak{}database} (\texttt{\{"db":…\}}, 200/409), \texttt{GET\ …?\allowbreak{}format=\allowbreak{}json} & 2026-09 \\
-8 & \href{https://docs.influxdata.com/influxdb3/core/get-started/write/}{InfluxDB 3 Core --- Write data (get started)} & schema-on-write: сан, хүснэгт автоматаар үүснэ & 2026-09 \\
-9 & \href{https://docs.influxdata.com/influxdb3/core/reference/line-protocol/}{InfluxDB 3 Core --- Line protocol} & escape дүрэм (tag утга: таслал, \texttt{=}, зай), \texttt{i} бүхэл тоо, давхар цэг нийлэх & 2026-09 \\
-10 & \href{https://docs.influxdata.com/influxdb3/core/reference/config-options/}{InfluxDB 3 Core --- Configuration options}, \href{https://docs.influxdata.com/influxdb3/core/get-started/setup/}{Set up Core}, \href{https://docs.influxdata.com/influxdb3/core/api/authentication/}{API authentication} & \texttt{-\/-without-auth}, \texttt{influxdb3\ create\ token\ -\/\allowbreak{}-admin}, \texttt{Authorization:\allowbreak{}\ Bearer} & 2026-09 \\
-11 & \href{https://grafana.com/docs/grafana/latest/datasources/influxdb/query-editor/}{Grafana --- InfluxDB query editor}, \href{https://grafana.com/docs/grafana/latest/datasources/influxdb/configure/}{Configure the InfluxDB data source} & SQL макро \texttt{\$\_\allowbreak{}\_\allowbreak{}timeFilter}, \texttt{\$\_\allowbreak{}\_\allowbreak{}dateBin}; SQL нь Flight SQL (gRPC), TLS-гүй үед Insecure Connection & 2026-09 \\
-12 & \href{https://docs.influxdata.com/influxdb3/core/visualize-data/grafana/}{InfluxDB 3 Core --- Use Grafana} & InfluxDB эх сурвалжийн SQL тохиргоо (database, token, insecure) & 2026-09 \\
-13 & \href{https://nodered.org/docs/user-guide/editor/workspace/import-export}{Node-RED --- Importing and Exporting Flows} & Import цонх, \texttt{Ctrl-I} & 2026-09 \\
-14 & \href{https://nodered.org/docs/getting-started/docker}{Node-RED --- Running under Docker} & \texttt{/data} хэрэглэгчийн хавтас, volume & 2026-09 \\
-15 & \href{https://nodered.org/docs/user-guide/handling-errors}{Node-RED --- Handling errors} & Catch зангилаа ба \texttt{node.error} & 2026-09 \\
-16 & \href{https://man7.org/linux/man-pages/man8/iptables.8.html}{iptables(8)}, \href{https://www.netfilter.org/projects/nftables/manpage.html}{nft(8)} & \texttt{-I}/\allowbreak\texttt{-D}/\allowbreak\texttt{-S}; \texttt{add\ table/\allowbreak{}chain\ …\ hook\ output}, \texttt{delete\ table} & 2026-09 \\
-17 & \href{https://man7.org/linux/man-pages/man8/mount.8.html}{mount(8)}, \href{https://man7.org/linux/man-pages/man1/fallocate.1.html}{fallocate(1)} & \texttt{mount\ -o\ loop} файлаас loop төхөөрөмж үүсгэх; файлд зай урьдчилан хуваарилах & 2026-09 \\
 \end{longtable}\endgroup

@@ -1,18 +1,35 @@
 % Автоматаар үүсгэсэн — эх файл: lab01/README.md
 \chapter{Лаб 1 — Хоёр давхаргат платформ ба ирмэг–үүлний гүүр}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
 \endhead
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\textbf{7 хоног}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+III\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\textbf{Хугацаа}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+4 цаг (8 алхам + 30 мин нөөц)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\textbf{Суралцахуйн үр дүн}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+ҮД1 (үүлд суурилсан платформ зохиох), ҮД2 (өргөтгөх боломжтой backend)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\textbf{Үнэлгээ}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+Бичгийн тайлан, 10 оноо\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\textbf{Гол хэмжилт}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+Гүүрний RTT, Pi-гийн үлдэгдэл санах ой, үйлчилгээний эхлэх хугацаа\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\textbf{7 хоног} & III \\
-\textbf{Хугацаа} & 4 цаг \\
-\textbf{Суралцахуйн үр дүн} & ҮД1 (үүлд суурилсан платформ зохиох), ҮД2 (өргөтгөх боломжтой backend) \\
-\textbf{Үнэлгээ} & Бичгийн тайлан, 10 оноо \\
-\textbf{Гол хэмжилт} & Гүүрний RTT, Pi-гийн үлдэгдэл санах ой, үйлчилгээний эхлэх хугацаа \\
 \end{longtable}\endgroup
 
 \hypertarget{ux437ux43eux440ux438ux43bux433ux43e}{%
@@ -33,33 +50,216 @@
   Яагаад платформын давхаргыг (EMQX, InfluxDB, Grafana) Pi 3B дээр ажиллуулах \textbf{боломжгүй} вэ --- таамаглал биш, тооцоо?
 \end{enumerate}
 
-\hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}{%
-\section{2. Урьдчилсан нөхцөл}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}}
+\hypertarget{ux43bux430ux431ux44bux43d-ux44fux432ux446-ux43dux44dux433-ux434ux43eux440}{%
+\subsection{Лабын явц нэг дор}\label{ux43bux430ux431ux44bux43d-ux44fux432ux446-ux43dux44dux433-ux434ux43eux440}}
 
-\texttt{SETUP.md} бүрэн дуусгасан байх ёстой. Ялангуяа:
+\begingroup\scriptsize\begin{longtable}[]{@{}lllll@{}}
+\toprule
+Алхам & Хаана & Юу хийх & Мин & Бөглөх хүснэгт\tabularnewline
+\midrule
+\endhead
+0 & {[}ЗК{]}{[}Pi{]} & Терминалууд нээх, урьдчилсан шалгалт & 15 & ---\tabularnewline
+1 & {[}Pi{]} & Хоосон Pi-гийн суурь хэмжилт & 25 & 1.1\tabularnewline
+2 & {[}ЗК{]} & Үүлний стекийг асааж, эхлэх хугацааг хэмжих & 35 & 1.2\tabularnewline
+3 & {[}Pi{]}{[}ЗК{]} & Гүүр ба ирмэгийн агентыг асаах & 25 & 1.3\tabularnewline
+4 & {[}Pi{]} & Гурван замын саатал & 40 & 1.4\tabularnewline
+5 & {[}ЗК{]}{[}Pi{]} & Pi-г флотоор ачаалах & 30 & 1.5\tabularnewline
+6 & {[}ЗК{]} & "Бүгдийг Pi дээр" тооцоо & 20 & 1.6\tabularnewline
+7 & {[}ЗК{]} & Grafana-д амьд самбар & 25 & ---\tabularnewline
+8 & {[}ЗК{]} & Гаралтаа цуглуулж, Git commit & 15 & ---\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+\begin{quote}
+☞ \textbf{Алхмуудыг дарааллаар нь хий.} Алхам бүрийн төгсгөлд ✓ \textbf{Шалгах} хэсэг бий. Тэнд бичсэн үр дүн гарахгүй бол \textbf{цааш бүү яв} --- ✗ мөр эсвэл §8-аас шалтгааныг ол. Алгассан алхам дараагийн бүх хэмжилтийг хүчингүй болгоно.
+\end{quote}
+
+\hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b-ux431ux430-ux431ux44dux43bux442ux433ux44dux43b-ux430ux43bux445ux430ux43c-0-15-ux43cux438ux43d}{%
+\section{2. Урьдчилсан нөхцөл ба бэлтгэл (Алхам 0, 15 мин)}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b-ux431ux430-ux431ux44dux43bux442ux433ux44dux43b-ux430ux43bux445ux430ux43c-0-15-ux43cux438ux43d}}
+
+\texttt{SETUP.md} бүрэн дуусгасан, \textbf{Г хэсгийн хяналтын жагсаалт бүгд ✔} байх ёстой. Үгүй бол \textbf{энд зогсоод SETUP.md-д буц} --- лабораторийн 4 цагийг орчин тохируулахад зарцуулж болохгүй.
+
+\hypertarget{ux434ux4e9ux440ux432ux4e9ux43d-ux442ux435ux440ux43cux438ux43dux430ux43b-ux43dux44dux44dux445}{%
+\subsection{0.1 Дөрвөн терминал нээх}\label{ux434ux4e9ux440ux432ux4e9ux43d-ux442ux435ux440ux43cux438ux43dux430ux43b-ux43dux44dux44dux445}}
+
+Энэ лабд \textbf{дөрвөн терминал} зэрэг нээлттэй байна. Цонх бүрийг нэрээр нь дуудна:
+
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
+\toprule
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+Цонх\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хаана\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хэрхэн нээх\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Prompt\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{{[}Pi-1{]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Raspberry Pi\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Windows Terminal → PowerShell таб → \texttt{ssh\ pi}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{cnc302@pi-team07:\textasciitilde{}\ \$}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{{[}Pi-2{]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Raspberry Pi\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Шинэ PowerShell таб (\texttt{Ctrl\ +\ Shift\ +\ T}) → \texttt{ssh\ pi}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{cnc302@pi-team07:\textasciitilde{}\ \$}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{{[}ЗК · Ubuntu-1{]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Зөөврийн компьютер (WSL)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Terminal-ын \texttt{▼} → \textbf{Ubuntu}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{bat@LAPTOP:\textasciitilde{}\$}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{{[}ЗК · Ubuntu-2{]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Зөөврийн компьютер (WSL)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Дахин \texttt{▼} → \textbf{Ubuntu}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{bat@LAPTOP:\textasciitilde{}\$}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+\begin{quote}
+☞ Таб бүрийг баруун товчоор \textbf{Rename tab} хийж \texttt{Pi-1}, \texttt{Pi-2}, \texttt{Ubuntu-1}, \texttt{Ubuntu-2} гэж нэрлэ. Буруу цонхонд бичих нь энэ лабын хамгийн түгээмэл алдаа.
+
+☞ Ubuntu цонх бүрт эхлээд: \texttt{cd\ \textasciitilde{}/cnc302\ \&\&\ source\ .venv/bin/activate} (prompt-ын эхэнд \texttt{(.venv)} гарна).
+\end{quote}
+
+\hypertarget{ux4e9ux4e9ux440ux438ux439ux43d-ux443ux442ux433ux443ux443ux434ux44bux433-ux431ux4e9ux433ux43bux4e9}{%
+\subsection{0.2 Өөрийн утгуудыг бөглө}\label{ux4e9ux4e9ux440ux438ux439ux43d-ux443ux442ux433ux443ux443ux434ux44bux433-ux431ux4e9ux433ux43bux4e9}}
+
+Зааврын \texttt{\textless{}\ldots{}\textgreater{}}-ийг өөрийн утгаар солино (\textbf{хаалтыг хамт устгана}):
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Хувьсагч\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Утга\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Хаанаас олох\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{\textless{}NN\textgreater{}}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+багийн дугаар, жишээ \texttt{07}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+багш\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{\textless{}LAPTOP\_\allowbreak{}IP\textgreater{}}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+жишээ \texttt{192.168.1.100}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{{[}ЗК · PowerShell{]}} \texttt{ipconfig} → Wi-Fi/Ethernet-ийн IPv4 (SETUP А.5)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{\textless{}PI\_\allowbreak{}IP\textgreater{}}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+жишээ \texttt{192.168.1.57}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{{[}Pi-1{]}} \texttt{hostname\ -I} → эхний хаяг\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+\begin{quote}
+⚠ IP хаяг сүлжээ солих, router restart хийхэд \textbf{өөрчлөгдөж болно}. Өнөөдрийн утгыг дахин шалга.
+\end{quote}
+
+\hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux448ux430ux43bux433ux430ux43bux442}{%
+\subsection{0.3 Урьдчилсан шалгалт}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux448ux430ux43bux433ux430ux43bux442}}
+
+\textbf{{[}Pi-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ check}
+\FunctionTok{uname}\NormalTok{ {-}m}
+\ExtensionTok{vcgencmd}\NormalTok{ get\_throttled}
+\FunctionTok{grep}\NormalTok{ {-}E }\StringTok{\textquotesingle{}\^{}(CLOUD\_HOST|DEVICE\_ID)=\textquotesingle{}}\NormalTok{ .env}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \textbf{Шалгах:}
 
 \begin{itemize}
 \tightlist
 \item
-  {[}Pi{]} \texttt{uname\ -m} → \texttt{aarch64}
+  \texttt{make\ check}-ийн бүх мөр \texttt{OK} (swap ≈ 2048 MB),
 \item
-  {[}Pi{]} \texttt{free\ -h} → Swap 2.0Gi, Mem \textasciitilde925Mi
+  \texttt{uname\ -m} → \texttt{aarch64},
 \item
-  {[}Pi{]} \texttt{vcgencmd\ get\_\allowbreak{}throttled} → \texttt{0x0}
+  \texttt{throttled=0x0},
 \item
-  {[}ЗК{]} Docker Desktop-д ≥ 6 GB
-\item
-  {[}ЗК{]} LAN IP мэдэгдэж байгаа
+  \texttt{CLOUD\_\allowbreak{}HOST=\allowbreak{}\textless{}LAPTOP\_\allowbreak{}IP\textgreater{}} (өнөөдрийн IP), \texttt{DEVICE\_\allowbreak{}ID=\allowbreak{}pi3b-team\textless{}NN\textgreater{}}.
 \end{itemize}
+
+✗ \texttt{CLOUD\_HOST} хуучин IP-тэй бол: \texttt{nano\ .env} → засаад хадгал → \texttt{make\ bridge}.
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [Pi] Pi дээр}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ check      }\CommentTok{\# бүгд OK байх ёстой}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ health}
+\ExtensionTok{docker}\NormalTok{ info {-}{-}format }\StringTok{\textquotesingle{}\{\{.MemTotal\}\}\textquotesingle{}} \KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}\{printf "Docker{-}т \%.1f GB\textbackslash{}n", $1/1024/1024/1024\}\textquotesingle{}}
 \end{Highlighting}
 \end{Shaded}
 
-Аль нэг ✘ байвал \textbf{энд зогсоод SETUP.md-д буц}. Лабораторийн 4 цагийг орчин тохируулахад зарцуулж болохгүй.
+✓ Дөрвөн мөр \texttt{200}; Docker-т ≈ 6 GB. \texttt{DOWN} гарвал \texttt{make\ up}, 1 мин хүлээгээд дахин \texttt{make\ health}.
+
+\hypertarget{ux44dux43dux44d-ux43bux430ux431ux434-ux43dux44dux43cux44dux43bux442ux44dux44dux440-ux445ux44dux440ux44dux433ux442ux44dux439-ux445ux44dux440ux44dux433ux441ux43bux4afux4afux434}{%
+\subsection{0.4 Энэ лабд нэмэлтээр хэрэгтэй хэрэгслүүд}\label{ux44dux43dux44d-ux43bux430ux431ux434-ux43dux44dux43cux44dux43bux442ux44dux44dux440-ux445ux44dux440ux44dux433ux442ux44dux439-ux445ux44dux440ux44dux433ux441ux43bux4afux4afux434}}
+
+\texttt{measure\_\allowbreak{}stack.\allowbreak{}sh} нь \texttt{bc}-ийг, Алхам 7 нь \texttt{jq}-ийг ашиглана. Байхгүй бол суулга (байгаа бол \texttt{already\ the\ newest\ version} гэж гарна):
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sudo}\NormalTok{ apt install {-}y bc jq}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{{[}Pi-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sudo}\NormalTok{ apt install {-}y bc jq}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux433ux430ux440ux430ux43bux442ux44bux43d-ux445ux430ux432ux442ux430ux441-ux4afux4afux441ux433ux44dux445}{%
+\subsection{0.5 Гаралтын хавтас үүсгэх}\label{ux433ux430ux440ux430ux43bux442ux44bux43d-ux445ux430ux432ux442ux430ux441-ux4afux4afux441ux433ux44dux445}}
+
+Бүх хэмжилтийн түүхий гаралт \texttt{lab01/out/}-д хадгалагдана --- \textbf{хоёр машин дээр хоёуланд нь} үүсгэ:
+
+\textbf{{[}Pi-1{]}} ба \textbf{{[}ЗК · Ubuntu-1{]}} хоёуланд:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mkdir}\NormalTok{ {-}p \textasciitilde{}/cnc302/lab01/out}
+\end{Highlighting}
+\end{Shaded}
 
 \hypertarget{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}{%
 \section{3. Онолын сануулга}\label{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}}
@@ -71,15 +271,14 @@ IoT лавлах архитектурт өгөгдөл нэг чиглэлд у�
 
 \begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-Асуулт & Ирмэг дээр & Үүл дээр \\
+Асуулт & Ирмэг дээр & Үүл дээр\tabularnewline
 \midrule
 \endhead
+Хэдэн мс дотор хариу хэрэгтэй вэ & \textless{} 100 мс & \textgreater{} 1 сек болно\tabularnewline
+Холбоос тасарвал ажиллах ёстой юу & тийм & үгүй\tabularnewline
+Хэдий хэмжээний өгөгдөл боловсруулах вэ & багахан & асар их\tabularnewline
+Түүх хадгалах уу & үгүй (эсвэл түр) & тийм\tabularnewline
 \bottomrule
-\endlastfoot
-Хэдэн мс дотор хариу хэрэгтэй вэ & \textless{} 100 мс & \textgreater{} 1 сек болно \\
-Холбоос тасарвал ажиллах ёстой юу & тийм & үгүй \\
-Хэдий хэмжээний өгөгдөл боловсруулах вэ & багахан & асар их \\
-Түүх хадгалах уу & үгүй (эсвэл түр) & тийм \\
 \end{longtable}\endgroup
 
 Энэ курсын байрлуулалт яг үүнийг дагана: \textbf{хурдан, локал, тасалдалд тэсвэртэй зүйл Pi дээр; хүнд, түүхэн, харьцуулсан зүйл компьютер дээр.}
@@ -103,25 +302,39 @@ MQTT гүүр бол \textbf{брокер хоорондын клиент хол
 
 Гүүрний гурван чухал тохиргоо (\texttt{edge/\allowbreak{}mosquitto/\allowbreak{}conf.\allowbreak{}d/\allowbreak{}bridge.\allowbreak{}conf}):
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Тохиргоо
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Утга
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Яагаад
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Тохиргоо\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Утга\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Яагаад\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{topic\ cnc302/\allowbreak{}shutis/\allowbreak{}\#\ out\ 1}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+юуг, хаашаа, QoS хэдээр\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+угтвар зөрвөл мессеж \textbf{хэзээ ч} үүлэнд хүрэхгүй\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{cleansession\ false}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+session хадгална\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+тасрахад дараалал үлдэнэ\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{restart\_\allowbreak{}timeout\ 5\ 60}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+дахин холбогдох завсарлага\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+5→60 сек өсөх backoff\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{topic\ cnc302/\allowbreak{}shutis/\allowbreak{}\#\ out\ 1} & юуг, хаашаа, QoS хэдээр & угтвар зөрвөл мессеж \textbf{хэзээ ч} үүлэнд хүрэхгүй \\
-\texttt{cleansession\ false} & session хадгална & тасрахад дараалал үлдэнэ \\
-\texttt{restart\_\allowbreak{}timeout\ 5\ 60} & дахин холбогдох завсарлага & 5→60 сек өсөх backoff \\
 \end{longtable}\endgroup
 
 \hypertarget{ux441ux430ux43dux430ux445-ux43eux439ux43d-ux445ux44fux437ux433ux430ux430ux440-ux431ux43eux43b-ux430ux440ux445ux438ux442ux435ux43aux442ux443ux440ux44bux43d-ux445ux44fux437ux433ux430ux430ux440}{%
@@ -137,39 +350,60 @@ ThingsBoard-ын албан ёсны суулгах зааварт хөгжүү�
 
 Юу ч асаахаас өмнө \textbf{хоосон Pi-гийн төлөвийг} бичиж авна. Дараагийн бүх тоо үүнтэй харьцуулагдана.
 
+\textbf{1.1 Pi дээрх илүүдэл процессыг зогсоох.} VS Code-ийн Remote-SSH сервер 150--250 MiB иддэг тул хэмжилтийн өмнө \textbf{заавал} зогсооно. Ирмэгийн стек асаалттай байвал түүнийг ч зогсооно:
+
+\textbf{{[}Pi-1{]}}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\ExtensionTok{pkill} \AttributeTok{{-}f}\NormalTok{ vscode{-}server           }\CommentTok{\# VS Code сервер 150–250 MiB иднэ!}
-\FunctionTok{sleep}\NormalTok{ 3}
-\ExtensionTok{./tools/measure\_stack.sh} \AttributeTok{{-}{-}role}\NormalTok{ edge}
+\ExtensionTok{pkill}\NormalTok{ {-}f vscode{-}server}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ down}
+\FunctionTok{sleep}\NormalTok{ 10}
 \end{Highlighting}
 \end{Shaded}
 
-Гаралтаас дараах хүснэгтийг бөглө:
+\texttt{pkill} юу ч олоогүй бол чимээгүй өнгөрнө --- хэвийн. VS Code-оор Pi-д холбогдсон байсан бол VS Code-ийн цонхоо хаа.
+
+\textbf{1.2 Суурь хэмжилт.}
+
+\textbf{{[}Pi-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\VariableTok{OUTDIR=}\NormalTok{lab01/out }\FunctionTok{bash}\NormalTok{ tools/measure\_stack.sh {-}{-}role edge }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab01/out/01{-}edge{-}baseline.txt}
+\ExtensionTok{vcgencmd}\NormalTok{ get\_mem gpu }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ {-}a lab01/out/01{-}edge{-}baseline.txt}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \textbf{Шалгах:} \texttt{ҮҮРЭГ\ :\allowbreak{}\ edge\ —\ Raspberry\ Pi\ 3B} гэсэн толгойтой тайлан хэвлэгдэж, \texttt{Throttle\ :\ 0x0} ба \texttt{✓\ Хэвийн} гэж гарна. \texttt{(ажиллаж\ буй\ cnc302-edge\ контейнер\ алга)} гэвэл \textbf{зөв} --- бид хоосон Pi-г хэмжиж байна.
+
+✗ \texttt{bc:\allowbreak{}\ command\ not\ found} → §0.4. \texttt{⚠\ THROTTLE\ ИЛЭРСЭН} → тэжээлээ солих хүртэл хэмжилт хүчингүй (§8).
+
+\textbf{1.3 Хүснэгт 1.1-ийг бөглө.} Утга бүрийг тайлангийн аль мөрөөс авахыг "Хаанаас" баганад заасан:
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-1.1-pi-3b-ux433ux438ux439ux43d-ux441ux443ux443ux440ux44c-ux442ux4e9ux43bux4e9ux432-ux44eux443-ux447-ux430ux436ux438ux43bux43bux430ux430ux433ux4afux439}{%
 \subsubsection{Хүснэгт 1.1 --- Pi 3B-гийн суурь төлөв (юу ч ажиллаагүй)}\label{ux445ux4afux441ux43dux44dux433ux442-1.1-pi-3b-ux433ux438ux439ux43d-ux441ux443ux443ux440ux44c-ux442ux4e9ux43bux4e9ux432-ux44eux443-ux447-ux430ux436ux438ux43bux43bux430ux430ux433ux4afux439}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-Хэмжигдэхүүн & Утга & Тэмдэглэл \\
+Хэмжигдэхүүн & Утга & Хаанаас & Тэмдэглэл\tabularnewline
 \midrule
 \endhead
+Pi загвар & & \texttt{Модель\ :} & \texttt{Raspberry\ Pi\ 3\ Model\ B\ \ldots{}}\tabularnewline
+\texttt{MemTotal} (MiB) & & \texttt{Санах\ ой\ :} --- "нийт" & \textasciitilde925 хүлээгдэнэ\tabularnewline
+\texttt{MemAvailable} (MiB) & & \texttt{Санах\ ой\ :} --- "боломжтой" &\tabularnewline
+Swap ашигласан (MiB) & & \texttt{Swap\ :} & 0 байх ёстой\tabularnewline
+CPU температур (°C) & & \texttt{Температур\ :} &\tabularnewline
+\texttt{get\_throttled} & & \texttt{Throttle\ :} & \textbf{0x0} байх ёстой\tabularnewline
+\texttt{gpu\_mem} & & \texttt{gpu=\ldots{}M} (сүүлийн мөр) & SETUP Б.3 хийсэн бол \texttt{16M}\tabularnewline
+microSD чөлөөтэй (GB) & & \texttt{microSD\ :} --- "сул" &\tabularnewline
+Ачаалал (1 мин) & & \texttt{Ачаалал\ :} --- эхний тоо &\tabularnewline
 \bottomrule
-\endlastfoot
-Pi загвар & & \texttt{Raspberry\ Pi\ 3\ Model\ B\ …} \\
-\texttt{MemTotal} (MiB) & & \textasciitilde925 хүлээгдэнэ \\
-\texttt{MemAvailable} (MiB) & & \\
-Swap ашигласан (MiB) & & 0 байх ёстой \\
-CPU температур (°C) & & \\
-\texttt{get\_throttled} & & \textbf{0x0} байх ёстой \\
-microSD чөлөөтэй (GB) & & \\
-Ачаалал (1 мин) & & \\
 \end{longtable}\endgroup
 
 \begin{quote}
-\textbf{\texttt{gpu\_mem} шалгалт:} \texttt{vcgencmd\ get\_\allowbreak{}mem\ gpu}-ийн утгыг (GPU-д хуваарилсан санах ой) хүснэгтэд бич. SETUP.md Б.3 хийсэн бол \texttt{16M} гарна. Албан ёсны баримтаар 1 GB-тай загварт \texttt{gpu\_mem}-ийн анхдагч утга нь \texttt{76}. Гэхдээ Raspberry Pi-гийн баримт \texttt{gpu\_mem}-ийг «legacy» тохиргоонд ангилж, \emph{Bookworm болон түүнээс хойшхи Raspberry Pi OS дээр албан ёсоор дэмжигдэхгүй} гэж тэмдэглэсэн. Тиймээс хэдэн MiB «хэмнэснийг» таамаглах биш, \texttt{MemTotal}-ийг өөрчлөхийн өмнөх ба дараах утгатай харьцуулж \textbf{хэмжинэ}.
+\textbf{\texttt{gpu\_mem} шалгалт:} SETUP.md Б.3 хийсэн бол \texttt{16M} гарна. Албан ёсны баримтаар 1 GB-тай загварт \texttt{gpu\_mem}-ийн анхдагч утга нь \texttt{76}. Гэхдээ Raspberry Pi-гийн баримт \texttt{gpu\_mem}-ийг «legacy» тохиргоонд ангилж, \emph{Bookworm болон түүнээс хойшхи Raspberry Pi OS дээр албан ёсоор дэмжигдэхгүй} гэж тэмдэглэсэн. Тиймээс хэдэн MiB «хэмнэснийг» таамаглах биш, SETUP Б.3-т тэмдэглэсэн өмнөх \texttt{MemTotal}-тай харьцуулж \textbf{хэмжинэ}.
 
 Албан ёсны баримт: \href{https://www.raspberrypi.com/documentation/computers/os.html\#vcgencmd}{vcgencmd --- get\_\allowbreak{}mem, get\_\allowbreak{}throttled} · \href{https://www.raspberrypi.com/documentation/computers/legacy_config_txt.html\#gpu_mem}{Legacy config.\allowbreak{}txt --- gpu\_\allowbreak{}mem}
 \end{quote}
@@ -177,17 +411,39 @@ microSD чөлөөтэй (GB) & & \\
 \hypertarget{ux430ux43bux445ux430ux43c-2-ux4afux4afux43bux43dux438ux439-ux434ux430ux432ux445ux430ux440ux433ux44bux433-ux430ux441ux430ux430ux445-ux431ux430-ux445ux44dux43cux436ux438ux445-35-ux43cux438ux43d-ux437ux43a}{%
 \subsection{Алхам 2 --- Үүлний давхаргыг асаах ба хэмжих (35 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-2-ux4afux4afux43bux43dux438ux439-ux434ux430ux432ux445ux430ux440ux433ux44bux433-ux430ux441ux430ux430ux445-ux431ux430-ux445ux44dux43cux436ux438ux445-35-ux43cux438ux43d-ux437ux43a}}
 
+\textbf{2.1 Docker Desktop ажиллаж байгааг шалга.} Docker Desktop-ийн зүүн доод буланд \texttt{Engine\ running} (ногоон).
+
+\textbf{2.2 Эхлэх хугацааг хэмжих.} \texttt{-\/-startup} горим нь core стекийг \textbf{бүрэн зогсоож} (өгөгдөл устахгүй), дахин асааж, үйлчилгээ бүр \textbf{healthy} болох хүртэлх хугацааг хэмжинэ (1--3 мин):
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack}
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core down }\DecValTok{2}\OperatorTok{\textgreater{}}\NormalTok{/dev/null}
-\ExtensionTok{../tools/measure\_stack.sh} \AttributeTok{{-}{-}role}\NormalTok{ cloud }\AttributeTok{{-}{-}startup}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\VariableTok{OUTDIR=}\NormalTok{lab01/out }\FunctionTok{bash}\NormalTok{ tools/measure\_stack.sh {-}{-}role cloud {-}{-}startup }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab01/out/02{-}cloud{-}startup.txt}
 \end{Highlighting}
 \end{Shaded}
 
-\texttt{-\/-startup} нь \texttt{docker\ compose\ -\/\allowbreak{}-profile\ core\ up\ -d} ажиллуулж, үйлчилгээ бүрийн \textbf{эрүүл болох хүртэлх} хугацааг хэмжинэ. \texttt{profiles} шинж өгсөн үйлчилгээ зөвхөн тухайн профайлыг \texttt{-\/-profile}-оор идэвхжүүлсэн үед асна.
+✓ \textbf{Шалгах:} \texttt{→\ Бүх\ үйлчилгээ\ healthy\ болтол\ хүлээж\ байна\ldots{}} гэсний дараа \texttt{→\ Нийт\ бэлэн\ болох\ хугацаа:\allowbreak{}\ NN\ сек} ба \texttt{→\ Бичигдлээ:\allowbreak{}\ lab01/\allowbreak{}out/\allowbreak{}startup-cloud-\ldots{}.\allowbreak{}csv} гарна.
+
+✗ Удаан хүлээгээд \texttt{unhealthy} гарвал: \texttt{cd\ stack\ \&\allowbreak{}\&\allowbreak{}\ docker\ compose\ ps} → аль үйлчилгээ асахгүй байгааг ол → \texttt{make\ logs\ S=\allowbreak{}\textless{}нэр\textgreater{}}.
+
+\textbf{2.3 RAM ба CPU-г хэмжих.} Эхлэх хугацааны дараа стек "тайвширтал" 1 минут хүлээгээд:
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sleep}\NormalTok{ 60}
+\VariableTok{OUTDIR=}\NormalTok{lab01/out }\FunctionTok{bash}\NormalTok{ tools/measure\_stack.sh {-}{-}role cloud }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab01/out/02{-}cloud{-}snapshot.txt}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{2.4 Хүснэгт 1.2-ыг бөглө.} "Эхэлсэн/Эрүүл болсон" нь \texttt{startup-cloud-\ldots{}.\allowbreak{}csv}-аас (\texttt{cat\ lab01/\allowbreak{}out/\allowbreak{}startup-cloud-*.\allowbreak{}csv}), RAM ба CPU нь \texttt{02-cloud-snapshot.\allowbreak{}txt}-ын \texttt{docker\ stats} хэсгээс.
 
 \begin{quote}
+\texttt{profiles} шинж өгсөн үйлчилгээ зөвхөн тухайн профайлыг \texttt{-\/-profile}-оор идэвхжүүлсэн үед асна --- тиймээс Node-RED, Dex, Ollama энд асахгүй.
+
 Албан ёсны баримт: \href{https://docs.docker.com/compose/how-tos/profiles/}{Using profiles with Compose}
 \end{quote}
 
@@ -196,83 +452,143 @@ microSD чөлөөтэй (GB) & & \\
 
 \begingroup\scriptsize\begin{longtable}[]{@{}lllll@{}}
 \toprule
-Үйлчилгээ & Эхэлсэн (сек) & Эрүүл болсон (сек) & RAM (MiB) & CPU \% \\
+Үйлчилгээ & Эхэлсэн (сек) & Эрүүл болсон (сек) & RAM (MiB) & CPU \%\tabularnewline
 \midrule
 \endhead
+emqx & & & &\tabularnewline
+influxdb & & & &\tabularnewline
+grafana & & & &\tabularnewline
+registry & & & &\tabularnewline
+\textbf{Нийт} & & & &\tabularnewline
 \bottomrule
-\endlastfoot
-emqx & & & & \\
-influxdb & & & & \\
-grafana & & & & \\
-registry & & & & \\
-\textbf{Нийт} & & & & \\
 \end{longtable}\endgroup
 
-Шалгах:
+\textbf{2.5 Шалгах ба хөтчөөр нээх.}
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{make}\NormalTok{ health              }\CommentTok{\# бүх мөр 200}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack}
+\FunctionTok{make}\NormalTok{ health}
 \ExtensionTok{docker}\NormalTok{ compose ps}
 \end{Highlighting}
 \end{Shaded}
 
-Хөтчөөр нээ:
+✓ Дөрвөн мөр \texttt{200}; \texttt{docker\ compose\ ps}-д дөрвөн контейнер \texttt{Up\ (healthy)}.
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+Windows-ийн хөтчөөр нээж, \textbf{нэвтэрч чадаж байгаагаа} шалга:
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Үйлчилгээ
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хаяг
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Нэвтрэх
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Үйлчилгээ\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Хаяг\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Нэвтрэх\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+EMQX самбар (dashboard)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+http://localhost:18083\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{admin} / \texttt{stack/.env}-ийн \texttt{EMQX\_\allowbreak{}DASHBOARD\_\allowbreak{}PASSWORD}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Grafana\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+http://localhost:3000\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{admin} / \texttt{stack/.env}-ийн \texttt{GRAFANA\_\allowbreak{}PASSWORD}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+InfluxDB\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+http://localhost:8181/health\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+--- (\texttt{OK} гэх мэт хариу)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Бүртгэл\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+http://localhost:8090/health\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+--- (JSON хариу)\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-EMQX самбар (dashboard) & http://localhost:18083 & admin / \texttt{.env}-ийн \texttt{EMQX\_\allowbreak{}DASHBOARD\_\allowbreak{}PASSWORD} \\
-Grafana & http://localhost:3000 & admin / \texttt{.env}-ийн нууц үг \\
-InfluxDB & http://localhost:8181/health & --- \\
-Бүртгэл & http://localhost:8090/health & --- \\
 \end{longtable}\endgroup
 
-\hypertarget{ux430ux43bux445ux430ux43c-3-ux438ux440ux43cux44dux433ux438ux439ux43d-ux434ux430ux432ux445ux430ux440ux433ux44bux433-ux430ux441ux430ux430ux445-25-ux43cux438ux43d-pi}{%
-\subsection{Алхам 3 --- Ирмэгийн давхаргыг асаах (25 мин) {[}Pi{]}}\label{ux430ux43bux445ux430ux43c-3-ux438ux440ux43cux44dux433ux438ux439ux43d-ux434ux430ux432ux445ux430ux440ux433ux44bux433-ux430ux441ux430ux430ux445-25-ux43cux438ux43d-pi}}
+\begin{quote}
+☞ Нууц үгээ мартсан бол: \textbf{{[}ЗК · Ubuntu-1{]}} \texttt{grep\ -E\ \textquotesingle{}PASSWORD\textquotesingle{}\ \textasciitilde{}/cnc302/stack/.env}.
+\end{quote}
+
+\hypertarget{ux430ux43bux445ux430ux43c-3-ux438ux440ux43cux44dux433ux438ux439ux43d-ux434ux430ux432ux445ux430ux440ux433ux44bux433-ux430ux441ux430ux430ux445-25-ux43cux438ux43d-piux437ux43a}{%
+\subsection{Алхам 3 --- Ирмэгийн давхаргыг асаах (25 мин) {[}Pi{]}{[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-3-ux438ux440ux43cux44dux433ux438ux439ux43d-ux434ux430ux432ux445ux430ux440ux433ux44bux433-ux430ux441ux430ux430ux445-25-ux43cux438ux43d-piux437ux43a}}
+
+\textbf{3.1 Гүүрний тохиргоог шинэчлээд mosquitto-г асаах.}
+
+\textbf{{[}Pi-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge}
-\FunctionTok{cat}\NormalTok{ .env }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ CLOUD\_HOST       }\CommentTok{\# компьютерийн LAN IP мөн үү?}
+\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}CLOUD\_HOST=\textquotesingle{}}\NormalTok{ .env}
 \FunctionTok{make}\NormalTok{ bridge}
 \FunctionTok{make}\NormalTok{ up}
 \end{Highlighting}
 \end{Shaded}
 
-Гүүр холбогдсоныг \textbf{хоёр талаас} батал:
+✓ \textbf{Шалгах:}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{CLOUD\_HOST=} нь өнөөдрийн \texttt{\textless{}LAPTOP\_\allowbreak{}IP\textgreater{}} (§0.2),
+\item
+  \texttt{✓\ mosquitto/\allowbreak{}conf.\allowbreak{}d/\allowbreak{}bridge.\allowbreak{}conf\ үүслээ\ \ →\ \ \textless{}LAPTOP\_\allowbreak{}IP\textgreater{}:\allowbreak{}1883},
+\item
+  \texttt{docker\ compose\ ps}-д \texttt{mosquitto} → \texttt{Up}.
+\end{itemize}
+
+\textbf{3.2 Гүүр холбогдсоныг Pi талаас батлах.}
+
+\textbf{{[}Pi-2{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [Pi] Pi дээр}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge}
 \FunctionTok{make}\NormalTok{ link}
-\CommentTok{\# → cnc302/shutis/mhts/lab/pi3b{-}01/bridge/state 1}
 \end{Highlighting}
 \end{Shaded}
+
+✓ Хэдэн секундын дотор:
+
+\begin{verbatim}
+cnc302/shutis/mhts/lab/pi3b-team<NN>/bridge/state 1
+\end{verbatim}
+
+\texttt{1} = холбогдсон. Энэ цонхыг \textbf{нээлттэй үлдээ} --- Алхам 4 хүртэл гүүрний төлөвийг харуулна.
+
+✗ \texttt{0} эсвэл юу ч гарахгүй бол → \texttt{docs/\allowbreak{}troubleshooting.\allowbreak{}md} §1 (ихэвчлэн \texttt{CLOUD\_HOST} буруу эсвэл Windows-ийн галт хана --- SETUP А.6).
+
+\textbf{3.3 Үүлний талаас сонсох.}
+
+\textbf{{[}ЗК · Ubuntu-2{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [ЗК] компьютер дээр}
-\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/\#\textquotesingle{}} \AttributeTok{{-}v}
+\ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}cnc302/\#\textquotesingle{}}\NormalTok{ {-}v}
 \end{Highlighting}
 \end{Shaded}
 
-\texttt{1} гарахгүй бол \texttt{docs/\allowbreak{}troubleshooting.\allowbreak{}md} §1.
+Энэ цонх \textbf{нээлттэй хүлээж} байна --- хааж болохгүй.
 
-Одоо ирмэгийн агентыг ажиллуул ({[}Pi{]} өөр терминал):
+\textbf{3.4 Ирмэгийн агентыг ажиллуулах.}
+
+\textbf{{[}Pi-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -280,27 +596,49 @@ InfluxDB & http://localhost:8181/health & --- \\
 \end{Highlighting}
 \end{Shaded}
 
-Компьютер дээрх \texttt{mosquitto\_sub} цонхонд телеметр урсаж эхлэх ёстой. \textbf{Хэрэв урсахгүй бол \texttt{docs/\allowbreak{}troubleshooting.\allowbreak{}md} §2 --- сэдвийн угтвар.}
+✓ \textbf{Шалгах:} \textbf{{[}ЗК · Ubuntu-2{]}} цонхонд 2 секунд тутам
+
+\begin{verbatim}
+cnc302/shutis/mhts/lab/pi3b-team<NN>/… {"…": …}
+\end{verbatim}
+
+хэлбэрийн мөр урсаж эхэлнэ. 30 секунд орчим тутам \texttt{\ldots{}/health} сэдэвтэй мөр (\texttt{cpu\_\allowbreak{}temp\_\allowbreak{}c}, \texttt{mem\_\allowbreak{}available\_\allowbreak{}mb} агуулсан) гарна.
+
+✗ Pi-1 дээр агент ажиллаж байгаа ч Ubuntu-2-т юу ч гарахгүй бол → \texttt{docs/\allowbreak{}troubleshooting.\allowbreak{}md} §2 (сэдвийн угтвар \texttt{SITE} зөрсөн).
+
+\textbf{3.5 Ирмэгийн нөөцийг хэмжих.} Агент ажиллаж байх үед (Pi-1-ийг бүү зогсоо):
+
+\textbf{{[}Pi-2{]}} --- эхлээд \texttt{make\ link}-ийг \texttt{Ctrl\ +\ C}-ээр зогсоогоод:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\VariableTok{OUTDIR=}\NormalTok{lab01/out }\FunctionTok{bash}\NormalTok{ tools/measure\_stack.sh {-}{-}role edge }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab01/out/03{-}edge{-}running.txt}
+\FunctionTok{ps}\NormalTok{ {-}o pid,rss,pcpu,cmd {-}C python3 }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ edge\_agent}
+\FunctionTok{ps}\NormalTok{ {-}o pid,rss,pcpu,cmd {-}C dockerd}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{ps}-ийн \texttt{RSS} багана \textbf{KiB}-ээр --- MiB болгохын тулд 1024-д хуваа.
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-1.3-ux438ux440ux43cux44dux433ux438ux439ux43d-ux4afux439ux43bux447ux438ux43bux433ux44dux44dux43dux438ux439-ux43dux4e9ux4e9ux446}{%
 \subsubsection{Хүснэгт 1.3 --- Ирмэгийн үйлчилгээний нөөц}\label{ux445ux4afux441ux43dux44dux433ux442-1.3-ux438ux440ux43cux44dux433ux438ux439ux43d-ux4afux439ux43bux447ux438ux43bux433ux44dux44dux43dux438ux439-ux43dux4e9ux4e9ux446}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-Хэсэг & RAM (MiB) & CPU \% & Тэмдэглэл \\
+Хэсэг & RAM (MiB) & CPU \% & Хаанаас\tabularnewline
 \midrule
 \endhead
+mosquitto & & & \texttt{03-edge-running.\allowbreak{}txt} → \texttt{docker\ stats} хэсэг\tabularnewline
+ирмэгийн агент & & & \texttt{ps\ \ldots{}\ edge\_\allowbreak{}agent} → RSS / 1024\tabularnewline
+Docker демон & & & \texttt{ps\ \ldots{}\ dockerd} → RSS / 1024\tabularnewline
+\textbf{Нийт нэмэгдсэн} & & & Хүснэгт 1.1-ийн \texttt{MemAvailable} − одоогийн \texttt{MemAvailable}\tabularnewline
+\textbf{Үлдэгдэл \texttt{MemAvailable}} & & & \texttt{03-edge-running.\allowbreak{}txt} → \texttt{Санах\ ой\ :} "боломжтой"\tabularnewline
 \bottomrule
-\endlastfoot
-mosquitto & & & \\
-ирмэгийн агент & & & \\
-Docker демон & & & \\
-\textbf{Нийт нэмэгдсэн} & & & Хүснэгт 1.1-тэй харьцуул \\
-\textbf{Үлдэгдэл \texttt{MemAvailable}} & & & \\
 \end{longtable}\endgroup
 
-\hypertarget{ux430ux43bux445ux430ux43c-4-ux433ux4afux4afux440ux43dux438ux439-ux441ux430ux430ux442ux43bux44bux433-ux445ux44dux43cux436ux438ux445-40-ux43cux438ux43d-piux437ux43a}{%
-\subsection{Алхам 4 --- Гүүрний саатлыг хэмжих (40 мин) {[}Pi{]}{[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-4-ux433ux4afux4afux440ux43dux438ux439-ux441ux430ux430ux442ux43bux44bux433-ux445ux44dux43cux436ux438ux445-40-ux43cux438ux43d-piux437ux43a}}
+\hypertarget{ux430ux43bux445ux430ux43c-4-ux433ux4afux4afux440ux43dux438ux439-ux441ux430ux430ux442ux43bux44bux433-ux445ux44dux43cux436ux438ux445-40-ux43cux438ux43d-pi}{%
+\subsection{Алхам 4 --- Гүүрний саатлыг хэмжих (40 мин) {[}Pi{]}}\label{ux430ux43bux445ux430ux43c-4-ux433ux4afux4afux440ux43dux438ux439-ux441ux430ux430ux442ux43bux44bux433-ux445ux44dux43cux436ux438ux445-40-ux43cux438ux43d-pi}}
 
 Гурван замын саатлыг харьцуулна. Энэ бол Лаб 3-ын бүрэн хэмжилтийн \textbf{урьдчилсан хувилбар}.
 
@@ -310,36 +648,65 @@ Docker демон & & & \\
 \caption{Зураг 1.2 --- Саатлын гурван зам: loopback, LAN, гүүр}
 \end{figure}
 
-\texttt{qos\_latency.py} нь нийтлэгч ба захиалагчийг \textbf{нэг процесс} дотор ажиллуулдаг тул хоёр машины цагийн зөрүү (clock skew) хэмжилтэд орохгүй.
+\texttt{qos\_latency.py} нь нийтлэгч ба захиалагчийг \textbf{нэг процесс} дотор ажиллуулдаг тул хоёр машины цагийн зөрүү (clock skew) хэмжилтэд орохгүй. Хэмжилт бүр 300 мессеж × 0.05 сек ≈ \textbf{15 сек} үргэлжилнэ.
 
-\textbf{А. Loopback (сүлжээгүй)} --- {[}Pi{]} Pi дээр, Pi-гийн өөрийн брокер руу:
+\textbf{4.1 Агентыг түр зогсоох.} Агентын урсгал хэмжилтэд саад болохгүйн тулд \textbf{{[}Pi-1{]}}-д \texttt{Ctrl\ +\ C} дар (mosquitto ба гүүр ажилласаар байна).
+
+\textbf{4.2 Орчноо бэлтгэх.} Pi дээр Python-ийн \texttt{paho-mqtt} зөвхөн \textbf{ирмэгийн venv} дотор суусан тул \texttt{python3} биш, \texttt{edge/\allowbreak{}.\allowbreak{}venv/\allowbreak{}bin/\allowbreak{}python}-ыг ашиглана:
+
+\textbf{{[}Pi-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\BuiltInTok{export} \VariableTok{CLOUD\_HOST}\OperatorTok{=}\VariableTok{$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}CLOUD\_HOST=\textquotesingle{}}\NormalTok{ edge/.env }\KeywordTok{|} \FunctionTok{cut} \AttributeTok{{-}d}\OperatorTok{=} \AttributeTok{{-}f2}\VariableTok{)}   \CommentTok{\# Б, В{-}д хэрэгтэй}
-\ExtensionTok{python3}\NormalTok{ tools/qos\_latency.py }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\AttributeTok{{-}{-}port}\NormalTok{ 1883 }\DataTypeTok{\textbackslash{}}
-        \AttributeTok{{-}{-}path}\NormalTok{ loopback }\AttributeTok{{-}{-}qos}\NormalTok{ 1 }\AttributeTok{{-}{-}count}\NormalTok{ 300 }\AttributeTok{{-}{-}interval}\NormalTok{ 0.05}
+\VariableTok{PY=}\NormalTok{edge/.venv/bin/python}
+\BuiltInTok{export} \VariableTok{CLOUD\_HOST=$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}CLOUD\_HOST=\textquotesingle{}}\NormalTok{ edge/.env }\KeywordTok{|} \FunctionTok{cut}\NormalTok{ {-}d= {-}f2}\VariableTok{)}
+\BuiltInTok{export} \VariableTok{DEVICE\_ID=$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}DEVICE\_ID=\textquotesingle{}}\NormalTok{ edge/.env }\KeywordTok{|} \FunctionTok{cut}\NormalTok{ {-}d= {-}f2}\VariableTok{)}
+\BuiltInTok{echo} \StringTok{"үүл=}\VariableTok{$CLOUD\_HOST}\StringTok{  төхөөрөмж=}\VariableTok{$DEVICE\_ID}\StringTok{"}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{Б. LAN (шууд үүл рүү, гүүрийг тойрч)} --- {[}Pi{]} Pi дээр:
+✓ \texttt{үүл=\allowbreak{}192.\allowbreak{}168.\allowbreak{}1.\allowbreak{}100\ \ төхөөрөмж=\allowbreak{}pi3b-team07} (өөрийн утгаар) хэвлэгдэнэ. \textbf{Хоосон} бол \texttt{.env}-ээ шалга.
+
+\begin{quote}
+⚠ Эдгээр хувьсагч зөвхөн \textbf{энэ цонхонд} хүчинтэй. Цонх хаагдвал эсвэл SSH тасарвал 4.2-ыг дахин ажиллуул.
+\end{quote}
+
+\textbf{4.3 А. Loopback (сүлжээгүй)} --- нийтлэгч ба захиалагч хоёулаа Pi-гийн өөрийн брокерт:
+
+\textbf{{[}Pi-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ tools/qos\_latency.py }\AttributeTok{{-}{-}host} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}{-}port}\NormalTok{ 1883 }\DataTypeTok{\textbackslash{}}
-        \AttributeTok{{-}{-}path}\NormalTok{ lan }\AttributeTok{{-}{-}qos}\NormalTok{ 1 }\AttributeTok{{-}{-}count}\NormalTok{ 300 }\AttributeTok{{-}{-}interval}\NormalTok{ 0.05}
+\VariableTok{$PY} \ExtensionTok{tools/qos\_latency.py}\NormalTok{ {-}{-}host localhost {-}{-}port 1883 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}path}\NormalTok{ loopback {-}{-}qos 1 {-}{-}count 300 {-}{-}interval 0.05 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}csv}\NormalTok{ lab01/out/04{-}latency{-}loopback.csv}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{В. Гүүрээр} --- {[}Pi{]} Pi дээр. Нийтлэгч Pi-гийн mosquitto руу бичнэ, мессеж гүүрээр EMQX-д очно, захиалагч EMQX-ээс уншина. Сэдэв нь гүүрийн \texttt{topic\ cnc302/\allowbreak{}shutis/\allowbreak{}\#\ out\ 1} дүрэмд \textbf{заавал} багтах ёстой --- эс бөгөөс мессеж Pi-гаас гарахгүй:
+\textbf{4.4 Б. LAN (шууд үүл рүү, гүүрийг тойрч)} --- Pi-гаас EMQX руу:
+
+\textbf{{[}Pi-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ tools/qos\_latency.py }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\AttributeTok{{-}{-}port}\NormalTok{ 1883 }\DataTypeTok{\textbackslash{}}
-        \AttributeTok{{-}{-}sub{-}host} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}{-}sub{-}port}\NormalTok{ 1883 }\DataTypeTok{\textbackslash{}}
-        \AttributeTok{{-}{-}topic}\NormalTok{ cnc302/shutis/mhts/lab/pi3b{-}01/bench }\DataTypeTok{\textbackslash{}}
-        \AttributeTok{{-}{-}path}\NormalTok{ bridge }\AttributeTok{{-}{-}qos}\NormalTok{ 1 }\AttributeTok{{-}{-}count}\NormalTok{ 300 }\AttributeTok{{-}{-}interval}\NormalTok{ 0.05}
+\VariableTok{$PY} \ExtensionTok{tools/qos\_latency.py}\NormalTok{ {-}{-}host }\VariableTok{$CLOUD\_HOST}\NormalTok{ {-}{-}port 1883 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}path}\NormalTok{ lan {-}{-}qos 1 {-}{-}count 300 {-}{-}interval 0.05 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}csv}\NormalTok{ lab01/out/04{-}latency{-}lan.csv}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{4.5 В. Гүүрээр} --- нийтлэгч Pi-гийн mosquitto руу бичнэ, мессеж гүүрээр EMQX-д очно, захиалагч EMQX-ээс уншина. Сэдэв нь гүүрийн \texttt{topic\ cnc302/\allowbreak{}shutis/\allowbreak{}\#\ out\ 1} дүрэмд \textbf{заавал} багтах ёстой --- эс бөгөөс мессеж Pi-гаас гарахгүй:
+
+\textbf{{[}Pi-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{$PY} \ExtensionTok{tools/qos\_latency.py}\NormalTok{ {-}{-}host localhost {-}{-}port 1883 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}sub{-}host} \VariableTok{$CLOUD\_HOST}\NormalTok{ {-}{-}sub{-}port 1883 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}topic}\NormalTok{ cnc302/shutis/mhts/lab/}\VariableTok{$DEVICE\_ID}\NormalTok{/bench }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}path}\NormalTok{ bridge {-}{-}qos 1 {-}{-}count 300 {-}{-}interval 0.05 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}csv}\NormalTok{ lab01/out/04{-}latency{-}bridge.csv}
 \end{Highlighting}
 \end{Shaded}
 
@@ -347,89 +714,221 @@ Docker демон & & & \\
 Санамж: \texttt{-\/-sub-host}-гүйгээр \texttt{-\/\allowbreak{}-host\ localhost} гэж ажиллуулбал нийтлэгч, захиалагч хоёулаа Pi-гийн брокерт холбогдоно --- энэ нь гүүр биш, loopback-ийг дахин хэмжинэ.
 \end{quote}
 
+✓ \textbf{Шалгах (4.3--4.5 бүрт):} \texttt{Зам\ \ QoS\ \ Sub\ \ Илгээв\ \ Ирсэн\ \ldots{}\ \ p99\ мс\ \ max\ мс} толгойтой хүснэгт хэвлэгдэж, \textbf{Илгээв = Ирсэн = 300}, Алдалт\% = 0 орчим байна.
+
+✗ \texttt{ModuleNotFoundError:\ No\ module\ named\ \textquotesingle{}paho\textquotesingle{}} → \texttt{python3} гэж бичсэн байна, \texttt{\$PY} ашигла (4.2). \texttt{АНХААР:\allowbreak{}\ \ldots{}\ бүх\ мессеж\ ирсэнгүй} → 4.5-д гүүр тасарсан эсвэл сэдэв \texttt{cnc302/shutis/}-ээр эхлээгүй; 4.4-т галт хана.
+
+\textbf{4.6 Хүснэгт 1.4-ийг бөглө.} Гурван хэмжилт тус бүр өөрийн CSV файлтай (\texttt{-\/-csv} файлыг дахин бичдэг тул нэр нь өөр): \texttt{cat\ lab01/\allowbreak{}out/\allowbreak{}04-latency-*.\allowbreak{}csv}. Утгыг дэлгэцэнд хэвлэгдсэн хүснэгтээс ч авч болно.
+
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-1.4-ux433ux443ux440ux432ux430ux43d-ux437ux430ux43cux44bux43d-ux441ux430ux430ux442ux430ux43b-qos-1-300-ux43cux435ux441ux441ux435ux436}{%
 \subsubsection{Хүснэгт 1.4 --- Гурван замын саатал (QoS 1, 300 мессеж)}\label{ux445ux4afux441ux43dux44dux433ux442-1.4-ux433ux443ux440ux432ux430ux43d-ux437ux430ux43cux44bux43d-ux441ux430ux430ux442ux430ux43b-qos-1-300-ux43cux435ux441ux441ux435ux436}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}llllll@{}}
 \toprule
-Зам & p50 (мс) & p95 (мс) & \textbf{p99 (мс)} & max (мс) & Алдагдал \% \\
+Зам & p50 (мс) & p95 (мс) & \textbf{p99 (мс)} & max (мс) & Алдагдал \%\tabularnewline
 \midrule
 \endhead
+loopback (Pi доторх) & & & & &\tabularnewline
+LAN (Pi → EMQX) & & & & &\tabularnewline
+гүүрээр & & & & &\tabularnewline
 \bottomrule
-\endlastfoot
-loopback (Pi доторх) & & & & & \\
-LAN (Pi → EMQX) & & & & & \\
-гүүрээр & & & & & \\
 \end{longtable}\endgroup
 
 \begin{quote}
 \textbf{p99 нь гол тоо, дундаж биш.} Pi 3B-гийн Ethernet нь 100 Mb/s (албан ёсны үзүүлэлт), CPU нь 1.2 GHz-ийн 4 цөмт Cortex-A53. Ийм хязгаартай төхөөрөмж дээр p50 сайхан харагдаж байхад саатлын сүүл (p99) хэд дахин том гарч болно. Хэрэглэгчийн мэдэрдэг зүйл нь p99.
 \end{quote}
 
-\hypertarget{ux430ux43bux445ux430ux43c-5-ux43dux4e9ux4e9ux446ux438ux439ux43d-ux445ux44fux437ux433ux430ux430ux440ux44bux433-ux438ux43b-ux433ux430ux440ux433ux430ux445-30-ux43cux438ux43d-pi}{%
-\subsection{Алхам 5 --- Нөөцийн хязгаарыг ил гаргах (30 мин) {[}Pi{]}}\label{ux430ux43bux445ux430ux43c-5-ux43dux4e9ux4e9ux446ux438ux439ux43d-ux445ux44fux437ux433ux430ux430ux440ux44bux433-ux438ux43b-ux433ux430ux440ux433ux430ux445-30-ux43cux438ux43d-pi}}
+\hypertarget{ux430ux43bux445ux430ux43c-5-ux43dux4e9ux4e9ux446ux438ux439ux43d-ux445ux44fux437ux433ux430ux430ux440ux44bux433-ux438ux43b-ux433ux430ux440ux433ux430ux445-30-ux43cux438ux43d-ux437ux43api}{%
+\subsection{Алхам 5 --- Нөөцийн хязгаарыг ил гаргах (30 мин) {[}ЗК{]}{[}Pi{]}}\label{ux430ux43bux445ux430ux43c-5-ux43dux4e9ux4e9ux446ux438ux439ux43d-ux445ux44fux437ux433ux430ux430ux440ux44bux433-ux438ux43b-ux433ux430ux440ux433ux430ux445-30-ux43cux438ux43d-ux437ux43api}}
 
-Виртуал флотыг Pi-гийн брокер руу чиглүүлж, санах ой хаана ханахыг \textbf{бодитоор} үзнэ.
+Компьютерээс виртуал флотыг \textbf{Pi-гийн брокер} руу чиглүүлж, Pi-гийн санах ой хаана ханахыг \textbf{бодитоор} үзнэ. Нэг түвшин = \textbf{2 минут}: флот илгээж байх хооронд Pi дээр хэмжинэ.
+
+\textbf{5.1 Pi дээр хяналтын цонх нээх.} Энэ давталт 5 секунд тутам \texttt{MemAvailable}, swap-ын хөдөлгөөн (\texttt{si}/\allowbreak\texttt{so} --- swap-аас уншсан / swap руу бичсэн, MiB/с), температур ба throttle-ийг нэг мөрөнд хэвлэж, файлд хадгална. Блокийг \texttt{cd}-ээс \texttt{done}-ын мөр хүртэл \textbf{бүтнээр нь} буулга:
+
+\textbf{{[}Pi-2{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [ЗК] компьютер дээрээс Pi{-}гийн брокер руу флот илгээнэ}
-\ExtensionTok{python3}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}host} \OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{ {-}{-}port 1883 }\DataTypeTok{\textbackslash{}}
-        \AttributeTok{{-}{-}target}\NormalTok{ edge }\AttributeTok{{-}{-}devices}\NormalTok{ 50 }\AttributeTok{{-}{-}interval}\NormalTok{ 1.0}
-
-\CommentTok{\# [Pi] зэрэгцүүлэн хэмжинэ}
-\ExtensionTok{./tools/measure\_stack.sh} \AttributeTok{{-}{-}role}\NormalTok{ edge }\AttributeTok{{-}{-}watch}\NormalTok{ 120 5}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\KeywordTok{while} \FunctionTok{true}\KeywordTok{;} \KeywordTok{do}
+  \BuiltInTok{printf} \StringTok{\textquotesingle{}\%s  avail=\%s MiB  \%s  \%s  \%s\textbackslash{}n\textquotesingle{}} \StringTok{"}\VariableTok{$(}\FunctionTok{date}\NormalTok{ +\%T}\VariableTok{)}\StringTok{"} \KeywordTok{\textbackslash{}}
+    \StringTok{"}\VariableTok{$(}\FunctionTok{awk} \StringTok{\textquotesingle{}/MemAvailable/\{print int($2/1024)\}\textquotesingle{}}\NormalTok{ /proc/meminfo}\VariableTok{)}\StringTok{"} \KeywordTok{\textbackslash{}}
+    \StringTok{"}\VariableTok{$(}\FunctionTok{vmstat}\NormalTok{ {-}S M 1 2 }\KeywordTok{|} \FunctionTok{tail}\NormalTok{ {-}1 }\KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}\{print "si="$7" so="$8\}\textquotesingle{}}\VariableTok{)}\StringTok{"} \KeywordTok{\textbackslash{}}
+    \StringTok{"}\VariableTok{$(}\ExtensionTok{vcgencmd}\NormalTok{ measure\_temp}\VariableTok{)}\StringTok{"} \StringTok{"}\VariableTok{$(}\ExtensionTok{vcgencmd}\NormalTok{ get\_throttled}\VariableTok{)}\StringTok{"}
+  \FunctionTok{sleep}\NormalTok{ 4}
+\KeywordTok{done} \KeywordTok{|} \FunctionTok{tee}\NormalTok{ {-}a lab01/out/05{-}monitor.txt}
 \end{Highlighting}
 \end{Shaded}
 
-Төхөөрөмжийн тоог 50 → 100 → 200 болгож давтана. Аль үед \texttt{MemAvailable} 150 MiB-аас доош унах вэ?
+✓ \texttt{14:05:12\ \ avail=610\ MiB\ \ si=0\ so=0\ \ temp=48.3\textquotesingle{}C\ \ throttled=0x0} хэлбэрийн мөр 5 секунд тутам гарна. Энэ цонх Алхам 5 дуустал нээлттэй үлдэнэ.
+
+\textbf{5.2 Суурь (0 төхөөрөмж) мөр.} Флотгүйгээр нэг удаа хэмж:
+
+\textbf{{[}Pi-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\VariableTok{OUTDIR=}\NormalTok{lab01/out }\FunctionTok{bash}\NormalTok{ tools/measure\_stack.sh {-}{-}role edge }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab01/out/05{-}load{-}000.txt}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{5.3 Флот = 50.} Компьютер дээр флот эхлүүл:
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \BuiltInTok{source}\NormalTok{ .venv/bin/activate}
+\ExtensionTok{python}\NormalTok{ tools/sim\_device.py {-}{-}host }\OperatorTok{\textless{}}\NormalTok{PI\_IP}\OperatorTok{\textgreater{}}\NormalTok{ {-}{-}port 1883 }\KeywordTok{\textbackslash{}}
+       \ExtensionTok{{-}{-}target}\NormalTok{ edge {-}{-}devices 50 {-}{-}interval 1.0}
+\end{Highlighting}
+\end{Shaded}
+
+✓ 10 секунд тутам илгээсэн мессежийн статистик хэвлэгдэнэ. Ubuntu-2-ын \texttt{mosquitto\_sub} цонхонд ч мессеж урсана (гүүрээр үүлэнд хүрч байгаа).
+
+✗ \texttt{Connection\ refused} / timeout → \texttt{\textless{}PI\_\allowbreak{}IP\textgreater{}} буруу; \textbf{{[}Pi-1{]}} \texttt{hostname\ -I}-ээр дахин шалга.
+
+30 секунд хүлээгээд, флот \textbf{ажилласаар байх үед} Pi дээр 2 минут хэмж:
+
+\textbf{{[}Pi-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{OUTDIR=}\NormalTok{lab01/out }\FunctionTok{bash}\NormalTok{ tools/measure\_stack.sh {-}{-}role edge {-}{-}watch 120 5 }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab01/out/05{-}load{-}050.txt}
+\end{Highlighting}
+\end{Shaded}
+
+Хэмжилт дууссаны дараа \textbf{{[}ЗК · Ubuntu-1{]}}-д \texttt{Ctrl\ +\ C} дарж флотыг зогсоо.
+
+\textbf{5.4 Флот = 100, 200.} 5.3-ыг \texttt{-\/-devices\ 100}, дараа нь \texttt{-\/-devices\ 200}-аар давтаж, гаралтыг \texttt{05-load-100.txt}, \texttt{05-load-200.txt} гэж хадгал.
+
+\begin{quote}
+⚠ \textbf{Аюулгүйн дүрэм:} \textbf{{[}Pi-2{]}}-ын \texttt{si} эсвэл \texttt{so} 0-ээс их болох, эсвэл \texttt{measure\_\allowbreak{}stack.\allowbreak{}sh} \texttt{⚠⚠\ САНАХ\ ОЙ\ ДУУСАХ\ ДӨХӨЖ\ БАЙНА} гэж анхааруулбал \textbf{тэр даруй флотыг зогсоо} (\texttt{Ctrl\ +\ C}). Тэр бол хязгаар. Цааш шахах нь Pi-г царцаана. Энэ нь алдаа биш, \textbf{хэмжилт} --- тухайн мөрийг хүснэгтэд бичээд дараагийн түвшинд \textbf{бүү} шилж.
+
+Pi царцвал: 2 мин хүлээ → хариу өгөхгүй бол тэжээлийг салгаж залга → \texttt{ssh\ pi} → Алхам 3.1-ээс гүүрээ асаа.
+\end{quote}
+
+\textbf{5.5 Хүснэгт 1.5-ыг бөглө.} Түвшин бүрийн 2 минутын хэмжилтээс:
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+\begin{minipage}[b]{0.47\columnwidth}\raggedright
+Багана\strut
+\end{minipage} & \begin{minipage}[b]{0.47\columnwidth}\raggedright
+Хаанаас\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+mosquitto RAM\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{05-load-NNN.txt} → \texttt{docker\ stats} мөрүүдийн \texttt{cnc302-mosquitto}-ийн хамгийн их утга\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{MemAvailable}, Темп, \texttt{get\_throttled}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\textbf{{[}Pi-2{]}} (\texttt{05-monitor.txt}) --- тухайн 2 минутын хамгийн \textbf{муу} мөр (хамгийн бага \texttt{avail})\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+Swap \texttt{si/so}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\textbf{{[}Pi-2{]}} --- тухайн 2 минутын хамгийн их \texttt{si} ба \texttt{so}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-1.5-ux438ux440ux43cux44dux433ux438ux439ux43d-ux430ux447ux430ux430ux43bux43bux44bux43d-ux445ux430ux440ux438ux443-ux4afux439ux43bux434ux44dux43b}{%
 \subsubsection{Хүснэгт 1.5 --- Ирмэгийн ачааллын хариу үйлдэл}\label{ux445ux4afux441ux43dux44dux433ux442-1.5-ux438ux440ux43cux44dux433ux438ux439ux43d-ux430ux447ux430ux430ux43bux43bux44bux43d-ux445ux430ux440ux438ux443-ux4afux439ux43bux434ux44dux43b}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llllll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Виртуал төхөөрөмж
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-mosquitto RAM (MiB)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\texttt{MemAvailable} (MiB)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Swap \texttt{si/so}
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Темп (°C)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\texttt{get\_throttled}
-\end{minipage} \\
+\begin{minipage}[b]{0.14\columnwidth}\raggedright
+Виртуал төхөөрөмж\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+mosquitto RAM (MiB)\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+\texttt{MemAvailable} (MiB)\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+Swap \texttt{si/so}\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+Темп (°C)\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+\texttt{get\_throttled}\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.14\columnwidth}\raggedright
+0 (суурь)\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright
+50\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright
+100\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright
+200\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-0 (суурь) & & & & & \\
-50 & & & & & \\
-100 & & & & & \\
-200 & & & & & \\
 \end{longtable}\endgroup
 
-\begin{quote}
-⚠ Swap идэвхжвэл (\texttt{si/so} \textgreater{} 0) \textbf{зогсоо}. Тэр бол хязгаар. Цааш шахах нь Pi-г царцаана. Энэ нь алдаа биш, \textbf{хэмжилт}.
-\end{quote}
+Аль түвшинд \texttt{MemAvailable} \textbf{150 MiB}-аас доош унав? Хариултаа тайландаа бич.
 
-\hypertarget{ux430ux43bux445ux430ux43c-6-ux44fux430ux433ux430ux430ux434-ux43fux43bux430ux442ux444ux43eux440ux43cux44bux433-pi-ux434ux44dux44dux440-ux430ux436ux438ux43bux43bux443ux443ux43bux436-ux431ux43eux43bux43eux445ux433ux4afux439-ux432ux44d-20-ux43cux438ux43d}{%
-\subsection{Алхам 6 --- Яагаад платформыг Pi дээр ажиллуулж болохгүй вэ (20 мин)}\label{ux430ux43bux445ux430ux43c-6-ux44fux430ux433ux430ux430ux434-ux43fux43bux430ux442ux444ux43eux440ux43cux44bux433-pi-ux434ux44dux44dux440-ux430ux436ux438ux43bux43bux443ux443ux43bux436-ux431ux43eux43bux43eux445ux433ux4afux439-ux432ux44d-20-ux43cux438ux43d}}
+\textbf{5.6 Цэвэрлэх.} \textbf{{[}Pi-2{]}}-д \texttt{Ctrl\ +\ C} (хяналтын давталтыг зогсооно).
 
-Таамаглах биш, \textbf{тоолох}. {[}ЗК{]} компьютер дээр:
+\hypertarget{ux430ux43bux445ux430ux43c-6-ux44fux430ux433ux430ux430ux434-ux43fux43bux430ux442ux444ux43eux440ux43cux44bux433-pi-ux434ux44dux44dux440-ux430ux436ux438ux43bux43bux443ux443ux43bux436-ux431ux43eux43bux43eux445ux433ux4afux439-ux432ux44d-20-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 6 --- Яагаад платформыг Pi дээр ажиллуулж болохгүй вэ (20 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-6-ux44fux430ux433ux430ux430ux434-ux43fux43bux430ux442ux444ux43eux440ux43cux44bux433-pi-ux434ux44dux44dux440-ux430ux436ux438ux43bux43bux443ux443ux43bux436-ux431ux43eux43bux43eux445ux433ux4afux439-ux432ux44d-20-ux43cux438ux43d-ux437ux43a}}
+
+Таамаглах биш, \textbf{тоолох}.
+
+\textbf{6.1 Үүлний үйлчилгээний бодит RAM.}
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{docker}\NormalTok{ stats }\AttributeTok{{-}{-}no{-}stream} \AttributeTok{{-}{-}format} \StringTok{\textquotesingle{}table \{\{.Name\}\}\textbackslash{}t\{\{.MemUsage\}\}\textquotesingle{}}
+\ExtensionTok{docker}\NormalTok{ stats {-}{-}no{-}stream {-}{-}format }\StringTok{\textquotesingle{}table \{\{.Name\}\}\textbackslash{}t\{\{.MemUsage\}\}\textquotesingle{}} \KeywordTok{|} \FunctionTok{tee}\NormalTok{ \textasciitilde{}/cnc302/lab01/out/06{-}cloud{-}mem.txt}
 \end{Highlighting}
 \end{Shaded}
 
@@ -437,91 +936,191 @@ Swap \texttt{si/so}
 Албан ёсны баримт: \href{https://docs.docker.com/reference/cli/docker/container/stats/}{docker container stats} --- \texttt{-\/-no-stream} нь нэг удаагийн хэмжилт авна; Linux дээр \texttt{MemUsage}-ээс кэшийг хасч тооцдог.
 \end{quote}
 
+\texttt{MemUsage} баганын эхний тоо (\texttt{/}-ийн өмнөх) нь тухайн контейнерийн бодит хэрэглээ. \texttt{GiB} бол 1024-өөр үржүүлж MiB болго.
+
+\textbf{6.2 Хүснэгт 1.6-г бөглө.} "Pi-д боломжтой" мөрөнд Хүснэгт 1.1-ийн \texttt{MemAvailable}-ийг бич. \textbf{Дутагдал} = Нийт − Pi-д боломжтой.
+
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-1.6-ux445ux44dux440ux44dux432-ux431ux4afux433ux434ux438ux439ux433-pi-ux434ux44dux44dux440-ux430ux436ux438ux43bux43bux443ux443ux43bux430ux445-ux433ux44dux432ux44dux43b}{%
 \subsubsection{Хүснэгт 1.6 --- Хэрэв бүгдийг Pi дээр ажиллуулах гэвэл}\label{ux445ux4afux441ux43dux44dux433ux442-1.6-ux445ux44dux440ux44dux432-ux431ux4afux433ux434ux438ux439ux433-pi-ux434ux44dux44dux440-ux430ux436ux438ux43bux43bux443ux443ux43bux430ux445-ux433ux44dux432ux44dux43b}}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-Үйлчилгээ & Компьютер дээрх бодит RAM (MiB) & Pi-д багтах уу \\
+Үйлчилгээ & Компьютер дээрх бодит RAM (MiB) & Pi-д багтах уу\tabularnewline
 \midrule
 \endhead
+emqx & &\tabularnewline
+influxdb & &\tabularnewline
+grafana & &\tabularnewline
+registry & &\tabularnewline
+\textbf{Нийт} & &\tabularnewline
+Pi-д боломжтой (Хүснэгт 1.1) & &\tabularnewline
+\textbf{Дутагдал} & &\tabularnewline
 \bottomrule
-\endlastfoot
-emqx & & \\
-influxdb & & \\
-grafana & & \\
-registry & & \\
-\textbf{Нийт} & & \\
-Pi-д боломжтой (Хүснэгт 1.1) & & \\
-\textbf{Дутагдал} & & \\
 \end{longtable}\endgroup
 
-Нэмэлт (сонголтот, {[}ЗК{]} хангалттай RAM байвал): ThingsBoard-ыг асааж хэмж.
+\textbf{6.3 Нэмэлт (сонголтот).} Компьютерт \textbf{16 GB RAM} байвал ThingsBoard-ыг асааж хэмж. 8 GB-тай бол \textbf{алгас}.
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}f}\NormalTok{ docker{-}compose.yml }\AttributeTok{{-}f}\NormalTok{ docker{-}compose.tb.yml }\DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}{-}profile}\NormalTok{ core }\AttributeTok{{-}{-}profile}\NormalTok{ tb up }\AttributeTok{{-}d}
-\CommentTok{\# 2{-}3 минут хүлээгээд:}
-\ExtensionTok{docker}\NormalTok{ stats }\AttributeTok{{-}{-}no{-}stream}\NormalTok{ cnc302{-}thingsboard}
-\end{Highlighting}
-\end{Shaded}
-
-Энэ нэг тоо (1.2--1.8 GiB) нь Pi-гийн \textbf{нийт} санах ойноос хэдэн дахин их вэ?
-
-\hypertarget{ux430ux43bux445ux430ux43c-7-grafana-ux434-ux430ux43cux44cux434-ux441ux430ux43cux431ux430ux440-25-ux43cux438ux43d-ux437ux43a}{%
-\subsection{Алхам 7 --- Grafana-д амьд самбар (25 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-7-grafana-ux434-ux430ux43cux44cux434-ux441ux430ux43cux431ux430ux440-25-ux43cux438ux43d-ux437ux43a}}
-
-\textbf{Анхаар:} Лаб 1-д MQTT-ээс InfluxDB руу бичих шугам хараахан \textbf{байхгүй} (Лаб 5-д Node-RED-ээр хийнэ). Тиймээс самбар хоосон байх болно. Доорх түр шугам нь \texttt{health} ба \texttt{bridge/state} мессежийг InfluxDB 3 Core-ын \texttt{/\allowbreak{}api/\allowbreak{}v3/\allowbreak{}write\_\allowbreak{}lp} руу line protocol болгон бичнэ ({[}ЗК{]} тусдаа терминал, \texttt{jq} шаардлагатай):
+\textbf{{[}ЗК · Ubuntu-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack}
-\ExtensionTok{docker}\NormalTok{ compose exec influxdb influxdb3 create database cnc302   }\CommentTok{\# аль хэдийн байвал алдаа өгнө — зүгээр}
-
-\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}v} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/+/+/+/health\textquotesingle{}} \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/+/+/+/bridge/state\textquotesingle{}} \KeywordTok{|}
-\ControlFlowTok{while} \BuiltInTok{read} \AttributeTok{{-}r} \VariableTok{topic} \VariableTok{payload}\KeywordTok{;} \ControlFlowTok{do}
-  \VariableTok{dev}\OperatorTok{=}\VariableTok{$(}\BuiltInTok{echo} \StringTok{"}\VariableTok{$topic}\StringTok{"} \KeywordTok{|} \FunctionTok{cut} \AttributeTok{{-}d}\NormalTok{/ }\AttributeTok{{-}f5}\VariableTok{)}\KeywordTok{;} \VariableTok{ch}\OperatorTok{=}\VariableTok{$(}\BuiltInTok{echo} \StringTok{"}\VariableTok{$topic}\StringTok{"} \KeywordTok{|} \FunctionTok{cut} \AttributeTok{{-}d}\NormalTok{/ }\AttributeTok{{-}f6}\VariableTok{)}
-  \ControlFlowTok{if} \BuiltInTok{[} \StringTok{"}\VariableTok{$ch}\StringTok{"} \OtherTok{=}\NormalTok{ health }\BuiltInTok{]}\KeywordTok{;} \ControlFlowTok{then}
-    \VariableTok{line}\OperatorTok{=}\VariableTok{$(}\BuiltInTok{echo} \StringTok{"}\VariableTok{$payload}\StringTok{"} \KeywordTok{|} \ExtensionTok{jq} \AttributeTok{{-}r} \AttributeTok{{-}{-}arg}\NormalTok{ d }\StringTok{"}\VariableTok{$dev}\StringTok{"} \StringTok{\textquotesingle{}"health,device=\textbackslash{}($d) " + ([to\_entries[]}
-\StringTok{      | select(.key | IN("cpu\_temp\_c","cpu\_pct","load1","mem\_available\_mb","swap\_used\_mb"))}
-\StringTok{      | select(.value != null) | "\textbackslash{}(.key)=\textbackslash{}(.value)"] | join(","))\textquotesingle{}}\VariableTok{)}
-  \ControlFlowTok{else}
-    \VariableTok{line}\OperatorTok{=}\StringTok{"bridge,device=}\VariableTok{$\{dev\}}\StringTok{ state=}\VariableTok{$\{payload\}}\StringTok{i"}
-  \ControlFlowTok{fi}
-  \ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST }\StringTok{"http://localhost:8181/api/v3/write\_lp?db=cnc302"} \AttributeTok{{-}{-}data{-}binary} \StringTok{"}\VariableTok{$line}\StringTok{"}
-\ControlFlowTok{done}
+\ExtensionTok{docker}\NormalTok{ compose {-}f docker{-}compose.yml {-}f docker{-}compose.tb.yml }\KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}{-}profile}\NormalTok{ core {-}{-}profile tb up {-}d}
+\FunctionTok{sleep}\NormalTok{ 180}
+\ExtensionTok{docker}\NormalTok{ stats {-}{-}no{-}stream cnc302{-}thingsboard}
 \end{Highlighting}
 \end{Shaded}
+
+Энэ нэг тоо (1.2--1.8 GiB орчим) нь Pi-гийн \textbf{нийт} санах ойноос хэдэн дахин их вэ? Хэмжиж дууссаны дараа \textbf{заавал} зогсоо:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ compose {-}f docker{-}compose.yml {-}f docker{-}compose.tb.yml {-}{-}profile tb stop thingsboard}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux430ux43bux445ux430ux43c-7-grafana-ux434-ux430ux43cux44cux434-ux441ux430ux43cux431ux430ux440-25-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 7 --- Grafana-д амьд самбар (25 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-7-grafana-ux434-ux430ux43cux44cux434-ux441ux430ux43cux431ux430ux440-25-ux43cux438ux43d-ux437ux43a}}
+
+\textbf{Анхаар:} Лаб 1-д MQTT-ээс InfluxDB руу бичих шугам хараахан \textbf{байхгүй} (Лаб 5-д Node-RED-ээр хийнэ). Тиймээс самбар хоосон байх болно. Доорх \textbf{түр шугам} нь агентын \texttt{health} ба \texttt{bridge/state} мессежийг InfluxDB 3 Core-ын \texttt{/\allowbreak{}api/\allowbreak{}v3/\allowbreak{}write\_\allowbreak{}lp} руу line protocol болгон бичнэ.
+
+\textbf{7.1 Агентыг дахин асаах.} Самбарт өгөгдөл хэрэгтэй:
+
+\textbf{{[}Pi-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ agent}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{7.2 InfluxDB-д өгөгдлийн сан үүсгэх.}
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack}
+\ExtensionTok{docker}\NormalTok{ compose exec influxdb influxdb3 create database cnc302}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{Database\ "cnc302"\ created\ successfully} эсвэл \texttt{already\ exists} --- \textbf{хоёулаа зүгээр}.
+
+\textbf{7.3 Түр шугамыг асаах.} \textbf{{[}ЗК · Ubuntu-2{]}}-ын \texttt{mosquitto\_sub}-ыг \texttt{Ctrl\ +\ C}-ээр зогсоогоод, доорх блокийг \texttt{mosquitto\_sub}-аас \texttt{done} хүртэл \textbf{бүтнээр нь НЭГ ДОР} хуулж буулга:
+
+\textbf{{[}ЗК · Ubuntu-2{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}v }\KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/+/+/+/health\textquotesingle{}}\NormalTok{ {-}t }\StringTok{\textquotesingle{}cnc302/shutis/+/+/+/bridge/state\textquotesingle{}} \KeywordTok{|}
+\KeywordTok{while} \BuiltInTok{read}\NormalTok{ {-}r }\VariableTok{topic} \VariableTok{payload}\NormalTok{; }\KeywordTok{do}
+  \VariableTok{dev=$(}\BuiltInTok{echo} \StringTok{"}\VariableTok{$topic}\StringTok{"} \KeywordTok{|} \FunctionTok{cut}\NormalTok{ {-}d/ {-}f5}\VariableTok{)}\NormalTok{; }\VariableTok{ch=$(}\BuiltInTok{echo} \StringTok{"}\VariableTok{$topic}\StringTok{"} \KeywordTok{|} \FunctionTok{cut}\NormalTok{ {-}d/ {-}f6}\VariableTok{)}
+  \KeywordTok{if}\BuiltInTok{ [} \StringTok{"}\VariableTok{$ch}\StringTok{"} \OtherTok{=}\NormalTok{ health}\BuiltInTok{ ]}\NormalTok{; }\KeywordTok{then}
+    \VariableTok{line=$(}\BuiltInTok{echo} \StringTok{"}\VariableTok{$payload}\StringTok{"} \KeywordTok{|} \ExtensionTok{jq}\NormalTok{ {-}r {-}{-}arg d }\StringTok{"}\VariableTok{$dev}\StringTok{"} \StringTok{\textquotesingle{}"health,device=\textbackslash{}($d) " + ([to\_entries[]}
+\StringTok{      | select(.key | IN("cpu\_temp\_c","cpu\_pct","load1","mem\_available\_mb","swap\_used\_mb"))}
+\StringTok{      | select(.value != null) | "\textbackslash{}(.key)=\textbackslash{}(.value)"] | join(","))\textquotesingle{}}\VariableTok{)}
+  \KeywordTok{else}
+    \VariableTok{line=}\StringTok{"bridge,device=}\VariableTok{$\{dev\}}\StringTok{ state=}\VariableTok{$\{payload\}}\StringTok{i"}
+  \KeywordTok{fi}
+  \ExtensionTok{curl}\NormalTok{ {-}s {-}X POST }\StringTok{"http://localhost:8181/api/v3/write\_lp?db=cnc302"}\NormalTok{ {-}{-}data{-}binary }\StringTok{"}\VariableTok{$line}\StringTok{"}
+  \BuiltInTok{echo} \StringTok{"→ }\VariableTok{$line}\StringTok{"}
+\KeywordTok{done}
+\end{Highlighting}
+\end{Shaded}
+
+✓ 30 секунд орчмын дотор \texttt{→\ health,device=\allowbreak{}pi3b-team07\ cpu\_\allowbreak{}temp\_\allowbreak{}c=\allowbreak{}\ldots{}} хэлбэрийн мөр хэвлэгдэнэ. Энэ цонхыг \textbf{Алхам 7 дуустал} нээлттэй үлдээ.
 
 \begin{quote}
 Албан ёсны баримт: \href{https://docs.influxdata.com/influxdb3/core/write-data/http-api/v3-write-lp/}{InfluxDB 3 Core --- v3 write\_\allowbreak{}lp API}. Line protocol-д \texttt{i} дагаваргүй тоо нь float, \texttt{1i} нь integer.
 \end{quote}
 
+\textbf{7.4 Өгөгдлийн эх сурвалжийг шалгах.} Хөтчөөр http://localhost:3000 → нэвтэр →
+
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  http://localhost:3000 → \textbf{Connections → Data sources} → \texttt{InfluxDB3} аль хэдийн бүртгэгдсэн (provisioning, хэл нь SQL, өгөгдлийн сан \texttt{cnc302}). \textbf{Save \& test} дарж шалга.
+  Зүүн цэс \textbf{☰ → Connections → Data sources} → \textbf{InfluxDB3} (provisioning-оор аль хэдийн бүртгэгдсэн; хэл нь SQL, өгөгдлийн сан \texttt{cnc302}).
 \item
-  \textbf{Dashboards → New → New dashboard} → 3 панел (SQL горим):
-
-  \begin{itemize}
-  \tightlist
-  \item
-    Pi-гийн CPU температур --- Time series:
-    \texttt{SELECT\ time,\ cpu\_temp\_c\ FROM\ health\ WHERE\ device\ =\ \textquotesingle{}pi3b-01\textquotesingle{}\ AND\ \$\_\_timeFilter(time)\ ORDER\ BY\ time}
-  \item
-    \texttt{MemAvailable} --- Time series:
-    \texttt{SELECT\ time,\ mem\_available\_mb\ FROM\ health\ WHERE\ device\ =\ \textquotesingle{}pi3b-01\textquotesingle{}\ AND\ \$\_\_timeFilter(time)\ ORDER\ BY\ time}
-  \item
-    Гүүрний төлөв --- Stat панел:
-    \texttt{SELECT\ time,\ state\ FROM\ bridge\ WHERE\ device\ =\ \textquotesingle{}pi3b-01\textquotesingle{}\ ORDER\ BY\ time\ DESC\ LIMIT\ 1}
-  \end{itemize}
-\item
-  Хадгална. Дараа нь \textbf{Export → Export as JSON} → \textbf{Download file}, файлыг \texttt{lab01/\allowbreak{}dashboard.\allowbreak{}json} нэрээр хадгалж commit хийнэ.
+  Хуудасны доод талд \textbf{Save \& test} → ✓ ногоон \texttt{OK} / \texttt{datasource\ is\ working}.
 \end{enumerate}
+
+\textbf{7.5 Самбар үүсгэх.} \textbf{☰ → Dashboards → New → New dashboard → + Add visualization} → өгөгдлийн эх сурвалжаас \textbf{InfluxDB3} сонго. Гурван панел нэмнэ. Панел бүрт:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Баруун талын \textbf{Visualization} жагсаалтаас төрлийг сонго (хүснэгтийн "Төрөл").
+\item
+  Доод хэсгийн query засварлагчийг \textbf{SQL / Code} горимд шилжүүлж, хүснэгтийн query-г буулга. \textbf{\texttt{pi3b-team\textless{}NN\textgreater{}}-ийг өөрийн \texttt{DEVICE\_ID}-аар соль.}
+\item
+  Баруун дээд \textbf{Title} талбарт нэр өг.
+\item
+  \textbf{Back to dashboard} (эсвэл \textbf{Apply}) → дараагийн панелд \textbf{Add → Visualization}.
+\end{enumerate}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Title\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Төрөл\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Query\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Pi CPU температур\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Time series\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{SELECT\ time,\ cpu\_temp\_c\ FROM\ health\ WHERE\ device\ =\ \textquotesingle{}pi3b-team\textless{}NN\textgreater{}\textquotesingle{}\ AND\ \$\_\_timeFilter(time)\ ORDER\ BY\ time}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Pi MemAvailable\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Time series\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{SELECT\ time,\ mem\_available\_mb\ FROM\ health\ WHERE\ device\ =\ \textquotesingle{}pi3b-team\textless{}NN\textgreater{}\textquotesingle{}\ AND\ \$\_\_timeFilter(time)\ ORDER\ BY\ time}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Гүүрний төлөв\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Stat\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{SELECT\ time,\ state\ FROM\ bridge\ WHERE\ device\ =\ \textquotesingle{}pi3b-team\textless{}NN\textgreater{}\textquotesingle{}\ ORDER\ BY\ time\ DESC\ LIMIT\ 1}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+✓ \textbf{Шалгах:} баруун дээд буланд хугацааны мужийг \textbf{Last 15 minutes} болгоход эхний хоёр панелд шугам, гурав дахьд нь \texttt{1} харагдана. \texttt{No\ data} бол 7.3-ын цонхонд \texttt{→\ health,\ldots{}} мөр гарч байгаа эсэхийг шалга.
+
+\textbf{7.6 Хадгалах ба экспортлох.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Баруун дээд \textbf{Save dashboard} → Title: \texttt{Лаб\ 1\ —\ Pi\ ирмэг} → \textbf{Save}.
+\item
+  \textbf{Export → Export as JSON} → \textbf{Download file}.
+\item
+  Татагдсан файлыг Ubuntu-д хуул (Windows-ийн хэрэглэгчийн нэрээ \texttt{\textless{}WinUser\textgreater{}} оронд бич):
+\end{enumerate}
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cp}\NormalTok{ /mnt/c/Users/}\OperatorTok{\textless{}}\NormalTok{WinUser}\OperatorTok{\textgreater{}}\NormalTok{/Downloads/*.json \textasciitilde{}/cnc302/lab01/dashboard.json}
+\FunctionTok{ls}\NormalTok{ {-}l \textasciitilde{}/cnc302/lab01/dashboard.json}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{quote}
 Албан ёсны баримт: \href{https://grafana.com/docs/grafana/v11.6/dashboards/share-dashboards-panels/}{Grafana 11.\allowbreak{}6 --- Export a dashboard as JSON} · \href{https://grafana.com/docs/grafana/v11.6/datasources/influxdb/query-editor/}{InfluxDB query editor --- SQL macros}
@@ -531,27 +1130,81 @@ Pi-д боломжтой (Хүснэгт 1.1) & & \\
 Энэ самбар Лаб 5-д гүүр тасрахыг \textbf{нүдээр харах} гол хэрэгсэл болно.
 \end{quote}
 
-\hypertarget{ux430ux43bux445ux430ux43c-8-git-commit-10-ux43cux438ux43d}{%
-\subsection{Алхам 8 --- Git commit (10 мин)}\label{ux430ux43bux445ux430ux43c-8-git-commit-10-ux43cux438ux43d}}
+\textbf{7.7 Зогсоох.} \textbf{{[}ЗК · Ubuntu-2{]}} ба \textbf{{[}Pi-1{]}}-д \texttt{Ctrl\ +\ C}.
+
+\hypertarget{ux430ux43bux445ux430ux43c-8-ux433ux430ux440ux430ux43bux442ux430ux430-ux446ux443ux433ux43bux443ux443ux43bux436-git-commit-15-ux43cux438ux43d-ux437ux43a}{%
+\subsection{Алхам 8 --- Гаралтаа цуглуулж, Git commit (15 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-8-ux433ux430ux440ux430ux43bux442ux430ux430-ux446ux443ux433ux43bux443ux443ux43bux436-git-commit-15-ux43cux438ux43d-ux437ux43a}}
+
+\textbf{8.1 Pi дээрх гаралтыг компьютер руу хуулах.} Алхам 1, 3, 4, 5-ын файлууд Pi-гийн \texttt{\textasciitilde{}/cnc302/lab01/out/}-д байгаа. Хуулахын тулд Windows дээрх SSH түлхүүрийг Ubuntu-д нэг удаа хуулна (Ubuntu нууц түлхүүрийг \texttt{/mnt/c/...}-ээс шууд ашиглахыг зөвшөөрдөггүй --- эрх нь хэт нээлттэй):
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mkdir}\NormalTok{ {-}p \textasciitilde{}/.ssh }\KeywordTok{\&\&} \FunctionTok{chmod}\NormalTok{ 700 \textasciitilde{}/.ssh}
+\FunctionTok{cp}\NormalTok{ /mnt/c/Users/}\OperatorTok{\textless{}}\NormalTok{WinUser}\OperatorTok{\textgreater{}}\NormalTok{/.ssh/cnc302 \textasciitilde{}/.ssh/cnc302}
+\FunctionTok{chmod}\NormalTok{ 600 \textasciitilde{}/.ssh/cnc302}
+\FunctionTok{scp}\NormalTok{ {-}i \textasciitilde{}/.ssh/cnc302 }\StringTok{\textquotesingle{}cnc302@\textless{}PI\_IP\textgreater{}:cnc302/lab01/out/*\textquotesingle{}}\NormalTok{ \textasciitilde{}/cnc302/lab01/out/}
+\FunctionTok{ls}\NormalTok{ \textasciitilde{}/cnc302/lab01/out/}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{01-edge-baseline.\allowbreak{}txt}, \texttt{03-edge-running.\allowbreak{}txt}, \texttt{04-latency-*.csv}, \texttt{05-load-*.txt}, \texttt{05-monitor.txt}, \texttt{stack-\ldots{}csv} болон компьютер дээрх \texttt{02-\ldots{}}, \texttt{06-\ldots{}} файлууд нэг хавтаст харагдана.
+
+\textbf{8.2 Тайлангийн файл үүсгэх.}
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\FunctionTok{git}\NormalTok{ add stack/ edge/ lab01/}
-\FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 1: хоёр давхаргат платформ, гүүр ажиллаж байна"}
-\FunctionTok{git}\NormalTok{ tag lab01{-}done}
-\FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\AttributeTok{{-}{-}tags}
+\FunctionTok{cp}\NormalTok{ docs/report{-}template.md lab01/report.md}
+\ExtensionTok{code}\NormalTok{ lab01/report.md}
 \end{Highlighting}
 \end{Shaded}
 
-⚠ \texttt{.env}, \texttt{bridge.conf} \textbf{орохгүй} байгааг шалга:
+VS Code дээр Хүснэгт 1.1--1.6 ба §5-ын асуултын хариултыг бөглөж хадгал.
+
+\textbf{8.3 Commit ба tag.} \texttt{lab01/out/} нь \texttt{.gitignore}-д орсон тул түүхий гаралтыг \texttt{-f}-ээр \textbf{зориуд} нэмнэ:
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{git}\NormalTok{ status }\AttributeTok{{-}{-}short}
-\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}E} \StringTok{\textquotesingle{}\textbackslash{}.env$|bridge\textbackslash{}.conf$\textquotesingle{}}    \CommentTok{\# хоосон байх ЁСТОЙ}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\FunctionTok{git}\NormalTok{ add lab01/report.md lab01/dashboard.json}
+\FunctionTok{git}\NormalTok{ add {-}f lab01/out/*.txt lab01/out/*.csv}
+\FunctionTok{git}\NormalTok{ status {-}{-}short}
 \end{Highlighting}
 \end{Shaded}
+
+\textbf{8.4 Нууц файл ороогүйг шалгах} --- commit хийхээс \textbf{өмнө}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}E }\StringTok{\textquotesingle{}\textbackslash{}.env$|bridge\textbackslash{}.conf$\textquotesingle{}}
+\FunctionTok{git}\NormalTok{ diff {-}{-}cached {-}{-}name{-}only }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}E }\StringTok{\textquotesingle{}\textbackslash{}.env$|bridge\textbackslash{}.conf$\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+✓ Хоёр команд \textbf{юу ч хэвлэхгүй} байх ЁСТОЙ. Ямар нэг файл гарвал \texttt{git\ restore\ -\/\allowbreak{}-staged\ \textless{}файл\textgreater{}} → \texttt{docs/\allowbreak{}troubleshooting.\allowbreak{}md} §12.
+
+\textbf{8.5 Commit ба push.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ commit {-}m }\StringTok{"Лаб 1: хоёр давхаргат платформ, гүүр ажиллаж байна"}
+\FunctionTok{git}\NormalTok{ tag lab01{-}done}
+\FunctionTok{git}\NormalTok{ push}
+\FunctionTok{git}\NormalTok{ push {-}{-}tags}
+\end{Highlighting}
+\end{Shaded}
+
+✓ GitHub дээрх багийн сангийн \textbf{Tags} хэсэгт \texttt{lab01-done} харагдана.
+
+✗ \texttt{Updates\ were\ rejected\ because\ the\ remote\ contains\ work\ldots{}} → багийн гишүүн түрүүлж push хийсэн: \texttt{git\ pull\ -\/\allowbreak{}-rebase} → дахин \texttt{git\ push}.
+
+\textbf{8.6 Лабыг дуусгах.} Дараагийн лаб хүртэл үүлний стекийг зогсоож болно (өгөгдөл үлдэнэ): \textbf{{[}ЗК · Ubuntu-1{]}} \texttt{cd\ \textasciitilde{}/cnc302/stack\ \&\&\ make\ down}. Pi-г унтраах бол: \textbf{{[}Pi-1{]}} \texttt{sudo\ poweroff} → ногоон гэрэл анивчихаа больсны дараа тэжээлийг сугал.
 
 \hypertarget{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442ux443ux443ux434}{%
 \section{5. Хяналтын асуултууд}\label{ux445ux44fux43dux430ux43bux442ux44bux43d-ux430ux441ux443ux443ux43bux442ux443ux443ux434}}
@@ -579,15 +1232,44 @@ Pi-д боломжтой (Хүснэгт 1.1) & & \\
 
 \begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\# & Зүйл & Байрлал \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+\#\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Зүйл\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Байрлал\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Тайлан (Хүснэгт 1.1--1.6 бөглөсөн, §5-ын хариулт)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{lab01/report.md} → PDF\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Grafana самбарын JSON\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{lab01/\allowbreak{}dashboard.\allowbreak{}json}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+3\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{measure\_\allowbreak{}stack.\allowbreak{}sh}, \texttt{qos\_latency.py}-ийн түүхий гаралт\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{lab01/out/} (\texttt{git\ add\ -f})\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Git tag\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{lab01-done}\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-1 & Тайлан (Хүснэгт 1.1--1.6 бөглөсөн) & \texttt{lab01/report.md} → PDF \\
-2 & Grafana самбарын JSON & \texttt{lab01/\allowbreak{}dashboard.\allowbreak{}json} \\
-3 & \texttt{measure\_\allowbreak{}stack.\allowbreak{}sh}-ийн түүхий гаралт & \texttt{lab01/out/} \\
-4 & Git tag & \texttt{lab01-done} \\
 \end{longtable}\endgroup
 
 \hypertarget{ux4afux43dux44dux43bux433ux44dux44dux43dux438ux439-ux448ux430ux43bux433ux443ux443ux440-10-ux43eux43dux43eux43e}{%
@@ -595,77 +1277,264 @@ Pi-д боломжтой (Хүснэгт 1.1) & & \\
 
 \begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-Шалгуур & Оноо \\
+Шалгуур & Оноо\tabularnewline
 \midrule
 \endhead
+Хоёр давхарга ажиллаж, гүүр холбогдсон (амьд үзүүлнэ) & 3\tabularnewline
+Хүснэгт 1.1--1.6 бүрэн, throttling шалгасан & 3\tabularnewline
+Хязгаарлагч нөөцийг \textbf{зөв тогтоож, тоогоор нотолсон} & 2\tabularnewline
+Git сан цэвэр, нууц файл ороогүй & 1\tabularnewline
+Grafana самбар ажиллаж байна & 1\tabularnewline
 \bottomrule
-\endlastfoot
-Хоёр давхарга ажиллаж, гүүр холбогдсон (амьд үзүүлнэ) & 3 \\
-Хүснэгт 1.1--1.6 бүрэн, throttling шалгасан & 3 \\
-Хязгаарлагч нөөцийг \textbf{зөв тогтоож, тоогоор нотолсон} & 2 \\
-Git сан цэвэр, нууц файл ороогүй & 1 \\
-Grafana самбар ажиллаж байна & 1 \\
 \end{longtable}\endgroup
 
 \hypertarget{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}{%
 \section{8. Түгээмэл алдаа}\label{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Шинж
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шалтгаан
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шийдэл
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шинж\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шалтгаан\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шийдэл\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Команд "олдсонгүй" эсвэл огт өөр үр дүн\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Буруу цонхонд бичсэн\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Prompt-ыг хар (§0.1)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{bc:\allowbreak{}\ command\ not\ found}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{bc} суугаагүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+§0.4\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{Permission\ denied} --- \texttt{tools/\allowbreak{}measure\_\allowbreak{}stack.\allowbreak{}sh}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Скриптийг \texttt{./}-ээр ажиллуулсан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{bash\ tools/\allowbreak{}measure\_\allowbreak{}stack.\allowbreak{}sh\ \ldots{}}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{ModuleNotFoundError:\ No\ module\ named\ \textquotesingle{}paho\textquotesingle{}} (Pi)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Системийн \texttt{python3}-ыг ашигласан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{edge/\allowbreak{}.\allowbreak{}venv/\allowbreak{}bin/\allowbreak{}python} (Алхам 4.2)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{bridge/state\ 0}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{CLOUD\_HOST} буруу / галт хана\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+troubleshooting §1, SETUP А.6\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Гүүр холбогдсон ч мессеж алга\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{SITE} зөрсөн\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+troubleshooting §2\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{qos\_latency.py}: \texttt{бүх\ мессеж\ ирсэнгүй} (гүүрээр)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Сэдэв \texttt{cnc302/shutis/}-ээр эхлээгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Алхам 4.5-ын \texttt{-\/-topic}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Санах ойн тоо хачин их\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+VS Code сервер ажиллаж байна\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{pkill\ -f\ vscode-server}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{docker\ stats} санах ой хоосон\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+cgroup идэвхгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+SETUP.md Б.5\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Саатал 10 дахин хэлбэлзэнэ\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+throttling эсвэл Wi-Fi\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{get\_throttled}, кабельд шилжих\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Pi царцав (Алхам 5)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Санах ой дууссан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+2 мин хүлээ → тэжээл салгаж залга; дараагийн удаа §5.4-ийн дүрмээр эрт зогсоо\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Grafana: \texttt{No\ data}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Түр шугам ажиллаагүй / \texttt{device} буруу\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Алхам 7.3-ын цонхыг шалга; query-ийн \texttt{pi3b-team\textless{}NN\textgreater{}}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{scp}: \texttt{UNPROTECTED\ PRIVATE\ KEY\ FILE}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Түлхүүрийг \texttt{/mnt/c/...}-ээс шууд ашигласан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Алхам 8.1 --- \texttt{\textasciitilde{}/.ssh/}-д хуулж \texttt{chmod\ 600}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{exec\ format\ error}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+32-bit OS\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{uname\ -m} → aarch64 байх ёстой\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{bridge/state\ 0} & CLOUD\_HOST буруу / галт хана & troubleshooting §1 \\
-Гүүр холбогдсон ч мессеж алга & \texttt{SITE} зөрсөн & troubleshooting §2 \\
-Санах ойн тоо хачин & VS Code сервер ажиллаж байна & \texttt{pkill\ -f\ vscode-server} \\
-\texttt{docker\ stats} санах ой хоосон & cgroup идэвхгүй & SETUP.md Б.5 \\
-Саатал 10 дахин хэлбэлзэнэ & throttling эсвэл Wi-Fi & \texttt{get\_throttled}, кабельд шилжих \\
-\texttt{exec\ format\ error} & 32-bit OS & \texttt{uname\ -m} → aarch64 байх ёстой \\
 \end{longtable}\endgroup
 
 \hypertarget{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}{%
 \section{9. Эх сурвалж}\label{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-\#
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Эх сурвалж
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Юуг баталгаажуулсан
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хандсан
-\end{minipage} \\
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+\#\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Эх сурвалж\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Юуг баталгаажуулсан\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хандсан\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html}{Raspberry Pi hardware --- Raspberry Pi 3 Model B} (эх: \href{https://github.com/raspberrypi/documentation/blob/master/documentation/asciidoc/computers/raspberry-pi/introduction.adoc}{github.\allowbreak{}com/\allowbreak{}raspberrypi/\allowbreak{}documentation})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+1 GB RAM, 100 Mb/s Ethernet, 4 × USB 2.0\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/processors.html\#bcm2837}{Processors --- BCM2837} (эх: \href{https://github.com/raspberrypi/documentation/blob/master/documentation/asciidoc/computers/processors/bcm2837.adoc}{bcm2837.adoc})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+4 цөмт Cortex-A53 (Armv8), 1.2 GHz\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+3\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/os.html\#vcgencmd}{vcgencmd} (эх: \href{https://github.com/raspberrypi/documentation/blob/master/documentation/asciidoc/computers/os/graphics-utilities.adoc}{graphics-utilities.\allowbreak{}adoc})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{get\_throttled} битүүд (0x1, 0x2, 0x4, 0x8, 0x10000\ldots0x80000), \texttt{get\_mem\ gpu}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/legacy_config_txt.html}{Legacy config.\allowbreak{}txt options --- gpu\_\allowbreak{}mem} (эх: \href{https://github.com/raspberrypi/documentation/blob/master/documentation/asciidoc/computers/legacy_config_txt/memory.adoc}{legacy\_\allowbreak{}config\_\allowbreak{}txt/\allowbreak{}memory.\allowbreak{}adoc})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+1 GB загварт анхдагч 76, доод утга 16; Bookworm+ дээр албан ёсоор дэмжигдэхгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+5\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.docker.com/compose/how-tos/profiles/}{Using profiles with Compose}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{-\/-profile}, \texttt{profiles:} шинж\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+6\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.docker.com/reference/cli/docker/container/stats/}{docker container stats}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{-\/-no-stream}, \texttt{-\/-format\ \textquotesingle{}table\ \{\{.Name\}\}\textbackslash{}t\{\{.MemUsage\}\}\textquotesingle{}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+7\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.emqx.com/en/emqx/v5.8/guides/dashboard/introduction.html}{EMQX 5.\allowbreak{}8 --- Dashboard}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+самбарын анхдагч порт 18083\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+8\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.influxdata.com/influxdb3/core/write-data/http-api/v3-write-lp/}{InfluxDB 3 Core --- v3 write\_\allowbreak{}lp API}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{/\allowbreak{}api/\allowbreak{}v3/\allowbreak{}write\_\allowbreak{}lp?\allowbreak{}db=\allowbreak{}}, line protocol\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+9\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.influxdata.com/influxdb3/core/reference/cli/influxdb3/create/database/}{influxdb3 create database}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+CLI синтакс, анхдагч host \texttt{http:\allowbreak{}/\allowbreak{}/\allowbreak{}127.\allowbreak{}0.\allowbreak{}0.\allowbreak{}1:\allowbreak{}8181}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+10\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://grafana.com/docs/grafana/v11.6/dashboards/share-dashboards-panels/}{Grafana 11.\allowbreak{}6 --- Share dashboards and panels}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Export → Export as JSON\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+11\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://grafana.com/docs/grafana/v11.6/datasources/influxdb/query-editor/}{Grafana 11.\allowbreak{}6 --- InfluxDB query editor}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+SQL макро \texttt{\$\_\allowbreak{}\_\allowbreak{}timeFilter(time)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+12\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://thingsboard.io/docs/installation/docker/}{ThingsBoard --- Install using Docker}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Dev/PoC-д доод тал нь 4 GB RAM\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+13\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://man7.org/linux/man-pages/man8/vmstat.8.html}{vmstat(8)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{si}/\allowbreak\texttt{so} --- swap-аас уншсан / swap руу бичсэн санах ой\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-10\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-1 & \href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html}{Raspberry Pi hardware --- Raspberry Pi 3 Model B} (эх: \href{https://github.com/raspberrypi/documentation/blob/master/documentation/asciidoc/computers/raspberry-pi/introduction.adoc}{github.\allowbreak{}com/\allowbreak{}raspberrypi/\allowbreak{}documentation}) & 1 GB RAM, 100 Mb/s Ethernet, 4 × USB 2.0 & 2026-09 \\
-2 & \href{https://www.raspberrypi.com/documentation/computers/processors.html\#bcm2837}{Processors --- BCM2837} (эх: \href{https://github.com/raspberrypi/documentation/blob/master/documentation/asciidoc/computers/processors/bcm2837.adoc}{bcm2837.adoc}) & 4 цөмт Cortex-A53 (Armv8), 1.2 GHz & 2026-09 \\
-3 & \href{https://www.raspberrypi.com/documentation/computers/os.html\#vcgencmd}{vcgencmd} (эх: \href{https://github.com/raspberrypi/documentation/blob/master/documentation/asciidoc/computers/os/graphics-utilities.adoc}{graphics-utilities.\allowbreak{}adoc}) & \texttt{get\_throttled} битүүд (0x1, 0x2, 0x4, 0x8, 0x10000\ldots0x80000), \texttt{get\_mem\ gpu} & 2026-09 \\
-4 & \href{https://www.raspberrypi.com/documentation/computers/legacy_config_txt.html}{Legacy config.\allowbreak{}txt options --- gpu\_\allowbreak{}mem} (эх: \href{https://github.com/raspberrypi/documentation/blob/master/documentation/asciidoc/computers/legacy_config_txt/memory.adoc}{legacy\_\allowbreak{}config\_\allowbreak{}txt/\allowbreak{}memory.\allowbreak{}adoc}) & 1 GB загварт анхдагч 76, доод утга 16; Bookworm+ дээр албан ёсоор дэмжигдэхгүй & 2026-09 \\
-5 & \href{https://docs.docker.com/compose/how-tos/profiles/}{Using profiles with Compose} & \texttt{-\/-profile}, \texttt{profiles:} шинж & 2026-09 \\
-6 & \href{https://docs.docker.com/reference/cli/docker/container/stats/}{docker container stats} & \texttt{-\/-no-stream}, \texttt{-\/-format\ \textquotesingle{}table\ \{\{.Name\}\}\textbackslash{}t\{\{.MemUsage\}\}\textquotesingle{}} & 2026-09 \\
-7 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/dashboard/introduction.html}{EMQX 5.\allowbreak{}8 --- Dashboard} & самбарын анхдагч порт 18083 & 2026-09 \\
-8 & \href{https://docs.influxdata.com/influxdb3/core/write-data/http-api/v3-write-lp/}{InfluxDB 3 Core --- v3 write\_\allowbreak{}lp API} & \texttt{/\allowbreak{}api/\allowbreak{}v3/\allowbreak{}write\_\allowbreak{}lp?\allowbreak{}db=\allowbreak{}}, line protocol & 2026-09 \\
-9 & \href{https://docs.influxdata.com/influxdb3/core/reference/cli/influxdb3/create/database/}{influxdb3 create database} & CLI синтакс, анхдагч host \texttt{http:\allowbreak{}/\allowbreak{}/\allowbreak{}127.\allowbreak{}0.\allowbreak{}0.\allowbreak{}1:\allowbreak{}8181} & 2026-09 \\
-10 & \href{https://grafana.com/docs/grafana/v11.6/dashboards/share-dashboards-panels/}{Grafana 11.\allowbreak{}6 --- Share dashboards and panels} & Export → Export as JSON & 2026-09 \\
-11 & \href{https://grafana.com/docs/grafana/v11.6/datasources/influxdb/query-editor/}{Grafana 11.\allowbreak{}6 --- InfluxDB query editor} & SQL макро \texttt{\$\_\allowbreak{}\_\allowbreak{}timeFilter(time)} & 2026-09 \\
-12 & \href{https://thingsboard.io/docs/installation/docker/}{ThingsBoard --- Install using Docker} & Dev/PoC-д доод тал нь 4 GB RAM & 2026-09 \\
 \end{longtable}\endgroup

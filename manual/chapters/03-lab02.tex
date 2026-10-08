@@ -1,18 +1,15 @@
 % Автоматаар үүсгэсэн — эх файл: lab02/README.md
 \chapter{Лаб 2 — Төхөөрөмжийн бүрэн амьдралын мөчлөг ба OTA}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
 \endhead
+\textbf{7 хоног} & V\tabularnewline
+\textbf{Хугацаа} & 4 цаг\tabularnewline
+\textbf{Суралцахуйн үр дүн} & ҮД4 (аюулгүй төхөөрөмж, өгөгдлийн удирдлага)\tabularnewline
+\textbf{Үнэлгээ} & Бичгийн тайлан, 10 оноо\tabularnewline
+\textbf{Гол хэмжилт} & Бүртгэлийн хурд, OTA-гийн хугацаа ба амжилтын хувь\tabularnewline
 \bottomrule
-\endlastfoot
-\textbf{7 хоног} & V \\
-\textbf{Хугацаа} & 4 цаг \\
-\textbf{Суралцахуйн үр дүн} & ҮД4 (аюулгүй төхөөрөмж, өгөгдлийн удирдлага) \\
-\textbf{Үнэлгээ} & Бичгийн тайлан, 10 оноо \\
-\textbf{Гол хэмжилт} & Бүртгэлийн хурд, OTA-гийн хугацаа ба амжилтын хувь \\
 \end{longtable}\endgroup
 
 \hypertarget{ux437ux43eux440ux438ux43bux433ux43e}{%
@@ -48,7 +45,7 @@
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [ЗК] бүртгэлийн үйлчилгээ ажиллаж байгаа эсэх}
-\ExtensionTok{curl} \AttributeTok{{-}s}\NormalTok{ localhost:8090/health }\KeywordTok{|} \ExtensionTok{jq}
+\ExtensionTok{curl}\NormalTok{ {-}s localhost:8090/health }\KeywordTok{|} \ExtensionTok{jq}
 \CommentTok{\# → \{"ok": true, "devices": 0, "mqtt": true\}}
 \end{Highlighting}
 \end{Shaded}
@@ -59,26 +56,53 @@
 \hypertarget{bulk-vs-jit-ux445ux43eux451ux440-ux437ux430ux433ux432ux430ux440ux44bux43d-ux441ux43eux43bux438ux43bux446ux43eux43e}{%
 \subsection{Bulk vs JIT --- хоёр загварын солилцоо}\label{bulk-vs-jit-ux445ux43eux451ux440-ux437ux430ux433ux432ux430ux440ux44bux43d-ux441ux43eux43bux438ux43bux446ux43eux43e}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\textbf{Bulk (бөөнөөр)}
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\textbf{JIT (яг цагт нь)}
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+\textbf{Bulk (бөөнөөр)}\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+\textbf{JIT (яг цагт нь)}\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Хэзээ бүртгэнэ\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+үйлдвэрээс гарахаас өмнө\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+төхөөрөмж анх залгагдахад\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Нэвтрэлт хаанаас\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+урьдчилан үүсгэж бүтээгдэхүүнд суулгана\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+төхөөрөмж өөрөө гуйна\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Давуу тал\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+хяналттай, аудит хийхэд амархан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+ашиглагдаагүй бүртгэл үлдэхгүй\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Сул тал\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+10 000 бүртгэлээс 3 000 нь хэзээ ч ашиглагдахгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{хэн болохыг батлах} асуудал хурцаар тавигдана\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Хэзээ хэрэглэх\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+хаалттай флот, тодорхой тоо\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+нээлттэй тархалт, тодорхойгүй тоо\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-Хэзээ бүртгэнэ & үйлдвэрээс гарахаас өмнө & төхөөрөмж анх залгагдахад \\
-Нэвтрэлт хаанаас & урьдчилан үүсгэж бүтээгдэхүүнд суулгана & төхөөрөмж өөрөө гуйна \\
-Давуу тал & хяналттай, аудит хийхэд амархан & ашиглагдаагүй бүртгэл үлдэхгүй \\
-Сул тал & 10 000 бүртгэлээс 3 000 нь хэзээ ч ашиглагдахгүй & \textbf{хэн болохыг батлах} асуудал хурцаар тавигдана \\
-Хэзээ хэрэглэх & хаалттай флот, тодорхой тоо & нээлттэй тархалт, тодорхойгүй тоо \\
 \end{longtable}\endgroup
 
 JIT-ийн гол эрсдэл: баталгаагүй бол \textbf{хэн ч} \texttt{device\_id} сонгоод флотод нэвтэрч болно. Шийдэл нь үйлдвэрт суусан X.509 сертификат --- үүнийг Алхам 3-т хийнэ.
@@ -88,14 +112,13 @@ JIT-ийн гол эрсдэл: баталгаагүй бол \textbf{хэн ч}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-Түвшин & Механизм & Хулгайлагдвал & Хэрэглээ \\
+Түвшин & Механизм & Хулгайлагдвал & Хэрэглээ\tabularnewline
 \midrule
 \endhead
+1 & нэр/нууц үг & бүх флот эрсдэлд & зөвхөн лаборатори\tabularnewline
+2 & төхөөрөмж тус бүрийн токен & нэг төхөөрөмж & дунд зэрэг\tabularnewline
+3 & \textbf{X.509 + mTLS} & нэг төхөөрөмж, CRL-ээр хаана & үйлдвэрлэл\tabularnewline
 \bottomrule
-\endlastfoot
-1 & нэр/нууц үг & бүх флот эрсдэлд & зөвхөн лаборатори \\
-2 & төхөөрөмж тус бүрийн токен & нэг төхөөрөмж & дунд зэрэг \\
-3 & \textbf{X.509 + mTLS} & нэг төхөөрөмж, CRL-ээр хаана & үйлдвэрлэл \\
 \end{longtable}\endgroup
 
 \hypertarget{ota-ux433ux438ux439ux43d-ux43fux440ux43eux442ux43eux43aux43eux43b-cnc302-ux445ux443ux432ux438ux43bux431ux430ux440}{%
@@ -153,11 +176,11 @@ DOWNLOADING → DOWNLOADED → VERIFIED → UPDATING → UPDATED
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack}
-\FunctionTok{nano}\NormalTok{ .env                         }\CommentTok{\# EMQX\_API\_KEY=…  EMQX\_API\_SECRET=…}
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core up }\AttributeTok{{-}d}\NormalTok{ registry}
-\BuiltInTok{export} \VariableTok{EMQX\_API\_KEY}\OperatorTok{=}\VariableTok{$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}EMQX\_API\_KEY=\textquotesingle{}}\NormalTok{ .env }\KeywordTok{|} \FunctionTok{cut} \AttributeTok{{-}d}\OperatorTok{=} \AttributeTok{{-}f2}\VariableTok{)}
-\BuiltInTok{export} \VariableTok{EMQX\_API\_SECRET}\OperatorTok{=}\VariableTok{$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}EMQX\_API\_SECRET=\textquotesingle{}}\NormalTok{ .env }\KeywordTok{|} \FunctionTok{cut} \AttributeTok{{-}d}\OperatorTok{=} \AttributeTok{{-}f2}\VariableTok{)}
-\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}u} \StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"}\NormalTok{ localhost:18083/api/v5/nodes }\KeywordTok{|} \ExtensionTok{jq} \StringTok{\textquotesingle{}.[0].version\textquotesingle{}}
+\FunctionTok{nano}\NormalTok{ .env                         \# EMQX\_API\_KEY=…  EMQX\_API\_SECRET=…}
+\ExtensionTok{docker}\NormalTok{ compose {-}{-}profile core up {-}d registry}
+\BuiltInTok{export} \VariableTok{EMQX\_API\_KEY=$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}EMQX\_API\_KEY=\textquotesingle{}}\NormalTok{ .env }\KeywordTok{|} \FunctionTok{cut}\NormalTok{ {-}d= {-}f2}\VariableTok{)}
+\BuiltInTok{export} \VariableTok{EMQX\_API\_SECRET=$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}EMQX\_API\_SECRET=\textquotesingle{}}\NormalTok{ .env }\KeywordTok{|} \FunctionTok{cut}\NormalTok{ {-}d= {-}f2}\VariableTok{)}
+\ExtensionTok{curl}\NormalTok{ {-}s {-}u }\StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"}\NormalTok{ localhost:18083/api/v5/nodes }\KeywordTok{|} \ExtensionTok{jq} \StringTok{\textquotesingle{}.[0].version\textquotesingle{}}
 \CommentTok{\# → "5.8.6"}
 \end{Highlighting}
 \end{Shaded}
@@ -166,9 +189,9 @@ DOWNLOADING → DOWNLOADED → VERIFIED → UPDATING → UPDATED
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}u} \StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"} \AttributeTok{{-}X}\NormalTok{ POST localhost:18083/api/v5/authentication }\DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}H} \StringTok{\textquotesingle{}content{-}type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}d} \StringTok{\textquotesingle{}\{"mechanism":"password\_based","backend":"built\_in\_database",}
+\ExtensionTok{curl}\NormalTok{ {-}s {-}u }\StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"}\NormalTok{ {-}X POST localhost:18083/api/v5/authentication }\KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}H} \StringTok{\textquotesingle{}content{-}type: application/json\textquotesingle{}} \KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}d} \StringTok{\textquotesingle{}\{"mechanism":"password\_based","backend":"built\_in\_database",}
 \StringTok{       "user\_id\_type":"username",}
 \StringTok{       "password\_hash\_algorithm":\{"name":"sha256","salt\_position":"suffix"\},}
 \StringTok{       "enable":false\}\textquotesingle{}} \KeywordTok{|} \ExtensionTok{jq} \StringTok{\textquotesingle{}.id, .enable\textquotesingle{}}
@@ -189,10 +212,10 @@ DOWNLOADING → DOWNLOADED → VERIFIED → UPDATING → UPDATED
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/lab02}
-\ExtensionTok{python3}\NormalTok{ provision.py bulk }\AttributeTok{{-}{-}count}\NormalTok{ 10  }\AttributeTok{{-}{-}out}\NormalTok{ out/devices.csv}
-\ExtensionTok{python3}\NormalTok{ provision.py bulk }\AttributeTok{{-}{-}count}\NormalTok{ 100 }\AttributeTok{{-}{-}prefix}\NormalTok{ b100 }\AttributeTok{{-}{-}out}\NormalTok{ out/b100.csv}
-\ExtensionTok{python3}\NormalTok{ provision.py bulk }\AttributeTok{{-}{-}count}\NormalTok{ 500 }\AttributeTok{{-}{-}prefix}\NormalTok{ b500 }\AttributeTok{{-}{-}out}\NormalTok{ out/b500.csv}
-\ExtensionTok{python3}\NormalTok{ provision.py list }\AttributeTok{{-}{-}limit}\NormalTok{ 10}
+\ExtensionTok{python3}\NormalTok{ provision.py bulk {-}{-}count 10  {-}{-}out out/devices.csv}
+\ExtensionTok{python3}\NormalTok{ provision.py bulk {-}{-}count 100 {-}{-}prefix b100 {-}{-}out out/b100.csv}
+\ExtensionTok{python3}\NormalTok{ provision.py bulk {-}{-}count 500 {-}{-}prefix b500 {-}{-}out out/b500.csv}
+\ExtensionTok{python3}\NormalTok{ provision.py list {-}{-}limit 10}
 \end{Highlighting}
 \end{Shaded}
 
@@ -201,14 +224,13 @@ DOWNLOADING → DOWNLOADED → VERIFIED → UPDATING → UPDATED
 
 \begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-Төхөөрөмжийн тоо & Нийт хугацаа (сек) & мс/төхөөрөмж & Тэмдэглэл \\
+Төхөөрөмжийн тоо & Нийт хугацаа (сек) & мс/төхөөрөмж & Тэмдэглэл\tabularnewline
 \midrule
 \endhead
+10 & & &\tabularnewline
+100 & & &\tabularnewline
+500 & & &\tabularnewline
 \bottomrule
-\endlastfoot
-10 & & & \\
-100 & & & \\
-500 & & & \\
 \end{longtable}\endgroup
 
 \begin{quote}
@@ -221,7 +243,7 @@ DOWNLOADING → DOWNLOADED → VERIFIED → UPDATING → UPDATED
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{git}\NormalTok{ check{-}ignore }\AttributeTok{{-}v}\NormalTok{ lab02/out/devices.csv    }\CommentTok{\# мөр буцаах ЁСТОЙ}
+\FunctionTok{git}\NormalTok{ check{-}ignore {-}v lab02/out/devices.csv    \# мөр буцаах ЁСТОЙ}
 \end{Highlighting}
 \end{Shaded}
 
@@ -230,8 +252,8 @@ DOWNLOADING → DOWNLOADED → VERIFIED → UPDATING → UPDATED
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ provision.py jit }\AttributeTok{{-}{-}device{-}id}\NormalTok{ pi3b{-}01}
-\ExtensionTok{python3}\NormalTok{ provision.py jit }\AttributeTok{{-}{-}device{-}id}\NormalTok{ pi3b{-}01      }\CommentTok{\# хоёр дахь удаа юу болох вэ?}
+\ExtensionTok{python3}\NormalTok{ provision.py jit {-}{-}device{-}id pi3b{-}01}
+\ExtensionTok{python3}\NormalTok{ provision.py jit {-}{-}device{-}id pi3b{-}01      \# хоёр дахь удаа юу болох вэ?}
 \end{Highlighting}
 \end{Shaded}
 
@@ -239,8 +261,8 @@ DOWNLOADING → DOWNLOADED → VERIFIED → UPDATING → UPDATED
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ provision.py jit }\AttributeTok{{-}{-}device{-}id}\NormalTok{ ямар{-}ч{-}нэр{-}бичиж{-}болно}
-\ExtensionTok{python3}\NormalTok{ provision.py list }\AttributeTok{{-}{-}limit}\NormalTok{ 20}
+\ExtensionTok{python3}\NormalTok{ provision.py jit {-}{-}device{-}id ямар{-}ч{-}нэр{-}бичиж{-}болно}
+\ExtensionTok{python3}\NormalTok{ provision.py list {-}{-}limit 20}
 \end{Highlighting}
 \end{Shaded}
 
@@ -249,15 +271,14 @@ DOWNLOADING → DOWNLOADED → VERIFIED → UPDATING → UPDATED
 
 \begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-Шалгуур & Bulk & JIT & Таны төслийн сонголт \\
+Шалгуур & Bulk & JIT & Таны төслийн сонголт\tabularnewline
 \midrule
 \endhead
+Нэг төхөөрөмжийн хугацаа (мс) & & &\tabularnewline
+Урьдчилан хэдэн бүртгэл шаардлагатай & & &\tabularnewline
+Баталгаажуулалт байгаа юу & & &\tabularnewline
+Хүчингүй болгоход яах вэ & & &\tabularnewline
 \bottomrule
-\endlastfoot
-Нэг төхөөрөмжийн хугацаа (мс) & & & \\
-Урьдчилан хэдэн бүртгэл шаардлагатай & & & \\
-Баталгаажуулалт байгаа юу & & & \\
-Хүчингүй болгоход яах вэ & & & \\
 \end{longtable}\endgroup
 
 \hypertarget{ux430ux43bux445ux430ux43c-3-x.509-ux442ux430ux43dux438ux445-ux442ux44dux43cux434ux44dux433-ux431ux430-mtls-50-ux43cux438ux43d-ux437ux43api}{%
@@ -269,15 +290,15 @@ DOWNLOADING → DOWNLOADED → VERIFIED → UPDATING → UPDATED
 \begin{Highlighting}[]
 \CommentTok{\# [ЗК] компьютер дээр}
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/lab02}
-\VariableTok{CLOUD\_HOST}\OperatorTok{=\textless{}}\NormalTok{компьютерийн }\ExtensionTok{LAN}\NormalTok{ IP}\OperatorTok{\textgreater{}}\NormalTok{ ./make\_certs.sh init   }\CommentTok{\# CA + брокерийн сертификат}
+\VariableTok{CLOUD\_HOST=}\OperatorTok{\textless{}}\NormalTok{компьютерийн }\ExtensionTok{LAN}\NormalTok{ IP}\OperatorTok{\textgreater{}}\NormalTok{ ./make\_certs.sh init   \# CA + брокерийн сертификат}
 \ExtensionTok{./make\_certs.sh}\NormalTok{ device pi3b{-}01}
 \ExtensionTok{./make\_certs.sh}\NormalTok{ device dev0001}
 \ExtensionTok{./make\_certs.sh}\NormalTok{ list}
 
 \CommentTok{\# Гинжин хэлхээг батлах}
-\ExtensionTok{openssl}\NormalTok{ verify }\AttributeTok{{-}CAfile}\NormalTok{ certs/ca.crt certs/server.crt certs/pi3b{-}01.crt   }\CommentTok{\# → OK, OK}
-\ExtensionTok{openssl}\NormalTok{ x509 }\AttributeTok{{-}in}\NormalTok{ certs/server.crt }\AttributeTok{{-}noout} \AttributeTok{{-}ext}\NormalTok{ subjectAltName              }\CommentTok{\# CLOUD\_HOST байгаа юу?}
-\ExtensionTok{openssl}\NormalTok{ x509 }\AttributeTok{{-}in}\NormalTok{ certs/pi3b{-}01.crt }\AttributeTok{{-}noout} \AttributeTok{{-}subject} \AttributeTok{{-}dates} \AttributeTok{{-}ext}\NormalTok{ extendedKeyUsage}
+\ExtensionTok{openssl}\NormalTok{ verify {-}CAfile certs/ca.crt certs/server.crt certs/pi3b{-}01.crt   \# → OK, OK}
+\ExtensionTok{openssl}\NormalTok{ x509 {-}in certs/server.crt {-}noout {-}ext subjectAltName              \# CLOUD\_HOST байгаа юу?}
+\ExtensionTok{openssl}\NormalTok{ x509 {-}in certs/pi3b{-}01.crt {-}noout {-}subject {-}dates {-}ext extendedKeyUsage}
 \end{Highlighting}
 \end{Shaded}
 
@@ -285,16 +306,16 @@ DOWNLOADING → DOWNLOADED → VERIFIED → UPDATING → UPDATED
 Албан ёсны баримт: \href{https://docs.openssl.org/3.0/man1/openssl-req/}{openssl-req} · \href{https://docs.openssl.org/3.0/man1/openssl-x509/}{openssl-x509} · \href{https://docs.openssl.org/3.0/man1/openssl-verify/}{openssl-verify} · \href{https://docs.openssl.org/3.0/man5/x509v3_config/}{x509v3\_\allowbreak{}config (subjectAltName, extendedKeyUsage)}
 \end{quote}
 
-EMQX-д mTLS сонсогчийг асаана. SSL сонсогч (8883) анхдагчаар \textbf{нэг талын} TLS: клиентийн сертификатыг шаарддаггүй. Хоёр талын (mTLS) болгохын тулд \texttt{ssl\_\allowbreak{}options.\allowbreak{}verify\ =\allowbreak{}\ verify\_\allowbreak{}peer} ба \texttt{ssl\_\allowbreak{}options.\allowbreak{}fail\_\allowbreak{}if\_\allowbreak{}no\_\allowbreak{}peer\_\allowbreak{}cert\ =\allowbreak{}\ true} хоёулаа хэрэгтэй. \texttt{stack/\allowbreak{}docker-compose.\allowbreak{}yml} эдгээрийг \texttt{EMQX\_\allowbreak{}LISTENERS\_\allowbreak{}\_\allowbreak{}SSL\_\allowbreak{}\_\allowbreak{}DEFAULT\_\allowbreak{}\_\allowbreak{}SSL\_\allowbreak{}OPTIONS\_\allowbreak{}\_\allowbreak{}…} орчны хувьсагчаар (\texttt{.} → \texttt{\_\allowbreak{}\_\allowbreak{}}, угтвар \texttt{EMQX\_}) аль хэдийн тохируулсан; \texttt{EMQX\_\allowbreak{}TLS\_\allowbreak{}ENABLE} нь сонсогчийг асаана:
+EMQX-д mTLS сонсогчийг асаана. SSL сонсогч (8883) анхдагчаар \textbf{нэг талын} TLS: клиентийн сертификатыг шаарддаггүй. Хоёр талын (mTLS) болгохын тулд \texttt{ssl\_\allowbreak{}options.\allowbreak{}verify\ =\allowbreak{}\ verify\_\allowbreak{}peer} ба \texttt{ssl\_\allowbreak{}options.\allowbreak{}fail\_\allowbreak{}if\_\allowbreak{}no\_\allowbreak{}peer\_\allowbreak{}cert\ =\allowbreak{}\ true} хоёулаа хэрэгтэй. \texttt{stack/\allowbreak{}docker-compose.\allowbreak{}yml} эдгээрийг \texttt{EMQX\_\allowbreak{}LISTENERS\_\allowbreak{}\_\allowbreak{}SSL\_\allowbreak{}\_\allowbreak{}DEFAULT\_\allowbreak{}\_\allowbreak{}SSL\_\allowbreak{}OPTIONS\_\allowbreak{}\_\allowbreak{}\ldots{}} орчны хувьсагчаар (\texttt{.} → \texttt{\_\allowbreak{}\_\allowbreak{}}, угтвар \texttt{EMQX\_}) аль хэдийн тохируулсан; \texttt{EMQX\_\allowbreak{}TLS\_\allowbreak{}ENABLE} нь сонсогчийг асаана:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack}
-\FunctionTok{cp}\NormalTok{ ../lab02/certs/}\DataTypeTok{\{ca.crt}\OperatorTok{,}\DataTypeTok{server.crt}\OperatorTok{,}\DataTypeTok{server.key\}}\NormalTok{ emqx/certs/}
-\FunctionTok{sed} \AttributeTok{{-}i} \StringTok{\textquotesingle{}s/\^{}EMQX\_TLS\_ENABLE=.*/EMQX\_TLS\_ENABLE=true/\textquotesingle{}}\NormalTok{ .env}
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core up }\AttributeTok{{-}d}\NormalTok{ emqx          }\CommentTok{\# орчны хувьсагч өөрчлөгдсөн тул контейнер дахин үүснэ}
-\ExtensionTok{docker}\NormalTok{ compose exec emqx emqx ctl listeners }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}A3} \StringTok{\textquotesingle{}ssl:default\textquotesingle{}}   \CommentTok{\# running: true}
-\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}u} \StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"}\NormalTok{ localhost:18083/api/v5/listeners/ssl:default }\DataTypeTok{\textbackslash{}}
+\FunctionTok{cp}\NormalTok{ ../lab02/certs/}\DataTypeTok{\{ca.crt,server.crt,server.key\}}\NormalTok{ emqx/certs/}
+\FunctionTok{sed}\NormalTok{ {-}i }\StringTok{\textquotesingle{}s/\^{}EMQX\_TLS\_ENABLE=.*/EMQX\_TLS\_ENABLE=true/\textquotesingle{}}\NormalTok{ .env}
+\ExtensionTok{docker}\NormalTok{ compose {-}{-}profile core up {-}d emqx          \# орчны хувьсагч өөрчлөгдсөн тул контейнер дахин үүснэ}
+\ExtensionTok{docker}\NormalTok{ compose exec emqx emqx ctl listeners }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}A3 }\StringTok{\textquotesingle{}ssl:default\textquotesingle{}}\NormalTok{   \# running: true}
+\ExtensionTok{curl}\NormalTok{ {-}s {-}u }\StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"}\NormalTok{ localhost:18083/api/v5/listeners/ssl:default }\KeywordTok{\textbackslash{}}
   \KeywordTok{|} \ExtensionTok{jq} \StringTok{\textquotesingle{}.ssl\_options | \{verify, fail\_if\_no\_peer\_cert\}\textquotesingle{}}
 \CommentTok{\# → \{"verify":"verify\_peer","fail\_if\_no\_peer\_cert":true\}}
 \end{Highlighting}
@@ -311,8 +332,8 @@ CA ба төхөөрөмжийн файлыг Pi руу хуулна (\texttt{la
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [ЗК]}
-\FunctionTok{scp} \AttributeTok{{-}i}\NormalTok{ \textasciitilde{}/.ssh/cnc302 certs/}\DataTypeTok{\{ca.crt}\OperatorTok{,}\DataTypeTok{pi3b{-}01.crt}\OperatorTok{,}\DataTypeTok{pi3b{-}01.key\}} \DataTypeTok{\textbackslash{}}
-\NormalTok{    cnc302@pi{-}team03.local:\textasciitilde{}/cnc302/lab02/certs/}
+\FunctionTok{scp}\NormalTok{ {-}i \textasciitilde{}/.ssh/cnc302 certs/}\DataTypeTok{\{ca.crt,pi3b{-}01.crt,pi3b{-}01.key\}} \KeywordTok{\textbackslash{}}
+    \ExtensionTok{cnc302@pi{-}team03.local}\NormalTok{:\textasciitilde{}/cnc302/lab02/certs/}
 \end{Highlighting}
 \end{Shaded}
 
@@ -321,10 +342,10 @@ CA ба төхөөрөмжийн файлыг Pi руу хуулна (\texttt{la
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/lab02}
-\BuiltInTok{export} \VariableTok{CLOUD\_HOST}\OperatorTok{=}\VariableTok{$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}CLOUD\_HOST=\textquotesingle{}}\NormalTok{ ../edge/.env }\KeywordTok{|} \FunctionTok{cut} \AttributeTok{{-}d}\OperatorTok{=} \AttributeTok{{-}f2}\VariableTok{)}
-\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}p}\NormalTok{ 8883 }\AttributeTok{{-}d} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}{-}cafile}\NormalTok{ certs/ca.crt }\AttributeTok{{-}{-}cert}\NormalTok{ certs/pi3b{-}01.crt }\AttributeTok{{-}{-}key}\NormalTok{ certs/pi3b{-}01.key }\DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/pi3b{-}01/telemetry\textquotesingle{}} \AttributeTok{{-}m} \StringTok{\textquotesingle{}\{"tls":true\}\textquotesingle{}}
+\BuiltInTok{export} \VariableTok{CLOUD\_HOST=$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}CLOUD\_HOST=\textquotesingle{}}\NormalTok{ ../edge/.env }\KeywordTok{|} \FunctionTok{cut}\NormalTok{ {-}d= {-}f2}\VariableTok{)}
+\ExtensionTok{mosquitto\_pub}\NormalTok{ {-}h }\VariableTok{$CLOUD\_HOST}\NormalTok{ {-}p 8883 {-}d }\KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}{-}cafile}\NormalTok{ certs/ca.crt {-}{-}cert certs/pi3b{-}01.crt {-}{-}key certs/pi3b{-}01.key }\KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/pi3b{-}01/telemetry\textquotesingle{}}\NormalTok{ {-}m }\StringTok{\textquotesingle{}\{"tls":true\}\textquotesingle{}}
 \CommentTok{\# → Client … received CONNACK (0)}
 \end{Highlighting}
 \end{Shaded}
@@ -333,8 +354,8 @@ CA ба төхөөрөмжийн файлыг Pi руу хуулна (\texttt{la
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}p}\NormalTok{ 8883 }\AttributeTok{{-}d} \AttributeTok{{-}{-}cafile}\NormalTok{ certs/ca.crt }\DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/pi3b{-}01/telemetry\textquotesingle{}} \AttributeTok{{-}m} \StringTok{\textquotesingle{}\{"tls":false\}\textquotesingle{}}
+\ExtensionTok{mosquitto\_pub}\NormalTok{ {-}h }\VariableTok{$CLOUD\_HOST}\NormalTok{ {-}p 8883 {-}d {-}{-}cafile certs/ca.crt }\KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/pi3b{-}01/telemetry\textquotesingle{}}\NormalTok{ {-}m }\StringTok{\textquotesingle{}\{"tls":false\}\textquotesingle{}}
 \CommentTok{\# → OpenSSL Error[0]: … tlsv13 alert certificate required}
 \CommentTok{\# → Error: The connection was lost.}
 \end{Highlighting}
@@ -344,10 +365,10 @@ CA ба төхөөрөмжийн файлыг Pi руу хуулна (\texttt{la
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{openssl}\NormalTok{ req }\AttributeTok{{-}x509} \AttributeTok{{-}newkey}\NormalTok{ rsa:2048 }\AttributeTok{{-}nodes} \AttributeTok{{-}days}\NormalTok{ 1 }\AttributeTok{{-}subj}\NormalTok{ /CN=pi3b{-}01 }\DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}keyout}\NormalTok{ /tmp/rogue.key }\AttributeTok{{-}out}\NormalTok{ /tmp/rogue.crt}
-\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}p}\NormalTok{ 8883 }\AttributeTok{{-}{-}cafile}\NormalTok{ certs/ca.crt }\DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}{-}cert}\NormalTok{ /tmp/rogue.crt }\AttributeTok{{-}{-}key}\NormalTok{ /tmp/rogue.key }\AttributeTok{{-}t}\NormalTok{ test }\AttributeTok{{-}m}\NormalTok{ x}
+\ExtensionTok{openssl}\NormalTok{ req {-}x509 {-}newkey rsa:2048 {-}nodes {-}days 1 {-}subj /CN=pi3b{-}01 }\KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}keyout}\NormalTok{ /tmp/rogue.key {-}out /tmp/rogue.crt}
+\ExtensionTok{mosquitto\_pub}\NormalTok{ {-}h }\VariableTok{$CLOUD\_HOST}\NormalTok{ {-}p 8883 {-}{-}cafile certs/ca.crt }\KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}{-}cert}\NormalTok{ /tmp/rogue.crt {-}{-}key /tmp/rogue.key {-}t test {-}m x}
 \end{Highlighting}
 \end{Shaded}
 
@@ -360,15 +381,14 @@ CA ба төхөөрөмжийн файлыг Pi руу хуулна (\texttt{la
 
 \begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-Хэмжигдэхүүн & 1883 (TLS-гүй) & 8883 (mTLS) & Ялгаа \\
+Хэмжигдэхүүн & 1883 (TLS-гүй) & 8883 (mTLS) & Ялгаа\tabularnewline
 \midrule
 \endhead
+Холбогдох хугацаа (мс) & & &\tabularnewline
+p50 саатал, QoS 1 (мс) & & &\tabularnewline
+p99 саатал (мс) & & &\tabularnewline
+Pi-гийн CPU \% нийтлэх үед & & &\tabularnewline
 \bottomrule
-\endlastfoot
-Холбогдох хугацаа (мс) & & & \\
-p50 саатал, QoS 1 (мс) & & & \\
-p99 саатал (мс) & & & \\
-Pi-гийн CPU \% нийтлэх үед & & & \\
 \end{longtable}\endgroup
 
 Хэмжих:
@@ -376,9 +396,9 @@ Pi-гийн CPU \% нийтлэх үед & & & \\
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [Pi] Pi дээр (\textasciitilde{}/cnc302/lab02)}
-\ExtensionTok{python3}\NormalTok{ ../tools/qos\_latency.py }\AttributeTok{{-}{-}host} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}{-}port}\NormalTok{ 1883 }\AttributeTok{{-}{-}path}\NormalTok{ lan }\AttributeTok{{-}{-}count}\NormalTok{ 200}
-\ExtensionTok{python3}\NormalTok{ ../tools/qos\_latency.py }\AttributeTok{{-}{-}host} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}{-}port}\NormalTok{ 8883 }\AttributeTok{{-}{-}path}\NormalTok{ lan }\AttributeTok{{-}{-}count}\NormalTok{ 200 }\DataTypeTok{\textbackslash{}}
-        \AttributeTok{{-}{-}tls} \AttributeTok{{-}{-}ca}\NormalTok{ certs/ca.crt }\AttributeTok{{-}{-}cert}\NormalTok{ certs/pi3b{-}01.crt }\AttributeTok{{-}{-}key}\NormalTok{ certs/pi3b{-}01.key}
+\ExtensionTok{python3}\NormalTok{ ../tools/qos\_latency.py {-}{-}host }\VariableTok{$CLOUD\_HOST}\NormalTok{ {-}{-}port 1883 {-}{-}path lan {-}{-}count 200}
+\ExtensionTok{python3}\NormalTok{ ../tools/qos\_latency.py {-}{-}host }\VariableTok{$CLOUD\_HOST}\NormalTok{ {-}{-}port 8883 {-}{-}path lan {-}{-}count 200 }\KeywordTok{\textbackslash{}}
+        \ExtensionTok{{-}{-}tls}\NormalTok{ {-}{-}ca certs/ca.crt {-}{-}cert certs/pi3b{-}01.crt {-}{-}key certs/pi3b{-}01.key}
 \end{Highlighting}
 \end{Shaded}
 
@@ -387,8 +407,8 @@ Pi-гийн CPU \% нийтлэх үед & & & \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{grep} \AttributeTok{{-}m1}\NormalTok{ Features /proc/cpuinfo      }\CommentTok{\# aes, sha1, sha2, pmull байгаа эсэх}
-\ExtensionTok{openssl}\NormalTok{ speed }\AttributeTok{{-}evp}\NormalTok{ aes{-}128{-}gcm        }\CommentTok{\# Pi дээр ба компьютер дээр харьцуул}
+\FunctionTok{grep}\NormalTok{ {-}m1 Features /proc/cpuinfo      \# aes, sha1, sha2, pmull байгаа эсэх}
+\ExtensionTok{openssl}\NormalTok{ speed {-}evp aes{-}128{-}gcm        \# Pi дээр ба компьютер дээр харьцуул}
 \end{Highlighting}
 \end{Shaded}
 
@@ -403,9 +423,9 @@ Firmware дүрс байршуулна (жинхэнэ биш, санамсар�
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [ЗК] компьютер дээр}
-\FunctionTok{head} \AttributeTok{{-}c}\NormalTok{ 524288 /dev/urandom }\OperatorTok{\textgreater{}}\NormalTok{ /tmp/fw{-}1.2.0.bin      }\CommentTok{\# 512 KiB}
-\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST }\StringTok{"localhost:8090/firmware?version=1.2.0"} \DataTypeTok{\textbackslash{}}
-     \AttributeTok{{-}F} \StringTok{"file=@/tmp/fw{-}1.2.0.bin"} \KeywordTok{|} \ExtensionTok{jq}
+\FunctionTok{head}\NormalTok{ {-}c 524288 /dev/urandom }\OperatorTok{\textgreater{}}\NormalTok{ /tmp/fw{-}1.2.0.bin      \# 512 KiB}
+\ExtensionTok{curl}\NormalTok{ {-}s {-}X POST }\StringTok{"localhost:8090/firmware?version=1.2.0"} \KeywordTok{\textbackslash{}}
+     \ExtensionTok{{-}F} \StringTok{"file=@/tmp/fw{-}1.2.0.bin"} \KeywordTok{|} \ExtensionTok{jq}
 \CommentTok{\# → \{"fw\_id":"…","version":"1.2.0","size":524288,"chunks":128,"sha256":"…"\}}
 \end{Highlighting}
 \end{Shaded}
@@ -415,7 +435,7 @@ Firmware дүрс байршуулна (жинхэнэ биш, санамсар�
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/lab02}
-\ExtensionTok{python3}\NormalTok{ ota\_agent.py }\AttributeTok{{-}{-}host} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}{-}device}\NormalTok{ pi3b{-}01 }\AttributeTok{{-}{-}out}\NormalTok{ out/fw }\AttributeTok{{-}{-}once}
+\ExtensionTok{python3}\NormalTok{ ota\_agent.py {-}{-}host }\VariableTok{$CLOUD\_HOST}\NormalTok{ {-}{-}device pi3b{-}01 {-}{-}out out/fw {-}{-}once}
 \end{Highlighting}
 \end{Shaded}
 
@@ -423,13 +443,13 @@ Firmware дүрс байршуулна (жинхэнэ биш, санамсар�
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\VariableTok{FW}\OperatorTok{=\textless{}}\NormalTok{дээрх }\ExtensionTok{fw\_id}\OperatorTok{\textgreater{}}
-\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST localhost:8090/rollout }\AttributeTok{{-}H} \StringTok{\textquotesingle{}content{-}type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}d} \StringTok{"\{}\DataTypeTok{\textbackslash{}"}\StringTok{fw\_id}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\VariableTok{$FW}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{canary\_percent}\DataTypeTok{\textbackslash{}"}\StringTok{:100,}\DataTypeTok{\textbackslash{}"}\StringTok{devices}\DataTypeTok{\textbackslash{}"}\StringTok{:[}\DataTypeTok{\textbackslash{}"}\StringTok{pi3b{-}01}\DataTypeTok{\textbackslash{}"}\StringTok{]\}"} \KeywordTok{|} \ExtensionTok{jq}
+\VariableTok{FW=}\OperatorTok{\textless{}}\NormalTok{дээрх }\ExtensionTok{fw\_id}\OperatorTok{\textgreater{}}
+\ExtensionTok{curl}\NormalTok{ {-}s {-}X POST localhost:8090/rollout {-}H }\StringTok{\textquotesingle{}content{-}type: application/json\textquotesingle{}} \KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}d} \StringTok{"\{}\DataTypeTok{\textbackslash{}"}\StringTok{fw\_id}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\VariableTok{$FW}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{canary\_percent}\DataTypeTok{\textbackslash{}"}\StringTok{:100,}\DataTypeTok{\textbackslash{}"}\StringTok{devices}\DataTypeTok{\textbackslash{}"}\StringTok{:[}\DataTypeTok{\textbackslash{}"}\StringTok{pi3b{-}01}\DataTypeTok{\textbackslash{}"}\StringTok{]\}"} \KeywordTok{|} \ExtensionTok{jq}
 \end{Highlighting}
 \end{Shaded}
 
-Pi дээрх лог \texttt{DOWNLOADING\ →\ …\ →\ UPDATED} дарааллыг харуулах ёстой.
+Pi дээрх лог \texttt{DOWNLOADING\ →\ \ldots{}\ →\ UPDATED} дарааллыг харуулах ёстой.
 
 \begin{quote}
 \texttt{offer} мессеж retained биш: агент \textbf{эхэлж} ажиллаж, захиалгаа хийсэн байх ёстой, дараа нь л тараалтыг эхлүүлнэ. Эс бөгөөс агент саналыг хэзээ ч авахгүй.
@@ -440,11 +460,11 @@ Pi дээрх лог \texttt{DOWNLOADING\ →\ …\ →\ UPDATED} дараалл
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [Pi] Pi → үүл шууд (LAN)}
-\ExtensionTok{python3}\NormalTok{ ota\_agent.py }\AttributeTok{{-}{-}host} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}{-}device}\NormalTok{ pi3b{-}01 }\AttributeTok{{-}{-}out}\NormalTok{ out/fw }\AttributeTok{{-}{-}once}
+\ExtensionTok{python3}\NormalTok{ ota\_agent.py {-}{-}host }\VariableTok{$CLOUD\_HOST}\NormalTok{ {-}{-}device pi3b{-}01 {-}{-}out out/fw {-}{-}once}
 \CommentTok{\# [Pi] Pi → гүүрээр: Pi{-}гийн mosquitto руу холбогдоно (ota/\# нь гүүрийн "in" сэдэвт бий)}
-\ExtensionTok{python3}\NormalTok{ ota\_agent.py }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\AttributeTok{{-}{-}device}\NormalTok{ pi3b{-}01 }\AttributeTok{{-}{-}out}\NormalTok{ out/fw }\AttributeTok{{-}{-}once}
+\ExtensionTok{python3}\NormalTok{ ota\_agent.py {-}{-}host localhost {-}{-}device pi3b{-}01 {-}{-}out out/fw {-}{-}once}
 \CommentTok{\# [ЗК] (лавлагаа) loopback: компьютер дээр, EMQX руу шууд}
-\ExtensionTok{python3}\NormalTok{ ota\_agent.py }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\AttributeTok{{-}{-}device}\NormalTok{ pi3b{-}01 }\AttributeTok{{-}{-}out}\NormalTok{ /tmp/fw{-}loop }\AttributeTok{{-}{-}once}
+\ExtensionTok{python3}\NormalTok{ ota\_agent.py {-}{-}host localhost {-}{-}device pi3b{-}01 {-}{-}out /tmp/fw{-}loop {-}{-}once}
 \end{Highlighting}
 \end{Shaded}
 
@@ -453,28 +473,26 @@ Pi дээрх лог \texttt{DOWNLOADING\ →\ …\ →\ UPDATED} дараалл
 
 \begingroup\scriptsize\begin{longtable}[]{@{}lllll@{}}
 \toprule
-Зам & Нийт хугацаа (сек) & KiB/сек & Хэсэг/сек & Тэмдэглэл \\
+Зам & Нийт хугацаа (сек) & KiB/сек & Хэсэг/сек & Тэмдэглэл\tabularnewline
 \midrule
 \endhead
+Pi → үүл шууд (LAN) & & & &\tabularnewline
+Pi → гүүрээр & & & &\tabularnewline
+(лавлагаа) loopback & & & &\tabularnewline
 \bottomrule
-\endlastfoot
-Pi → үүл шууд (LAN) & & & & \\
-Pi → гүүрээр & & & & \\
-(лавлагаа) loopback & & & & \\
 \end{longtable}\endgroup
 
 Файлын хэмжээг өөрчилж давт: 128 KiB, 512 KiB, 2 MiB.
 
 \begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-Хэмжээ & Хэсэг & Хугацаа (сек) & KiB/сек \\
+Хэмжээ & Хэсэг & Хугацаа (сек) & KiB/сек\tabularnewline
 \midrule
 \endhead
+128 KiB & 32 & &\tabularnewline
+512 KiB & 128 & &\tabularnewline
+2 MiB & 512 & &\tabularnewline
 \bottomrule
-\endlastfoot
-128 KiB & 32 & & \\
-512 KiB & 128 & & \\
-2 MiB & 512 & & \\
 \end{longtable}\endgroup
 
 \begin{quote}
@@ -489,11 +507,11 @@ Pi → гүүрээр & & & & \\
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [ЗК]}
-\FunctionTok{head} \AttributeTok{{-}c}\NormalTok{ 131072 /dev/urandom }\OperatorTok{\textgreater{}}\NormalTok{ /tmp/fw{-}1.3.0.bin}
-\VariableTok{FW2}\OperatorTok{=}\VariableTok{$(}\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST }\StringTok{"localhost:8090/firmware?version=1.3.0"} \DataTypeTok{\textbackslash{}}
-      \AttributeTok{{-}F} \StringTok{"file=@/tmp/fw{-}1.3.0.bin"} \KeywordTok{|} \ExtensionTok{jq} \AttributeTok{{-}r}\NormalTok{ .fw\_id}\VariableTok{)}
-\FunctionTok{offer()} \KeywordTok{\{} \ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST localhost:8090/rollout }\AttributeTok{{-}H} \StringTok{\textquotesingle{}content{-}type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}d} \StringTok{"\{}\DataTypeTok{\textbackslash{}"}\StringTok{fw\_id}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\VariableTok{$FW2}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{canary\_percent}\DataTypeTok{\textbackslash{}"}\StringTok{:100,}\DataTypeTok{\textbackslash{}"}\StringTok{devices}\DataTypeTok{\textbackslash{}"}\StringTok{:[}\DataTypeTok{\textbackslash{}"}\StringTok{pi3b{-}01}\DataTypeTok{\textbackslash{}"}\StringTok{]\}"} \KeywordTok{|} \ExtensionTok{jq} \AttributeTok{{-}c}\KeywordTok{;} \KeywordTok{\}}
+\FunctionTok{head}\NormalTok{ {-}c 131072 /dev/urandom }\OperatorTok{\textgreater{}}\NormalTok{ /tmp/fw{-}1.3.0.bin}
+\VariableTok{FW2=$(}\ExtensionTok{curl}\NormalTok{ {-}s {-}X POST }\StringTok{"localhost:8090/firmware?version=1.3.0"} \KeywordTok{\textbackslash{}}
+      \ExtensionTok{{-}F} \StringTok{"file=@/tmp/fw{-}1.3.0.bin"} \KeywordTok{|} \ExtensionTok{jq}\NormalTok{ {-}r .fw\_id}\VariableTok{)}
+\FunctionTok{offer()} \KeywordTok{\{} \ExtensionTok{curl}\NormalTok{ {-}s {-}X POST localhost:8090/rollout {-}H }\StringTok{\textquotesingle{}content{-}type: application/json\textquotesingle{}} \KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}d} \StringTok{"\{}\DataTypeTok{\textbackslash{}"}\StringTok{fw\_id}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\VariableTok{$FW2}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{canary\_percent}\DataTypeTok{\textbackslash{}"}\StringTok{:100,}\DataTypeTok{\textbackslash{}"}\StringTok{devices}\DataTypeTok{\textbackslash{}"}\StringTok{:[}\DataTypeTok{\textbackslash{}"}\StringTok{pi3b{-}01}\DataTypeTok{\textbackslash{}"}\StringTok{]\}"} \KeywordTok{|} \ExtensionTok{jq}\NormalTok{ {-}c}\KeywordTok{;} \KeywordTok{\}}
 \CommentTok{\# [Pi] агентыг ажиллуулсны ДАРАА [ЗК] дээр \textasciigrave{}offer\textasciigrave{} гэж дуудна}
 \end{Highlighting}
 \end{Shaded}
@@ -502,7 +520,7 @@ Pi → гүүрээр & & & & \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ ota\_agent.py }\AttributeTok{{-}{-}host} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}{-}device}\NormalTok{ pi3b{-}01 }\AttributeTok{{-}{-}out}\NormalTok{ out/fw }\AttributeTok{{-}{-}once} \AttributeTok{{-}{-}fail{-}verify}
+\ExtensionTok{python3}\NormalTok{ ota\_agent.py {-}{-}host }\VariableTok{$CLOUD\_HOST}\NormalTok{ {-}{-}device pi3b{-}01 {-}{-}out out/fw {-}{-}once {-}{-}fail{-}verify}
 \end{Highlighting}
 \end{Shaded}
 
@@ -512,7 +530,7 @@ Pi → гүүрээр & & & & \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ ota\_agent.py }\AttributeTok{{-}{-}host} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}{-}device}\NormalTok{ pi3b{-}01 }\AttributeTok{{-}{-}out}\NormalTok{ out/fw }\AttributeTok{{-}{-}once} \AttributeTok{{-}{-}fail{-}apply}
+\ExtensionTok{python3}\NormalTok{ ota\_agent.py {-}{-}host }\VariableTok{$CLOUD\_HOST}\NormalTok{ {-}{-}device pi3b{-}01 {-}{-}out out/fw {-}{-}once {-}{-}fail{-}apply}
 \end{Highlighting}
 \end{Shaded}
 
@@ -520,7 +538,7 @@ Pi → гүүрээр & & & & \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{sha256sum}\NormalTok{ out/fw/current.bin out/fw/previous.bin}
+\ExtensionTok{sha256sum}\NormalTok{ out/fw/current.bin out/fw/previous.bin}
 \FunctionTok{cat}\NormalTok{ out/fw/version.txt}
 \end{Highlighting}
 \end{Shaded}
@@ -529,43 +547,84 @@ Pi → гүүрээр & & & & \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ ota\_agent.py }\AttributeTok{{-}{-}host} \VariableTok{$CLOUD\_HOST} \AttributeTok{{-}{-}device}\NormalTok{ pi3b{-}01 }\AttributeTok{{-}{-}out}\NormalTok{ out/fw }\AttributeTok{{-}{-}once} \DataTypeTok{\textbackslash{}}
-        \AttributeTok{{-}{-}drop{-}rate}\NormalTok{ 0.2 }\AttributeTok{{-}{-}retry{-}after}\NormalTok{ 1.0 }\AttributeTok{{-}{-}max{-}retries}\NormalTok{ 8}
+\ExtensionTok{python3}\NormalTok{ ota\_agent.py {-}{-}host }\VariableTok{$CLOUD\_HOST}\NormalTok{ {-}{-}device pi3b{-}01 {-}{-}out out/fw {-}{-}once }\KeywordTok{\textbackslash{}}
+        \ExtensionTok{{-}{-}drop{-}rate}\NormalTok{ 0.2 {-}{-}retry{-}after 1.0 {-}{-}max{-}retries 8}
 \end{Highlighting}
 \end{Shaded}
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-2.5-ux44dux432ux434ux440ux44dux43bux438ux439ux43d-ux445ux430ux440ux438ux443-ux4afux439ux43bux434ux44dux43b}{%
 \subsubsection{Хүснэгт 2.5 --- Эвдрэлийн хариу үйлдэл}\label{ux445ux4afux441ux43dux44dux433ux442-2.5-ux44dux432ux434ux440ux44dux43bux438ux439ux43d-ux445ux430ux440ux438ux443-ux4afux439ux43bux434ux44dux43b}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llllll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Хувилбар
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Эцсийн төлөв
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хугацаа (сек)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Алдагдсан хэсэг
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Дахин гуйсан тоо
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хуучин хувилбар хадгалагдсан уу
-\end{minipage} \\
+\begin{minipage}[b]{0.14\columnwidth}\raggedright
+Хувилбар\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+Эцсийн төлөв\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+Хугацаа (сек)\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+Алдагдсан хэсэг\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+Дахин гуйсан тоо\strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\raggedright
+Хуучин хувилбар хадгалагдсан уу\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.14\columnwidth}\raggedright
+Хэвийн\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+UPDATED\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+0\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+0\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+---\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright
+\texttt{-\/-fail-verify}\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright
+\texttt{-\/-fail-apply}\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright
+\texttt{-\/\allowbreak{}-drop-rate\ 0.\allowbreak{}2}\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-Хэвийн & UPDATED & & 0 & 0 & --- \\
-\texttt{-\/-fail-verify} & & & & & \\
-\texttt{-\/-fail-apply} & & & & & \\
-\texttt{-\/\allowbreak{}-drop-rate\ 0.\allowbreak{}2} & & & & & \\
 \end{longtable}\endgroup
 
 \begin{quote}
@@ -580,62 +639,43 @@ Pi → гүүрээр & & & & \\
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# 20 виртуал төхөөрөмж бүртгэнэ}
-\ExtensionTok{python3}\NormalTok{ provision.py bulk }\AttributeTok{{-}{-}count}\NormalTok{ 20 }\AttributeTok{{-}{-}prefix}\NormalTok{ ota }\AttributeTok{{-}{-}out}\NormalTok{ out/ota.csv}
+\ExtensionTok{python3}\NormalTok{ provision.py bulk {-}{-}count 20 {-}{-}prefix ota {-}{-}out out/ota.csv}
 
 \CommentTok{\# 20 OTA клиент зэрэг ажиллуулна (2 нь эвдэрсэн байхаар)}
-\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \VariableTok{$(}\FunctionTok{seq} \AttributeTok{{-}w}\NormalTok{ 1 18}\VariableTok{)}\KeywordTok{;} \ControlFlowTok{do}
-  \ExtensionTok{python3}\NormalTok{ ota\_agent.py }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\AttributeTok{{-}{-}device}\NormalTok{ ota00}\VariableTok{$i} \AttributeTok{{-}{-}out}\NormalTok{ out/f}\VariableTok{$i} \AttributeTok{{-}{-}once} \KeywordTok{\&}
-\ControlFlowTok{done}
-\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in}\NormalTok{ 19 20}\KeywordTok{;} \ControlFlowTok{do}
-  \ExtensionTok{python3}\NormalTok{ ota\_agent.py }\AttributeTok{{-}{-}host}\NormalTok{ localhost }\AttributeTok{{-}{-}device}\NormalTok{ ota00}\VariableTok{$i} \AttributeTok{{-}{-}out}\NormalTok{ out/f}\VariableTok{$i} \AttributeTok{{-}{-}once} \AttributeTok{{-}{-}fail{-}apply} \KeywordTok{\&}
-\ControlFlowTok{done}
+\KeywordTok{for} \ExtensionTok{i}\NormalTok{ in }\VariableTok{$(}\FunctionTok{seq}\NormalTok{ {-}w 1 18}\VariableTok{)}\KeywordTok{;} \KeywordTok{do}
+  \ExtensionTok{python3}\NormalTok{ ota\_agent.py {-}{-}host localhost {-}{-}device ota00}\VariableTok{$i}\NormalTok{ {-}{-}out out/f}\VariableTok{$i}\NormalTok{ {-}{-}once }\KeywordTok{\&}
+\KeywordTok{done}
+\KeywordTok{for} \ExtensionTok{i}\NormalTok{ in 19 20}\KeywordTok{;} \KeywordTok{do}
+  \ExtensionTok{python3}\NormalTok{ ota\_agent.py {-}{-}host localhost {-}{-}device ota00}\VariableTok{$i}\NormalTok{ {-}{-}out out/f}\VariableTok{$i}\NormalTok{ {-}{-}once {-}{-}fail{-}apply }\KeywordTok{\&}
+\KeywordTok{done}
 \FunctionTok{sleep}\NormalTok{ 3}
 
 \CommentTok{\# Canary 20\% (жагсаалтын ЭХНИЙ 4 төхөөрөмж). \textasciigrave{}devices\textasciigrave{}{-}ийг заавал өгнө —}
 \CommentTok{\# эс бөгөөс хүчингүй болоогүй БҮХ төхөөрөмж (dev*, b100*, b500* …) зорилт болно.}
-\VariableTok{DEVS}\OperatorTok{=}\VariableTok{$(}\FunctionTok{seq} \AttributeTok{{-}f} \StringTok{\textquotesingle{}"ota\%04g"\textquotesingle{}}\NormalTok{ 1 20 }\KeywordTok{|} \FunctionTok{paste} \AttributeTok{{-}sd,} \AttributeTok{{-}}\VariableTok{)}
-\VariableTok{RID}\OperatorTok{=}\VariableTok{$(}\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST localhost:8090/rollout }\AttributeTok{{-}H} \StringTok{\textquotesingle{}content{-}type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}d} \StringTok{"\{}\DataTypeTok{\textbackslash{}"}\StringTok{fw\_id}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\VariableTok{$FW}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{canary\_percent}\DataTypeTok{\textbackslash{}"}\StringTok{:20,}\DataTypeTok{\textbackslash{}"}\StringTok{devices}\DataTypeTok{\textbackslash{}"}\StringTok{:[}\VariableTok{$DEVS}\StringTok{]\}"} \KeywordTok{|} \ExtensionTok{jq} \AttributeTok{{-}r}\NormalTok{ .rollout\_id}\VariableTok{)}
+\VariableTok{DEVS=$(}\FunctionTok{seq}\NormalTok{ {-}f }\StringTok{\textquotesingle{}"ota\%04g"\textquotesingle{}}\NormalTok{ 1 20 }\KeywordTok{|} \ExtensionTok{paste}\NormalTok{ {-}sd, {-}}\VariableTok{)}
+\VariableTok{RID=$(}\ExtensionTok{curl}\NormalTok{ {-}s {-}X POST localhost:8090/rollout {-}H }\StringTok{\textquotesingle{}content{-}type: application/json\textquotesingle{}} \KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}d} \StringTok{"\{}\DataTypeTok{\textbackslash{}"}\StringTok{fw\_id}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\VariableTok{$FW}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{canary\_percent}\DataTypeTok{\textbackslash{}"}\StringTok{:20,}\DataTypeTok{\textbackslash{}"}\StringTok{devices}\DataTypeTok{\textbackslash{}"}\StringTok{:[}\VariableTok{$DEVS}\StringTok{]\}"} \KeywordTok{|} \ExtensionTok{jq}\NormalTok{ {-}r .rollout\_id}\VariableTok{)}
 
 \FunctionTok{sleep}\NormalTok{ 10}
-\ExtensionTok{curl} \AttributeTok{{-}s}\NormalTok{ localhost:8090/rollout/}\VariableTok{$RID} \KeywordTok{|} \ExtensionTok{jq} \StringTok{\textquotesingle{}.summary, .success\_rate\textquotesingle{}}
+\ExtensionTok{curl}\NormalTok{ {-}s localhost:8090/rollout/}\VariableTok{$RID} \KeywordTok{|} \ExtensionTok{jq} \StringTok{\textquotesingle{}.summary, .success\_rate\textquotesingle{}}
 
 \CommentTok{\# Canary{-}гийн БҮХ төхөөрөмж UPDATED бол бусдад тараана (эс бөгөөс HTTP 409)}
-\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}X}\NormalTok{ POST localhost:8090/rollout/}\VariableTok{$RID}\NormalTok{/promote }\KeywordTok{|} \ExtensionTok{jq}
+\ExtensionTok{curl}\NormalTok{ {-}s {-}X POST localhost:8090/rollout/}\VariableTok{$RID}\NormalTok{/promote }\KeywordTok{|} \ExtensionTok{jq}
 \end{Highlighting}
 \end{Shaded}
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-2.6-canary-ux442ux430ux440ux430ux430ux43bux442}{%
 \subsubsection{Хүснэгт 2.6 --- Canary тараалт}\label{ux445ux4afux441ux43dux44dux433ux442-2.6-canary-ux442ux430ux440ux430ux430ux43bux442}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1667}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llllll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Давалгаа
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Төхөөрөмж
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-UPDATED
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-FAILED / ROLLED\_BACK
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Амжилтын \%
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хугацаа
-\end{minipage} \\
+Давалгаа & Төхөөрөмж & UPDATED & FAILED / ROLLED\_BACK & Амжилтын \% & Хугацаа\tabularnewline
 \midrule
 \endhead
+Canary (20\%) & & & & &\tabularnewline
+Бүрэн (80\%) & & & & &\tabularnewline
+\textbf{Нийт} & 20 & & & &\tabularnewline
 \bottomrule
-\endlastfoot
-Canary (20\%) & & & & & \\
-Бүрэн (80\%) & & & & & \\
-\textbf{Нийт} & 20 & & & & \\
 \end{longtable}\endgroup
 
 Одоо \textbf{canary унасан} хувилбарыг туршина: агентуудыг дахин ажиллуулаад \texttt{devices} жагсаалтын эхэнд \texttt{"ota0019","ota0020"}-ийг тавьж canary-д оруул, дараа нь \texttt{promote} дууд. (Хүлээгдэх: HTTP 409, \texttt{rollout.state} = \texttt{halted}; дахин \texttt{promote} дуудсан ч 409.)
@@ -648,22 +688,22 @@ Canary (20\%) & & & & & \\
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [ЗК] (Алхам 0{-}ийн EMQX\_API\_KEY / EMQX\_API\_SECRET export хийсэн терминал)}
-\VariableTok{AUTHN}\OperatorTok{=}\NormalTok{localhost:18083/api/v5/authentication/password\_based\%3Abuilt\_in\_database}
-\FunctionTok{authn()} \KeywordTok{\{} \ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}o}\NormalTok{ /dev/null }\AttributeTok{{-}w} \StringTok{"authn enable=}\VariableTok{$1}\StringTok{ → HTTP \%\{http\_code\}\textbackslash{}n"} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}u} \StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"} \AttributeTok{{-}X}\NormalTok{ PUT }\StringTok{"}\VariableTok{$AUTHN}\StringTok{"} \AttributeTok{{-}H} \StringTok{\textquotesingle{}content{-}type: application/json\textquotesingle{}} \DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}d} \StringTok{"\{}\DataTypeTok{\textbackslash{}"}\StringTok{mechanism}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{password\_based}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{backend}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{built\_in\_database}\DataTypeTok{\textbackslash{}"}\StringTok{,}
+\VariableTok{AUTHN=}\NormalTok{localhost:18083/api/v5/authentication/password\_based\%3Abuilt\_in\_database}
+\FunctionTok{authn()} \KeywordTok{\{} \ExtensionTok{curl}\NormalTok{ {-}s {-}o /dev/null {-}w }\StringTok{"authn enable=}\VariableTok{$1}\StringTok{ → HTTP \%\{http\_code\}\textbackslash{}n"} \KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}u} \StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"}\NormalTok{ {-}X PUT }\StringTok{"}\VariableTok{$AUTHN}\StringTok{"}\NormalTok{ {-}H }\StringTok{\textquotesingle{}content{-}type: application/json\textquotesingle{}} \KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}d} \StringTok{"\{}\DataTypeTok{\textbackslash{}"}\StringTok{mechanism}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{password\_based}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{backend}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{built\_in\_database}\DataTypeTok{\textbackslash{}"}\StringTok{,}
 \StringTok{       }\DataTypeTok{\textbackslash{}"}\StringTok{user\_id\_type}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{username}\DataTypeTok{\textbackslash{}"}\StringTok{,}
 \StringTok{       }\DataTypeTok{\textbackslash{}"}\StringTok{password\_hash\_algorithm}\DataTypeTok{\textbackslash{}"}\StringTok{:\{}\DataTypeTok{\textbackslash{}"}\StringTok{name}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{sha256}\DataTypeTok{\textbackslash{}"}\StringTok{,}\DataTypeTok{\textbackslash{}"}\StringTok{salt\_position}\DataTypeTok{\textbackslash{}"}\StringTok{:}\DataTypeTok{\textbackslash{}"}\StringTok{suffix}\DataTypeTok{\textbackslash{}"}\StringTok{\},}
 \StringTok{       }\DataTypeTok{\textbackslash{}"}\StringTok{enable}\DataTypeTok{\textbackslash{}"}\StringTok{:}\VariableTok{$1}\StringTok{\}"}\KeywordTok{;} \KeywordTok{\}}
-\ExtensionTok{authn}\NormalTok{ true                                                   }\CommentTok{\# → HTTP 204}
+\ExtensionTok{authn}\NormalTok{ true                                                   \# → HTTP 204}
 
-\VariableTok{PW}\OperatorTok{=}\VariableTok{$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}dev0001,\textquotesingle{}}\NormalTok{ out/devices.csv }\KeywordTok{|} \FunctionTok{cut} \AttributeTok{{-}d,} \AttributeTok{{-}f3}\VariableTok{)}
-\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}u}\NormalTok{ dev0001 }\AttributeTok{{-}P} \StringTok{"}\VariableTok{$PW}\StringTok{"} \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/dev0001/telemetry\textquotesingle{}} \AttributeTok{{-}m} \StringTok{\textquotesingle{}\{"test":1\}\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+\VariableTok{PW=$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}dev0001,\textquotesingle{}}\NormalTok{ out/devices.csv }\KeywordTok{|} \FunctionTok{cut}\NormalTok{ {-}d, {-}f3}\VariableTok{)}
+\ExtensionTok{mosquitto\_pub}\NormalTok{ {-}h localhost {-}u dev0001 {-}P }\StringTok{"}\VariableTok{$PW}\StringTok{"}\NormalTok{ {-}t }\StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/dev0001/telemetry\textquotesingle{}}\NormalTok{ {-}m }\StringTok{\textquotesingle{}\{"test":1\}\textquotesingle{}} \KeywordTok{\textbackslash{}}
   \KeywordTok{\&\&} \BuiltInTok{echo} \StringTok{"нэвтрэлт OK"}
-\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/dev0001/telemetry\textquotesingle{}} \AttributeTok{{-}m}\NormalTok{ x   }\CommentTok{\# нэргүй → "bad user name or password"}
+\ExtensionTok{mosquitto\_pub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/dev0001/telemetry\textquotesingle{}}\NormalTok{ {-}m x   \# нэргүй → }\StringTok{"bad user name or password"}
 
 \CommentTok{\# «Хулгайлагдсан» төхөөрөмж холбогдсон хэвээр байна (тусдаа терминал)}
-\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}u}\NormalTok{ dev0001 }\AttributeTok{{-}P} \StringTok{"}\VariableTok{$PW}\StringTok{"} \AttributeTok{{-}i}\NormalTok{ dev0001{-}live }\AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/dev0001/\#\textquotesingle{}} \AttributeTok{{-}v}
+\ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}u dev0001 {-}P }\StringTok{"}\VariableTok{$PW}\StringTok{"}\NormalTok{ {-}i dev0001{-}live {-}t }\StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/dev0001/\#\textquotesingle{}}\NormalTok{ {-}v}
 \end{Highlighting}
 \end{Shaded}
 
@@ -671,11 +711,11 @@ Canary (20\%) & & & & & \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ provision.py revoke }\AttributeTok{{-}{-}device{-}id}\NormalTok{ dev0001}
+\ExtensionTok{python3}\NormalTok{ provision.py revoke {-}{-}device{-}id dev0001}
 \CommentTok{\# ✓ dev0001 хүчингүй боллоо (EMQX хэрэглэгч: deleted)}
 \CommentTok{\#   Хөөсөн идэвхтэй холболт: [\textquotesingle{}dev0001{-}live\textquotesingle{}]}
-\ExtensionTok{python3}\NormalTok{ provision.py list }\AttributeTok{{-}{-}state}\NormalTok{ revoked}
-\ExtensionTok{mosquitto\_pub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}u}\NormalTok{ dev0001 }\AttributeTok{{-}P} \StringTok{"}\VariableTok{$PW}\StringTok{"} \AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/dev0001/telemetry\textquotesingle{}} \AttributeTok{{-}m}\NormalTok{ x}
+\ExtensionTok{python3}\NormalTok{ provision.py list {-}{-}state revoked}
+\ExtensionTok{mosquitto\_pub}\NormalTok{ {-}h localhost {-}u dev0001 {-}P }\StringTok{"}\VariableTok{$PW}\StringTok{"}\NormalTok{ {-}t }\StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/dev0001/telemetry\textquotesingle{}}\NormalTok{ {-}m x}
 \CommentTok{\# → Connection error: Connection Refused: not authorised.}
 \end{Highlighting}
 \end{Shaded}
@@ -684,10 +724,10 @@ Canary (20\%) & & & & & \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}o}\NormalTok{ /dev/null }\AttributeTok{{-}w} \StringTok{\textquotesingle{}\%\{http\_code\}\textbackslash{}n\textquotesingle{}} \AttributeTok{{-}u} \StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"} \AttributeTok{{-}X}\NormalTok{ DELETE }\DataTypeTok{\textbackslash{}}
-  \StringTok{"localhost:18083/api/v5/authentication/password\_based\%3Abuilt\_in\_database/users/dev0002"}   \CommentTok{\# 204}
-\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}u} \StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"} \StringTok{"localhost:18083/api/v5/clients?username=dev0002"} \DataTypeTok{\textbackslash{}}
-  \KeywordTok{|} \ExtensionTok{jq} \StringTok{\textquotesingle{}[.data[].clientid]\textquotesingle{}}          \CommentTok{\# → ["dev0002{-}live"] — холбогдсон хэвээр!}
+\ExtensionTok{curl}\NormalTok{ {-}s {-}o /dev/null {-}w }\StringTok{\textquotesingle{}\%\{http\_code\}\textbackslash{}n\textquotesingle{}}\NormalTok{ {-}u }\StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"}\NormalTok{ {-}X DELETE }\KeywordTok{\textbackslash{}}
+  \StringTok{"localhost:18083/api/v5/authentication/password\_based\%3Abuilt\_in\_database/users/dev0002"}\NormalTok{   \# }\ExtensionTok{204}
+\ExtensionTok{curl}\NormalTok{ {-}s {-}u }\StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"} \StringTok{"localhost:18083/api/v5/clients?username=dev0002"} \KeywordTok{\textbackslash{}}
+  \KeywordTok{|} \ExtensionTok{jq} \StringTok{\textquotesingle{}[.data[].clientid]\textquotesingle{}}\NormalTok{          \# → [}\StringTok{"dev0002{-}live"}\NormalTok{] — холбогдсон хэвээр!}
 \end{Highlighting}
 \end{Shaded}
 
@@ -697,7 +737,7 @@ Canary (20\%) & & & & & \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{authn}\NormalTok{ false                                                  }\CommentTok{\# → HTTP 204}
+\ExtensionTok{authn}\NormalTok{ false                                                  \# → HTTP 204}
 \end{Highlighting}
 \end{Shaded}
 
@@ -710,15 +750,14 @@ Canary (20\%) & & & & & \\
 
 \begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-Асуулт & Хариу \\
+Асуулт & Хариу\tabularnewline
 \midrule
 \endhead
+Шинэ холболт татгалзаж байна уу &\tabularnewline
+Одоо байгаа session тасарсан уу &\tabularnewline
+Хэдэн секундын дараа тасарсан &\tabularnewline
+X.509 бол CRL/OCSP хэрэгтэй юу &\tabularnewline
 \bottomrule
-\endlastfoot
-Шинэ холболт татгалзаж байна уу & \\
-Одоо байгаа session тасарсан уу & \\
-Хэдэн секундын дараа тасарсан & \\
-X.509 бол CRL/OCSP хэрэгтэй юу & \\
 \end{longtable}\endgroup
 
 \hypertarget{ux430ux43bux445ux430ux43c-8-ux441ux43eux43dux433ux43eux43bux442ux43eux442-thingsboard-ux442ux430ux439-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux445-25-ux43cux438ux43d-ux437ux43a}{%
@@ -731,10 +770,10 @@ X.509 бол CRL/OCSP хэрэгтэй юу & \\
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack}
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}f}\NormalTok{ docker{-}compose.yml }\AttributeTok{{-}f}\NormalTok{ docker{-}compose.tb.yml }\DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}{-}profile}\NormalTok{ core }\AttributeTok{{-}{-}profile}\NormalTok{ tb up }\AttributeTok{{-}d}
+\ExtensionTok{docker}\NormalTok{ compose {-}f docker{-}compose.yml {-}f docker{-}compose.tb.yml }\KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}{-}profile}\NormalTok{ core {-}{-}profile tb up {-}d}
 \CommentTok{\# 2–3 минут хүлээнэ}
-\ExtensionTok{docker}\NormalTok{ stats }\AttributeTok{{-}{-}no{-}stream}\NormalTok{ cnc302{-}thingsboard}
+\ExtensionTok{docker}\NormalTok{ stats {-}{-}no{-}stream cnc302{-}thingsboard}
 \end{Highlighting}
 \end{Shaded}
 
@@ -747,35 +786,25 @@ http://localhost:8080 --- анхдагч нэвтрэлт: \textbf{System Admini
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-2.8-ux4e9ux4e9ux440ux441ux434ux438ux439ux43d-ux431ux4afux440ux442ux433ux44dux43b-vs-thingsboard}{%
 \subsubsection{Хүснэгт 2.8 --- Өөрсдийн бүртгэл vs ThingsBoard}\label{ux445ux4afux441ux43dux44dux433ux442-2.8-ux4e9ux4e9ux440ux441ux434ux438ux439ux43d-ux431ux4afux440ux442ux433ux44dux43b-vs-thingsboard}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Шалгуур
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\texttt{registry} (бидний)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-ThingsBoard
-\end{minipage} \\
+Шалгуур & \texttt{registry} (бидний) & ThingsBoard\tabularnewline
 \midrule
 \endhead
+RAM (MiB) & &\tabularnewline
+Эхлэх хугацаа (сек) & &\tabularnewline
+Кодын мөрийн тоо & \textasciitilde500 (\texttt{wc\ -l\ registry/\allowbreak{}app.\allowbreak{}py}) & (GitHub сангаас тооцоол)\tabularnewline
+Pi 3B дээр ажиллах уу & &\tabularnewline
+Rule engine, UI, олон түрээслэгч & ✗ & ✓\tabularnewline
+Протокол ил харагдах уу & ✓ & ✗\tabularnewline
 \bottomrule
-\endlastfoot
-RAM (MiB) & & \\
-Эхлэх хугацаа (сек) & & \\
-Кодын мөрийн тоо & \textasciitilde500 (\texttt{wc\ -l\ registry/\allowbreak{}app.\allowbreak{}py}) & (GitHub сангаас тооцоол) \\
-Pi 3B дээр ажиллах уу & & \\
-Rule engine, UI, олон түрээслэгч & ✗ & ✓ \\
-Протокол ил харагдах уу & ✓ & ✗ \\
 \end{longtable}\endgroup
 
 Дуусаад \textbf{заавал} зогсооно (санах ой суллана):
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}f}\NormalTok{ docker{-}compose.yml }\AttributeTok{{-}f}\NormalTok{ docker{-}compose.tb.yml }\AttributeTok{{-}{-}profile}\NormalTok{ tb stop thingsboard}
+\ExtensionTok{docker}\NormalTok{ compose {-}f docker{-}compose.yml {-}f docker{-}compose.tb.yml {-}{-}profile tb stop thingsboard}
 \end{Highlighting}
 \end{Shaded}
 
@@ -786,11 +815,11 @@ Rule engine, UI, олон түрээслэгч & ✗ & ✓ \\
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
 \FunctionTok{git}\NormalTok{ add lab02/ stack/ edge/}
-\FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб 2: бүртгэл, mTLS, OTA, canary тараалт"}
-\FunctionTok{git}\NormalTok{ tag lab02{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\AttributeTok{{-}{-}tags}
+\FunctionTok{git}\NormalTok{ commit {-}m }\StringTok{"Лаб 2: бүртгэл, mTLS, OTA, canary тараалт"}
+\FunctionTok{git}\NormalTok{ tag lab02{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push {-}{-}tags}
 
 \CommentTok{\# Нууц файл ороогүй эсэхийг ЗААВАЛ шалга}
-\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}E} \StringTok{\textquotesingle{}\textbackslash{}.crt$|\textbackslash{}.key$|devices\textbackslash{}.csv|\textbackslash{}.env$\textquotesingle{}}   \CommentTok{\# хоосон байх ЁСТОЙ}
+\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}E }\StringTok{\textquotesingle{}\textbackslash{}.crt$|\textbackslash{}.key$|devices\textbackslash{}.csv|\textbackslash{}.env$\textquotesingle{}}\NormalTok{   \# хоосон байх ЁСТОЙ}
 \end{Highlighting}
 \end{Shaded}
 
@@ -818,26 +847,16 @@ Rule engine, UI, олон түрээслэгч & ✗ & ✓ \\
 \hypertarget{ux445ux4afux43bux44dux44dux43bux433ux44dux43d-ux4e9ux433ux4e9ux445-ux437ux4afux439ux43b}{%
 \section{6. Хүлээлгэн өгөх зүйл}\label{ux445ux4afux43bux44dux44dux43bux433ux44dux43d-ux4e9ux433ux4e9ux445-ux437ux4afux439ux43b}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-\#
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Зүйл
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Байрлал
-\end{minipage} \\
+\# & Зүйл & Байрлал\tabularnewline
 \midrule
 \endhead
+1 & Тайлан (Хүснэгт 2.1--2.7, сонголтоор 2.8) & \texttt{lab02/report.md} → PDF\tabularnewline
+2 & OTA-гийн дөрвөн хувилбарын лог & \texttt{lab02/out/*.log}\tabularnewline
+3 & Багийн таних тэмдгийн стратеги (½ хуудас) & тайлангийн хавсралт\tabularnewline
+4 & Git tag & \texttt{lab02-done}\tabularnewline
 \bottomrule
-\endlastfoot
-1 & Тайлан (Хүснэгт 2.1--2.7, сонголтоор 2.8) & \texttt{lab02/report.md} → PDF \\
-2 & OTA-гийн дөрвөн хувилбарын лог & \texttt{lab02/out/*.log} \\
-3 & Багийн таних тэмдгийн стратеги (½ хуудас) & тайлангийн хавсралт \\
-4 & Git tag & \texttt{lab02-done} \\
 \end{longtable}\endgroup
 
 СТОП: Сертификат, түлхүүр, \texttt{devices.csv} \textbf{Git-д орохгүй}.
@@ -847,90 +866,298 @@ Rule engine, UI, олон түрээслэгч & ✗ & ✓ \\
 
 \begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-Шалгуур & Оноо \\
+Шалгуур & Оноо\tabularnewline
 \midrule
 \endhead
+Bulk + JIT + mTLS ажиллаж байна (амьд үзүүлнэ) & 3\tabularnewline
+OTA-гийн 4 хувилбар бүгд хэмжигдсэн, Хүснэгт 2.4--2.5 бүрэн & 3\tabularnewline
+Canary + rollback ажилласан, тоогоор баримтжуулсан & 2\tabularnewline
+Таних тэмдгийн стратеги үндэслэлтэй & 1\tabularnewline
+Git цэвэр, нууц файл ороогүй & 1\tabularnewline
 \bottomrule
-\endlastfoot
-Bulk + JIT + mTLS ажиллаж байна (амьд үзүүлнэ) & 3 \\
-OTA-гийн 4 хувилбар бүгд хэмжигдсэн, Хүснэгт 2.4--2.5 бүрэн & 3 \\
-Canary + rollback ажилласан, тоогоор баримтжуулсан & 2 \\
-Таних тэмдгийн стратеги үндэслэлтэй & 1 \\
-Git цэвэр, нууц файл ороогүй & 1 \\
 \end{longtable}\endgroup
 
 \hypertarget{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}{%
 \section{8. Түгээмэл алдаа}\label{ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Шинж
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шалтгаан
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шийдэл
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шинж\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шалтгаан\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шийдэл\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{бүртгэлийн\ үйлчилгээнд\ хүрэхгүй}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{registry} асаагүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+{[}ЗК{]} \texttt{cd\ stack\ \&\allowbreak{}\&\allowbreak{}\ make\ up}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+OTA-д санал ирэхгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+сэдвийн угтвар / SITE зөрсөн\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+troubleshooting §2\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+mTLS: \texttt{TLS\ error} зөв сертификаттай ч\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+цаг синхрончлогдоогүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+{[}Pi{]} \texttt{timedatectl\ status}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{openssl\ verify} → error 10\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+сертификат хугацаа дууссан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{make\_\allowbreak{}certs.\allowbreak{}sh\ device\ \textless{}нэр\textgreater{}} дахин\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+OTA хэт удаан (\textgreater5 мин)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+throttling эсвэл Wi-Fi\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{vcgencmd\ get\_\allowbreak{}throttled}, кабель\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+OTA-д санал ирэхгүй, агент 180 сек хүлээгээд гарна\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+тараалтыг агентаас ӨМНӨ эхлүүлсэн (offer retained биш)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+агентыг эхлүүлээд \texttt{rollout}-ыг дахин дууд\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+mTLS: \texttt{host\ name\ verification\ failed}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+серверийн сертификатын SAN-д \texttt{CLOUD\_HOST} алга\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{CLOUD\_\allowbreak{}HOST=\allowbreak{}\textless{}IP\textgreater{}\ .\allowbreak{}/\allowbreak{}make\_\allowbreak{}certs.\allowbreak{}sh\ server}, EMQX-д дахин хуулна\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+mTLS: \texttt{TLS\ error} зөв сертификаттай ч\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+цаг синхрончлогдоогүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+{[}Pi{]} \texttt{timedatectl\ status}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Сертификатгүй клиент 8883-т холбогдчихлоо\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{verify\_peer} / \texttt{fail\_\allowbreak{}if\_\allowbreak{}no\_\allowbreak{}peer\_\allowbreak{}cert} тохируулаагүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{curl\ \ldots{}/\allowbreak{}api/\allowbreak{}v5/\allowbreak{}listeners/\allowbreak{}ssl:\allowbreak{}default} → \texttt{ssl\_options} шалга\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{devices.csv}-д \texttt{emqx\ =\allowbreak{}\ error\ 404}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+authenticator үүсгээгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Алхам 0-ийн 3\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{devices.csv}-д \texttt{emqx\ =\ skipped}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{EMQX\_\allowbreak{}API\_\allowbreak{}KEY} хоосон\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Алхам 0-ийн 1--2\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Алхам 7-ийн дараа гүүр/агент холбогдохгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+authenticator идэвхтэй хэвээр\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{authn\ false}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{openssl\ verify} → error 10\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+сертификат хугацаа дууссан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{make\_\allowbreak{}certs.\allowbreak{}sh\ device\ \textless{}нэр\textgreater{}} дахин\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+OTA хэт удаан (\textgreater5 мин)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+throttling эсвэл Wi-Fi\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{vcgencmd\ get\_\allowbreak{}throttled}, кабель\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{promote} → HTTP 409\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+canary-д алдаа гарсан эсвэл дуусаагүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+зөв ажиллаж байна --- \texttt{detail}, лог шалга\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{бүртгэлийн\ үйлчилгээнд\ хүрэхгүй} & \texttt{registry} асаагүй & {[}ЗК{]} \texttt{cd\ stack\ \&\allowbreak{}\&\allowbreak{}\ make\ up} \\
-OTA-д санал ирэхгүй & сэдвийн угтвар / SITE зөрсөн & troubleshooting §2 \\
-mTLS: \texttt{TLS\ error} зөв сертификаттай ч & цаг синхрончлогдоогүй & {[}Pi{]} \texttt{timedatectl\ status} \\
-\texttt{openssl\ verify} → error 10 & сертификат хугацаа дууссан & \texttt{make\_\allowbreak{}certs.\allowbreak{}sh\ device\ \textless{}нэр\textgreater{}} дахин \\
-OTA хэт удаан (\textgreater5 мин) & throttling эсвэл Wi-Fi & \texttt{vcgencmd\ get\_\allowbreak{}throttled}, кабель \\
-OTA-д санал ирэхгүй, агент 180 сек хүлээгээд гарна & тараалтыг агентаас ӨМНӨ эхлүүлсэн (offer retained биш) & агентыг эхлүүлээд \texttt{rollout}-ыг дахин дууд \\
-mTLS: \texttt{host\ name\ verification\ failed} & серверийн сертификатын SAN-д \texttt{CLOUD\_HOST} алга & \texttt{CLOUD\_\allowbreak{}HOST=\allowbreak{}\textless{}IP\textgreater{}\ .\allowbreak{}/\allowbreak{}make\_\allowbreak{}certs.\allowbreak{}sh\ server}, EMQX-д дахин хуулна \\
-mTLS: \texttt{TLS\ error} зөв сертификаттай ч & цаг синхрончлогдоогүй & {[}Pi{]} \texttt{timedatectl\ status} \\
-Сертификатгүй клиент 8883-т холбогдчихлоо & \texttt{verify\_peer} / \texttt{fail\_\allowbreak{}if\_\allowbreak{}no\_\allowbreak{}peer\_\allowbreak{}cert} тохируулаагүй & \texttt{curl\ …/\allowbreak{}api/\allowbreak{}v5/\allowbreak{}listeners/\allowbreak{}ssl:\allowbreak{}default} → \texttt{ssl\_options} шалга \\
-\texttt{devices.csv}-д \texttt{emqx\ =\allowbreak{}\ error\ 404} & authenticator үүсгээгүй & Алхам 0-ийн 3 \\
-\texttt{devices.csv}-д \texttt{emqx\ =\ skipped} & \texttt{EMQX\_\allowbreak{}API\_\allowbreak{}KEY} хоосон & Алхам 0-ийн 1--2 \\
-Алхам 7-ийн дараа гүүр/агент холбогдохгүй & authenticator идэвхтэй хэвээр & \texttt{authn\ false} \\
-\texttt{openssl\ verify} → error 10 & сертификат хугацаа дууссан & \texttt{make\_\allowbreak{}certs.\allowbreak{}sh\ device\ \textless{}нэр\textgreater{}} дахин \\
-OTA хэт удаан (\textgreater5 мин) & throttling эсвэл Wi-Fi & \texttt{vcgencmd\ get\_\allowbreak{}throttled}, кабель \\
-\texttt{promote} → HTTP 409 & canary-д алдаа гарсан эсвэл дуусаагүй & зөв ажиллаж байна --- \texttt{detail}, лог шалга \\
 \end{longtable}\endgroup
 
 \hypertarget{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}{%
 \section{9. Эх сурвалж}\label{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-\#
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Эх сурвалж
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Юуг баталгаажуулсан
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хандсан
-\end{minipage} \\
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+\#\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Эх сурвалж\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Юуг баталгаажуулсан\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хандсан\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.emqx.com/en/emqx/v5.8/guides/api.html}{EMQX 5.\allowbreak{}8 --- REST API}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+суурь зам \texttt{/api/v5}, API key/secret-ээр HTTP Basic, самбарын нэвтрэлт REST-д ажиллахгүй, 201/204/404/409 кодууд\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.emqx.com/en/emqx/v5.8/guides/api-keys.html}{EMQX 5.\allowbreak{}8 --- API Keys}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+System → API Key → Create; secret нэг л удаа харагдана\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+3\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.emqx.com/en/emqx/v5.8/guides/access-control/authn/authn.html}{EMQX 5.\allowbreak{}8 --- Authentication}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+анхдагчаар нээлттэй; сүүлийн authenticator-т олдоогүй бол татгалзана; ID \texttt{password\_\allowbreak{}based:\allowbreak{}built\_\allowbreak{}in\_\allowbreak{}database}, \texttt{:} → \texttt{\%3A}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.emqx.com/en/emqx/v5.8/guides/access-control/authn/mnesia.html}{EMQX 5.\allowbreak{}8 --- Built-in Database}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{mechanism}, \texttt{backend}, \texttt{user\_\allowbreak{}id\_\allowbreak{}type}, \texttt{password\_\allowbreak{}hash\_\allowbreak{}algorithm}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+5\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.emqx.com/en/emqx/v5.8/guides/access-control/authn/user_management.html}{EMQX 5.\allowbreak{}8 --- Manage user data via HTTP API}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{/\allowbreak{}api/\allowbreak{}v5/\allowbreak{}authentication/\allowbreak{}\{id\}/users}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+6\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.emqx.com/en/emqx/v5.8/guides/network/emqx-mqtt-tls.html}{EMQX 5.\allowbreak{}8 --- Enable SSL/\allowbreak{}TLS Connection}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+8883 анхдагчаар нэг талын; mTLS-д \texttt{verify\ =\allowbreak{}\ verify\_\allowbreak{}peer}, \texttt{fail\_\allowbreak{}if\_\allowbreak{}no\_\allowbreak{}peer\_\allowbreak{}cert\ =\allowbreak{}\ true}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+7\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.emqx.com/en/emqx/v5.8/guides/configuration/configuration.html}{EMQX 5.\allowbreak{}8 --- Configuration}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+орчны хувьсагч: \texttt{EMQX\_} угтвар, \texttt{.} → \texttt{\_\allowbreak{}\_\allowbreak{}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+8\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.emqx.com/en/emqx/v5.8/guides/network/crl.html}{EMQX 5.\allowbreak{}8 --- CRL Check}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+CRL-ийг сертификатын CRL Distribution Point-оос татна; зөвхөн \texttt{ssl} сонсогч\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+9\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.emqx.com/en/emqx/v5.8/guides/dashboard/connections.html}{EMQX 5.\allowbreak{}8 --- Dashboard: Clients}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Kick Out\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+10\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://mosquitto.org/man/mosquitto_pub-1.html}{mosquitto\_pub(1)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{-\/-cafile}, \texttt{-\/-cert}, \texttt{-\/-key}, \texttt{-d}, \texttt{-\/-insecure}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+11\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.openssl.org/3.0/man1/openssl-req/}{openssl-req(1)} · \href{https://docs.openssl.org/3.0/man1/openssl-x509/}{openssl-x509(1)} · \href{https://docs.openssl.org/3.0/man1/openssl-verify/}{openssl-verify(1)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{-subj}, \texttt{-x509}, \texttt{-req\ -CA\ -CAkey\ -CAcreateserial\ -extfile}, \texttt{-ext}, \texttt{-CAfile}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+12\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.openssl.org/3.0/man5/x509v3_config/}{x509v3\_config(5)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{subjectAltName}, \texttt{extendedKeyUsage\ =\allowbreak{}\ serverAuth\ /\allowbreak{}\ clientAuth}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+13\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://eclipse.dev/paho/files/paho.mqtt.python/html/migrations.html}{Eclipse Paho Python --- Migrations (2.\allowbreak{}0)} · \href{https://eclipse.dev/paho/files/paho.mqtt.python/html/client.html}{Client}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{CallbackAPIVersion.\allowbreak{}VERSION2}, \texttt{on\_\allowbreak{}connect(client,\ userdata,\ flags,\ reason\_\allowbreak{}code,\ properties)}, \texttt{on\_\allowbreak{}disconnect(\ldots{},\ flags,\ reason\_\allowbreak{}code,\ properties)}, \texttt{tls\_set}, \texttt{username\_\allowbreak{}pw\_\allowbreak{}set}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+14\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://fastapi.tiangolo.com/tutorial/request-files/}{FastAPI --- Request Files} · \href{https://fastapi.tiangolo.com/advanced/events/}{Lifespan Events}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{UploadFile} нь \texttt{python-multipart} шаардана; \texttt{lifespan}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+15\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/processors.html\#bcm2837}{Raspberry Pi --- BCM2837} (эх: \href{https://github.com/raspberrypi/documentation/blob/master/documentation/asciidoc/computers/processors/bcm2837.adoc}{bcm2837.adoc})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Cortex-A53 (Armv8); крипто өргөтгөлийн тухай дурдаагүй\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+16\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://thingsboard.io/docs/installation/docker/}{ThingsBoard --- Installing using Docker}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{sysadmin@thingsboard.\allowbreak{}org} / \texttt{sysadmin}; \texttt{tenant@\ldots{}} зөвхөн демо өгөгдөлтэй; Dev/PoC 4 GB RAM\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-1 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/api.html}{EMQX 5.\allowbreak{}8 --- REST API} & суурь зам \texttt{/api/v5}, API key/secret-ээр HTTP Basic, самбарын нэвтрэлт REST-д ажиллахгүй, 201/204/404/409 кодууд & 2026-09 \\
-2 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/api-keys.html}{EMQX 5.\allowbreak{}8 --- API Keys} & System → API Key → Create; secret нэг л удаа харагдана & 2026-09 \\
-3 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/access-control/authn/authn.html}{EMQX 5.\allowbreak{}8 --- Authentication} & анхдагчаар нээлттэй; сүүлийн authenticator-т олдоогүй бол татгалзана; ID \texttt{password\_\allowbreak{}based:\allowbreak{}built\_\allowbreak{}in\_\allowbreak{}database}, \texttt{:} → \texttt{\%3A} & 2026-09 \\
-4 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/access-control/authn/mnesia.html}{EMQX 5.\allowbreak{}8 --- Built-in Database} & \texttt{mechanism}, \texttt{backend}, \texttt{user\_\allowbreak{}id\_\allowbreak{}type}, \texttt{password\_\allowbreak{}hash\_\allowbreak{}algorithm} & 2026-09 \\
-5 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/access-control/authn/user_management.html}{EMQX 5.\allowbreak{}8 --- Manage user data via HTTP API} & \texttt{/\allowbreak{}api/\allowbreak{}v5/\allowbreak{}authentication/\allowbreak{}\{id\}/users} & 2026-09 \\
-6 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/network/emqx-mqtt-tls.html}{EMQX 5.\allowbreak{}8 --- Enable SSL/\allowbreak{}TLS Connection} & 8883 анхдагчаар нэг талын; mTLS-д \texttt{verify\ =\allowbreak{}\ verify\_\allowbreak{}peer}, \texttt{fail\_\allowbreak{}if\_\allowbreak{}no\_\allowbreak{}peer\_\allowbreak{}cert\ =\allowbreak{}\ true} & 2026-09 \\
-7 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/configuration/configuration.html}{EMQX 5.\allowbreak{}8 --- Configuration} & орчны хувьсагч: \texttt{EMQX\_} угтвар, \texttt{.} → \texttt{\_\allowbreak{}\_\allowbreak{}} & 2026-09 \\
-8 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/network/crl.html}{EMQX 5.\allowbreak{}8 --- CRL Check} & CRL-ийг сертификатын CRL Distribution Point-оос татна; зөвхөн \texttt{ssl} сонсогч & 2026-09 \\
-9 & \href{https://docs.emqx.com/en/emqx/v5.8/guides/dashboard/connections.html}{EMQX 5.\allowbreak{}8 --- Dashboard: Clients} & Kick Out & 2026-09 \\
-10 & \href{https://mosquitto.org/man/mosquitto_pub-1.html}{mosquitto\_pub(1)} & \texttt{-\/-cafile}, \texttt{-\/-cert}, \texttt{-\/-key}, \texttt{-d}, \texttt{-\/-insecure} & 2026-09 \\
-11 & \href{https://docs.openssl.org/3.0/man1/openssl-req/}{openssl-req(1)} · \href{https://docs.openssl.org/3.0/man1/openssl-x509/}{openssl-x509(1)} · \href{https://docs.openssl.org/3.0/man1/openssl-verify/}{openssl-verify(1)} & \texttt{-subj}, \texttt{-x509}, \texttt{-req\ -CA\ -CAkey\ -CAcreateserial\ -extfile}, \texttt{-ext}, \texttt{-CAfile} & 2026-09 \\
-12 & \href{https://docs.openssl.org/3.0/man5/x509v3_config/}{x509v3\_config(5)} & \texttt{subjectAltName}, \texttt{extendedKeyUsage\ =\allowbreak{}\ serverAuth\ /\allowbreak{}\ clientAuth} & 2026-09 \\
-13 & \href{https://eclipse.dev/paho/files/paho.mqtt.python/html/migrations.html}{Eclipse Paho Python --- Migrations (2.\allowbreak{}0)} · \href{https://eclipse.dev/paho/files/paho.mqtt.python/html/client.html}{Client} & \texttt{CallbackAPIVersion.\allowbreak{}VERSION2}, \texttt{on\_\allowbreak{}connect(client,\ userdata,\ flags,\ reason\_\allowbreak{}code,\ properties)}, \texttt{on\_\allowbreak{}disconnect(…,\ flags,\ reason\_\allowbreak{}code,\ properties)}, \texttt{tls\_set}, \texttt{username\_\allowbreak{}pw\_\allowbreak{}set} & 2026-09 \\
-14 & \href{https://fastapi.tiangolo.com/tutorial/request-files/}{FastAPI --- Request Files} · \href{https://fastapi.tiangolo.com/advanced/events/}{Lifespan Events} & \texttt{UploadFile} нь \texttt{python-multipart} шаардана; \texttt{lifespan} & 2026-09 \\
-15 & \href{https://www.raspberrypi.com/documentation/computers/processors.html\#bcm2837}{Raspberry Pi --- BCM2837} (эх: \href{https://github.com/raspberrypi/documentation/blob/master/documentation/asciidoc/computers/processors/bcm2837.adoc}{bcm2837.adoc}) & Cortex-A53 (Armv8); крипто өргөтгөлийн тухай дурдаагүй & 2026-09 \\
-16 & \href{https://thingsboard.io/docs/installation/docker/}{ThingsBoard --- Installing using Docker} & \texttt{sysadmin@thingsboard.\allowbreak{}org} / \texttt{sysadmin}; \texttt{tenant@…} зөвхөн демо өгөгдөлтэй; Dev/PoC 4 GB RAM & 2026-09 \\
 \end{longtable}\endgroup

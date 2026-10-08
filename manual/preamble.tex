@@ -14,13 +14,29 @@
 \usepackage{fontspec}
 \usepackage{amssymb}   % $\square$ (pandoc-ийн checkbox жагсаалт)
 \defaultfontfeatures{Ligatures=TeX}
-\setmainfont{DejaVu Serif}[
-  Scale=0.94,
-  BoldFont={DejaVu Serif Bold},
-  ItalicFont={DejaVu Serif Italic},
-  BoldItalicFont={DejaVu Serif Bold Italic}]
-\setsansfont{DejaVu Sans}[Scale=0.90]
-\setmonofont{DejaVu Sans Mono}[Scale=0.82]
+
+% Үндсэн фонт: Times New Roman (ШУТИС-ийн бичиг баримтын стандарт).
+% Хэрэв систем дээр Times New Roman суулгаагүй бол (Linux, CI орчин)
+% метрик нь яг ижил Liberation Serif-ээр солино — хуудасны байрлал,
+% мөрийн тоо өөрчлөгдөхгүй. Кирилл үсгийн бүрэн хамрах хүрээтэй.
+\IfFontExistsTF{Times New Roman}{%
+  \newcommand{\cncserif}{Times New Roman}%
+}{%
+  \newcommand{\cncserif}{Liberation Serif}%
+}
+\setmainfont{\cncserif}[Scale=1.0]
+% Гарчиг, хүснэгтийн толгой (\sffamily) мөн Times New Roman-оор —
+% баримт бичиг бүхэлдээ нэг фонттой байхын тулд. Ялгаа нь зузаан,
+% хэмжээ, өнгөөр гарна.
+\setsansfont{\cncserif}[Scale=1.0]
+% Кодын блок заавал моно фонт байх ёстой (багана тэгшилгээ, 0/O, 1/l/I
+% ялгаа). Courier New / Liberation Mono нь ASCII-диаграмын ▶ ◀ ба зарим
+% хүрээний тэмдэгтийг агуулдаггүй тул кодод DejaVu Sans Mono-г үлдээв.
+\IfFontExistsTF{DejaVu Sans Mono}{%
+  \setmonofont{DejaVu Sans Mono}[Scale=0.85]%
+}{%
+  \setmonofont{Liberation Mono}[Scale=0.92]%
+}
 
 % Монгол хэлэнд тусгай мөр таслалт байхгүй тул зөөлөн зохицуулалт хийнэ
 \sloppy
@@ -28,7 +44,7 @@
 \hyphenpenalty=1000
 \tolerance=2000
 
-% ── Тусгай тэмдэгт (DejaVu Serif-д байхгүй, DejaVu Sans-аас авна) ──────────
+% ── Тусгай тэмдэгт (Times-д байхгүй, DejaVu Sans-аас авна) ─────────────────
 \usepackage{newunicodechar}
 \newfontfamily{\symfont}{DejaVu Sans}[Scale=0.90]
 \newcommand{\sym}[1]{{\symfont #1}}
@@ -49,6 +65,7 @@
 \newunicodechar{⌈}{\sym{⌈}}
 \newunicodechar{⌉}{\sym{⌉}}
 \newunicodechar{σ}{\sym{σ}}
+\newunicodechar{☞}{\sym{☞}}
 
 % ── Өнгө ────────────────────────────────────────────────────────────────────
 \usepackage{xcolor}
@@ -167,8 +184,8 @@
 % ── Толгой, хөл ─────────────────────────────────────────────────────────────
 \usepackage{fancyhdr}
 \pagestyle{fancy}
-% DejaVu Sans-ийн мөрийн өндөр geometry-гийн тооцооноос өндөр тул fancyhdr
-% анхааруулга өгдөг. Энд ил зааж, дээд захыг тэр хэмжээгээр нөхнө.
+% Толгойн мөрийн өндрийг ил зааж, дээд захыг тэр хэмжээгээр нөхнө
+% (fancyhdr-ийн headheight анхааруулгыг арилгана).
 \setlength{\headheight}{22pt}
 \addtolength{\topmargin}{-4pt}
 \fancyhf{}

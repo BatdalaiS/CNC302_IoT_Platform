@@ -6,14 +6,13 @@
 
 \begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-Гишүүн & Хийсэн ажил \\
+Гишүүн & Хийсэн ажил\tabularnewline
 \midrule
 \endhead
+&\tabularnewline
+&\tabularnewline
+&\tabularnewline
 \bottomrule
-\endlastfoot
-& \\
-& \\
-& \\
 \end{longtable}\endgroup
 
 \textbf{Git commit:} `ule{1.5cm}{0.4pt}\texttt{**Tag:**}lab0\_\_-done`
@@ -25,33 +24,31 @@
 
 \begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-& {[}Pi{]} Raspberry Pi 3B & {[}ЗК{]} Зөөврийн компьютер \\
+& {[}Pi{]} Raspberry Pi 3B & {[}ЗК{]} Зөөврийн компьютер\tabularnewline
 \midrule
 \endhead
+Загвар / процессор & &\tabularnewline
+RAM (нийт / боломжтой) & &\tabularnewline
+OS, цөмийн хувилбар & &\tabularnewline
+Сүлжээ (кабель / Wi-Fi, хурд) & &\tabularnewline
+Хадгалалт (microSD ангилал) & &\tabularnewline
+Docker хувилбар & &\tabularnewline
 \bottomrule
-\endlastfoot
-Загвар / процессор & & \\
-RAM (нийт / боломжтой) & & \\
-OS, цөмийн хувилбар & & \\
-Сүлжээ (кабель / Wi-Fi, хурд) & & \\
-Хадгалалт (microSD ангилал) & & \\
-Docker хувилбар & & \\
 \end{longtable}\endgroup
 
 \textbf{Хэмжилтийн өмнөх шалгалт ({[}Pi{]}):}
 
 \begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-Шалгалт & Утга & Хэвийн үү \\
+Шалгалт & Утга & Хэвийн үү\tabularnewline
 \midrule
 \endhead
+\texttt{vcgencmd\ get\_\allowbreak{}throttled} & & \texttt{0x0} байх ЁСТОЙ\tabularnewline
+\texttt{vcgencmd\ measure\_\allowbreak{}temp} & & \textless{} 70 °C\tabularnewline
+\texttt{free\ -m} → available & & \textgreater{} 400 MiB\tabularnewline
+\texttt{timedatectl} synchronized & & yes\tabularnewline
+VS Code сервер таслагдсан уу & & \texttt{pkill\ -f\ vscode-server}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{vcgencmd\ get\_\allowbreak{}throttled} & & \texttt{0x0} байх ЁСТОЙ \\
-\texttt{vcgencmd\ measure\_\allowbreak{}temp} & & \textless{} 70 °C \\
-\texttt{free\ -m} → available & & \textgreater{} 400 MiB \\
-\texttt{timedatectl} synchronized & & yes \\
-VS Code сервер таслагдсан уу & & \texttt{pkill\ -f\ vscode-server} \\
 \end{longtable}\endgroup
 
 \begin{quote}
@@ -98,12 +95,11 @@ $ docker compose --profile core up -d
 
 \begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-Асуудал & Шалтгаан & Шийдсэн арга & Хугацаа \\
+Асуудал & Шалтгаан & Шийдсэн арга & Хугацаа\tabularnewline
 \midrule
 \endhead
+& & &\tabularnewline
 \bottomrule
-\endlastfoot
-& & & \\
 \end{longtable}\endgroup
 
 \hypertarget{ux430ux448ux438ux433ux43bux430ux441ux430ux43d-ux44dux445-ux441ux443ux440ux432ux430ux43bux436}{%

@@ -1,42 +1,687 @@
 % Автоматаар үүсгэсэн — эх файл: SETUP.md
 \chapter{Ажлын орчны бэлтгэл}
 
-Хугацаа: \textbf{60--90 минут} (Лаб 8-ын VM-ийг оруулбал +30 минут). Үүнийг лабораторийн цагаар биш, \textbf{I--II долоо хоногийн бие даалтаар} гүйцэтгэнэ. Лаб 1 эхлэхэд энэ бүхэн бэлэн байх ёстой.
+Энэ заавраар \textbf{нэг удаа} бэлтгэсэн орчинг 8 лабораторийн ажил бүгд ашиглана. Үүнийг лабораторийн цагаар биш, \textbf{I--II долоо хоногийн бие даалтаар} гүйцэтгэнэ. Лаб 1-д ирэхээс өмнө бүх алхмыг дуусгаж, \textbf{Г хэсгийн хяналтын жагсаалтыг} бүгдийг ✔ болгосон байх ёстой.
 
-Бэлтгэл нь хоёр машин дээр явагдана: \textbf{{[}ЗК{]} зөөврийн компьютер} (үүл) ба \textbf{{[}Pi{]} Raspberry Pi 3B} (ирмэг). Аль хэсэг хаана хийгдэхийг тэмдэглэгээгээр заасан. Лаб 8-д гурав дахь зангилаа болох \textbf{{[}VM{]} K3s server VM} (зөөврийн компьютер дээрх виртуал машин) нэмэгдэнэ --- А.8.
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
+\toprule
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хэсэг\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хаана\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Юу хийх вэ\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хугацаа\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{0}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+---\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Уншиж, өөрийн утгуудаа тэмдэглэх\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+10 мин\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{А}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+{[}ЗК{]} Зөөврийн компьютер (үүл)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+WSL 2 + Ubuntu, Git, VS Code, Docker Desktop, Raspberry Pi Imager → үүлний стек\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+1.5--2 цаг\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{Б}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+{[}Pi{]} Raspberry Pi 3B (ирмэг)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+microSD бичих, Docker Engine, swap, cgroup, ирмэгийн орчин\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+1.5--2 цаг\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{В}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+{[}ЗК{]}{[}Pi{]} Хоёулаа\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Гүүр холбож, мессеж дамжихыг шалгах\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+15 мин\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{Г}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+{[}ЗК{]}{[}Pi{]}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Хяналтын жагсаалт\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+10 мин\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{Д}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+---\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Түгээмэл алдаа ба шийдэл\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+хэрэгтэй үед\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+Нийт \textbf{3--4 цаг}, ихэнх нь татаж авах хугацаа --- \textbf{хурдан интернэттэй газар} хий. Лаб 8-ын K3s server VM (А.8)-ийг Лаб 8-аас өмнө тусад нь бэлтгэнэ (+30 мин).
+
+\begin{quote}
+☞ \textbf{Алхмуудыг дарааллаар нь хий.} Алхам бүрийн төгсгөлд ✓ \textbf{Шалгах} гэсэн хэсэг бий. Тэнд бичсэн үр дүн гарахгүй бол \textbf{цааш бүү яв} --- Д хэсгээс шалтгааныг хайж ол. Алдааг дараа нь засах нь хамаагүй хэцүү.
+\end{quote}
+
+\hypertarget{ux44dux445ux43bux44dux445ux44dux44dux441-ux4e9ux43cux43dux4e9-ux443ux43dux448ux438ux43dux430-ux443ux443}{%
+\section{0. Эхлэхээс өмнө уншина уу}\label{ux44dux445ux43bux44dux445ux44dux44dux441-ux4e9ux43cux43dux4e9-ux443ux43dux448ux438ux43dux430-ux443ux443}}
+
+\hypertarget{ux43aux43eux43cux430ux43dux434ux44bux433-ux445ux430ux430ux43dux430-ux431ux438ux447ux438ux445ux438ux439ux433-ux430ux43dux445ux430ux430ux440}{%
+\subsection{0.1 Командыг ХААНА бичихийг анхаар}\label{ux43aux43eux43cux430ux43dux434ux44bux433-ux445ux430ux430ux43dux430-ux431ux438ux447ux438ux445ux438ux439ux433-ux430ux43dux445ux430ux430ux440}}
+
+Энэ курст \textbf{гурван өөр терминал} ашиглана. Код блок бүрийн дээр командыг аль терминалд бичихийг заасан:
+
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
+\toprule
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+Тэмдэглэгээ\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хаана ажиллана\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хэрхэн нээх вэ\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Prompt (мөрийн эхлэл)\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{{[}ЗК · PowerShell{]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Windows\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Start → \texttt{Terminal} (Windows 10-д \texttt{PowerShell})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{PS\ C:\textbackslash{}Users\textbackslash{}bat\textgreater{}}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{{[}ЗК · PowerShell (Admin){]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Windows, администраторын эрхтэй\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Start → \texttt{Terminal} → \textbf{баруун товч} → \textbf{Run as administrator} → \textbf{Yes}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{PS\ C:\textbackslash{}WINDOWS\textbackslash{}system32\textgreater{}}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{{[}ЗК · Ubuntu{]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Зөөврийн компьютер доторх Linux (WSL)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Start → \texttt{Ubuntu} (эсвэл Terminal-ын \texttt{▼} товч → \textbf{Ubuntu})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{bat@LAPTOP:\textasciitilde{}\$}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{{[}Pi{]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Raspberry Pi дээр, SSH-ээр\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Б.2-т заасан\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{cnc302@pi-team07:\textasciitilde{}\ \$}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+\begin{quote}
+⚠ \textbf{Хамгийн түгээмэл алдаа:} командыг буруу терминалд бичих. Командыг бичихээсээ өмнө \textbf{prompt-ыг хар}.
+
+☞ \textbf{Лабораторийн зааварт} {[}ЗК{]} гэж тэмдэглэсэн бүх командыг \textbf{{[}ЗК · Ubuntu{]}} терминалд бичнэ. Лабын заавар \texttt{make}, \texttt{mosquitto\_sub}, \texttt{python3} зэрэг Linux командыг ашигладаг --- тэдгээр нь Windows PowerShell-д байхгүй, харин Ubuntu (WSL) дотор шууд ажиллана. PowerShell-ийг зөвхөн энэ SETUP-д, Windows-ийн тохиргоонд л хэрэглэнэ.
+\end{quote}
+
+\begin{quote}
+☞ \textbf{macOS / Linux зөөврийн компьютертэй бол:} WSL-тэй холбоотой алхмуудыг (А.1.3, А.2-ын \texttt{.wslconfig}) алгас. {[}ЗК · PowerShell{]} ба {[}ЗК · Ubuntu{]} гэсэн бүх командыг өөрийн \textbf{Terminal}-д бич. Docker Desktop-ийн санах ойг \textbf{Settings → Resources → Advanced → Memory limit}-ээр тохируулна (А.2).
+\end{quote}
+
+\hypertarget{ux43aux43eux43cux430ux43dux434ux44bux433-ux445ux44dux440ux445ux44dux43d-ux445ux443ux443ux43bux430ux445-ux432ux44d}{%
+\subsection{0.2 Командыг хэрхэн хуулах вэ}\label{ux43aux43eux43cux430ux43dux434ux44bux433-ux445ux44dux440ux445ux44dux43d-ux445ux443ux443ux43bux430ux445-ux432ux44d}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Код блокийн баруун дээд буланд байгаа \textbf{хуулах (copy)} товчийг дар --- эсвэл хулганаар бүтэн мөрийг сонгож \texttt{Ctrl\ +\ C}.
+\item
+  Терминал дээр \textbf{баруун товч} дар (эсвэл \texttt{Ctrl\ +\ Shift\ +\ V}) --- буулгана.
+\item
+  \texttt{Enter} дар.
+\item
+  Команд \textbf{дуусахыг хүлээ}: prompt дахин гарч ирсний дараа дараагийн командаа бич.
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{sudo} гэж эхэлсэн команд \textbf{нууц үг} асууна. Нууц үг бичихэд дэлгэцэнд \textbf{юу ч гарахгүй} (одоор ч харагдахгүй) --- энэ хэвийн. Бичээд \texttt{Enter} дар.
+\item
+  \texttt{\#}-ээс хойшхи хэсэг бол \textbf{тайлбар} --- бичих шаардлагагүй.
+\item
+  Командыг зогсоох: \texttt{Ctrl\ +\ C}.
+\end{itemize}
+
+\hypertarget{ux4e9ux4e9ux440ux438ux439ux43d-ux443ux442ux433ux443ux443ux434ux44bux433-ux442ux44dux43cux434ux44dux433ux43bux44d}{%
+\subsection{0.3 Өөрийн утгуудыг тэмдэглэ}\label{ux4e9ux4e9ux440ux438ux439ux43d-ux443ux442ux433ux443ux443ux434ux44bux433-ux442ux44dux43cux434ux44dux433ux43bux44d}}
+
+Заавар дахь \texttt{\textless{}\ldots{}\textgreater{}} хэсгийг өөрийн утгаар солино. \textbf{Хаалтыг (\texttt{\textless{}\ \textgreater{}}) хамт устгана.} Жишээ: \texttt{pi-team\textless{}NN\textgreater{}} → \texttt{pi-team07}.
+
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
+\toprule
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хувьсагч\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Утга\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Жишээ\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хаанаас\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{\textless{}NN\textgreater{}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Багийн дугаар, \textbf{хоёр оронтой}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{07}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Багш\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{\textless{}REPO\_\allowbreak{}URL\textgreater{}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Багийн Git сангийн хаяг\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{https:\allowbreak{}/\allowbreak{}/\allowbreak{}github.\allowbreak{}com/\allowbreak{}\ldots{}/\allowbreak{}cnc302-team07.\allowbreak{}git}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Багш\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{\textless{}LAPTOP\_\allowbreak{}IP\textgreater{}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Зөөврийн компьютерийн LAN IP\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{192.168.1.100}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+А.5\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{\textless{}PI\_\allowbreak{}IP\textgreater{}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Pi-гийн IP хаяг\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{192.168.1.57}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Б.2\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+Pi-гийн hostname нь \texttt{pi-team\textless{}NN\textgreater{}}, хэрэглэгч нь \textbf{\texttt{cnc302}}, ирмэгийн \texttt{DEVICE\_ID} нь \texttt{pi3b-team\textless{}NN\textgreater{}} байна. Эдгээр нэрийг \textbf{өөрчлөхгүй} --- лабын код ба \texttt{edge/\allowbreak{}agent/\allowbreak{}cnc302-edge-agent.\allowbreak{}service} яг эдгээр нэрийг хүлээнэ.
+
+\hypertarget{ux442ux43eux43dux43eux433-ux442ux4e9ux445ux4e9ux4e9ux440ux4e9ux43cux436ux438ux439ux43d-ux448ux430ux430ux440ux434ux43bux430ux433ux430}{%
+\subsection{0.4 Тоног төхөөрөмжийн шаардлага}\label{ux442ux43eux43dux43eux433-ux442ux4e9ux445ux4e9ux4e9ux440ux4e9ux43cux436ux438ux439ux43d-ux448ux430ux430ux440ux434ux43bux430ux433ux430}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+\begin{minipage}[b]{0.47\columnwidth}\raggedright
+Зүйл\strut
+\end{minipage} & \begin{minipage}[b]{0.47\columnwidth}\raggedright
+Шаардлага\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+Зөөврийн компьютер\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+Windows 10 22H2 (build 19045) эсвэл Windows 11 23H2 (build 22631)+, 64-bit; \textbf{RAM ≥ 8 GB} (16 GB тав тухтай --- Лаб 8); дискэнд \textbf{≥ 40 GB} сул зай\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+Raspberry Pi 3B\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
++ \textbf{5 V / 2.5 A} тэжээлийн адаптер (утасны цэнэглэгч хангалтгүй) + \textbf{microSD 16 GB+} (A1/A2) + microSD уншигч\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+Сүлжээ\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+Зөөврийн компьютер ба Pi \textbf{нэг сүлжээнд}. Pi-г \textbf{кабелиар} холбох нь хамгийн найдвартай (А.5)\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
 
 \hypertarget{ux430.-ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux434ux44dux44dux440}{%
 \section{А. {[}ЗК{]} Зөөврийн компьютер дээр}\label{ux430.-ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux434ux44dux44dux440}}
 
-\hypertarget{ux430.1-ux448ux430ux430ux440ux434ux43bux430ux433ux430ux442ux430ux439-ux43fux440ux43eux433ux440ux430ux43c}{%
-\subsection{А.1 Шаардлагатай програм}\label{ux430.1-ux448ux430ux430ux440ux434ux43bux430ux433ux430ux442ux430ux439-ux43fux440ux43eux433ux440ux430ux43c}}
+\hypertarget{ux430.1-ux43fux440ux43eux433ux440ux430ux43cux443ux443ux434-ux441ux443ux443ux43bux433ux430ux445}{%
+\subsection{А.1 Програмууд суулгах}\label{ux430.1-ux43fux440ux43eux433ux440ux430ux43cux443ux443ux434-ux441ux443ux443ux43bux433ux430ux445}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+Суулгах дараалал \textbf{чухал}: WSL → Git → VS Code → Docker Desktop → Raspberry Pi Imager. Docker Desktop нь WSL 2 дээр ажилладаг тул WSL-ийг \textbf{эхэлж} суулгана.
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Програм
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шалгах комманд
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Тайлбар
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+\#\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Програм\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Юунд хэрэглэх вэ\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+А.1.3\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{WSL 2 + Ubuntu}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Windows доторх Linux. Лабын бүх {[}ЗК{]} команд энд ажиллана\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+А.1.4\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{Git for Windows}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Git-ийн нэвтрэлт (Credential Manager), VS Code-ийн Git\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+А.1.5\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{VS Code}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Код засах, Ubuntu (WSL) ба Pi (SSH) руу холбогдох\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+А.1.6\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{Docker Desktop}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Үүлний стек (EMQX, InfluxDB, Grafana, \ldots)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+А.1.7\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{Raspberry Pi Imager}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+microSD карт бичих\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+А.1.9\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Ubuntu доторх хэрэгслүүд\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{make}, \texttt{python3-venv}, \texttt{mosquitto-clients}, \texttt{git}, \texttt{curl}\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-Git & \texttt{git\ -\/-version} & 2.30+ \\
-Python & \texttt{python3\ -\/\allowbreak{}-version} & 3.10+ \\
-Docker Desktop & \texttt{docker\ compose\ version} & v2.20+; Лаб 8-ын \texttt{docker\ save\ -\/\allowbreak{}-platform}-д Docker API 1.48+ (шинэ хувилбар) \\
-VS Code & --- & + \textbf{Remote - SSH}, \textbf{Docker}, \textbf{YAML} өргөтгөл \\
-SSH клиент & \texttt{ssh\ -V} & Windows 10/11-д суулгаастай \\
-MQTT Explorer & --- & http://mqtt-explorer.com (сонголт: \texttt{mosquitto\_sub}) \\
-VirtualBox & \texttt{VBoxManage\ -\/\allowbreak{}-version} & Зөвхөн Лаб 8 (А.8) \\
 \end{longtable}\endgroup
 
-\textbf{Зөөврийн компьютерийн санах ой:} Docker Desktop-д 6 GB + Лаб 8-ын VM-д 4 GB + хост OS → \textbf{16 GB RAM тав тухтай}. 8 GB-тай бол Лаб 8-д VM-д 2 GB өгч, Ollama-г зогсоож ажиллана (\texttt{lab08/\allowbreak{}k3s/\allowbreak{}README.\allowbreak{}md}).
+\hypertarget{ux430.1.1-windows-ux438ux439ux43d-ux445ux443ux432ux438ux43bux431ux430ux440-ux431ux430-virtualization-ux448ux430ux43bux433ux430ux445}{%
+\subsubsection{А.1.1 Windows-ийн хувилбар ба virtualization шалгах}\label{ux430.1.1-windows-ux438ux439ux43d-ux445ux443ux432ux438ux43bux431ux430ux440-ux431ux430-virtualization-ux448ux430ux43bux433ux430ux445}}
+
+\textbf{Алхам 1 --- Windows-ийн хувилбар.} \texttt{Win\ +\ R} → \texttt{winver} гэж бичээд \texttt{Enter}.
+
+✓ \textbf{Шалгах:} Нээгдсэн цонхонд \textbf{Version 22H2} (Windows 10) эсвэл \textbf{Version 23H2 / 24H2 / 25H2} (Windows 11) байна. Хуучин бол \textbf{Settings → Windows Update → Check for updates} → бүх шинэчлэлийг суулгаж, restart хий, дахин шалга.
+
+\begin{quote}
+☞ Windows \textbf{Home} хувилбар ч болно. Docker-ийн баримтаар Home нь зөвхөн \emph{Linux контейнер} ажиллуулна --- бидэнд яг тэр л хэрэгтэй.
+\end{quote}
+
+\textbf{Алхам 2 --- Virtualization.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \texttt{Ctrl\ +\ Shift\ +\ Esc} → \textbf{Task Manager} нээгдэнэ.
+\item
+  Зүүн талаас \textbf{Performance} → \textbf{CPU} сонго.
+\item
+  Баруун доод хэсгээс \textbf{Virtualization}-ийг хай.
+\end{enumerate}
+
+✓ \textbf{Шалгах:} \texttt{Virtualization:\allowbreak{}\ Enabled}.
+
+✗ \textbf{Disabled} бол компьютерээ restart хийж, асах үед BIOS руу ор (DELL: \texttt{F2}; бусад: \texttt{F2}, \texttt{Del}, \texttt{F10} эсвэл \texttt{Esc}). \textbf{Intel Virtualization Technology (VT-x)} эсвэл AMD дээр \textbf{SVM Mode}-ийг хайж \textbf{Enabled} болго → \textbf{Save \& Exit}. Олдохгүй бол багшид хандана.
+
+\hypertarget{ux430.1.2-winget-ux431ux430-windows-terminal-ux448ux430ux43bux433ux430ux445}{%
+\subsubsection{\texorpdfstring{А.1.2 \texttt{winget} ба Windows Terminal шалгах}{А.1.2 winget ба Windows Terminal шалгах}}\label{ux430.1.2-winget-ux431ux430-windows-terminal-ux448ux430ux43bux433ux430ux445}}
+
+\texttt{winget} бол Windows-ийн багц менежер: програмыг \textbf{албан ёсны эх сурвалжаас} нэг командаар татаж суулгана.
+
+\textbf{{[}ЗК · PowerShell{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{winget {-}{-}version}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \textbf{Шалгах:} \texttt{v1.x.x} гэж хэвлэнэ.
+
+✗ \texttt{winget\ is\ not\ recognized} гэвэл: \textbf{Microsoft Store} → \texttt{App\ Installer} гэж хайж → \textbf{Update} (эсвэл \textbf{Get}) → PowerShell-ээ хаагаад дахин нээ.
+
+Windows 10 дээр \textbf{Windows Terminal} байхгүй бол суулга (Windows 11-д суулгаастай):
+
+\textbf{{[}ЗК · PowerShell{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{winget install {-}{-}id Microsoft.}\FunctionTok{WindowsTerminal}\NormalTok{ {-}e}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+☞ \texttt{winget}-ийг \textbf{анх удаа} ажиллуулахад \texttt{Do\ you\ agree\ to\ all\ the\ source\ agreements\ terms?\allowbreak{}\ {[}Y{]}\ Yes\ {[}N{]}\ No} гэж асууна → \texttt{Y} дараад \texttt{Enter}. Суулгах явцад Windows \textbf{"Do you want to allow this app to make changes?"} гэж асуувал \textbf{Yes}.
+\end{quote}
+
+\hypertarget{ux430.1.3-wsl-2-ux431ux430-ubuntu-ux441ux443ux443ux43bux433ux430ux445}{%
+\subsubsection{А.1.3 WSL 2 ба Ubuntu суулгах}\label{ux430.1.3-wsl-2-ux431ux430-ubuntu-ux441ux443ux443ux43bux433ux430ux445}}
+
+WSL (Windows Subsystem for Linux) нь Windows дотор жинхэнэ Linux ажиллуулна. Docker Desktop контейнерүүдээ үүн дотор ажиллуулдаг бөгөөд бид лабын командуудаа \textbf{Ubuntu} дотор бичнэ.
+
+\textbf{Алхам 1 --- суулгах.}
+
+\textbf{{[}ЗК · PowerShell (Admin){]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{wsl {-}{-}install {-}d Ubuntu}
+\end{Highlighting}
+\end{Shaded}
+
+Татаж суулгахад 5--10 мин болно. \texttt{The\ requested\ operation\ is\ successful.\allowbreak{}\ Changes\ will\ not\ be\ effective\ until\ the\ system\ is\ rebooted.\allowbreak{}} гэвэл \textbf{компьютерээ restart хий}.
+
+\begin{quote}
+✗ Явц \texttt{0.0\%} дээр удаан зогсвол \texttt{Ctrl\ +\ C} дараад: \texttt{wsl\ -\/\allowbreak{}-install\ -\/\allowbreak{}-web-download\ -d\ Ubuntu}
+
+✗ Команд суулгахын оронд тусламжийн текст хэвлэвэл WSL аль хэдийн суусан байна → \texttt{wsl\ -\/-update} хийгээд дараа нь \texttt{wsl\ -\/\allowbreak{}-install\ -d\ Ubuntu}.
+\end{quote}
+
+\textbf{Алхам 2 --- Ubuntu-гийн хэрэглэгч үүсгэх.} Restart хийсний дараа \textbf{Ubuntu} цонх автоматаар нээгдэнэ (нээгдэхгүй бол Start → \texttt{Ubuntu}). Хэдэн минут хүлээсний дараа:
+
+\begin{verbatim}
+Enter new UNIX username:
+\end{verbatim}
+
+→ \textbf{жижиг латин үсгээр}, хоосон зайгүй нэр бич (жишээ: \texttt{bat}) → \texttt{Enter}.
+
+\begin{verbatim}
+New password:
+Retype new password:
+\end{verbatim}
+
+→ нууц үгээ хоёр удаа бич (\textbf{дэлгэцэнд харагдахгүй --- хэвийн}). Энэ бол Ubuntu-гийн \texttt{sudo} нууц үг --- \textbf{тэмдэглэж ав}.
+
+✓ Prompt \texttt{bat@LAPTOP-XXXX:\textasciitilde{}\$} болж өөрчлөгдвөл Ubuntu бэлэн.
+
+\textbf{Алхам 3 --- WSL-ийн хувилбар шалгах.}
+
+\textbf{{[}ЗК · PowerShell{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{wsl {-}{-}update}
+\NormalTok{wsl {-}{-}version}
+\NormalTok{wsl {-}{-}list {-}{-}verbose}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \textbf{Шалгах:}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{wsl\ -\/-version}-ийн эхний мөр: \texttt{WSL\ version:\allowbreak{}\ 2.\allowbreak{}x.\allowbreak{}x} --- \textbf{2.1.5-аас бага биш} (Docker Desktop-ийн шаардлага).
+\item
+  \texttt{wsl\ -\/\allowbreak{}-list\ -\/\allowbreak{}-verbose}: \texttt{Ubuntu} мөрийн \textbf{VERSION} баганад \texttt{2}, нэрийн өмнө \texttt{*} (анхдагч distribution).
+\end{itemize}
+
+✗ VERSION \texttt{1} бол: \texttt{wsl\ -\/\allowbreak{}-set-version\ Ubuntu\ 2}. \texttt{*} өөр distribution дээр байвал: \texttt{wsl\ -\/\allowbreak{}-set-default\ Ubuntu}.
+
+\hypertarget{ux430.1.4-git-for-windows}{%
+\subsubsection{А.1.4 Git for Windows}\label{ux430.1.4-git-for-windows}}
+
+\textbf{{[}ЗК · PowerShell{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{winget install {-}{-}id Git.}\FunctionTok{Git}\NormalTok{ {-}e}
+\end{Highlighting}
+\end{Shaded}
+
+Суусны дараа \textbf{PowerShell-ээ хаагаад шинээр нээ} (шинэ програм PATH-д нэмэгдэнэ).
+
+\textbf{{[}ЗК · PowerShell{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{git {-}{-}version}
+\NormalTok{git credential{-}manager {-}{-}version}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \textbf{Шалгах:} хоёулаа хувилбарын дугаар хэвлэнэ (\texttt{git\ version\ 2.\allowbreak{}5x\ldots{}}, \texttt{2.x.x\ldots{}}).
+
+\begin{quote}
+☞ Git-ийг Ubuntu дотор ч ашиглана (А.1.9). Windows-ийн Git нь Ubuntu-д GitHub-ын нэвтрэлтийг хадгалах \textbf{Git Credential Manager}-ийг өгдөг (А.3).
+\end{quote}
+
+\hypertarget{ux430.1.5-vs-code-ux431ux430-ux4e9ux440ux433ux4e9ux442ux433ux4e9ux43bux4afux4afux434}{%
+\subsubsection{А.1.5 VS Code ба өргөтгөлүүд}\label{ux430.1.5-vs-code-ux431ux430-ux4e9ux440ux433ux4e9ux442ux433ux4e9ux43bux4afux4afux434}}
+
+\textbf{{[}ЗК · PowerShell{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{winget install {-}{-}id Microsoft.}\FunctionTok{VisualStudioCode}\NormalTok{ {-}e}
+\end{Highlighting}
+\end{Shaded}
+
+PowerShell-ээ \textbf{хаагаад шинээр нээ}, дараа нь өргөтгөлүүдийг суулга (мөр бүрийг тус тусад нь, эсвэл бүгдийг нэг дор буулгаж болно):
+
+\textbf{{[}ЗК · PowerShell{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{code {-}{-}install{-}extension ms{-}vscode{-}remote.}\FunctionTok{remote}\NormalTok{{-}wsl}
+\NormalTok{code {-}{-}install{-}extension ms{-}vscode{-}remote.}\FunctionTok{remote}\NormalTok{{-}ssh}
+\NormalTok{code {-}{-}install{-}extension ms{-}python.}\FunctionTok{python}
+\NormalTok{code {-}{-}install{-}extension ms{-}azuretools.}\FunctionTok{vscode}\NormalTok{{-}containers}
+\NormalTok{code {-}{-}install{-}extension redhat.}\FunctionTok{vscode}\NormalTok{{-}yaml}
+\end{Highlighting}
+\end{Shaded}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+Өргөтгөл & Юунд\tabularnewline
+\midrule
+\endhead
+\textbf{WSL} & Ubuntu доторх файлыг VS Code-оор нээх (\texttt{code\ .})\tabularnewline
+\textbf{Remote - SSH} & Pi дээрх файлыг шууд засах (В.3)\tabularnewline
+\textbf{Python} & Python код\tabularnewline
+\textbf{Container Tools} & Контейнер, Compose файл\tabularnewline
+\textbf{YAML} & \texttt{docker-compose.\allowbreak{}yml}-ийн алдааг илрүүлэх\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+✓ \textbf{Шалгах:} \texttt{code\ -\/\allowbreak{}-list-extensions} → дээрх таван ID жагсаалтад байна.
+
+\hypertarget{ux430.1.6-docker-desktop}{%
+\subsubsection{А.1.6 Docker Desktop}\label{ux430.1.6-docker-desktop}}
+
+\textbf{Алхам 1 --- суулгах.}
+
+\textbf{{[}ЗК · PowerShell{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{winget install {-}{-}id Docker.}\FunctionTok{DockerDesktop}\NormalTok{ {-}e}
+\end{Highlighting}
+\end{Shaded}
+
+Installer-ийн цонх нээгдвэл:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Configuration} хуудсанд \textbf{Use WSL 2 instead of Hyper-V} чагттай байгааг шалга (анхдагчаар чагттай).
+\item
+  \textbf{OK} дар → суулгаж дуусахыг хүлээ (3--5 мин).
+\item
+  \textbf{Close} (эсвэл \textbf{Close and log out}) гарвал дар. Log out хийвэл дахин нэвтэр.
+\end{enumerate}
+
+\begin{quote}
+☞ \texttt{winget} ажиллахгүй бол: https://docs.docker.com/desktop/setup/install/windows-install/ → \textbf{Docker Desktop for Windows -- x86\_64} товчоор \texttt{Docker\ Desktop\ Installer.\allowbreak{}exe} татаж, давхар товшоод дээрх 1--3-ыг хий.
+\end{quote}
+
+\textbf{Алхам 2 --- анх асаах.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Start → \texttt{Docker\ Desktop} → нээ.
+\item
+  \textbf{Docker Subscription Service Agreement} гарна → \textbf{Accept}. (Зөвшөөрөхгүй бол Docker Desktop ажиллахгүй. Боловсролын зорилгоор үнэгүй.)
+\item
+  Нэвтрэх (Sign in) эсвэл судалгааны цонх гарвал \textbf{Skip} / \textbf{Continue without signing in} дар.
+\item
+  Цонхны \textbf{зүүн доод буланд} \texttt{Engine\ running} (ногоон) гэж гартал хүлээ --- анх удаа 1--3 мин.
+\end{enumerate}
+
+\textbf{Алхам 3 --- WSL-тэй холбох.} Docker Desktop-ийн баруун дээд буланд \textbf{⚙ (Settings)}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{General} → \textbf{Use the WSL 2 based engine} чагттай байгааг шалга.
+\item
+  \textbf{Resources} → \textbf{WSL integration} →
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Enable integration with my default WSL distro} --- чагттай,
+  \item
+    доорх жагсаалтад \textbf{Ubuntu}-гийн шилжүүлэгч --- \textbf{асаалттай} (цэнхэр).
+  \end{itemize}
+\item
+  \textbf{Apply \& restart} дар.
+\end{enumerate}
+
+\textbf{Алхам 4 --- шалгах (хоёр терминалаас).}
+
+\textbf{{[}ЗК · PowerShell{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{docker version}
+\NormalTok{docker compose version}
+\NormalTok{docker run {-}{-}rm hello{-}world}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{{[}ЗК · Ubuntu{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ version}
+\ExtensionTok{docker}\NormalTok{ compose version}
+\ExtensionTok{docker}\NormalTok{ run {-}{-}rm hello{-}world}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \textbf{Шалгах (хоёр терминал дээр хоёуланд нь):}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{docker\ version} нь \textbf{Client:} ба \textbf{Server:} гэсэн \textbf{хоёр} хэсэг хэвлэнэ.
+\item
+  \texttt{docker\ compose\ version} → \texttt{Docker\ Compose\ version\ v2.\allowbreak{}x.\allowbreak{}x}.
+\item
+  \texttt{hello-world} → \texttt{Hello\ from\ Docker!} гэсэн мөр гарна.
+\end{itemize}
+
+✗ \texttt{error\ during\ connect} / \texttt{Cannot\ connect\ to\ the\ Docker\ daemon} → Docker Desktop ажиллаагүй байна: Алхам 2-ын 4-р зүйлийг шалга.
+✗ Ubuntu-д \texttt{docker:\allowbreak{}\ command\ not\ found} эсвэл \texttt{The\ command\ \textquotesingle{}docker\textquotesingle{}\ could\ not\ be\ found\ in\ this\ WSL\ 2\ distro} → Алхам 3-ын \textbf{WSL integration} асаагүй байна.
+
+\begin{quote}
+☞ \textbf{Docker Desktop-ийг лаб бүрийн өмнө асаа.} Компьютер асах бүрт автоматаар асаах бол: \textbf{Settings → General → Start Docker Desktop when you sign in to your computer}.
+\end{quote}
+
+\hypertarget{ux430.1.7-raspberry-pi-imager}{%
+\subsubsection{А.1.7 Raspberry Pi Imager}\label{ux430.1.7-raspberry-pi-imager}}
+
+\textbf{{[}ЗК · PowerShell{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{winget install {-}{-}id RaspberryPiFoundation.}\FunctionTok{RaspberryPiImager}\NormalTok{ {-}e}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \textbf{Шалгах:} Start цэсэнд \textbf{Raspberry Pi Imager} гарч ирнэ. Хувилбар нь \textbf{2.0 ба түүнээс шинэ} байх ёстой (Б.1-ийн дэлгэцүүд энэ хувилбарынх).
+
+\begin{quote}
+☞ Гараар: https://www.raspberrypi.com/software/ → \textbf{Download for Windows}.
+\end{quote}
+
+\hypertarget{ux430.1.8-mqtt-explorer-ux441ux43eux43dux433ux43eux43bux442ux43eux442}{%
+\subsubsection{А.1.8 MQTT Explorer (сонголтот)}\label{ux430.1.8-mqtt-explorer-ux441ux43eux43dux433ux43eux43bux442ux43eux442}}
+
+Брокер дахь сэдвийн модыг график хэлбэрээр харуулна. Заавал биш --- \texttt{mosquitto\_sub} хангалттай.
+
+\textbf{{[}ЗК · PowerShell{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{winget install {-}{-}id thomasnordquist.}\FunctionTok{MQTT}\NormalTok{{-}Explorer {-}e}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux430.1.9-ubuntu-ux434ux43eux442ux43eux440ux445-ux445ux44dux440ux44dux433ux441ux43bux4afux4afux434}{%
+\subsubsection{А.1.9 Ubuntu доторх хэрэгслүүд}\label{ux430.1.9-ubuntu-ux434ux43eux442ux43eux440ux445-ux445ux44dux440ux44dux433ux441ux43bux4afux4afux434}}
+
+\textbf{{[}ЗК · Ubuntu{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sudo}\NormalTok{ apt update}
+\FunctionTok{sudo}\NormalTok{ apt upgrade {-}y}
+\FunctionTok{sudo}\NormalTok{ apt install {-}y git make curl bc jq python3{-}venv python3{-}pip mosquitto{-}clients}
+\end{Highlighting}
+\end{Shaded}
+
+Эхний команд Ubuntu-гийн нууц үгийг (А.1.3, Алхам 2) асууна.
+
+✓ \textbf{Шалгах:}
+
+\textbf{{[}ЗК · Ubuntu{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ {-}{-}version}\KeywordTok{;} \FunctionTok{make}\NormalTok{ {-}{-}version }\KeywordTok{|} \FunctionTok{head}\NormalTok{ {-}1}\KeywordTok{;} \ExtensionTok{python3}\NormalTok{ {-}{-}version}\KeywordTok{;} \ExtensionTok{mosquitto\_sub}\NormalTok{ {-}{-}help }\KeywordTok{|} \FunctionTok{head}\NormalTok{ {-}1}
+\end{Highlighting}
+\end{Shaded}
+
+Дөрвөн мөр хувилбарын мэдээлэл хэвлэнэ (\texttt{python3} нь \textbf{3.10+}).
 
 \hypertarget{ux430.2-docker-desktop-ux438ux439ux43d-ux441ux430ux43dux430ux445-ux43eux439-ux437ux430ux430ux432ux430ux43b}{%
 \subsection{А.2 Docker Desktop-ийн санах ой (ЗААВАЛ)}\label{ux430.2-docker-desktop-ux438ux439ux43d-ux441ux430ux43dux430ux445-ux43eux439-ux437ux430ux430ux432ux430ux43b}}
@@ -44,8 +689,26 @@ VirtualBox & \texttt{VBoxManage\ -\/\allowbreak{}-version} & Зөвхөн Лаб
 Docker Desktop-ийн баримтаар Linux VM-д анхдагчаар \textbf{хост компьютерийн санах ойн 50\%}-ийг өгдөг. Бидэнд \textbf{6 GB} хэрэгтэй (Лаб 8-д Ollama). Тохируулах газар нь backend-ээс хамаарна:
 
 \begin{itemize}
+\tightlist
 \item
-  \textbf{Windows + WSL 2 backend (анхдагч):} Resources-ийн Memory гулсуур \textbf{байхгүй} --- санах ойг WSL 2-ын VM-д \texttt{\%UserProfile\%\textbackslash{}.wslconfig} файлаар өгнө:
+  \textbf{Windows + WSL 2 backend (бидний сонголт):} Docker Desktop-ийн \textbf{Resources} хэсэгт Memory гулсуур \textbf{байхгүй} --- санах ойг WSL 2-ын VM-д \texttt{\%UserProfile\%\textbackslash{}.wslconfig} файлаар өгнө (доорх алхмууд).
+\item
+  \textbf{macOS, Linux, Windows Hyper-V backend:} \textbf{Settings → Resources → Advanced → Memory limit → 6 GB} (16 GB-тай бол 8 GB) → \emph{Apply \& restart}.
+\end{itemize}
+
+\textbf{Алхам 1 --- файл нээх.}
+
+\textbf{{[}ЗК · PowerShell{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{notepad }\StringTok{"$env:USERPROFILE\textbackslash{}.wslconfig"}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{Cannot\ find\ the\ .\allowbreak{}wslconfig\ file.\allowbreak{}\ Do\ you\ want\ to\ create\ a\ new\ file?\allowbreak{}} гэж асуувал \textbf{Yes}.
+
+\textbf{Алхам 2 --- дараах хоёр мөрийг бичээд хадгал} (\texttt{Ctrl\ +\ S}), Notepad-ийг хаа:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -54,93 +717,291 @@ Docker Desktop-ийн баримтаар Linux VM-д анхдагчаар \textb
 \end{Highlighting}
 \end{Shaded}
 
-  Дараа нь PowerShell-д \texttt{wsl\ -\/\allowbreak{}-shutdown} хийж, Docker Desktop-ийг дахин асаана. (Windows-ийн \emph{WSL Settings} програмаар ч тохируулж болно.)
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+Компьютерийн RAM & \texttt{memory=}\tabularnewline
+\midrule
+\endhead
+8 GB & \texttt{6GB} (Лаб 8-д Chrome ба бусад програмаа хаана)\tabularnewline
+16 GB ба түүнээс их & \texttt{8GB}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+\begin{quote}
+⚠ Файлын нэр яг \texttt{.wslconfig} байх ёстой --- \textbf{\texttt{.wslconfig.txt} БИШ}. Шалгах: \texttt{Get-ChildItem\ \$env:USERPROFILE\textbackslash{}.wslconfig} → алдаагүй гарвал зөв.
+\end{quote}
+
+\textbf{Алхам 3 --- WSL-ийг дахин эхлүүлэх.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
 \item
-  \textbf{macOS, Linux, Windows Hyper-V backend:} \textbf{Settings → Resources → Advanced → Memory limit → 6 GB} (16 GB-тай бол 8 GB) → \emph{Apply \& restart}.
-\end{itemize}
+  Docker Desktop-ийг хаа: taskbar-ын баруун доод талын \textbf{халимны дүрс} дээр баруун товч → \textbf{Quit Docker Desktop}.
+\item
+  Бүх Ubuntu цонхоо хаа.
+\item
+  \textbf{{[}ЗК · PowerShell{]}} \texttt{wsl\ -\/\allowbreak{}-shutdown}
+\item
+  10 секунд хүлээгээд Docker Desktop-ийг дахин нээ → \texttt{Engine\ running} болтол хүлээ.
+\end{enumerate}
+
+✓ \textbf{Шалгах:}
+
+\textbf{{[}ЗК · Ubuntu{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{docker}\NormalTok{ info }\AttributeTok{{-}{-}format} \StringTok{\textquotesingle{}\{\{.MemTotal\}\}\textquotesingle{}} \KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}\{printf "Docker{-}т \%.1f GB\textbackslash{}n", $1/1024/1024/1024\}\textquotesingle{}}
+\ExtensionTok{docker}\NormalTok{ info {-}{-}format }\StringTok{\textquotesingle{}\{\{.MemTotal\}\}\textquotesingle{}} \KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}\{printf "Docker{-}т \%.1f GB\textbackslash{}n", $1/1024/1024/1024\}\textquotesingle{}}
 \end{Highlighting}
 \end{Shaded}
 
-4 GB-аас бага бол Лаб 8-д \texttt{ai} профайл ажиллахгүй.
+\texttt{Docker-т\ 5.\allowbreak{}8\ GB} орчим (6GB тавьсан бол 5.7--6.0) гарна. Хэвээр 50\% бол файлын нэр эсвэл байршил буруу (Алхам 2-ын ⚠). \textbf{4 GB-аас бага бол Лаб 8-д \texttt{ai} профайл ажиллахгүй.}
 
 \begin{quote}
 Албан ёсны баримт: \href{https://docs.docker.com/desktop/settings-and-maintenance/settings/}{Docker Desktop --- Settings (Resources)} · \href{https://learn.microsoft.com/en-us/windows/wsl/wsl-config}{WSL --- .wslconfig}
 \end{quote}
 
-\hypertarget{ux430.3-python-ux43eux440ux447ux438ux43d}{%
-\subsection{А.3 Python орчин}\label{ux430.3-python-ux43eux440ux447ux438ux43d}}
+\hypertarget{ux430.3-ux441ux430ux43dux433ux430ux430-ux442ux430ux442ux430ux445-ux431ux430-python-ux43eux440ux447ux438ux43d}{%
+\subsection{А.3 Сангаа татах ба Python орчин}\label{ux430.3-ux441ux430ux43dux433ux430ux430-ux442ux430ux442ux430ux445-ux431ux430-python-ux43eux440ux447ux438ux43d}}
+
+\textbf{Алхам 1 --- Git тохируулах} (нэг удаа):
+
+\textbf{{[}ЗК · Ubuntu{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\BuiltInTok{cd} \OperatorTok{\textless{}}\NormalTok{багийн{-}сан}\OperatorTok{\textgreater{}}
-\ExtensionTok{python3} \AttributeTok{{-}m}\NormalTok{ venv .venv}
-\BuiltInTok{source}\NormalTok{ .venv/bin/activate          }\CommentTok{\# Windows: .venv\textbackslash{}Scripts\textbackslash{}activate}
-\ExtensionTok{pip}\NormalTok{ install }\AttributeTok{{-}r}\NormalTok{ tools/requirements.txt}
+\FunctionTok{git}\NormalTok{ config {-}{-}global user.name }\StringTok{"Овог Нэр"}
+\FunctionTok{git}\NormalTok{ config {-}{-}global user.email }\StringTok{"таны@имэйл.mn"}
+\FunctionTok{git}\NormalTok{ config {-}{-}global core.autocrlf input}
+\FunctionTok{git}\NormalTok{ config {-}{-}global credential.helper }\StringTok{"/mnt/c/Program\textbackslash{} Files/Git/mingw64/bin/git{-}credential{-}manager.exe"}
 \end{Highlighting}
 \end{Shaded}
 
-Шалгах:
+\begin{itemize}
+\tightlist
+\item
+  \texttt{core.\allowbreak{}autocrlf\ input} --- мөрийн төгсгөлийг Linux-ийн (LF) хэвээр үлдээнэ. Үгүй бол \texttt{.sh} файлд CRLF орж контейнерт \texttt{/bin/sh\^{}M:\ bad\ interpreter} алдаа гарна.
+\item
+  \texttt{credential.\allowbreak{}helper} --- GitHub-ын нэвтрэлтийг Windows-ийн Git Credential Manager-т хадгална: \texttt{git\ clone}/\allowbreak\texttt{git\ push} анх удаа \textbf{хөтөч нээж} нэвтрүүлнэ, дараа нь дахин асуухгүй.
+\end{itemize}
+
+\textbf{Алхам 2 --- сангаа Ubuntu-гийн гэрийн хавтаст clone хийх.}
+
+\begin{quote}
+⚠ Сангаа \textbf{Ubuntu дотор} (\texttt{\textasciitilde{}/cnc302}) хадгална --- \texttt{/mnt/c/\ldots{}}, \textbf{OneDrive}, \textbf{Desktop}, \textbf{Documents}-д БИШ. Docker-ийн WSL-ийн зөвлөмжөөр Linux файлын системд байгаа файл контейнерт хамаагүй хурдан харагдана; OneDrive нь \texttt{.git}-ийг эвддэг.
+\end{quote}
+
+\textbf{{[}ЗК · Ubuntu{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python}\NormalTok{ tools/sim\_device.py }\AttributeTok{{-}{-}dry{-}run} \AttributeTok{{-}{-}devices}\NormalTok{ 2 }\AttributeTok{{-}{-}count}\NormalTok{ 3}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}}
+\FunctionTok{git}\NormalTok{ clone }\OperatorTok{\textless{}}\NormalTok{REPO\_URL}\OperatorTok{\textgreater{}}\NormalTok{ cnc302}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\FunctionTok{ls}
 \end{Highlighting}
 \end{Shaded}
 
-Брокергүйгээр 6 мессежийн JSON хэвлэгдэх ёстой. Хэвлэгдэхгүй бол цааш явахгүй.
+✓ \textbf{Шалгах:} \texttt{lab01\ \ldots{}\ lab08\ \ stack\ \ edge\ \ tools\ \ docs\ \ README.\allowbreak{}md\ \ SETUP.\allowbreak{}md} харагдана.
+
+\begin{quote}
+☞ Сангаа VS Code-оор нээх: \texttt{cd\ \textasciitilde{}/cnc302\ \&\&\ code\ .} --- VS Code нээгдэж, зүүн доод буланд \textbf{WSL: Ubuntu} гэж харагдана. Windows-ийн File Explorer-оос: хаягийн мөрөнд \texttt{\textbackslash{}\textbackslash{}wsl\$\textbackslash{}Ubuntu\textbackslash{}home\textbackslash{}\textless{}ubuntu-нэр\textgreater{}\textbackslash{}cnc302}.
+\end{quote}
+
+\textbf{Алхам 3 --- Python-ийн virtual environment.}
+
+\textbf{{[}ЗК · Ubuntu{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\ExtensionTok{python3}\NormalTok{ {-}m venv .venv}
+\BuiltInTok{source}\NormalTok{ .venv/bin/activate}
+\ExtensionTok{pip}\NormalTok{ install {-}{-}upgrade pip}
+\ExtensionTok{pip}\NormalTok{ install {-}r tools/requirements.txt}
+\end{Highlighting}
+\end{Shaded}
+
+✓ Prompt-ын эхэнд \texttt{(.venv)} гарна. Шинэ Ubuntu цонх нээх бүрт \textbf{\texttt{cd\ \textasciitilde{}/cnc302\ \&\&\ source\ .venv/bin/activate}}-ийг дахин бичнэ.
+
+\textbf{Алхам 4 --- шалгах.}
+
+\textbf{{[}ЗК · Ubuntu{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ tools/sim\_device.py {-}{-}dry{-}run {-}{-}devices 2 {-}{-}count 3}
+\end{Highlighting}
+\end{Shaded}
+
+✓ Брокергүйгээр \textbf{6 мессежийн JSON} хэвлэгдэнэ. Хэвлэгдэхгүй бол цааш явахгүй.
 
 \hypertarget{ux430.4-ux4afux4afux43bux43dux438ux439-ux441ux442ux435ux43aux438ux439ux433-ux442ux430ux442ux430ux436-ux430ux441ux430ux430ux445}{%
 \subsection{А.4 Үүлний стекийг татаж, асаах}\label{ux430.4-ux4afux4afux43bux43dux438ux439-ux441ux442ux435ux43aux438ux439ux433-ux442ux430ux442ux430ux436-ux430ux441ux430ux430ux445}}
 
+\textbf{Алхам 1 --- нууц утгын файл үүсгэх.}
+
+\textbf{{[}ЗК · Ubuntu{]}}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\BuiltInTok{cd}\NormalTok{ stack}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack}
 \FunctionTok{cp}\NormalTok{ .env.example .env}
-\FunctionTok{nano}\NormalTok{ .env                          }\CommentTok{\# нууц үгсээ солино}
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ core pull }\CommentTok{\# 5–10 минут}
-\FunctionTok{make}\NormalTok{ up}
-\FunctionTok{make}\NormalTok{ health                        }\CommentTok{\# бүгд 200 байх ёстой}
+\FunctionTok{nano}\NormalTok{ .env}
 \end{Highlighting}
 \end{Shaded}
+
+\texttt{nano} засварлагч нээгдэнэ. Сумаар зөөж дараах \textbf{гурван утгыг} өөрийнхөөрөө соль:
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+Мөр & Юу бичих\tabularnewline
+\midrule
+\endhead
+\texttt{EMQX\_COOKIE=} & дурын урт үг (жишээ: \texttt{team07-cookie-x8k2})\tabularnewline
+\texttt{EMQX\_\allowbreak{}DASHBOARD\_\allowbreak{}PASSWORD=\allowbreak{}} & EMQX самбарын нууц үг --- \textbf{тэмдэглэж ав}\tabularnewline
+\texttt{GRAFANA\_\allowbreak{}PASSWORD=\allowbreak{}} & Grafana-гийн нууц үг --- \textbf{тэмдэглэж ав}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+Бусад мөрийг (жишээ нь хоосон \texttt{EMQX\_\allowbreak{}API\_\allowbreak{}KEY=\allowbreak{}}) \textbf{хэвээр нь} үлдээ --- тэдгээрийг Лаб 2-т бөглөнө.
+
+Хадгалах: \texttt{Ctrl\ +\ O} → \texttt{Enter}. Гарах: \texttt{Ctrl\ +\ X}.
+
+\begin{quote}
+⚠ Нууц үгийг \textbf{стекийг анх асаахаас өмнө} соль. EMQX ба Grafana нууц үгээ зөвхөн \textbf{анх асахдаа} \texttt{.env}-ээс уншина; дараа нь \texttt{.env}-ийг сольсон ч өөрчлөгдөхгүй.
+\end{quote}
+
+\textbf{Алхам 2 --- image-уудыг татах} (анх удаа хэдэн GB, \textbf{10--30 мин}):
+
+\textbf{{[}ЗК · Ubuntu{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ compose {-}{-}profile core pull {-}{-}ignore{-}buildable}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{-\/\allowbreak{}-ignore-buildable} --- манай \texttt{registry} image Docker Hub-д байхгүй, дараагийн алхамд \textbf{локалд барина}; энэ туг түүнийг татах гэж оролдохгүй болгоно.
+
+\textbf{Алхам 3 --- асаах.}
+
+\textbf{{[}ЗК · Ubuntu{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{make}\NormalTok{ up}
+\end{Highlighting}
+\end{Shaded}
+
+Анх удаа \texttt{registry}-г барина (2--5 мин). Төгсгөлд \texttt{Pi-гийн\ edge/\allowbreak{}.\allowbreak{}env\ файлд\ бичих\ утга:\allowbreak{}} гэсэн жагсаалт хэвлэгдэнэ --- А.5-д хэрэглэнэ.
+
+\textbf{Алхам 4 --- шалгах.} 1 минут хүлээгээд:
+
+\textbf{{[}ЗК · Ubuntu{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{make}\NormalTok{ status}
+\FunctionTok{make}\NormalTok{ health}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \textbf{Шалгах:}
+
+\begin{itemize}
+\item
+  \texttt{make\ status}-ын \textbf{STATUS} баганад бүх контейнер \texttt{Up} эсвэл \texttt{Up\ (healthy)}. \texttt{starting} / \texttt{health:\allowbreak{}\ starting} бол 1 мин хүлээгээд дахин ажиллуул.
+\item
+  \texttt{make\ health} дөрвөн мөр \textbf{\texttt{200}} хэвлэнэ:
+
+\begin{verbatim}
+EMQX      200
+InfluxDB  200
+Grafana   200
+Registry  200
+\end{verbatim}
+\end{itemize}
+
+Хөтчөөр шалгах:
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+Хаяг & Нэвтрэх\tabularnewline
+\midrule
+\endhead
+http://localhost:18083 & EMQX самбар: \texttt{admin} / \texttt{EMQX\_\allowbreak{}DASHBOARD\_\allowbreak{}PASSWORD}\tabularnewline
+http://localhost:3000 & Grafana: \texttt{admin} / \texttt{GRAFANA\_\allowbreak{}PASSWORD}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+\begin{quote}
+☞ Стекийг зогсоох (өгөгдөл устахгүй): \texttt{make\ down}. Дахин асаах: \texttt{make\ up}. \textbf{\texttt{make\ clean} бүх өгөгдлийг устгана} --- хэрэглэхээсээ өмнө бод.
+\end{quote}
 
 \hypertarget{ux430.5-lan-ip-ux445ux430ux44fux433ux430ux430-ux43eux43bux43eux445-ux447ux443ux445ux430ux43b}{%
 \subsection{А.5 LAN IP хаягаа олох (ЧУХАЛ)}\label{ux430.5-lan-ip-ux445ux430ux44fux433ux430ux430-ux43eux43bux43eux445-ux447ux443ux445ux430ux43b}}
 
-Pi нь зөөврийн компьютерийн \textbf{LAN IP}-ээр холбогдоно. \texttt{localhost} БИШ.
+Pi нь зөөврийн компьютерт \textbf{LAN IP}-ээр холбогдоно --- \texttt{localhost} БИШ (Pi дээр \texttt{localhost} гэдэг нь Pi өөрөө).
+
+\textbf{{[}ЗК · PowerShell{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\BuiltInTok{cd}\NormalTok{ stack }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ ip}
-\CommentTok{\# эсвэл Windows дээр:  ipconfig | findstr IPv4}
-\CommentTok{\# эсвэл Linux/macOS:   ip {-}4 addr show scope global | grep inet}
+\NormalTok{ipconfig}
 \end{Highlighting}
 \end{Shaded}
 
-Гарсан хаягийг (жишээ \texttt{192.168.1.57}) тэмдэглэ. Pi-гийн \texttt{edge/.env} дотор хэрэгтэй.
+Гаралтаас \textbf{Wireless LAN adapter Wi-Fi} (кабелиар бол \textbf{Ethernet adapter Ethernet}) хэсгийг олж, \textbf{IPv4 Address} мөрийн утгыг ав. Энэ бол \texttt{\textless{}LAPTOP\_\allowbreak{}IP\textgreater{}} --- \textbf{тэмдэглэ}.
 
 \begin{quote}
-\textbf{Wi-Fi-гийн урхи:} зөөврийн компьютер Wi-Fi, Pi кабелиар холбогдсон бол өөр дэд сүлжээнд байж болно. Хамгийн найдвартай нь \textbf{хоёуланг нь нэг свич/роутерт кабелиар} холбох.
+⚠ \texttt{vEthernet\ (WSL\ldots{})} эсвэл \texttt{vEthernet\ (Default\ Switch)} хэсгийн хаягийг БҮҮ ав --- тэр нь Windows доторх \textbf{дотоод} сүлжээ, Pi түүнийг харахгүй. Ubuntu дотор \texttt{ip\ addr}-оор гарах \texttt{172.x.x.x} хаяг ч мөн адил \textbf{буруу}.
+
+☞ Ubuntu-гийн \texttt{make\ ip} (\texttt{make\ up}-ын төгсгөлд хэвлэгддэг) WSL дотор Windows-ийн \texttt{ipconfig}-ийн IPv4 мөрүүдийг харуулна --- тэндээс мөн Wi-Fi/Ethernet адаптерийнхийг сонго.
+\end{quote}
+
+\textbf{Сүлжээний профайлыг Private болгох.} \textbf{Settings → Network \& internet → Wi-Fi} (эсвэл \textbf{Ethernet}) → холбогдсон сүлжээний нэр → \textbf{Network profile type} → \textbf{Private network}. Public байвал Windows Firewall Pi-гаас ирэх холболтыг хаана (А.6).
+
+\begin{quote}
+\textbf{Сүлжээний урхи:}
+- Хамгийн найдвартай нь \textbf{хоёуланг нь нэг router/switch-д кабелиар} холбох.
+- Pi 3B-ийн Wi-Fi нь \textbf{зөвхөн 2.4 GHz}. 5 GHz сүлжээ Imager-т харагдах боловч Pi холбогдохгүй.
+- Их сургуулийн нийтийн Wi-Fi ихэвчлэн төхөөрөмжүүдийг хооронд нь \textbf{тусгаарладаг} (client isolation) тул Pi зөөврийн компьютерээ "харахгүй". Лабораторийн router эсвэл утасныхаа \textbf{2.4 GHz hotspot}-ыг ашигла.
+- Зөөврийн компьютер Wi-Fi-аар, Pi кабелиар холбогдсон бол өөр дэд сүлжээнд (subnet) байж болно --- \texttt{\textless{}LAPTOP\_\allowbreak{}IP\textgreater{}} ба \texttt{\textless{}PI\_\allowbreak{}IP\textgreater{}}-ийн эхний гурван тоо ижил эсэхийг шалга.
+- IP \textbf{өөрчлөгдөж болно} (өөр сүлжээ, router restart). Лаб бүрийн эхэнд \texttt{ipconfig}-оор шалга.
 \end{quote}
 
 \hypertarget{ux430.6-ux433ux430ux43bux442-ux445ux430ux43dux430-windows}{%
 \subsection{А.6 Галт хана (Windows)}\label{ux430.6-ux433ux430ux43bux442-ux445ux430ux43dux430-windows}}
 
-Windows Defender Firewall гаднаас ирэх холболтыг анхдагчаар хаадаг тул Pi-гаас ирэх портуудыг нээнэ: 1883 (MQTT, гүүр), 8883 (MQTT/TLS, Лаб 2), 8090 (registry/OTA, Лаб 2), 8181 (InfluxDB), 3000 (Grafana):
+Windows Defender Firewall гаднаас ирэх холболтыг анхдагчаар хаадаг. Pi-гаас ирэх портуудыг нээнэ: \textbf{1883} (MQTT, гүүр), \textbf{8883} (MQTT/TLS, Лаб 2), \textbf{8090} (registry/OTA, Лаб 2), \textbf{8181} (InfluxDB), \textbf{3000} (Grafana).
+
+\textbf{{[}ЗК · PowerShell (Admin){]}} --- доорх \textbf{хоёр мөрийг бүтнээр нь нэг дор} хуулж буулга (эхний мөрийн төгсгөлийн \texttt{\textasciigrave{}} тэмдэг нь "команд дараагийн мөрөнд үргэлжилнэ" гэсэн утгатай):
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# PowerShell (Administrator)}
-\NormalTok{New}\OperatorTok{{-}}\NormalTok{NetFirewallRule }\OperatorTok{{-}}\NormalTok{DisplayName }\StringTok{"CNC302 cloud"} \OperatorTok{{-}}\NormalTok{Direction Inbound \textasciigrave{}}
-  \OperatorTok{{-}}\NormalTok{Protocol TCP }\OperatorTok{{-}}\NormalTok{LocalPort 1883}\OperatorTok{,}\NormalTok{8883}\OperatorTok{,}\NormalTok{8090}\OperatorTok{,}\NormalTok{8181}\OperatorTok{,}\NormalTok{3000 }\OperatorTok{{-}}\NormalTok{Action Allow }\OperatorTok{{-}}\NormalTok{Profile Private}
+\NormalTok{New{-}NetFirewallRule {-}DisplayName }\StringTok{"CNC302 cloud"}\NormalTok{ {-}Direction Inbound \textasciigrave{}}
+\NormalTok{  {-}Protocol TCP {-}LocalPort 1883,8883,8090,8181,3000 {-}Action Allow {-}Profile Private}
 \end{Highlighting}
 \end{Shaded}
 
+✓ \textbf{Шалгах:}
+
+\textbf{{[}ЗК · PowerShell{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Get{-}NetFirewallRule {-}DisplayName }\StringTok{"CNC302 cloud"}\NormalTok{ | }\FunctionTok{Format{-}Table}\NormalTok{ DisplayName, Enabled, Profile, Action}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{CNC302\ cloud\ \ True\ \ Private\ \ Allow} гарна.
+
 \begin{quote}
-Зөвхөн \textbf{Private} профайлд нээ (Windows-д сүлжээгээ "Private" гэж тохируулсан байх ёстой). Нийтийн сүлжээнд задгай MQTT брокер орхиж болохгүй.
+Зөвхөн \textbf{Private} профайлд нээ (А.5). Нийтийн сүлжээнд задгай MQTT брокер орхиж болохгүй.
+
+☞ Docker Desktop эсвэл өөр програм \textbf{"Windows Defender Firewall has blocked some features"} цонх гаргавал \textbf{Private networks}-ийг чагтлаад \textbf{Allow access} дар.
 
 Албан ёсны баримт: \href{https://learn.microsoft.com/en-us/powershell/module/netsecurity/new-netfirewallrule}{New-NetFirewallRule}
 \end{quote}
@@ -148,39 +1009,105 @@ Windows Defender Firewall гаднаас ирэх холболтыг анхда�
 \hypertarget{ux430.7-ssh-ux442ux4afux43bux445ux4afux4afux440-ux4afux4afux441ux433ux44dux445}{%
 \subsection{А.7 SSH түлхүүр үүсгэх}\label{ux430.7-ssh-ux442ux4afux43bux445ux4afux4afux440-ux4afux4afux441ux433ux44dux445}}
 
+Pi руу \textbf{нууц үггүй, түлхүүрээр} нэвтэрнэ. Түлхүүрийг \textbf{Windows} талд үүсгэнэ --- PowerShell-ийн \texttt{ssh} болон VS Code хоёулаа үүнийг ашиглана.
+
+\textbf{Алхам 1 --- түлхүүр үүсгэх.}
+
+\textbf{{[}ЗК · PowerShell{]}}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{ssh{-}keygen} \AttributeTok{{-}t}\NormalTok{ ed25519 }\AttributeTok{{-}C} \StringTok{"\textless{}таны{-}имэйл\textgreater{}"} \AttributeTok{{-}f}\NormalTok{ \textasciitilde{}/.ssh/cnc302}
+\FunctionTok{New{-}Item}\NormalTok{ {-}ItemType Directory {-}Force }\StringTok{"$env:USERPROFILE\textbackslash{}.ssh"}\NormalTok{ | }\FunctionTok{Out{-}Null}
+\NormalTok{ssh{-}keygen {-}t ed25519 {-}C }\StringTok{"таны@имэйл.mn"}\NormalTok{ {-}f }\StringTok{"$env:USERPROFILE\textbackslash{}.ssh\textbackslash{}cnc302"}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{quote}
-Нууц түлхүүрийг (\texttt{cnc302}) \textbf{хэзээ ч} Git санд оруулахгүй.
-\end{quote}
+\texttt{Enter\ passphrase} гэж асуувал хоосон орхиж \textbf{Enter}, дахин \textbf{Enter}.
+
+✓ \texttt{Your\ identification\ has\ been\ saved\ in\ C:\textbackslash{}Users\textbackslash{}\ldots{}\textbackslash{}.ssh\textbackslash{}cnc302} гэж гарна. Хоёр файл үүснэ:
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+Файл & Юу вэ &\tabularnewline
+\midrule
+\endhead
+\texttt{cnc302} & \textbf{нууц} түлхүүр & СТОП: \textbf{Хэнд ч бүү өг, Git-д хэзээ ч бүү оруул}\tabularnewline
+\texttt{cnc302.pub} & \textbf{нийтийн} түлхүүр & Pi-д өгнө (Б.1)\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+\textbf{Алхам 2 --- нийтийн түлхүүрийг харах.} Б.1-д хуулж буулгана:
+
+\textbf{{[}ЗК · PowerShell{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{Get{-}Content} \StringTok{"$env:USERPROFILE\textbackslash{}.ssh\textbackslash{}cnc302.pub"}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{ssh-ed25519\ AAAAC3Nza\ldots{}\ таны@имэйл.\allowbreak{}mn} гэсэн \textbf{нэг урт мөр} гарна.
+
+\textbf{Алхам 3 --- \texttt{ssh\ pi} товчлол үүсгэх.} Доорх блокийн \texttt{\textless{}NN\textgreater{}}-ийг багийн дугаараар \textbf{сольсны дараа} бүтнээр нь буулга:
+
+\textbf{{[}ЗК · PowerShell{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{Add{-}Content}\NormalTok{ {-}Encoding ascii }\StringTok{"$env:USERPROFILE\textbackslash{}.ssh\textbackslash{}config"} \VerbatimStringTok{@"}
+
+\VerbatimStringTok{Host pi}
+\VerbatimStringTok{    HostName pi{-}team\textless{}NN\textgreater{}.local}
+\VerbatimStringTok{    User cnc302}
+\VerbatimStringTok{    IdentityFile \textasciitilde{}/.ssh/cnc302}
+\VerbatimStringTok{"@}
+\end{Highlighting}
+\end{Shaded}
+
+Одооноос \texttt{ssh\ pi} гэж бичихэд \texttt{ssh\ -i\ \textasciitilde{}/.ssh/cnc302\ cnc302@pi-team\textless{}NN\textgreater{}.local}-тай ижил ажиллана. VS Code ч энэ файлыг уншина (В.3).
+
+✓ \textbf{Шалгах:} \texttt{Get-Content\ "\$env:USERPROFILE\textbackslash{}.ssh\textbackslash{}config"} → \texttt{HostName\ pi-team07.\allowbreak{}local} гэх мэт \textbf{өөрийн дугаартай} мөр харагдана (\texttt{\textless{}NN\textgreater{}} үлдсэн бол файлыг \texttt{notepad\ "\$env:USERPROFILE\textbackslash{}.ssh\textbackslash{}config"}-оор засна).
 
 \hypertarget{ux430.8-vm-ux43bux430ux431-8-ux44bux43d-k3s-server-vm-ux43bux430ux431-8-ux430ux430ux441-ux4e9ux43cux43dux4e9-ux445ux438ux439ux43dux44d}{%
 \subsection{А.8 {[}VM{]} Лаб 8-ын K3s server VM (Лаб 8-аас өмнө хийнэ)}\label{ux430.8-vm-ux43bux430ux431-8-ux44bux43d-k3s-server-vm-ux43bux430ux431-8-ux430ux430ux441-ux4e9ux43cux43dux4e9-ux445ux438ux439ux43dux44d}}
 
 Лаб 8-д K3s-ийн \textbf{server} нь зөөврийн компьютер дээрх VM-д, Pi 3B нь \textbf{agent} болж нэгдэнэ. K3s-ийн албан ёсны доод шаардлага: server \textbf{2 цөм / 2 GB}, agent \textbf{1 цөм / 512 MB} --- 1 GB-тай Pi server-т хүрэлцэхгүй.
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Тохиргоо
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Утга
-\end{minipage} \\
+\begin{minipage}[b]{0.47\columnwidth}\raggedright
+Тохиргоо\strut
+\end{minipage} & \begin{minipage}[b]{0.47\columnwidth}\raggedright
+Утга\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+Гипервизор\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+Oracle VirtualBox\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+Зочин OS\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\textbf{Ubuntu Server LTS} amd64 --- одоогийн LTS нь \textbf{26.04} (24.04 LTS ч дэмжигдсэн хэвээр)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+vCPU / RAM / диск\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\textbf{≥ 2 vCPU}, \textbf{4 GB} (доод 2 GB), 20 GB\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+Сүлжээ\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\textbf{Bridged Adapter} (LAN-д холбогдсон физик адаптер), NAT адаптер нэмэхгүй\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+Суулгахдаа\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\textbf{OpenSSH server}-ийг сонго\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-Гипервизор & Oracle VirtualBox \\
-Зочин OS & \textbf{Ubuntu Server LTS} amd64 --- одоогийн LTS нь \textbf{26.04} (24.04 LTS ч дэмжигдсэн хэвээр) \\
-vCPU / RAM / диск & \textbf{≥ 2 vCPU}, \textbf{4 GB} (доод 2 GB), 20 GB \\
-Сүлжээ & \textbf{Bridged Adapter} (LAN-д холбогдсон физик адаптер), NAT адаптер нэмэхгүй \\
-Суулгахдаа & \textbf{OpenSSH server}-ийг сонго \\
 \end{longtable}\endgroup
 
 Дэлгэрэнгүй алхам ба K3s-ийн суулгалт: \texttt{lab08/\allowbreak{}k3s/\allowbreak{}README.\allowbreak{}md} §3.1--3.2.
@@ -197,163 +1124,460 @@ vCPU / RAM / диск & \textbf{≥ 2 vCPU}, \textbf{4 GB} (доод 2 GB), 20 G
 \hypertarget{ux431.0-ux442ux43eux43dux43eux433-ux442ux4e9ux445ux4e9ux4e9ux440ux4e9ux43cux436ux438ux439ux43d-ux448ux430ux43bux433ux443ux443ux440}{%
 \subsection{Б.0 Тоног төхөөрөмжийн шалгуур}\label{ux431.0-ux442ux43eux43dux43eux433-ux442ux4e9ux445ux4e9ux4e9ux440ux4e9ux43cux436ux438ux439ux43d-ux448ux430ux43bux433ux443ux443ux440}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Зүйл
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шаардлага
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Яагаад
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Зүйл\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шаардлага\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Яагаад\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Тэжээл\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{5 V / 2.5 A} (албан ёсны 12.5 W Micro USB адаптер)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Сул тэжээл → хүчдэл унана (\texttt{get\_throttled}-ийн бит 0) → бүх хэмжилт гажина\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Хөргөлт\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Наалдацтай хөргөгч, боломжтой бол сэнс\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Албан ёсны баримтаар 80--85 °C-д Arm цөмийн давтамж аажмаар буурна\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+microSD\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{A1 эсвэл A2}, 16 GB+\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Хямд карт дээр persistence, swap бичилт удаан\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Сүлжээ\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{Кабель} (Wi-Fi биш)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Pi 3B-ийн Wi-Fi нь зөвхөн 2.4 GHz, лабораторид бөглөрдөг\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-Тэжээл & \textbf{5 V / 2.5 A} (албан ёсны 12.5 W Micro USB адаптер) & Сул тэжээл → хүчдэл унана (\texttt{get\_throttled}-ийн бит 0) → бүх хэмжилт гажина \\
-Хөргөлт & Наалдацтай хөргөгч, боломжтой бол сэнс & Албан ёсны баримтаар 80--85 °C-д Arm цөмийн давтамж аажмаар буурна \\
-microSD & \textbf{A1 эсвэл A2}, 16 GB+ & Хямд карт дээр persistence, swap бичилт удаан \\
-Сүлжээ & \textbf{Кабель} (Wi-Fi биш) & Pi 3B-ийн Wi-Fi нь зөвхөн 2.4 GHz, лабораторид бөглөрдөг \\
 \end{longtable}\endgroup
 
 Pi 3B-ийн албан ёсны үзүүлэлт: BCM2837, 4 × Cortex-A53 (Armv8) @ 1.2 GHz, \textbf{1 GB} RAM, 100 Mb/s Ethernet, 4 × USB 2.0, 2.4 GHz 802.11n Wi-Fi, microSD.
 
-\hypertarget{ux431.1-ux441ux438ux441ux442ux435ux43c-ux441ux443ux443ux43bux433ux430ux445}{%
-\subsection{Б.1 Систем суулгах}\label{ux431.1-ux441ux438ux441ux442ux435ux43c-ux441ux443ux443ux43bux433ux430ux445}}
+\hypertarget{ux431.1-microsd-ux43aux430ux440ux442-ux431ux438ux447ux438ux445-raspberry-pi-imager}{%
+\subsection{Б.1 microSD карт бичих (Raspberry Pi Imager)}\label{ux431.1-microsd-ux43aux430ux440ux442-ux431ux438ux447ux438ux445-raspberry-pi-imager}}
+
+\begin{quote}
+⚠ Бичихэд картын \textbf{бүх өгөгдөл устна}. Компьютерийн өөр диск эсвэл USB flash-ийг андуурч сонгохгүйн тулд \textbf{бусад USB төхөөрөмжөө салга}.
+\end{quote}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  Raspberry Pi Imager → \textbf{Raspberry Pi OS Lite (64-bit)} --- одоогийн хувилбар нь \textbf{Debian Trixie} дээр суурилсан (өмнөх нь Bookworm). Pi 3B нь 64-бит процессортой тул 64-бит хувилбарыг албан ёсоор дэмжинэ.
+  microSD картаа уншигчаар зөөврийн компьютерт залга.
+  \textgreater{} ⚠ Windows \textbf{"You need to format the disk in drive X: before you can use it"} гэж асуувал \textbf{Cancel} дар. Format хийх ШААРДЛАГАГҮЙ.
+\item
+  \textbf{Raspberry Pi Imager}-ийг нээ (Windows зөвшөөрөл асуувал \textbf{Yes}).
+\item
+  \textbf{Device} → \textbf{Raspberry Pi 3} → \textbf{Next}.
+\item
+  \textbf{OS} → \textbf{Raspberry Pi OS (other)} → \textbf{Raspberry Pi OS Lite (64-bit)} → \textbf{Next}.
 
   \begin{quote}
-  ⚠ \textbf{64-bit заавал.} Манай бүх дүрс (image) ба Python wheel (\texttt{ai-edge-litert} г.м.) arm64-д зориулагдсан. Docker Engine v29-өөс эхлэн Raspberry Pi OS 32-bit (armhf)-д шинэ багц гаргахаа больсон. Imager 32-bit санал болговол \texttt{Raspberry\ Pi\ OS\ (other)} цэснээс \textbf{Lite (64-bit)}-ыг сонгоно.
-  \end{quote}
+  ⚠ \textbf{64-bit заавал.} Манай бүх image ба Python wheel (\texttt{ai-edge-litert} г.м.) arm64-д зориулагдсан. Docker Engine v29-өөс эхлэн Raspberry Pi OS 32-bit (armhf)-д шинэ багц гаргахаа больсон.
 
-  \begin{quote}
-  ⚠ \textbf{Lite заавал.} Ширээний орчин 1 GB-д хэт үнэтэй --- Lite нь \emph{"command-line-only"} хувилбар.
+  ⚠ \textbf{Lite заавал.} Lite бол дэлгэцгүй, \emph{"command-line-only"} хувилбар --- ширээний орчин 1 GB-д хэт үнэтэй. Одоогийн хувилбар нь \textbf{Debian Trixie} дээр суурилсан (өмнөх нь Bookworm).
   \end{quote}
 \item
-  Imager-ийн OS тохируулгын (customisation) хэсэгт:
+  \textbf{Storage} → \textbf{microSD картаа} сонго. \textbf{Хэмжээг нь шалга} (16 GB карт бол \textasciitilde15 GB гэж харагдана) → \textbf{Next}.
+\item
+  \textbf{Customisation} (OS тохируулга) --- хуудас бүрт доорх утгыг оруулаад \textbf{Next}:
 
-  \begin{itemize}
-  \tightlist
-  \item
-    Хостын нэр: \texttt{pi-\textless{}багийн-нэр\textgreater{}} (жишээ: \texttt{pi-team03})
-  \item
-    Хэрэглэгч: \texttt{cnc302}, хүчтэй нууц үг (\texttt{edge/\allowbreak{}agent/\allowbreak{}cnc302-edge-agent.\allowbreak{}service} энэ нэрийг хүлээнэ)
-  \item
-    SSH идэвхжүүлэх → \textbf{public-key authentication only} → А.7-д үүсгэсэн \texttt{cnc302.pub}-ийн агуулгыг наах
-  \item
-    Кабель сүлжээ (Wi-Fi зөвхөн шаардлагатай үед)
-  \end{itemize}
+  \begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+  \toprule
+  \begin{minipage}[b]{0.30\columnwidth}\raggedright
+  Хуудас\strut
+  \end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+  Талбар\strut
+  \end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+  Утга\strut
+  \end{minipage}\tabularnewline
+  \midrule
+  \endhead
+  \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \textbf{Hostname}\strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  Hostname\strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \texttt{pi-team\textless{}NN\textgreater{}} (жишээ: \texttt{pi-team07})\strut
+  \end{minipage}\tabularnewline
+  \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \textbf{Localisation}\strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  Capital city\strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \textbf{Ulaanbaatar (Mongolia)}\strut
+  \end{minipage}\tabularnewline
+  \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  Time zone\strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \texttt{Asia/Ulaanbaatar} (автоматаар бөглөгдөнө)\strut
+  \end{minipage}\tabularnewline
+  \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  Keyboard layout\strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \texttt{us}\strut
+  \end{minipage}\tabularnewline
+  \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \textbf{User}\strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  Username\strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \textbf{\texttt{cnc302}} (өөр нэр бүү ашигла)\strut
+  \end{minipage}\tabularnewline
+  \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  Password\strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  Өөрийн нууц үг --- \textbf{тэмдэглэж ав} (\texttt{sudo}-д хэрэгтэй)\strut
+  \end{minipage}\tabularnewline
+  \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \textbf{Wi-Fi}\strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \textbf{Кабель} ашиглах бол алгас (\textbf{Skip}). Wi-Fi бол: SSID ба нууц үг (\textbf{2.4 GHz}, том/жижиг үсгийг яг зөв)\strut
+  \end{minipage}\tabularnewline
+  \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \textbf{Remote access}\strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  Enable SSH\strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \textbf{асаана}\strut
+  \end{minipage}\tabularnewline
+  \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  Authentication\strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \textbf{Use public key authentication}\strut
+  \end{minipage}\tabularnewline
+  \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  Public key\strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  А.7, Алхам 2-т гарсан \textbf{бүтэн мөрийг} (\texttt{ssh-ed25519\ AAAA\ldots{}\ таны@имэйл.\allowbreak{}mn}) буулга\strut
+  \end{minipage}\tabularnewline
+  \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \textbf{Raspberry Pi Connect}\strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \strut
+  \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+  \textbf{Унтраалттай} үлдээ\strut
+  \end{minipage}\tabularnewline
+  \bottomrule
+  \end{longtable}\endgroup
+
+  \begin{quote}
+  ⚠ Hostname \textbf{баг бүрт өөр} байх ёстой. Ижил нэртэй хоёр Pi нэг сүлжээнд байвал хооронд нь ялгах боломжгүй.
+
+  ☞ Imager-ийн хувилбараас хамаарч хуудасны нэр бага зэрэг өөр байж болно --- утга нь адилхан.
+  \end{quote}
+\item
+  \textbf{Write} → анхааруулга гарвал \textbf{I understand, erase and write} (эсвэл \textbf{Yes}) дар. Windows-ийн администраторын зөвшөөрөл асуувал \textbf{Yes}.
+\item
+  Бичих (\textbf{Writing}) ба баталгаажуулах (\textbf{Verifying}) явц дуусахыг хүлээ (5--15 мин). \textbf{Write complete!} гарвал картаа салга.
 \end{enumerate}
 
 \begin{quote}
-Албан ёсны баримт: \href{https://www.raspberrypi.com/documentation/computers/os.html}{Raspberry Pi OS} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/os/rpi-os-introduction.adoc}{эх: GitHub})
+Албан ёсны баримт: \href{https://www.raspberrypi.com/documentation/computers/getting-started.html}{Getting started --- Install using Imager} · \href{https://www.raspberrypi.com/documentation/computers/os.html}{Raspberry Pi OS} · \href{https://www.raspberrypi.com/news/a-new-raspberry-pi-imager/}{A new Raspberry Pi Imager (2.\allowbreak{}0)}
 \end{quote}
 
-\hypertarget{ux431.2-ux44dux445ux43dux438ux439-ux445ux43eux43bux431ux43eux43bux442-ux431ux430-ux448ux438ux43dux44dux447ux43bux44dux43b}{%
-\subsection{Б.2 Эхний холболт ба шинэчлэл}\label{ux431.2-ux44dux445ux43dux438ux439-ux445ux43eux43bux431ux43eux43bux442-ux431ux430-ux448ux438ux43dux44dux447ux43bux44dux43b}}
+\hypertarget{ux431.2-ux430ux43dux445-ux430ux441ux430ux430ux445-ssh-ux44dux44dux440-ux445ux43eux43bux431ux43eux433ux434ux43eux445-ux448ux438ux43dux44dux447ux43bux44dux445}{%
+\subsection{Б.2 Анх асаах, SSH-ээр холбогдох, шинэчлэх}\label{ux431.2-ux430ux43dux445-ux430ux441ux430ux430ux445-ssh-ux44dux44dux440-ux445ux43eux43bux431ux43eux433ux434ux43eux445-ux448ux438ux43dux44dux447ux43bux44dux445}}
+
+\textbf{Алхам 1 --- асаах.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  microSD картаа Pi-д хий (контактаараа дээш биш, \textbf{доош} --- PCB тал руу).
+\item
+  Ethernet кабелиа зөөврийн компьютертэй \textbf{нэг router/switch}-д залга.
+\item
+  Тэжээлээ \textbf{хамгийн сүүлд} залга. Улаан гэрэл асаж, ногоон гэрэл анивчина.
+\item
+  \textbf{3--5 минут хүлээ.} Pi анх асахдаа файлын системээ өргөтгөж, өөрөө нэг-хоёр удаа restart хийнэ.
+\end{enumerate}
+
+\textbf{Алхам 2 --- Pi-г сүлжээнээс олох.}
+
+\textbf{{[}ЗК · PowerShell{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{ssh} \AttributeTok{{-}i}\NormalTok{ \textasciitilde{}/.ssh/cnc302 cnc302@pi{-}team03.local}
+\NormalTok{ping {-}4 pi{-}team\textless{}NN\textgreater{}.}\FunctionTok{local}
+\end{Highlighting}
+\end{Shaded}
 
-\FunctionTok{sudo}\NormalTok{ apt update }\KeywordTok{\&\&} \FunctionTok{sudo}\NormalTok{ apt full{-}upgrade }\AttributeTok{{-}y}
-\FunctionTok{sudo}\NormalTok{ apt install }\AttributeTok{{-}y}\NormalTok{ git curl jq htop iotop stress{-}ng mosquitto{-}clients }\DataTypeTok{\textbackslash{}}
-\NormalTok{                    python3{-}venv python3{-}dev}
+✓ \texttt{Reply\ from\ 192.\allowbreak{}168.\allowbreak{}x.\allowbreak{}x:\allowbreak{}\ bytes=\allowbreak{}32\ time=\allowbreak{}\ldots{}} гарна. Тэр хаяг бол \texttt{\textless{}PI\_\allowbreak{}IP\textgreater{}} --- \textbf{тэмдэглэ}.
+
+✗ \texttt{Ping\ request\ could\ not\ find\ host}: (а) дахиад 2 мин хүлээгээд оролд; (б) router-ийн удирдлагын хуудаснаас \textbf{connected devices / DHCP clients} жагсаалтад \texttt{pi-team\textless{}NN\textgreater{}}-ийг хайж IP-г ол; (в) Д хэсэг.
+
+\textbf{Алхам 3 --- SSH-ээр холбогдох.}
+
+\textbf{{[}ЗК · PowerShell{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ssh pi}
+\end{Highlighting}
+\end{Shaded}
+
+(\texttt{.local} ажиллахгүй бол: \texttt{ssh\ -i\ "\$env:USERPROFILE\textbackslash{}.ssh\textbackslash{}cnc302"\ cnc302@\textless{}PI\_IP\textgreater{}}.)
+
+Анх удаа:
+
+\begin{verbatim}
+Are you sure you want to continue connecting (yes/no/[fingerprint])?
+\end{verbatim}
+
+→ \texttt{yes} гэж \textbf{бүтнээр} бичээд \texttt{Enter}.
+
+✓ Нууц үг асуулгүйгээр prompt \texttt{cnc302@pi-team07:\textasciitilde{}\ \$} болж өөрчлөгдөнө. Одооноос \textbf{{[}Pi{]}} командыг \textbf{энэ цонхонд} бичнэ.
+
+✗ \texttt{Permission\ denied\ (publickey)} → Д хэсэг.
+
+\textbf{Алхам 4 --- системийг шинэчлэх ба хэрэгслүүд суулгах} (10--20 мин):
+
+\textbf{{[}Pi{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sudo}\NormalTok{ apt update}
+\FunctionTok{sudo}\NormalTok{ apt full{-}upgrade {-}y}
+\FunctionTok{sudo}\NormalTok{ apt install {-}y git curl jq bc htop iotop stress{-}ng mosquitto{-}clients }\KeywordTok{\textbackslash{}}
+                    \ExtensionTok{netcat{-}openbsd}\NormalTok{ python3{-}venv python3{-}dev}
 \FunctionTok{sudo}\NormalTok{ reboot}
 \end{Highlighting}
 \end{Shaded}
+
+\texttt{sudo} анх удаа Б.1-д тавьсан \textbf{Pi-гийн нууц үгийг} асууна. Сүүлийн мөрийн төгсгөлийн \texttt{\textbackslash{}} нь "команд дараагийн мөрөнд үргэлжилнэ" гэсэн утгатай --- хоёр мөрийг \textbf{хамт} хуул.
+
+\texttt{reboot} хийхэд SSH тасарна (\texttt{Connection\ to\ \ldots{}\ closed}) --- энэ хэвийн. \textbf{1--2 мин хүлээгээд} \texttt{ssh\ pi}-ээр дахин холбогд.
+
+\textbf{Алхам 5 --- үндсэн шалгалт.}
+
+\textbf{{[}Pi{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{uname}\NormalTok{ {-}m}
+\ExtensionTok{dpkg}\NormalTok{ {-}{-}print{-}architecture}
+\BuiltInTok{.} \ExtensionTok{/etc/os{-}release} \KeywordTok{\&\&} \BuiltInTok{echo} \StringTok{"}\VariableTok{$PRETTY\_NAME}\StringTok{"}
+\FunctionTok{free}\NormalTok{ {-}h}
+\ExtensionTok{vcgencmd}\NormalTok{ get\_throttled}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \textbf{Хүлээгдэх үр дүн:}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+Команд & Байх ёстой & Өөр бол\tabularnewline
+\midrule
+\endhead
+\texttt{uname\ -m} & \texttt{aarch64} & \texttt{armv7l} = 32-bit OS → Б.1\tabularnewline
+\texttt{dpkg\ -\/\allowbreak{}-print-architecture} & \texttt{arm64} & дээрхтэй адил\tabularnewline
+\texttt{PRETTY\_NAME} & \texttt{\ldots{}\ 13\ (trixie)} эсвэл \texttt{\ldots{}\ 12\ (bookworm)} & ---\tabularnewline
+\texttt{free\ -h} → Mem total & ≈ \texttt{900Mi} & ---\tabularnewline
+\texttt{get\_throttled} & \texttt{throttled=0x0} & Тэжээл сул → Б.0, Д\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
 
 \hypertarget{ux431.3-gpu-ux433ux438ux439ux43d-ux441ux430ux43dux430ux445-ux43eux439-gpu_mem-ux445ux44dux43cux436ux438ux436-ux448ux438ux439ux434ux43dux44d}{%
 \subsection{\texorpdfstring{Б.3 GPU-гийн санах ой (\texttt{gpu\_mem}) --- хэмжиж шийднэ}{Б.3 GPU-гийн санах ой (gpu\_mem) --- хэмжиж шийднэ}}\label{ux431.3-gpu-ux433ux438ux439ux43d-ux441ux430ux43dux430ux445-ux43eux439-gpu_mem-ux445ux44dux43cux436ux438ux436-ux448ux438ux439ux434ux43dux44d}}
 
-Raspberry Pi-гийн баримтаар 1 GB-тай загварт \texttt{gpu\_mem}-ийн \textbf{анхдагч утга 76} MiB. Гэхдээ баримт \texttt{gpu\_mem}-ийг \textbf{legacy} тохиргоонд ангилж, \emph{Raspberry Pi OS Bookworm болон түүнээс хойшхи хувилбарт ажиллахгүй, албан ёсоор дэмжигдэхгүй} гэж тэмдэглэсэн. Тиймээс «N MiB хэмнэнэ» гэж амлахгүй --- \textbf{өмнө ба дараа нь хэмжинэ}:
+Raspberry Pi-гийн баримтаар 1 GB-тай загварт \texttt{gpu\_mem}-ийн \textbf{анхдагч утга 76} MiB. Гэхдээ баримт \texttt{gpu\_mem}-ийг \textbf{legacy} тохиргоонд ангилж, \emph{Raspberry Pi OS Bookworm болон түүнээс хойшхи хувилбарт ажиллахгүй, албан ёсоор дэмжигдэхгүй} гэж тэмдэглэсэн. Тиймээс «N MiB хэмнэнэ» гэж амлахгүй --- \textbf{өмнө ба дараа нь хэмжинэ}.
+
+\textbf{Алхам 1 --- өмнөх утгыг хэмжих.}
+
+\textbf{{[}Pi{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{grep}\NormalTok{ MemTotal /proc/meminfo          }\CommentTok{\# (1) өмнөх утгыг тэмдэглэ}
-\ExtensionTok{vcgencmd}\NormalTok{ get\_mem gpu}
-\BuiltInTok{echo} \StringTok{\textquotesingle{}gpu\_mem=16\textquotesingle{}} \KeywordTok{|} \FunctionTok{sudo}\NormalTok{ tee }\AttributeTok{{-}a}\NormalTok{ /boot/firmware/config.txt}
-\FunctionTok{sudo}\NormalTok{ reboot}
-\CommentTok{\# дахин нэвтэрсний дараа:}
-\FunctionTok{grep}\NormalTok{ MemTotal /proc/meminfo          }\CommentTok{\# (2) өөрчлөгдсөн үү?}
+\FunctionTok{grep}\NormalTok{ MemTotal /proc/meminfo}
 \ExtensionTok{vcgencmd}\NormalTok{ get\_mem gpu}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{enumerate}
-\def\labelenumi{(\arabic{enumi})}
-\tightlist
-\item
-  ба (2)-ын зөрүүг Лаб 1-ийн хүснэгтэд бич. Зөрүүгүй бол энэ мөр таны OS дээр нөлөөгүй гэсэн үг --- буруу биш, \textbf{хэмжилт}.
-\end{enumerate}
+Хоёр утгыг (жишээ: \texttt{MemTotal:\allowbreak{}\ 925\ldots{}kB}, \texttt{gpu=76M}) \textbf{тэмдэглэ} --- (1).
+
+\textbf{Алхам 2 --- тохиргоо нэмж, дахин ачаалах.}
+
+\textbf{{[}Pi{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{echo} \StringTok{\textquotesingle{}gpu\_mem=16\textquotesingle{}} \KeywordTok{|} \FunctionTok{sudo}\NormalTok{ tee {-}a /boot/firmware/config.txt}
+\FunctionTok{sudo}\NormalTok{ reboot}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Алхам 3 --- дахин холбогдоод} (\texttt{ssh\ pi}) \textbf{хэмжих.}
+
+\textbf{{[}Pi{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{grep}\NormalTok{ MemTotal /proc/meminfo}
+\ExtensionTok{vcgencmd}\NormalTok{ get\_mem gpu}
+\end{Highlighting}
+\end{Shaded}
+
+Утгыг \textbf{тэмдэглэ} --- (2). (1) ба (2)-ын зөрүүг Лаб 1-ийн хүснэгтэд бич. Зөрүүгүй бол энэ мөр таны OS дээр нөлөөгүй гэсэн үг --- буруу биш, \textbf{хэмжилт}.
 
 \begin{quote}
-Албан ёсны баримт: \href{https://www.raspberrypi.com/documentation/computers/legacy_config_txt.html\#gpu_mem}{Legacy config.\allowbreak{}txt --- gpu\_\allowbreak{}mem} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/legacy_config_txt/memory.adoc}{эх: GitHub})
+Албан ёсны баримт: \href{https://www.raspberrypi.com/documentation/computers/legacy_config_txt.html\#gpu_mem}{Legacy config.\allowbreak{}txt --- gpu\_\allowbreak{}mem}
 \end{quote}
 
-\hypertarget{ux431.4-docker-ux441ux443ux443ux43bux433ux430ux445}{%
-\subsection{Б.4 Docker суулгах}\label{ux431.4-docker-ux441ux443ux443ux43bux433ux430ux445}}
+\hypertarget{ux431.4-docker-engine-ux441ux443ux443ux43bux433ux430ux445}{%
+\subsection{Б.4 Docker Engine суулгах}\label{ux431.4-docker-engine-ux441ux443ux443ux43bux433ux430ux445}}
 
-Pi 3B дээрх \textbf{64-бит} Raspberry Pi OS бол Debian-д суурилсан тул Docker-ийн \textbf{Debian} зааврыг (\texttt{apt} репозитор) дагана. \texttt{get.docker.com} convenience script-ийг Docker өөрөө \emph{зөвхөн туршилт ба хөгжүүлэлтийн орчинд} зөвлөдөг бөгөөд одоо суусан Docker-ийг шинэчлэхэд зориулагдаагүй.
+Pi дээр Docker \textbf{Desktop} биш, \textbf{Docker Engine} суулгана. 64-бит Raspberry Pi OS нь Debian-д суурилсан тул Docker-ийн \textbf{Debian} зааврыг (\texttt{apt} repository) дагана. \texttt{get.docker.com} convenience script-ийг Docker өөрөө \emph{зөвхөн туршилт ба хөгжүүлэлтийн орчинд} зөвлөдөг тул бид ашиглахгүй.
+
+\textbf{Алхам 1 --- зөрчилдөх албан бус багцыг устгах.} Шинэ систем дээр эдгээр байхгүй тул \texttt{no\ packages\ found} эсвэл \texttt{0\ to\ remove} гарна --- \textbf{энэ хэвийн}.
+
+\textbf{{[}Pi{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# 1. Зөрчилдөх албан бус багцыг устгах (байхгүй бол алгасна)}
-\FunctionTok{sudo}\NormalTok{ apt remove }\VariableTok{$(}\ExtensionTok{dpkg} \AttributeTok{{-}{-}get{-}selections}\NormalTok{ docker.io docker{-}compose docker{-}doc docker{-}buildx podman{-}docker containerd runc }\KeywordTok{|} \FunctionTok{cut} \AttributeTok{{-}f1}\VariableTok{)}
+\FunctionTok{sudo}\NormalTok{ apt remove }\VariableTok{$(}\ExtensionTok{dpkg}\NormalTok{ {-}{-}get{-}selections docker.io docker{-}compose docker{-}doc docker{-}buildx podman{-}docker containerd runc }\KeywordTok{|} \FunctionTok{cut}\NormalTok{ {-}f1}\VariableTok{)}
+\end{Highlighting}
+\end{Shaded}
 
-\CommentTok{\# 2. Docker{-}ийн apt репозитор}
+\textbf{Алхам 2 --- Docker-ийн GPG түлхүүр нэмэх} (\texttt{apt} Docker-ийн багцыг жинхэнэ эсэхийг үүгээр шалгана):
+
+\textbf{{[}Pi{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{sudo}\NormalTok{ apt update}
-\FunctionTok{sudo}\NormalTok{ apt install ca{-}certificates curl}
-\FunctionTok{sudo}\NormalTok{ install }\AttributeTok{{-}m}\NormalTok{ 0755 }\AttributeTok{{-}d}\NormalTok{ /etc/apt/keyrings}
-\FunctionTok{sudo}\NormalTok{ curl }\AttributeTok{{-}fsSL}\NormalTok{ https://download.docker.com/linux/debian/gpg }\AttributeTok{{-}o}\NormalTok{ /etc/apt/keyrings/docker.asc}
+\FunctionTok{sudo}\NormalTok{ apt install {-}y ca{-}certificates curl}
+\FunctionTok{sudo}\NormalTok{ install {-}m 0755 {-}d /etc/apt/keyrings}
+\FunctionTok{sudo}\NormalTok{ curl {-}fsSL https://download.docker.com/linux/debian/gpg {-}o /etc/apt/keyrings/docker.asc}
 \FunctionTok{sudo}\NormalTok{ chmod a+r /etc/apt/keyrings/docker.asc}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \textbf{Шалгах:} \texttt{ls\ -l\ /\allowbreak{}etc/\allowbreak{}apt/\allowbreak{}keyrings/\allowbreak{}docker.\allowbreak{}asc} → файл байна (хэмжээ \textasciitilde3.8 KB).
+
+\textbf{Алхам 3 --- Docker-ийн repository нэмэх.} Доорх блокийг \texttt{sudo\ tee}-ээс \texttt{EOF} хүртэл \textbf{бүтнээр нь НЭГ ДОР} хуулж буулга:
+
+\textbf{{[}Pi{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{sudo}\NormalTok{ tee /etc/apt/sources.list.d/docker.sources }\OperatorTok{\textless{}\textless{}EOF}
-\StringTok{Types: deb}
-\StringTok{URIs: https://download.docker.com/linux/debian}
-\StringTok{Suites: }\VariableTok{$(}\BuiltInTok{.}\NormalTok{ /etc/os{-}release }\KeywordTok{\&\&} \BuiltInTok{echo} \StringTok{"}\VariableTok{$VERSION\_CODENAME}\StringTok{"}\VariableTok{)}
-\StringTok{Components: stable}
-\StringTok{Architectures: }\VariableTok{$(}\ExtensionTok{dpkg} \AttributeTok{{-}{-}print{-}architecture}\VariableTok{)}
-\StringTok{Signed{-}By: /etc/apt/keyrings/docker.asc}
-\OperatorTok{EOF}
+\NormalTok{Types: deb}
+\NormalTok{URIs: https://download.docker.com/linux/debian}
+\NormalTok{Suites: }\VariableTok{$(}\BuiltInTok{.} \ExtensionTok{/etc/os{-}release} \KeywordTok{\&\&} \BuiltInTok{echo} \StringTok{"}\VariableTok{$VERSION\_CODENAME}\StringTok{"}\VariableTok{)}
+\NormalTok{Components: stable}
+\NormalTok{Architectures: }\VariableTok{$(}\ExtensionTok{dpkg}\NormalTok{ {-}{-}print{-}architecture}\VariableTok{)}
+\NormalTok{Signed{-}By: /etc/apt/keyrings/docker.asc}
+\NormalTok{EOF}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \textbf{Шалгах:} терминал файлын агуулгыг хэвлэнэ. Тэнд \textbf{\texttt{Suites:\ trixie}} (эсвэл \texttt{bookworm}) ба \textbf{\texttt{Architectures:\allowbreak{}\ arm64}} байх ёстой. Хоосон бол Алхам 3-ыг дахин хий.
+
+\textbf{Алхам 4 --- суулгах.}
+
+\textbf{{[}Pi{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{sudo}\NormalTok{ apt update}
+\FunctionTok{sudo}\NormalTok{ apt install {-}y docker{-}ce docker{-}ce{-}cli containerd.io docker{-}buildx{-}plugin docker{-}compose{-}plugin}
+\end{Highlighting}
+\end{Shaded}
 
-\CommentTok{\# 3. Суулгах}
-\FunctionTok{sudo}\NormalTok{ apt install docker{-}ce docker{-}ce{-}cli containerd.io docker{-}buildx{-}plugin docker{-}compose{-}plugin}
+✓ \texttt{sudo\ apt\ update}-ийн гаралтад \texttt{https:\allowbreak{}/\allowbreak{}/\allowbreak{}download.\allowbreak{}docker.\allowbreak{}com/\allowbreak{}linux/\allowbreak{}debian\ trixie\ InRelease} мөр харагдана. Суулгалт 3--5 мин.
 
-\CommentTok{\# 4. sudo{-}гүй ажиллуулах}
-\FunctionTok{sudo}\NormalTok{ usermod }\AttributeTok{{-}aG}\NormalTok{ docker }\VariableTok{$USER}
-\ExtensionTok{newgrp}\NormalTok{ docker                      }\CommentTok{\# эсвэл гараад дахин нэвтэрнэ}
+\textbf{Алхам 5 --- \texttt{sudo}-гүй ажиллуулах эрх өгөх.}
 
-\ExtensionTok{docker} \AttributeTok{{-}{-}version}
-\ExtensionTok{docker}\NormalTok{ compose version             }\CommentTok{\# v2.20+ байх ёстой}
-\ExtensionTok{docker}\NormalTok{ run }\AttributeTok{{-}{-}rm}\NormalTok{ hello{-}world}
+\textbf{{[}Pi{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sudo}\NormalTok{ usermod {-}aG docker }\VariableTok{$USER}
+\BuiltInTok{exit}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{quote}
+⚠ \texttt{exit} хийж SSH-ээс \textbf{заавал гараад}, \texttt{ssh\ pi}-ээр \textbf{дахин холбогд}. Бүлгийн эрх зөвхөн шинэ session-д хүчинтэй болно.
+
 ⚠ \texttt{docker} бүлэгт орсон хэрэглэгч root-той дүйцэх эрхтэй болдог (Docker-ийн post-install баримт) --- Pi-гийн \texttt{cnc302} хэрэглэгчийн нууц үгийг хамгаал.
 \end{quote}
 
-Docker-ийн лог microSD-г элээхээс сэргийлэх (\texttt{log-opts}-ийн утгууд \textbf{мөр} байх ёстой):
+\textbf{Алхам 6 --- шалгах.}
+
+\textbf{{[}Pi{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{docker}\NormalTok{ {-}{-}version}
+\ExtensionTok{docker}\NormalTok{ compose version}
+\ExtensionTok{docker}\NormalTok{ run {-}{-}rm hello{-}world}
+\ExtensionTok{systemctl}\NormalTok{ is{-}enabled docker}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \textbf{Хүлээгдэх үр дүн:}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{Docker\ version\ 2x.\allowbreak{}x.\allowbreak{}x} ба \texttt{Docker\ Compose\ version\ v2.\allowbreak{}x.\allowbreak{}x} (\textbf{v2.20+}),
+\item
+  \texttt{Hello\ from\ Docker!},
+\item
+  \texttt{enabled} (Pi асах бүрт Docker автоматаар асна).
+\end{itemize}
+
+✗ \texttt{permission\ denied\ while\ trying\ to\ connect\ to\ the\ Docker\ daemon\ socket} → Алхам 5-ын дараа SSH-ээс гараагүй байна.
+
+\textbf{Алхам 7 --- Docker-ийн лог microSD-г элээхээс сэргийлэх.} Блокийг \textbf{бүтнээр нь} буулга (\texttt{log-opts}-ийн утгууд \textbf{мөр} --- хашилтанд --- байх ёстой):
+
+\textbf{{[}Pi{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{sudo}\NormalTok{ tee /etc/docker/daemon.json }\OperatorTok{\textgreater{}}\NormalTok{ /dev/null }\OperatorTok{\textless{}\textless{}\textquotesingle{}EOF\textquotesingle{}}
-\StringTok{\{}
-\StringTok{  "log{-}driver": "json{-}file",}
-\StringTok{  "log{-}opts": \{ "max{-}size": "5m", "max{-}file": "2" \}}
-\StringTok{\}}
+\NormalTok{\{}
+\NormalTok{  "log{-}driver": "json{-}file",}
+\NormalTok{  "log{-}opts": \{ "max{-}size": "5m", "max{-}file": "2" \}}
+\NormalTok{\}}
 \OperatorTok{EOF}
-\FunctionTok{sudo}\NormalTok{ systemctl restart docker      }\CommentTok{\# зөвхөн ШИНЭЭР үүсэх контейнерт үйлчилнэ}
+\FunctionTok{sudo}\NormalTok{ systemctl restart docker}
 \end{Highlighting}
 \end{Shaded}
+
+✓ \textbf{Шалгах:} \texttt{docker\ info\ -\/-format\ \textquotesingle{}\{\{.LoggingDriver\}\}\textquotesingle{}} → \texttt{json-file}. Энэ тохиргоо зөвхөн \textbf{шинээр үүсэх} контейнерт үйлчилнэ.
+
+✗ \texttt{systemctl\ restart\ docker} алдаа гаргавал JSON-д алдаа байна: \texttt{sudo\ nano\ /\allowbreak{}etc/\allowbreak{}docker/\allowbreak{}daemon.\allowbreak{}json}-оор дээрх блоктой тулгаж засна.
 
 \begin{quote}
 Албан ёсны баримт: \href{https://docs.docker.com/engine/install/debian/}{Install Docker Engine on Debian} · \href{https://docs.docker.com/engine/install/linux-postinstall/}{Linux post-installation steps} · \href{https://docs.docker.com/engine/logging/drivers/json-file/}{JSON File logging driver}
@@ -362,48 +1586,81 @@ Docker-ийн лог microSD-г элээхээс сэргийлэх (\texttt{log
 \hypertarget{ux431.5-ux441ux43eux43bux438ux445-ux441ux430ux43dux430ux445-ux43eux439-swap-ux431ux430-cgroup-ux437ux430ux430ux432ux430ux43b}{%
 \subsection{Б.5 Солих санах ой (swap) ба cgroup (ЗААВАЛ)}\label{ux431.5-ux441ux43eux43bux438ux445-ux441ux430ux43dux430ux445-ux43eux439-swap-ux431ux430-cgroup-ux437ux430ux430ux432ux430ux43b}}
 
-\textbf{Swap.} 1 GB RAM дээр swap нь Лаб 4--8-д OOM-оос хамгаалах \textbf{аюулгүйн сүлжээ}. Курсын бүх заавар \textbf{2 GiB} swap гэж тооцсон. Raspberry Pi OS-ийн хувилбараас хамаарч swap-ыг удирдах хэрэгсэл өөр:
+\hypertarget{swap}{%
+\subsubsection{Swap}\label{swap}}
+
+1 GB RAM дээр swap нь Лаб 4--8-д OOM-оос хамгаалах \textbf{аюулгүйн сүлжээ}. Курсын бүх заавар \textbf{2 GiB} swap гэж тооцсон. Raspberry Pi OS-ийн хувилбараас хамаарч swap-ыг удирдах хэрэгсэл өөр байдаг тул \textbf{эхлээд аль нь болохыг} тодорхойлно.
+
+\textbf{Алхам 1 --- одоогийн байдал.}
+
+\textbf{{[}Pi{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{swapon} \AttributeTok{{-}{-}show}\KeywordTok{;} \FunctionTok{free} \AttributeTok{{-}h}                      \CommentTok{\# одоогийн байдал}
-\BuiltInTok{test} \AttributeTok{{-}e}\NormalTok{ /etc/rpi/swap.conf }\KeywordTok{\&\&} \BuiltInTok{echo} \StringTok{"rpi{-}swap"} \KeywordTok{||} \BuiltInTok{echo} \StringTok{"rpi{-}swap алга"}
-\ExtensionTok{systemctl}\NormalTok{ is{-}enabled dphys{-}swapfile }\DecValTok{2}\OperatorTok{\textgreater{}}\NormalTok{/dev/null}
+\ExtensionTok{swapon}\NormalTok{ {-}{-}show}\KeywordTok{;} \FunctionTok{free}\NormalTok{ {-}h}
+\BuiltInTok{test}\NormalTok{ {-}e /etc/rpi/swap.conf }\KeywordTok{\&\&} \BuiltInTok{echo} \StringTok{"rpi{-}swap"} \KeywordTok{||} \BuiltInTok{echo} \StringTok{"rpi{-}swap алга"}
+\ExtensionTok{systemctl}\NormalTok{ is{-}enabled dphys{-}swapfile }\OperatorTok{2\textgreater{}}\NormalTok{/dev/null}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{(а) \texttt{rpi-swap} байгаа бол (шинэ зураг, Trixie).} Raspberry Pi-гийн \texttt{rpi-swap} багц \texttt{dphys-swapfile}-ийг орлох зорилготой; анхдагч \texttt{Mechanism=auto} нь одоогоор \textbf{zram+file} (шахсан RAM swap + ховор бичигддэг файл), zram-ын хэмжээ анхдагчаар RAM-тай тэнцүү (2048 MiB-ээр хязгаарлагдана) --- Pi 3B дээр \textasciitilde0.9 GiB. Бид \texttt{swap.conf(5)}-ын \textbf{албан ёсны "Example 1"}-ийг дагаж 2 GiB-ийн уламжлалт swap файл тавина:
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+Хоёр дахь мөрийн гаралт & Аль замаар явах\tabularnewline
+\midrule
+\endhead
+\texttt{rpi-swap} & \textbf{Алхам 2а} (шинэ Trixie image --- ихэнх тохиолдол)\tabularnewline
+\texttt{rpi-swap\ алга} ба дараа нь \texttt{enabled} & \textbf{Алхам 2б} (хуучин Bookworm image)\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+\textbf{Алхам 2а --- \texttt{rpi-swap} байгаа бол.} Raspberry Pi-гийн \texttt{rpi-swap} багц \texttt{dphys-swapfile}-ийг орлох зорилготой; анхдагч \texttt{Mechanism=auto} нь одоогоор \textbf{zram+file} (шахсан RAM swap + ховор бичигддэг файл), zram-ын хэмжээ анхдагчаар RAM-тай тэнцүү (2048 MiB-ээр хязгаарлагдана) --- Pi 3B дээр \textasciitilde0.9 GiB. Бид \texttt{swap.conf(5)}-ын \textbf{албан ёсны "Example 1"}-ийг дагаж 2 GiB-ийн уламжлалт swap файл тавина. Блокийг \textbf{бүтнээр нь} буулга:
+
+\textbf{{[}Pi{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{sudo}\NormalTok{ mkdir }\AttributeTok{{-}p}\NormalTok{ /etc/rpi/swap.conf.d/}
+\FunctionTok{sudo}\NormalTok{ mkdir {-}p /etc/rpi/swap.conf.d/}
 \FunctionTok{sudo}\NormalTok{ tee /etc/rpi/swap.conf.d/80{-}use{-}swapfile.conf }\OperatorTok{\textgreater{}}\NormalTok{ /dev/null }\OperatorTok{\textless{}\textless{}EOF}
-\StringTok{[Main]}
-\StringTok{Mechanism=swapfile}
+\NormalTok{[Main]}
+\NormalTok{Mechanism=swapfile}
 
-\StringTok{[File]}
-\StringTok{FixedSizeMiB=2048}
+\NormalTok{[File]}
+\NormalTok{FixedSizeMiB=2048}
 \OperatorTok{EOF}
-\FunctionTok{sudo}\NormalTok{ reboot                        }\CommentTok{\# swap{-}ын тохиргоо ЗӨВХӨН дахин ачаалахад хэрэгжинэ}
+\FunctionTok{sudo}\NormalTok{ reboot}
 \end{Highlighting}
 \end{Shaded}
+
+swap-ын тохиргоо \textbf{зөвхөн дахин ачаалахад} хэрэгжинэ. 1--2 мин хүлээгээд \texttt{ssh\ pi}.
 
 \begin{quote}
 Анхдагч zram+file-ийг үлдээх нь microSD-г бага элээнэ (албан ёсны зорилго нь тэр). Энэ тохиолдолд \texttt{make\ check}-ийн swap мөр ✗ гарах бөгөөд Лаб 1--8-ын "2.0Gi" гэсэн хүлээлтийн оронд өөрийн утгаа тайландаа бич.
 \end{quote}
 
-\textbf{(б) \texttt{rpi-swap} байхгүй, \texttt{dphys-swapfile} ажиллаж байгаа бол (хуучин Bookworm зураг).} Энэ багцын тохиргоо Raspberry Pi-гийн баримтад ороогүй тул доорх нь уламжлалт арга:
+\textbf{Алхам 2б --- \texttt{rpi-swap} байхгүй, \texttt{dphys-swapfile} ажиллаж байгаа бол.} Энэ багцын тохиргоо Raspberry Pi-гийн баримтад ороогүй тул доорх нь уламжлалт арга:
+
+\textbf{{[}Pi{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{sudo}\NormalTok{ dphys{-}swapfile swapoff}
-\FunctionTok{sudo}\NormalTok{ sed }\AttributeTok{{-}i} \StringTok{\textquotesingle{}s/\^{}\#\textbackslash{}?CONF\_SWAPSIZE=.*/CONF\_SWAPSIZE=2048/\textquotesingle{}}\NormalTok{ /etc/dphys{-}swapfile}
+\FunctionTok{sudo}\NormalTok{ sed {-}i }\StringTok{\textquotesingle{}s/\^{}\#\textbackslash{}?CONF\_SWAPSIZE=.*/CONF\_SWAPSIZE=2048/\textquotesingle{}}\NormalTok{ /etc/dphys{-}swapfile}
 \FunctionTok{sudo}\NormalTok{ dphys{-}swapfile setup}
 \FunctionTok{sudo}\NormalTok{ dphys{-}swapfile swapon}
 \end{Highlighting}
 \end{Shaded}
 
-Аль ч тохиолдолд шалгах: \texttt{free\ -h} → \texttt{Swap:\ 2.0Gi}.
+\textbf{Алхам 3 --- шалгах} (аль ч замаар явсан):
+
+\textbf{{[}Pi{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{free}\NormalTok{ {-}h}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{Swap:} мөрийн \textbf{total} баганад \texttt{2.0Gi}.
 
 \begin{quote}
 \textbf{Санамж:} swap файл microSD дээр байгаа тул \textbf{маш удаан}. Энэ бол гүйцэтгэлийн шийдэл биш. Лаб 4-д swap ажиллаж эхэлбэл (\texttt{vmstat\ 1}-ийн \texttt{si/so} багана 0-ээс их) та аль хэдийн хязгаарт хүрсэн --- тэр нь хэмжилт өөрөө юм.
@@ -411,77 +1668,168 @@ Docker-ийн лог microSD-г элээхээс сэргийлэх (\texttt{log
 Албан ёсны эх: \href{https://github.com/raspberrypi/rpi-swap}{raspberrypi/\allowbreak{}rpi-swap --- README, swap.\allowbreak{}conf(5)}
 \end{quote}
 
-\textbf{cgroup.} K3s-ийн баримтаар стандарт Raspberry Pi OS cgroup-ийн санах ойн хянагчийг идэвхжүүлээгүй эхэлдэг; Лаб 8-ын K3s agent ба \texttt{docker\ stats}-ын санах ойн тоонд хэрэгтэй. Параметрийг \texttt{/\allowbreak{}boot/\allowbreak{}firmware/\allowbreak{}cmdline.\allowbreak{}txt}-ийн \textbf{цорын ганц мөрийн төгсгөлд} залгана (Debian 11 ба түүнээс өмнөх зурагт зам нь \texttt{/\allowbreak{}boot/\allowbreak{}cmdline.\allowbreak{}txt}). Raspberry Pi-гийн баримт: бүх параметр нэг мөрөнд байх ёстой --- шинэ мөр оруулбал түүнээс хойшхыг цөм үл тоомсорлоно.
+\hypertarget{cgroup}{%
+\subsubsection{cgroup}\label{cgroup}}
+
+K3s-ийн баримтаар стандарт Raspberry Pi OS cgroup-ийн санах ойн хянагчийг идэвхжүүлээгүй эхэлдэг; Лаб 8-ын K3s agent, \texttt{docker\ stats}-ын санах ойн тоо ба ирмэгийн агентын \texttt{MemoryMax=200M} хязгаарт хэрэгтэй. Параметрийг \texttt{/\allowbreak{}boot/\allowbreak{}firmware/\allowbreak{}cmdline.\allowbreak{}txt}-ийн \textbf{цорын ганц мөрийн төгсгөлд} залгана (Debian 11 ба түүнээс өмнөх image-д зам нь \texttt{/\allowbreak{}boot/\allowbreak{}cmdline.\allowbreak{}txt}).
+
+\begin{quote}
+⚠ Raspberry Pi-гийн баримт: \texttt{cmdline.txt}-ийн бүх параметр \textbf{нэг мөрөнд} байх ёстой --- шинэ мөр оруулбал түүнээс хойшхыг цөм үл тоомсорлоно. Тиймээс файлыг гараар \textbf{бүү} зас, доорх командыг ашигла.
+\end{quote}
+
+\textbf{Алхам 1 --- параметр нэмэх ба дахин ачаалах.}
+
+\textbf{{[}Pi{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{grep} \AttributeTok{{-}q} \StringTok{\textquotesingle{}cgroup\_memory=1\textquotesingle{}}\NormalTok{ /boot/firmware/cmdline.txt }\KeywordTok{||} \DataTypeTok{\textbackslash{}}
-  \FunctionTok{sudo}\NormalTok{ sed }\AttributeTok{{-}i} \StringTok{\textquotesingle{}1 s/$/ cgroup\_memory=1 cgroup\_enable=memory/\textquotesingle{}}\NormalTok{ /boot/firmware/cmdline.txt}
-\FunctionTok{cat}\NormalTok{ /boot/firmware/cmdline.txt    }\CommentTok{\# НЭГ мөр байх ёстой}
+\FunctionTok{grep}\NormalTok{ {-}q }\StringTok{\textquotesingle{}cgroup\_memory=1\textquotesingle{}}\NormalTok{ /boot/firmware/cmdline.txt }\KeywordTok{||} \KeywordTok{\textbackslash{}}
+  \FunctionTok{sudo}\NormalTok{ sed {-}i }\StringTok{\textquotesingle{}1 s/$/ cgroup\_memory=1 cgroup\_enable=memory/\textquotesingle{}}\NormalTok{ /boot/firmware/cmdline.txt}
+\FunctionTok{cat}\NormalTok{ /boot/firmware/cmdline.txt}
+\end{Highlighting}
+\end{Shaded}
+
+✓ Сүүлийн команд \textbf{НЭГ мөр} хэвлэх бөгөөд төгсгөлд нь \texttt{cgroup\_\allowbreak{}memory=\allowbreak{}1\ cgroup\_\allowbreak{}enable=\allowbreak{}memory} байна. Тэгвэл:
+
+\textbf{{[}Pi{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{sudo}\NormalTok{ reboot}
 \end{Highlighting}
 \end{Shaded}
 
-Шалгах:
+\textbf{Алхам 2 --- дахин холбогдоод шалгах.}
+
+\textbf{{[}Pi{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{grep} \AttributeTok{{-}w}\NormalTok{ memory /sys/fs/cgroup/cgroup.controllers   }\CommentTok{\# "memory" гарах ёстой}
-\FunctionTok{free} \AttributeTok{{-}m} \KeywordTok{|} \FunctionTok{head} \AttributeTok{{-}2}                                   \CommentTok{\# MemTotal{-}ийг Лаб 1{-}д бичнэ}
+\FunctionTok{grep}\NormalTok{ {-}w memory /sys/fs/cgroup/cgroup.controllers}
+\FunctionTok{free}\NormalTok{ {-}m }\KeywordTok{|} \FunctionTok{head}\NormalTok{ {-}2}
 \end{Highlighting}
 \end{Shaded}
 
+✓ Эхний команд \texttt{memory} үгийг агуулсан мөр хэвлэнэ. \texttt{MemTotal}-ийг Лаб 1-д бичнэ.
+
 \begin{quote}
-Албан ёсны баримт: \href{https://docs.k3s.io/installation/requirements}{K3s Requirements --- Raspberry Pi (cgroups)} · \href{https://www.raspberrypi.com/documentation/computers/configuration.html\#configure-the-kernel-command-line}{Kernel command line (cmdline.\allowbreak{}txt)} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/configuration/boot-behaviour.adoc}{эх: GitHub})
+Албан ёсны баримт: \href{https://docs.k3s.io/installation/requirements}{K3s Requirements --- Raspberry Pi (cgroups)} · \href{https://www.raspberrypi.com/documentation/computers/configuration.html\#configure-the-kernel-command-line}{Kernel command line (cmdline.\allowbreak{}txt)}
 \end{quote}
 
 \hypertarget{ux431.6-ux446ux430ux433ux438ux439ux43d-ux441ux438ux43dux445ux440ux43eux43dux447ux43bux43eux43b-ux437ux430ux430ux432ux430ux43b}{%
 \subsection{Б.6 Цагийн синхрончлол (ЗААВАЛ)}\label{ux431.6-ux446ux430ux433ux438ux439ux43d-ux441ux438ux43dux445ux440ux43eux43dux447ux43bux43eux43b-ux437ux430ux430ux432ux430ux43b}}
 
-Лаб 3, Лаб 5-ын саатлын хэмжилт цагийн зөрүүнээс шалтгаалж утгагүй болдог. Pi 3B-д бодит цагийн цаг (RTC) \textbf{байхгүй} --- асаах бүрд NTP-ээс цагаа авдаг.
+Лаб 2-ын TLS гэрчилгээ, Лаб 3 ба Лаб 5-ын саатлын хэмжилт буруу цагтай үед утгагүй болдог. Pi 3B-д бодит цагийн цаг (RTC) \textbf{байхгүй} --- асаах бүрд NTP-ээс цагаа авдаг.
+
+\textbf{{[}Pi{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{sudo}\NormalTok{ timedatectl set{-}timezone Asia/Ulaanbaatar}
 \FunctionTok{sudo}\NormalTok{ timedatectl set{-}ntp true}
-\ExtensionTok{timedatectl}\NormalTok{ status                 }\CommentTok{\# "System clock synchronized: yes"}
+\ExtensionTok{timedatectl}\NormalTok{ status}
 \end{Highlighting}
 \end{Shaded}
+
+✓ \texttt{Time\ zone:\allowbreak{}\ Asia/\allowbreak{}Ulaanbaatar\ (+08,\ +0800)} ба \texttt{System\ clock\ synchronized:\allowbreak{}\ yes}.
+
+✗ \texttt{synchronized:\allowbreak{}\ no} хэвээр бол 1--2 мин хүлээгээд дахин шалга; тэгээд ч болохгүй бол Pi интернэтэд гарч чадахгүй байна (\texttt{ping\ -c3\ 8.\allowbreak{}8.\allowbreak{}8.\allowbreak{}8}).
 
 \hypertarget{ux431.7-ux441ux430ux43dux433ux430ux430-pi-ux434ux44dux44dux440-ux431ux430ux439ux440ux43bux443ux443ux43bux430ux445}{%
 \subsection{Б.7 Сангаа Pi дээр байрлуулах}\label{ux431.7-ux441ux430ux43dux433ux430ux430-pi-ux434ux44dux44dux440-ux431ux430ux439ux440ux43bux443ux443ux43bux430ux445}}
 
+\begin{quote}
+⚠ Pi дээрх сангийн зам \textbf{заавал \texttt{\textasciitilde{}/cnc302}} (\texttt{/\allowbreak{}home/\allowbreak{}cnc302/\allowbreak{}cnc302}) байна --- \texttt{edge/\allowbreak{}agent/\allowbreak{}cnc302-edge-agent.\allowbreak{}service} ба лабын заавар яг энэ замыг хүлээнэ.
+\end{quote}
+
+\textbf{Алхам 1 --- clone хийх.}
+
+\textbf{{[}Pi{]}}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{mkdir} \AttributeTok{{-}p}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\FunctionTok{git}\NormalTok{ clone }\OperatorTok{\textless{}}\NormalTok{багийн{-}сангийн{-}хаяг}\OperatorTok{\textgreater{}}\NormalTok{ .}
-
-\BuiltInTok{cd}\NormalTok{ edge}
-\FunctionTok{cp}\NormalTok{ .env.example .env}
-\FunctionTok{nano}\NormalTok{ .env}
-\CommentTok{\#   CLOUD\_HOST=192.168.1.57      ← А.5{-}д олсон IP}
-\CommentTok{\#   DEVICE\_ID=pi3b{-}team03        ← баг бүр өөр}
-\FunctionTok{make}\NormalTok{ bridge                        }\CommentTok{\# conf.d/bridge.conf үүснэ}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}}
+\FunctionTok{git}\NormalTok{ clone }\OperatorTok{\textless{}}\NormalTok{REPO\_URL}\OperatorTok{\textgreater{}}\NormalTok{ cnc302}
+\FunctionTok{ls}\NormalTok{ \textasciitilde{}/cnc302}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{quote}
-\texttt{.env}-д тайлбарыг \textbf{тусдаа мөрөнд} бич (\texttt{KEY=\allowbreak{}утга\ \ \#\ тайлбар} БИШ): systemd-ийн \texttt{EnvironmentFile=} мөрийн дундах \texttt{\#}-ийг утгын нэг хэсэг гэж уншдаг.
+☞ Багийн сан \textbf{private} бол GitHub HTTPS-ээр нэвтрэхэд нууц үгийн оронд \textbf{Personal Access Token} шаардана: \texttt{Username} → GitHub-ын нэр, \texttt{Password} → token (GitHub → Settings → Developer settings → Personal access tokens). Токенийг Pi дээр файлд бүү хадгал.
 \end{quote}
 
-\hypertarget{ux431.8-ux438ux440ux43cux44dux433ux438ux439ux43d-ux434ux4afux440ux441-ux431ux430-python-ux43eux440ux447ux438ux43d}{%
-\subsection{Б.8 Ирмэгийн дүрс ба Python орчин}\label{ux431.8-ux438ux440ux43cux44dux433ux438ux439ux43d-ux434ux4afux440ux441-ux431ux430-python-ux43eux440ux447ux438ux43d}}
+\textbf{Алхам 2 --- ирмэгийн тохиргоо.}
+
+\textbf{{[}Pi{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge}
-\ExtensionTok{docker}\NormalTok{ compose pull                }\CommentTok{\# eclipse{-}mosquitto, хэдэн MB}
-\ExtensionTok{python3} \AttributeTok{{-}m}\NormalTok{ venv .venv}
-\ExtensionTok{.venv/bin/pip}\NormalTok{ install }\AttributeTok{{-}{-}upgrade}\NormalTok{ pip}
-\ExtensionTok{.venv/bin/pip}\NormalTok{ install }\AttributeTok{{-}r}\NormalTok{ agent/requirements.txt   }\CommentTok{\# paho{-}mqtt, numpy, ai{-}edge{-}litert}
-\ExtensionTok{.venv/bin/python} \AttributeTok{{-}c} \StringTok{"from ai\_edge\_litert.interpreter import Interpreter; print(\textquotesingle{}LiteRT OK\textquotesingle{})"}
+\FunctionTok{cp}\NormalTok{ .env.example .env}
+\FunctionTok{nano}\NormalTok{ .env}
 \end{Highlighting}
 \end{Shaded}
+
+Дараах \textbf{хоёр мөрийг} соль (бусдыг хэвээр нь үлдээ):
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+Мөр & Утга & Жишээ\tabularnewline
+\midrule
+\endhead
+\texttt{CLOUD\_HOST=} & А.5-д олсон \texttt{\textless{}LAPTOP\_\allowbreak{}IP\textgreater{}} & \texttt{CLOUD\_\allowbreak{}HOST=\allowbreak{}192.\allowbreak{}168.\allowbreak{}1.\allowbreak{}100}\tabularnewline
+\texttt{DEVICE\_ID=} & \texttt{pi3b-team\textless{}NN\textgreater{}} & \texttt{DEVICE\_\allowbreak{}ID=\allowbreak{}pi3b-team07}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+Хадгалах: \texttt{Ctrl\ +\ O} → \texttt{Enter} → \texttt{Ctrl\ +\ X}.
+
+\begin{quote}
+⚠ \texttt{.env}-д тайлбарыг \textbf{тусдаа мөрөнд} бич (\texttt{KEY=\allowbreak{}утга\ \ \#\ тайлбар} БИШ), утгыг хашилтгүй, хоосон зайгүй бич: systemd-ийн \texttt{EnvironmentFile=} мөрийн дундах \texttt{\#}-ийг утгын нэг хэсэг гэж уншдаг.
+\end{quote}
+
+\textbf{Алхам 3 --- гүүрний тохиргоо үүсгэх.}
+
+\textbf{{[}Pi{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{make}\NormalTok{ bridge}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{✓\ mosquitto/\allowbreak{}conf.\allowbreak{}d/\allowbreak{}bridge.\allowbreak{}conf\ үүслээ\ \ →\ \ 192.\allowbreak{}168.\allowbreak{}1.\allowbreak{}100:\allowbreak{}1883} (таны IP) гарна.
+
+✗ \texttt{⚠\ CLOUD\_\allowbreak{}HOST\ хэвээрээ\ байна} → Алхам 2-т IP-г сольж хадгалаагүй байна.
+
+\hypertarget{ux431.8-ux438ux440ux43cux44dux433ux438ux439ux43d-image-ux431ux430-python-ux43eux440ux447ux438ux43d}{%
+\subsection{Б.8 Ирмэгийн image ба Python орчин}\label{ux431.8-ux438ux440ux43cux44dux433ux438ux439ux43d-image-ux431ux430-python-ux43eux440ux447ux438ux43d}}
+
+\textbf{{[}Pi{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge}
+\ExtensionTok{docker}\NormalTok{ compose pull}
+\ExtensionTok{python3}\NormalTok{ {-}m venv .venv}
+\ExtensionTok{.venv/bin/pip}\NormalTok{ install {-}{-}upgrade pip}
+\ExtensionTok{.venv/bin/pip}\NormalTok{ install {-}r agent/requirements.txt}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{pip\ install} Pi 3B дээр \textbf{5--15 мин} үргэлжилж магадгүй --- дэлгэц хэсэг хугацаанд өөрчлөгдөхгүй байсан ч \textbf{бүү тасал}.
+
+✓ \textbf{Шалгах:}
+
+\textbf{{[}Pi{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{.venv/bin/python}\NormalTok{ {-}c }\StringTok{"from ai\_edge\_litert.interpreter import Interpreter; print(\textquotesingle{}LiteRT OK\textquotesingle{})"}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{LiteRT\ OK} гарна.
 
 \begin{quote}
 \texttt{ai-edge-litert} (LiteRT --- TensorFlow Lite-ийн шинэ нэр) нь PyPI дээр Python 3.11 (Bookworm) ба 3.13 (Trixie)-д зориулсан \texttt{manylinux\_\allowbreak{}2\_\allowbreak{}27\_\allowbreak{}aarch64} wheel-тэй; \texttt{numpy} ч мөн aarch64 wheel-тэй тул Pi дээр эх кодоос барихгүй. \texttt{No\ matching\ distribution} гарвал \texttt{uname\ -m} → \texttt{aarch64} эсэхийг шалга. Хуучин \texttt{tflite-runtime} (сүүлийн хувилбар 2.14, 2023) нь зөвхөн нөөц хувилбар.
@@ -492,25 +1840,70 @@ Docker-ийн лог microSD-г элээхээс сэргийлэх (\texttt{log
 \hypertarget{ux432.-ux437ux43api-ux445ux43eux451ux440-ux43cux430ux448ux438ux43dux44bux433-ux445ux43eux43bux431ux43eux445}{%
 \section{В. {[}ЗК{]}{[}Pi{]} Хоёр машиныг холбох}\label{ux432.-ux437ux43api-ux445ux43eux451ux440-ux43cux430ux448ux438ux43dux44bux433-ux445ux43eux43bux431ux43eux445}}
 
+Энэ бол бүх лабын суурь: Pi-гаас илгээсэн MQTT мессеж зөөврийн компьютер дээрх EMQX-д хүрэх ёстой. \textbf{Гурван терминал} зэрэг нээлттэй байна:
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+Цонх & Терминал & Үүрэг\tabularnewline
+\midrule
+\endhead
+1 & {[}Pi{]} & Гүүр ба агент\tabularnewline
+2 & {[}Pi{]} (хоёр дахь \texttt{ssh\ pi}) & Гүүрний төлөв\tabularnewline
+3 & {[}ЗК · Ubuntu{]} & Үүлэн дэх мессежийг сонсох\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
 \hypertarget{ux432.1-ux433ux4afux4afux440ux438ux439ux433-ux430ux441ux430ux430ux445}{%
 \subsection{В.1 Гүүрийг асаах}\label{ux432.1-ux433ux4afux4afux440ux438ux439ux433-ux430ux441ux430ux430ux445}}
 
-{[}Pi{]} Pi дээр:
+Эхлээд зөөврийн компьютер дээр стек ажиллаж байгааг шалга:
+
+\textbf{{[}ЗК · Ubuntu{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ up }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ health}
+\end{Highlighting}
+\end{Shaded}
+
+Дараа нь:
+
+\textbf{{[}Pi{]}} (цонх 1)
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge}
 \FunctionTok{make}\NormalTok{ up}
-\FunctionTok{make}\NormalTok{ link            }\CommentTok{\# Ctrl+C{-}ээр зогсооно}
 \end{Highlighting}
 \end{Shaded}
 
-\texttt{.\allowbreak{}.\allowbreak{}.\allowbreak{}/\allowbreak{}bridge/\allowbreak{}state\ 1} гарвал \textbf{гүүр холбогдсон}. \texttt{0} бол --- тасарсан.
+✓ \texttt{docker\ compose\ ps}-ын жагсаалтад \texttt{mosquitto} → \texttt{Up}.
+
+\textbf{{[}Pi{]}} (цонх 2 --- PowerShell-ээс дахин \texttt{ssh\ pi})
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge}
+\FunctionTok{make}\NormalTok{ link}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{cnc302/\allowbreak{}shutis/\allowbreak{}\ldots{}/\allowbreak{}bridge/\allowbreak{}state\ 1} гарвал \textbf{гүүр холбогдсон}. \texttt{0} бол тасарсан → В.2-ын хүснэгт. \texttt{Ctrl\ +\ C}-ээр зогсооно.
 
 \hypertarget{ux432.2-ux445ux43eux451ux440-ux442ux430ux43bux430ux430ux441-ux448ux430ux43bux433ux430ux445}{%
 \subsection{В.2 Хоёр талаас шалгах}\label{ux432.2-ux445ux43eux451ux440-ux442ux430ux43bux430ux430ux441-ux448ux430ux43bux433ux430ux445}}
 
-{[}Pi{]} Pi дээр (нэг терминал):
+\textbf{{[}ЗК · Ubuntu{]}} (цонх 3)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}cnc302/\#\textquotesingle{}}\NormalTok{ {-}v}
+\end{Highlighting}
+\end{Shaded}
+
+Энэ цонх \textbf{нээлттэй хүлээж} байх ёстой --- хааж болохгүй.
+
+\textbf{{[}Pi{]}} (цонх 1)
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -518,41 +1911,68 @@ Docker-ийн лог microSD-г элээхээс сэргийлэх (\texttt{log
 \end{Highlighting}
 \end{Shaded}
 
-{[}ЗК{]} Компьютер дээр (өөр терминал):
+✓ Цонх 3-т Pi-гийн телеметр 2 секунд тутам \texttt{cnc302/\allowbreak{}shutis/\allowbreak{}mhts/\allowbreak{}lab/\allowbreak{}pi3b-team\textless{}NN\textgreater{}/\allowbreak{}\ldots{}} сэдвээр гарч ирнэ. Гарвал \textbf{орчин бэлэн боллоо} --- цонх 1 ба 3-ыг \texttt{Ctrl\ +\ C}-ээр зогсоо.
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}t} \StringTok{\textquotesingle{}cnc302/\#\textquotesingle{}} \AttributeTok{{-}v}
-\end{Highlighting}
-\end{Shaded}
+\textbf{Гарч ирэхгүй бол Лаб 1 эхлэхгүй.} Дарааллаар нь шалга:
 
-Pi-гийн телеметр компьютер дээр гарч ирэх ёстой. \textbf{Гарч ирэхгүй бол Лаб 1 эхлэхгүй.} Шалгах дараалал:
-
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Шалгах зүйл
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Комманд
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хүлээгдэх
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шалгах зүйл\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Команд\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Хүлээгдэх\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+1. Pi үүлийг харж байна уу\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+{[}Pi{]} \texttt{ping\ -c3\ \textless{}LAPTOP\_\allowbreak{}IP\textgreater{}}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{3\ received}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+2. Порт нээлттэй юу\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+{[}Pi{]} \texttt{nc\ -vz\ \textless{}LAPTOP\_\allowbreak{}IP\textgreater{}\ 1883}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{succeeded} / \texttt{open}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+3. Гүүрний тохиргоо\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+{[}Pi{]} \texttt{docker\ compose\ logs\ mosquitto\ \textbackslash{}\textbar{}\ grep\ -i\ bridge}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{Connecting\ bridge}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+4. Сэдвийн угтвар\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+{[}Pi{]} \texttt{grep\ \textquotesingle{}\^{}topic\textquotesingle{}\ mosquitto/conf.d/bridge.conf}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{cnc302/shutis/\#}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+5. Агентын сэдэв\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+{[}Pi{]} \texttt{grep\ SITE\ .env}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{SITE=shutis}\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-1. Pi үүлийг харж байна уу & {[}Pi{]} \texttt{ping\ -c3\ \$CLOUD\_\allowbreak{}HOST} & хариу ирнэ \\
-2. Порт нээлттэй юу & {[}Pi{]} \texttt{nc\ -vz\ \$CLOUD\_\allowbreak{}HOST\ 1883} & succeeded \\
-3. Гүүрний тохиргоо & {[}Pi{]} \texttt{docker\ compose\ logs\ mosquitto\ \textbackslash{}\textbar{}\ grep\ -i\ bridge} & "Connecting bridge" \\
-4. Сэдвийн угтвар & {[}Pi{]} \texttt{grep\ \textquotesingle{}\^{}topic\textquotesingle{}\ mosquitto/conf.d/bridge.conf} & \texttt{cnc302/shutis/\#} \\
-5. Агентын сэдэв & {[}Pi{]} \texttt{grep\ SITE\ .env} & \texttt{shutis} \\
 \end{longtable}\endgroup
 
-3-р алхамд "Connection refused" эсвэл удаа дараа тасарч байвал → А.6 галт хана.
-4 ба 5-р алхмын \texttt{SITE} зөрүүтэй бол → мессеж дамжихгүй. Энэ бол \textbf{хамгийн түгээмэл алдаа}.
+\begin{itemize}
+\tightlist
+\item
+  1-р алхам бүтэлгүйтвэл → сүлжээ (А.5): нэг subnet мөн үү, client isolation байна уу.
+\item
+  2--3-р алхамд \texttt{Connection\ refused}, timeout эсвэл удаа дараа тасарч байвал → А.6 галт хана ба Private профайл; зөөврийн компьютер дээр стек асаалттай эсэх.
+\item
+  4 ба 5-р алхмын \texttt{SITE} зөрүүтэй бол мессеж дамжихгүй. Энэ бол \textbf{хамгийн түгээмэл алдаа}.
+\end{itemize}
 
 \hypertarget{ux432.3-vs-code-remote-ssh-ux445ux43eux43bux431ux43eux43bux442}{%
 \subsection{В.3 VS Code Remote-SSH холболт}\label{ux432.3-vs-code-remote-ssh-ux445ux43eux43bux431ux43eux43bux442}}
@@ -561,17 +1981,21 @@ Pi-гийн телеметр компьютер дээр гарч ирэх ёс�
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  VS Code → \texttt{Ctrl+Shift+P} → \textbf{Remote-SSH: Add New SSH Host}
+  VS Code нээ → \texttt{F1} (эсвэл \texttt{Ctrl\ +\ Shift\ +\ P}) → \texttt{Remote-SSH:\allowbreak{}\ Connect\ to\ Host.\allowbreak{}.\allowbreak{}.\allowbreak{}} гэж бичээд сонго.
 \item
-  \texttt{ssh\ -i\ \textasciitilde{}/.ssh/cnc302\ cnc302@pi-team03.local}
+  Жагсаалтаас \textbf{\texttt{pi}}-г сонго (А.7, Алхам 3-т үүсгэсэн).
 \item
-  Холбогдоод \texttt{\textasciitilde{}/cnc302} фолдерыг нээнэ
+  Платформ асуувал \textbf{Linux}.
 \item
-  VS Code-ийн терминал одоо Pi дээр ажиллана
+  Анх удаа Pi дээр VS Code Server суулгана --- 3--5 мин хүлээ. Зүүн доод буланд \textbf{SSH: pi} гарна.
+\item
+  \textbf{File → Open Folder} → \texttt{/\allowbreak{}home/\allowbreak{}cnc302/\allowbreak{}cnc302} → \textbf{OK}.
+\item
+  \textbf{Terminal → New Terminal} --- энэ терминал одоо \textbf{Pi дээр} ажиллана.
 \end{enumerate}
 
 \begin{quote}
-VS Code-ийн баримтаар Remote-SSH-ийн алсын хостод \textbf{1 GB RAM шаардлагатай, 2 GB RAM ба 2 цөм зөвлөмжтэй} --- Pi 3B яг доод хязгаар дээр. Дэмжигдэх платформ: Debian 64-бит ARMv8 (AArch64), kernel ≥ 4.18, glibc ≥ 2.28; ARM хост дээр зарим өргөтгөлийн native модуль ажиллахгүй байж болно. Хэмжилт хийхийн өмнө \textbf{VS Code-ийн холболтыг таслах} --- эс бөгөөс санах ойн тоо гажина (\texttt{pkill\ -f\ vscode-server}).
+VS Code-ийн баримтаар Remote-SSH-ийн алсын хостод \textbf{1 GB RAM шаардлагатай, 2 GB RAM ба 2 цөм зөвлөмжтэй} --- Pi 3B яг доод хязгаар дээр. Дэмжигдэх платформ: Debian 64-бит ARMv8 (AArch64), kernel ≥ 4.18, glibc ≥ 2.28. Хэмжилт хийхийн өмнө \textbf{VS Code-ийн холболтыг таслах} --- эс бөгөөс санах ойн тоо гажина (\texttt{pkill\ -f\ vscode-server}).
 
 Албан ёсны баримт: \href{https://code.visualstudio.com/docs/remote/ssh}{Remote Development using SSH --- System requirements} · \href{https://code.visualstudio.com/docs/remote/linux}{Remote Development with Linux}
 \end{quote}
@@ -579,7 +2003,7 @@ VS Code-ийн баримтаар Remote-SSH-ийн алсын хостод \tex
 \hypertarget{ux433.-ux431ux44dux43bux44dux43d-ux431ux430ux439ux434ux43bux44bux43d-ux448ux430ux43bux433ux430ux43bux442}{%
 \section{Г. Бэлэн байдлын шалгалт}\label{ux433.-ux431ux44dux43bux44dux43d-ux431ux430ux439ux434ux43bux44bux43d-ux448ux430ux43bux433ux430ux43bux442}}
 
-Лаб 1-д ирэхээс өмнө эдгээр бүгд ✔ байх ёстой:
+Лаб 1-д ирэхээс өмнө эдгээр \textbf{бүгд ✔} байх ёстой. Командын гаралтыг \textbf{хуулж} Лаб 1-ийн тайлангийн хавсралтад оруулна.
 
 \hypertarget{ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440}{%
 \subsection{{[}ЗК{]} Зөөврийн компьютер}\label{ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440}}
@@ -587,17 +2011,19 @@ VS Code-ийн баримтаар Remote-SSH-ийн алсын хостод \tex
 \begin{itemize}
 \tightlist
 \item[$\square$]
-  \texttt{docker\ info} → санах ой ≥ 6 GB
+  \textbf{{[}ЗК · PowerShell{]}} \texttt{wsl\ -\/-version} → WSL ≥ 2.1.5; \texttt{wsl\ -l\ -v} → Ubuntu, VERSION 2
 \item[$\square$]
-  \texttt{cd\ stack\ \&\allowbreak{}\&\allowbreak{}\ make\ health} → бүх мөр 200
+  \textbf{{[}ЗК · Ubuntu{]}} \texttt{docker\ run\ -\/\allowbreak{}-rm\ hello-world} → \texttt{Hello\ from\ Docker!}
 \item[$\square$]
-  \texttt{make\ ip} → LAN IP тодорхой
+  \textbf{{[}ЗК · Ubuntu{]}} \texttt{docker\ info} санах ой ≈ 6 GB (А.2)
 \item[$\square$]
-  \texttt{mosquitto\_sub\ -h\ localhost\ -t\ \textquotesingle{}cnc302/\#\textquotesingle{}\ -v} ажиллаж байна
+  \textbf{{[}ЗК · Ubuntu{]}} \texttt{cd\ \textasciitilde{}/cnc302/stack\ \&\&\ make\ health} → дөрвөн мөр 200
 \item[$\square$]
-  \texttt{python\ tools/\allowbreak{}sim\_\allowbreak{}device.\allowbreak{}py\ -\/\allowbreak{}-dry-run} ажиллаж байна
+  \textbf{{[}ЗК · PowerShell{]}} \texttt{ipconfig} → \texttt{\textless{}LAPTOP\_\allowbreak{}IP\textgreater{}} тодорхой, сүлжээ \textbf{Private}
 \item[$\square$]
-  Галт ханд 1883, 8883, 8090 порт нээлттэй (Windows)
+  \textbf{{[}ЗК · PowerShell{]}} \texttt{Get-NetFirewallRule\ -DisplayName\ "CNC302\ cloud"} → Enabled True
+\item[$\square$]
+  \textbf{{[}ЗК · Ubuntu{]}} \texttt{python\ tools/\allowbreak{}sim\_\allowbreak{}device.\allowbreak{}py\ -\/\allowbreak{}-dry-run\ -\/\allowbreak{}-devices\ 2\ -\/\allowbreak{}-count\ 3} ажиллаж байна
 \end{itemize}
 
 \hypertarget{pi-raspberry-pi-3b}{%
@@ -606,13 +2032,13 @@ VS Code-ийн баримтаар Remote-SSH-ийн алсын хостод \tex
 \begin{itemize}
 \tightlist
 \item[$\square$]
-  \texttt{uname\ -m} → \textbf{aarch64} (armv7l бол 64-bit OS дахин суулгана)
+  \texttt{ssh\ pi} → нууц үггүй холбогдож байна
 \item[$\square$]
-  \texttt{ssh} түлхүүрээр нууц үггүй холбогдож байна
+  \texttt{uname\ -m} → \textbf{aarch64}
 \item[$\square$]
-  \texttt{docker\ run\ -\/\allowbreak{}-rm\ hello-world} ажиллаж байна
+  \texttt{docker\ run\ -\/\allowbreak{}-rm\ hello-world} → \texttt{sudo}-гүй ажиллаж байна
 \item[$\square$]
-  \texttt{free\ -h} → Swap 2.0Gi; \texttt{MemTotal}-ийг тэмдэглэсэн (Б.3)
+  \texttt{free\ -h} → Swap 2.0Gi; \texttt{MemTotal}-ийг өмнө/дараа нь тэмдэглэсэн (Б.3)
 \item[$\square$]
   \texttt{grep\ -w\ memory\ /\allowbreak{}sys/\allowbreak{}fs/\allowbreak{}cgroup/\allowbreak{}cgroup.\allowbreak{}controllers} → \texttt{memory} агуулна
 \item[$\square$]
@@ -620,7 +2046,7 @@ VS Code-ийн баримтаар Remote-SSH-ийн алсын хостод \tex
 \item[$\square$]
   \texttt{timedatectl\ status} → synchronized: yes
 \item[$\square$]
-  \texttt{cd\ edge\ \&\allowbreak{}\&\allowbreak{}\ make\ check} → бүгд OK
+  \texttt{cd\ \textasciitilde{}/cnc302/edge\ \&\&\ make\ check} → бүгд OK
 \end{itemize}
 
 \hypertarget{ux437ux43api-ux445ux430ux43cux442ux434ux430ux430}{%
@@ -631,7 +2057,7 @@ VS Code-ийн баримтаар Remote-SSH-ийн алсын хостод \tex
 \item[$\square$]
   \texttt{make\ link} → \texttt{bridge/state\ 1}
 \item[$\square$]
-  Pi-гийн агентын телеметр компьютер дээр харагдаж байна
+  Pi-гийн агентын телеметр зөөврийн компьютерийн \texttt{mosquitto\_sub}-д харагдаж байна (В.2)
 \item[$\square$]
   Багийн Git санд эхний commit хийгдсэн, багш унших эрхтэй
 \end{itemize}
@@ -645,49 +2071,467 @@ VS Code-ийн баримтаар Remote-SSH-ийн алсын хостод \tex
   А.8-ын VM асаж, \texttt{ssh}-ээр холбогдож байна; \texttt{ip\ -4\ addr} → LAN-ын хаяг (10.0.2.x БИШ)
 \end{itemize}
 
-Аль нэг нь ✘ бол лабораторийн өмнөх өдөр багшид хандана. \textbf{Лабораторийн 4 цагийг орчин тохируулахад зарцуулж болохгүй.}
+Аль нэг нь ✘ бол \textbf{лабораторийн өмнөх өдөр} багшид хандана. \textbf{Лабораторийн 4 цагийг орчин тохируулахад зарцуулж болохгүй.}
+
+\hypertarget{ux434.-ux43eux43dux43eux448ux438ux43bux433ux43eux43e-ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430-ux431ux430-ux448ux438ux439ux434ux44dux43b}{%
+\section{Д. Оношилгоо --- түгээмэл алдаа ба шийдэл}\label{ux434.-ux43eux43dux43eux448ux438ux43bux433ux43eux43e-ux442ux4afux433ux44dux44dux43cux44dux43b-ux430ux43bux434ux430ux430-ux431ux430-ux448ux438ux439ux434ux44dux43b}}
+
+\hypertarget{ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440-1}{%
+\subsection{{[}ЗК{]} Зөөврийн компьютер}\label{ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440-1}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шинж тэмдэг\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шалтгаан\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шийдэл\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{wsl\ -\/-install} 0.0\%-д гацах\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Store-оос татаж чадахгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{wsl\ -\/\allowbreak{}-install\ -\/\allowbreak{}-web-download\ -d\ Ubuntu}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Docker Desktop: \texttt{WSL\ 2\ installation\ is\ incomplete} / \texttt{WSL\ update\ failed}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+WSL суугаагүй эсвэл хуучин\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+А.1.3-ыг дахин хий, \texttt{wsl\ -\/-update}, restart\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Docker Desktop: \texttt{Virtualization\ support\ not\ detected}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+BIOS-д VT-x/SVM унтраалттай\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+А.1.1, Алхам 2\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{You\ are\ not\ allowed\ to\ use\ Docker,\ you\ must\ be\ in\ the\ "docker-users"\ group}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+"All users" горимоор суулгасан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{{[}ЗК · PowerShell (Admin){]}} \texttt{net\ localgroup\ docker-users\ \$env:\allowbreak{}USERNAME\ /\allowbreak{}add} → Windows-оос \textbf{sign out} хийж дахин нэвтэр\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{docker:\allowbreak{}\ error\ during\ connect} / \texttt{Cannot\ connect\ to\ the\ Docker\ daemon}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Docker Desktop ажиллаагүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Docker Desktop нээж, \textbf{Engine running} болтол хүлээ\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Ubuntu-д \texttt{docker:\allowbreak{}\ command\ not\ found}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+WSL integration асаагүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+А.1.6, Алхам 3\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Docker Desktop гацах, компьютер удаашрах\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+RAM хүрэлцэхгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+А.2-т \texttt{memory}-г 1 GB-аар багасга; Chrome-ын табуудыг хаа\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{docker\ info} санах ой 50\% хэвээр\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{.wslconfig} буруу нэртэй/газарт\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+А.2-ын ⚠; \texttt{wsl\ -\/\allowbreak{}-shutdown} хийсэн эсэх\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{Bind\ for\ 0.\allowbreak{}0.\allowbreak{}0.\allowbreak{}0:\allowbreak{}1883\ failed:\allowbreak{}\ port\ is\ already\ allocated}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Windows дээр өөр MQTT брокер (Mosquitto service) ажиллаж байна\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{Win\ +\ R} → \texttt{services.msc} → \textbf{Mosquitto Broker} → \textbf{Stop}, Startup type: \textbf{Disabled}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{pull\ access\ denied\ for\ cnc302/\allowbreak{}registry}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{-\/\allowbreak{}-ignore-buildable}-гүй \texttt{pull}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Анхааралгүй байж болно --- \texttt{make\ up} өөрөө барина. Эсвэл А.4, Алхам 2\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{pull} маш удаан, тасраад байх\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Интернэт удаан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Дахин ажиллуул --- татсан давхаргуудаа үргэлжлүүлнэ\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{make\ health}-д \texttt{000} эсвэл \texttt{DOWN}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Контейнер асаагүй / асаж байна\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+1 мин хүлээ; \texttt{make\ status}; \texttt{make\ logs\ S=\allowbreak{}emqx}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+EMQX/Grafana нууц үг таарахгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{.env}-ийг стек анх асаасны дараа сольсон\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Өгөгдлийг устгаж дахин эхлэх: \texttt{make\ clean} (\texttt{yes}) → \texttt{make\ up}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{/bin/sh\^{}M:\ bad\ interpreter}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{.sh} файлд CRLF орсон\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+А.3, Алхам 1-ийн \texttt{core.\allowbreak{}autocrlf\ input} → сангаа устгаж \textbf{дахин clone} хий\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{git\ clone} нэвтрэлт асуугаад бүтэлгүйтэх\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Credential Manager тохируулаагүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+А.3, Алхам 1-ийн \texttt{credential.\allowbreak{}helper} мөр\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+\hypertarget{pi-raspberry-pi}{%
+\subsection{{[}Pi{]} Raspberry Pi}\label{pi-raspberry-pi}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шинж тэмдэг\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шалтгаан\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шийдэл\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{Ping\ request\ could\ not\ find\ host\ pi-teamNN.\allowbreak{}local}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Pi асаж дуусаагүй / mDNS ажиллахгүй / Pi сүлжээнд ороогүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+2 мин хүлээ; router-ийн жагсаалтаас IP-г ол; \texttt{\textless{}PI\_\allowbreak{}IP\textgreater{}}-ээр холбогд\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Pi сүлжээнд огт гарч ирэхгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Imager-ийн customisation хэрэгжээгүй, Wi-Fi SSID/нууц үг буруу, 5 GHz сүлжээ\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Кабелиар холбо; Imager-ийг дахин нээж картаа \textbf{дахин бич}; HDMI дэлгэц + гар залгаж шалгаж болно\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{Permission\ denied\ (publickey)}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Imager-т өөр түлхүүр буулгасан, эсвэл \texttt{ssh} буруу түлхүүр ашиглаж байна\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{ssh\ -i\ "\$env:USERPROFILE\textbackslash{}.ssh\textbackslash{}cnc302"\ cnc302@\textless{}PI\_IP\textgreater{}}; хэрэглэгчийн нэр \texttt{cnc302} эсэх (\texttt{pi@} биш); болохгүй бол картаа А.7-ийн \texttt{.pub}-аар \textbf{дахин бич}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{WARNING:\allowbreak{}\ REMOTE\ HOST\ IDENTIFICATION\ HAS\ CHANGED!}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Картаа дахин бичсэн тул Pi-гийн түлхүүр солигдсон\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{{[}ЗК · PowerShell{]}} \texttt{ssh-keygen\ -R\ pi-team\textless{}NN\textgreater{}.\allowbreak{}local} (ба \texttt{ssh-keygen\ -R\ \textless{}PI\_\allowbreak{}IP\textgreater{}}) → дахин холбогд\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{uname\ -m} → \texttt{armv7l}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+32-bit OS бичсэн\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Б.1 --- \textbf{Lite (64-bit)}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{Suites:} хоосон / \texttt{apt\ update}-д Docker-ийн 404\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Б.4, Алхам 3-ыг хэсэгчлэн хуулсан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Алхам 3-ыг блокоор нь дахин буулга\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{permission\ denied\ .\allowbreak{}.\allowbreak{}.\allowbreak{}\ docker.\allowbreak{}sock}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{docker} бүлэгт нэмсний дараа дахин нэвтрээгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{exit} → \texttt{ssh\ pi}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{exec\ format\ error}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+arm64 биш (x86) image эсвэл 32-bit OS\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{uname\ -m} → \texttt{aarch64} байх ёстой\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{get\_throttled} ≠ \texttt{0x0}, Pi санамсаргүй restart хийх\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Тэжээл сул (under-voltage)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Албан ёсны 5 V / 2.5 A адаптер, богино зузаан кабель\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{free\ -h} → Swap 2.0Gi биш\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Reboot хийгээгүй / буруу зам\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Б.5, Алхам 1-ээс дахин; \texttt{sudo\ reboot}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{make\ check} → \texttt{cgroup\ mem\ ✗}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{cmdline.txt} хоёр мөр болсон эсвэл reboot хийгээгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{cat\ /\allowbreak{}boot/\allowbreak{}firmware/\allowbreak{}cmdline.\allowbreak{}txt} нэг мөр эсэх; reboot\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{pip\ install} маш удаан, "гацсан мэт"\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Pi 3B удаан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+15 мин хүлээ; \texttt{htop}-оор CPU ачаалал байгаа эсэхийг шалга\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{bridge/state\ 0}, Pi → 1883 холбогдохгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+(а) стек асаагүй (б) Windows Firewall (в) Public профайл (г) client isolation (д) \texttt{CLOUD\_HOST} буруу\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+(а) \texttt{make\ health} (б) А.6 (в) А.5 (г) лабын router/hotspot (д) \texttt{grep\ CLOUD\_HOST\ \textasciitilde{}/cnc302/edge/.env} → \texttt{make\ bridge} → \texttt{make\ restart}\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+Илүү олон тохиолдол: \texttt{docs/\allowbreak{}troubleshooting.\allowbreak{}md}.
+
+\textbf{Pi-г унтраахдаа} тэжээлийг шууд бүү сугал --- microSD эвдэрнэ. \texttt{sudo\ poweroff} гэж бичээд \textbf{ногоон гэрэл анивчихаа больсны дараа} сугал.
 
 \hypertarget{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}{%
 \section{Эх сурвалж}\label{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-\#
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Эх сурвалж
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Юуг баталгаажуулсан
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хандсан
-\end{minipage} \\
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+\#\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Эх сурвалж\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Юуг баталгаажуулсан\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хандсан\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.docker.com/desktop/setup/install/windows-install/}{Install Docker Desktop on Windows}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+WSL 2 backend: Windows 10 22H2 (19045) / Windows 11 23H2 (22631)+, WSL ≥ 2.1.5, 8 GB RAM, virtualization; Home нь зөвхөн Linux контейнер; "Use WSL 2 instead of Hyper-V"; Subscription Service Agreement; \texttt{docker-users} бүлэг\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-10\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.docker.com/desktop/features/wsl/}{Docker Desktop --- WSL 2 backend}, \href{https://docs.docker.com/desktop/features/wsl/best-practices/}{Best practices}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Use WSL 2 based engine; Resources → WSL Integration; \texttt{wsl\ -l\ -v}, \texttt{-\/-set-version}; кодыг Linux файлын системд хадгалах\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-10\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+3\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://learn.microsoft.com/en-us/windows/wsl/install}{Microsoft --- Install WSL}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{wsl\ -\/\allowbreak{}-install\ -d}, \texttt{-\/-web-download}, анх асаахад UNIX хэрэглэгч үүсгэх, \texttt{wsl\ -l\ -v}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-10\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://github.com/git-ecosystem/git-credential-manager/blob/main/docs/wsl.md}{Git Credential Manager --- WSL}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+WSL-ийн Git-ийг Windows-ийн GCM-тэй холбох \texttt{credential.\allowbreak{}helper}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-10\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+5\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.docker.com/desktop/settings-and-maintenance/settings/}{Docker Desktop --- Settings}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Memory limit: Mac, Linux, Windows Hyper-V; анхдагч нь хостын 50\%; WSL 2 горимд санах ойг WSL 2 VM дээр тохируулна\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+6\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://learn.microsoft.com/en-us/windows/wsl/wsl-config}{WSL --- Advanced settings configuration (.\allowbreak{}wslconfig)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{\%UserProfile\%\textbackslash{}.wslconfig}, \texttt{{[}wsl2{]}\ memory=\allowbreak{}}, анхдагч 50\%, \texttt{wsl\ -\/\allowbreak{}-shutdown}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+7\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://learn.microsoft.com/en-us/powershell/module/netsecurity/new-netfirewallrule}{New-NetFirewallRule}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{-LocalPort} порт/жагсаалт, \texttt{-Profile\ Private}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+8\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.virtualbox.org/manual/UserManual.html}{VirtualBox User Manual}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Hyper-V ажиллаж буй хост дээр гүйцэтгэл буурна, Windows Hypervisor Platform шаардлагатай; Bridged networking\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+9\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://ubuntu.com/about/release-cycle}{Ubuntu release cycle}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Одоогийн LTS: 26.04 (24.04 LTS дэмжигдсэн)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+10\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.k3s.io/installation/requirements}{K3s --- Requirements}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+server 2 цөм/2 GB, agent 1 цөм/512 MB; Raspberry Pi OS-д \texttt{cgroup\_\allowbreak{}memory=\allowbreak{}1\ cgroup\_\allowbreak{}enable=\allowbreak{}memory}, \texttt{/\allowbreak{}boot/\allowbreak{}firmware/\allowbreak{}cmdline.\allowbreak{}txt}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+11\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html}{Raspberry Pi hardware}, \href{https://www.raspberrypi.com/documentation/computers/processors.html\#bcm2837}{BCM2837}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Pi 3B: BCM2837, 4×Cortex-A53 @1.2 GHz, 1 GB, 100 Mb/s Ethernet, 4×USB 2.0, 2.4 GHz Wi-Fi; 80--85 °C-д throttle\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+12\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/getting-started.html}{Getting started}, \href{https://www.raspberrypi.com/news/a-new-raspberry-pi-imager/}{A new Raspberry Pi Imager}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Pi 3: 5 V / 2.5 A, 12.5 W; Imager 2.0-ийн алхмууд: device → OS → storage → customisation (hostname, localisation, user, Wi-Fi, remote access/SSH public key, Raspberry Pi Connect) → write\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-10\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+13\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/os.html\#vcgencmd}{vcgencmd get\_\allowbreak{}throttled}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+бит 0 = undervoltage, бит 2 = throttled, бит 16/18 = өмнө нь болсон\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+14\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/os.html}{Raspberry Pi OS}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Сүүлийн хувилбар Trixie (өмнөх Bookworm); Lite = command-line-only; 64-бит нь Pi 3-д\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+15\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/legacy_config_txt.html}{Legacy config.\allowbreak{}txt --- gpu\_\allowbreak{}mem}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+1 GB-д анхдагч 76; legacy --- Bookworm+ дээр ажиллахгүй, албан ёсоор дэмжигдэхгүй; доод утга 16\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+16\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/configuration.html}{Kernel command line}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{cmdline.txt}-ийн бүх параметр нэг мөрөнд\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+17\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://github.com/raspberrypi/rpi-swap}{raspberrypi/rpi-swap}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{dphys-swapfile}-ийг орлоно; \texttt{/\allowbreak{}etc/\allowbreak{}rpi/\allowbreak{}swap.\allowbreak{}conf.\allowbreak{}d/\allowbreak{}}; \texttt{Mechanism=auto} = zram+file; Example 1 (\texttt{swapfile}, \texttt{FixedSizeMiB=\allowbreak{}2048}); өөрчлөлтийн дараа reboot\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+18\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.docker.com/engine/install/debian/}{Install Docker Engine on Debian}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Trixie 13 / Bookworm 12, arm64; apt repository-ийн алхам; convenience script зөвхөн туршилт/хөгжүүлэлтэд\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+19\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.docker.com/engine/install/raspberry-pi-os/}{Install Docker Engine on Raspberry Pi OS (32-bit)}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Engine v28 нь armhf-ийн сүүлийнх; 64-бит ARM-д Debian arm64 багц\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+20\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.docker.com/engine/install/linux-postinstall/}{Linux post-installation steps}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{usermod\ -aG\ docker}, дахин нэвтрэх, docker бүлгийн эрсдэл\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+21\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.docker.com/engine/logging/drivers/json-file/}{JSON File logging driver}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{daemon.json}-ийн \texttt{log-opts} мөр утгатай; зөвхөн шинэ контейнерт\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+22\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://code.visualstudio.com/docs/remote/ssh}{VS Code --- Remote Development using SSH}, \href{https://code.visualstudio.com/docs/remote/linux}{with Linux}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+1 GB RAM шаардлагатай, 2 GB + 2 цөм зөвлөмжтэй; Debian 64-бит ARMv8, kernel ≥ 4.18, glibc ≥ 2.28\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+23\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://pypi.org/project/ai-edge-litert/}{pypi: ai-edge-litert}, \href{https://pypi.org/project/numpy/}{pypi: numpy}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+ai-edge-litert: cp311/cp313 \texttt{manylinux\_\allowbreak{}2\_\allowbreak{}27\_\allowbreak{}aarch64}; numpy aarch64 wheel\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-1 & \href{https://docs.docker.com/desktop/settings-and-maintenance/settings/}{Docker Desktop --- Settings} & Memory limit: Mac, Linux, Windows Hyper-V; анхдагч нь хостын 50\%; WSL 2 горимд санах ойг WSL 2 VM дээр тохируулна & 2026-09 \\
-2 & \href{https://learn.microsoft.com/en-us/windows/wsl/wsl-config}{WSL --- Advanced settings configuration (.\allowbreak{}wslconfig)} & \texttt{\%UserProfile\%\textbackslash{}.wslconfig}, \texttt{{[}wsl2{]}\ memory=\allowbreak{}}, анхдагч 50\%, \texttt{wsl\ -\/\allowbreak{}-shutdown} & 2026-09 \\
-3 & \href{https://learn.microsoft.com/en-us/powershell/module/netsecurity/new-netfirewallrule}{New-NetFirewallRule} & \texttt{-LocalPort} порт/жагсаалт, \texttt{-Profile\ Private} & 2026-09 \\
-4 & \href{https://www.virtualbox.org/manual/UserManual.html}{VirtualBox User Manual} & Hyper-V ажиллаж буй хост дээр гүйцэтгэл буурна, Windows Hypervisor Platform шаардлагатай; Bridged networking & 2026-09 \\
-5 & \href{https://ubuntu.com/about/release-cycle}{Ubuntu release cycle}, \href{https://ubuntu.com/download/server}{Ubuntu Server download} & Одоогийн LTS: 26.04 (24.04 LTS дэмжигдсэн) & 2026-09 \\
-6 & \href{https://docs.k3s.io/installation/requirements}{K3s --- Requirements} & server 2 цөм/2 GB, agent 1 цөм/512 MB; Raspberry Pi OS-д \texttt{cgroup\_\allowbreak{}memory=\allowbreak{}1\ cgroup\_\allowbreak{}enable=\allowbreak{}memory}, \texttt{/\allowbreak{}boot/\allowbreak{}firmware/\allowbreak{}cmdline.\allowbreak{}txt} (Debian 11 ба өмнөх: \texttt{/\allowbreak{}boot/\allowbreak{}cmdline.\allowbreak{}txt}) & 2026-09 \\
-7 & \href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html}{Raspberry Pi hardware} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/raspberry-pi/introduction.adoc}{эх}), \href{https://www.raspberrypi.com/documentation/computers/processors.html\#bcm2837}{BCM2837} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/processors/bcm2837.adoc}{эх}) & Pi 3B: BCM2837, 4×Cortex-A53 @1.2 GHz, 1 GB, 100 Mb/s Ethernet, 4×USB 2.0, 2.4 GHz Wi-Fi & 2026-09 \\
-8 & \href{https://www.raspberrypi.com/documentation/computers/getting-started.html}{Getting started --- power supply} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/getting-started/setting-up.adoc}{эх}) & Pi 3 (бүх загвар): 5 V / 2.5 A, 12.5 W Micro USB & 2026-09 \\
-9 & \href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html\#frequency-management-and-thermal-control}{Frequency management and thermal control} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/raspberry-pi/frequency-management.adoc}{эх}) & 80--85 °C-д Arm цөм аажмаар throttle, 85 °C хатуу хязгаар & 2026-09 \\
-10 & \href{https://www.raspberrypi.com/documentation/computers/os.html\#vcgencmd}{vcgencmd get\_\allowbreak{}throttled} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/os/graphics-utilities.adoc}{эх}) & бит 0 = undervoltage, бит 2 = throttled, бит 16/18 = өмнө нь болсон & 2026-09 \\
-11 & \href{https://www.raspberrypi.com/documentation/computers/os.html}{Raspberry Pi OS} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/os/rpi-os-introduction.adoc}{эх}) & Сүүлийн хувилбар Trixie (өмнөх Bookworm); Lite = command-line-only; 64-бит нь Pi 3-д & 2026-09 \\
-12 & \href{https://www.raspberrypi.com/documentation/computers/legacy_config_txt.html}{Legacy config.\allowbreak{}txt --- gpu\_\allowbreak{}mem} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/legacy_config_txt/legacy.adoc}{эх 1}, \href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/legacy_config_txt/memory.adoc}{эх 2}) & 1 GB-д анхдагч 76; legacy --- Bookworm+ дээр ажиллахгүй, албан ёсоор дэмжигдэхгүй; доод утга 16 & 2026-09 \\
-13 & \href{https://www.raspberrypi.com/documentation/computers/configuration.html}{Kernel command line} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/configuration/boot-behaviour.adoc}{эх}) & \texttt{cmdline.txt}-ийн бүх параметр нэг мөрөнд & 2026-09 \\
-14 & \href{https://github.com/raspberrypi/rpi-swap}{raspberrypi/rpi-swap} (README, \texttt{man/\allowbreak{}man5/\allowbreak{}swap.\allowbreak{}conf.\allowbreak{}5}) & \texttt{dphys-swapfile}-ийг орлоно; \texttt{/\allowbreak{}etc/\allowbreak{}rpi/\allowbreak{}swap.\allowbreak{}conf.\allowbreak{}d/\allowbreak{}}; \texttt{Mechanism=auto} = zram+file; Example 1 (\texttt{swapfile}, \texttt{FixedSizeMiB=\allowbreak{}2048}); өөрчлөлтийн дараа reboot & 2026-09 \\
-15 & \href{https://docs.docker.com/engine/install/debian/}{Install Docker Engine on Debian} & Trixie 13 / Bookworm 12, arm64; apt репозиторын алхам; convenience script зөвхөн туршилт/хөгжүүлэлтэд & 2026-09 \\
-16 & \href{https://docs.docker.com/engine/install/raspberry-pi-os/}{Install Docker Engine on Raspberry Pi OS (32-bit)} & Engine v28 нь armhf-ийн сүүлийнх; 64-бит ARM-д Debian arm64 багц & 2026-09 \\
-17 & \href{https://docs.docker.com/engine/install/linux-postinstall/}{Linux post-installation steps} & \texttt{usermod\ -aG\ docker}, \texttt{newgrp\ docker}, docker бүлгийн эрсдэл & 2026-09 \\
-18 & \href{https://docs.docker.com/engine/logging/drivers/json-file/}{JSON File logging driver} & \texttt{daemon.json}-ийн \texttt{log-opts} мөр утгатай; зөвхөн шинэ контейнерт & 2026-09 \\
-19 & \href{https://code.visualstudio.com/docs/remote/ssh}{VS Code --- Remote Development using SSH} & 1 GB RAM шаардлагатай, 2 GB + 2 цөм зөвлөмжтэй & 2026-09 \\
-20 & \href{https://code.visualstudio.com/docs/remote/linux}{VS Code --- Remote Development with Linux} & Debian 64-бит ARMv8 (AArch64), kernel ≥ 4.18, glibc ≥ 2.28; ARM дээр өргөтгөлийн native модулийн эрсдэл & 2026-09 \\
-21 & \href{https://pypi.org/project/ai-edge-litert/}{pypi: ai-edge-litert}, \href{https://pypi.org/project/numpy/}{pypi: numpy} & ai-edge-litert 2.2.0: cp311/cp313 \texttt{manylinux\_\allowbreak{}2\_\allowbreak{}27\_\allowbreak{}aarch64}; numpy aarch64 wheel & 2026-09 \\
 \end{longtable}\endgroup

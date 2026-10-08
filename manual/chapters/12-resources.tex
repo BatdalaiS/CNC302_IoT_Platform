@@ -9,57 +9,122 @@
 \hypertarget{ux44eux443-ux445ux430ux430ux43dux430-ux44fux432ux434ux430ux433-ux432ux44d}{%
 \subsection{Юу хаана явдаг вэ}\label{ux44eux443-ux445ux430ux430ux43dux430-ux44fux432ux434ux430ux433-ux432ux44d}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Хэсэг
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-MiB
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Тэмдэглэл
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Хэсэг\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+MiB\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Тэмдэглэл\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Нийт физик санах ой\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+1024\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+албан ёсны үзүүлэлт: 1 GB\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+GPU-д (\texttt{gpu\_mem})\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+−16\ldots−76\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+1 GB-тай загварт анхдагч \textbf{76}. \texttt{gpu\_mem} нь legacy тохиргоо --- Bookworm ба түүнээс хойш албан ёсоор дэмжигдэхгүй, тиймээс SETUP.md Б.3-т өмнө/дараа нь \textbf{хэмжинэ}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Цөм + firmware\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textasciitilde85\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+таамаг\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{Системд харагдах (\texttt{MemTotal})}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{\textasciitilde925} (хэмжинэ)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{free\ -m} энийг харуулна\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Pi OS Lite, headless, амарч байгаа\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+−90\ldots−130\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+systemd, sshd, journald\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Docker демон\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+−60\ldots−80\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{dockerd} + \texttt{containerd}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{Ажилд боломжтой}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{\textasciitilde720\ldots780}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-Нийт физик санах ой & 1024 & албан ёсны үзүүлэлт: 1 GB \\
-GPU-д (\texttt{gpu\_mem}) & −16\ldots−76 & 1 GB-тай загварт анхдагч \textbf{76}. \texttt{gpu\_mem} нь legacy тохиргоо --- Bookworm ба түүнээс хойш албан ёсоор дэмжигдэхгүй, тиймээс SETUP.md Б.3-т өмнө/дараа нь \textbf{хэмжинэ} \\
-Цөм + firmware & \textasciitilde85 & таамаг \\
-\textbf{Системд харагдах (\texttt{MemTotal})} & \textbf{\textasciitilde925} (хэмжинэ) & \texttt{free\ -m} энийг харуулна \\
-Pi OS Lite, headless, амарч байгаа & −90\ldots−130 & systemd, sshd, journald \\
-Docker демон & −60\ldots−80 & \texttt{dockerd} + \texttt{containerd} \\
-\textbf{Ажилд боломжтой} & \textbf{\textasciitilde720\ldots780} & \\
 \end{longtable}\endgroup
 
 \hypertarget{ux438ux440ux43cux44dux433ux438ux439ux43d-ux4afux439ux43bux447ux438ux43bux433ux44dux44dux43dux438ux439-ux442ux4e9ux441ux4e9ux432}{%
 \subsection{Ирмэгийн үйлчилгээний төсөв}\label{ux438ux440ux43cux44dux433ux438ux439ux43d-ux4afux439ux43bux447ux438ux43bux433ux44dux44dux43dux438ux439-ux442ux4e9ux441ux4e9ux432}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Үйлчилгээ
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Compose хязгаар
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Бодит амралтын хэрэглээ
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Тэмдэглэл
-\end{minipage} \\
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+Үйлчилгээ\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Compose хязгаар\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Бодит амралтын хэрэглээ\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Тэмдэглэл\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{mosquitto}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+128 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+12--25 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Дараалал дүүрэхэд өснө: 100k мессеж × 250 B ≈ 25 MiB\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+ирмэгийн агент (venv)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+200 MiB (systemd)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+45--70 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+numpy \textasciitilde25 MiB эзэлнэ\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
++ TFLite дүгнэлт (Лаб 6)\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+↑\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
++40\ldots+90 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+загварын хэмжээ ба цонхноос хамаарна\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+VS Code Remote сервер\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+---\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{150--250 MiB}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+⚠ хэмжилтийн өмнө таслах!\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{mosquitto} & 128 MiB & 12--25 MiB & Дараалал дүүрэхэд өснө: 100k мессеж × 250 B ≈ 25 MiB \\
-ирмэгийн агент (venv) & 200 MiB (systemd) & 45--70 MiB & numpy \textasciitilde25 MiB эзэлнэ \\
-+ TFLite дүгнэлт (Лаб 6) & ↑ & +40\ldots+90 MiB & загварын хэмжээ ба цонхноос хамаарна \\
-VS Code Remote сервер & --- & \textbf{150--250 MiB} & ⚠ хэмжилтийн өмнө таслах! \\
 \end{longtable}\endgroup
 
 \textbf{Нийлбэр (Лаб 1--5):} \textasciitilde120 MiB → \textbf{600 MiB илүүдэлтэй.} Тав тухтай.
@@ -71,27 +136,20 @@ VS Code Remote сервер & --- & \textbf{150--250 MiB} & ⚠ хэмжилти
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{free} \AttributeTok{{-}m} \KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}/Mem:/\{print $7 " MiB available"\}\textquotesingle{}}
+\FunctionTok{free}\NormalTok{ {-}m }\KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}/Mem:/\{print $7 " MiB available"\}\textquotesingle{}}
 \end{Highlighting}
 \end{Shaded}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Үлдэгдэл
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Утга
-\end{minipage} \\
+Үлдэгдэл & Утга\tabularnewline
 \midrule
 \endhead
+\textgreater{} 400 MiB & хэвийн\tabularnewline
+150--400 MiB & болгоомжтой --- шинэ үйлчилгээ нэмэхээс өмнө хэмж\tabularnewline
+\textless{} 150 MiB & \textbf{аюултай} --- swap идэвхжиж, бүх саатал 10--100 дахин өснө\tabularnewline
+swap \texttt{si/so} \textgreater{} 0 & аль хэдийн хязгаарт хүрсэн. Энэ нь \textbf{хэмжилт}, алдаа биш.\tabularnewline
 \bottomrule
-\endlastfoot
-\textgreater{} 400 MiB & хэвийн \\
-150--400 MiB & болгоомжтой --- шинэ үйлчилгээ нэмэхээс өмнө хэмж \\
-\textless{} 150 MiB & \textbf{аюултай} --- swap идэвхжиж, бүх саатал 10--100 дахин өснө \\
-swap \texttt{si/so} \textgreater{} 0 & аль хэдийн хязгаарт хүрсэн. Энэ нь \textbf{хэмжилт}, алдаа биш. \\
 \end{longtable}\endgroup
 
 \texttt{tools/\allowbreak{}measure\_\allowbreak{}stack.\allowbreak{}sh\ -\/\allowbreak{}-role\ edge} эдгээрийг автоматаар шалгана.
@@ -99,37 +157,121 @@ swap \texttt{si/so} \textgreater{} 0 & аль хэдийн хязгаарт хү
 \hypertarget{ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux4afux4afux43bux43dux438ux439-ux434ux430ux432ux445ux430ux440ux433ux430}{%
 \section{2. {[}ЗК{]} Зөөврийн компьютер --- үүлний давхарга}\label{ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux4afux4afux43bux43dux438ux439-ux434ux430ux432ux445ux430ux440ux433ux430}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lllll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Үйлчилгээ
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Профайл
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Compose хязгаар
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хүлээгдэх хэрэглээ
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Тэмдэглэл
-\end{minipage} \\
+\begin{minipage}[b]{0.17\columnwidth}\raggedright
+Үйлчилгээ\strut
+\end{minipage} & \begin{minipage}[b]{0.17\columnwidth}\raggedright
+Профайл\strut
+\end{minipage} & \begin{minipage}[b]{0.17\columnwidth}\raggedright
+Compose хязгаар\strut
+\end{minipage} & \begin{minipage}[b]{0.17\columnwidth}\raggedright
+Хүлээгдэх хэрэглээ\strut
+\end{minipage} & \begin{minipage}[b]{0.17\columnwidth}\raggedright
+Тэмдэглэл\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.17\columnwidth}\raggedright
+\texttt{emqx}\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+core\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+1024 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+150--250 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+Холболт нэмэгдэхэд \textasciitilde4 KiB/холболт\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright
+\texttt{influxdb}\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+core\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+1024 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+250--500 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+Бичилтийн ачаалалтай өснө\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright
+\texttt{grafana}\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+core\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+512 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+120--200 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+Самбарын тоогоор өснө\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright
+\texttt{registry}\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+core\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+384 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+60--110 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+FastAPI + SQLite\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright
+\texttt{nodered}\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+pipeline\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+512 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+120--200 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+Урсгалын нарийвчлалаас\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright
+\texttt{dex}\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+app\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+256 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+30--60 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright
+\texttt{graphql-api}\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+app\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+512 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+80--150 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+Python/FastAPI\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright
+\texttt{ollama}\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+ai\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+4096 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+загвараас\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+qwen2.5:1.5b q4 ≈ 1.2--1.6 GiB + KV\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright
+\texttt{thingsboard}\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+tb (сонголт)\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+2500 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+1200--1800 MiB\strut
+\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
+зөвхөн Лаб 2-ын харьцуулалт; албан ёсны заавар хөгжүүлэлтэд ч 4 GB RAM\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{emqx} & core & 1024 MiB & 150--250 MiB & Холболт нэмэгдэхэд \textasciitilde4 KiB/холболт \\
-\texttt{influxdb} & core & 1024 MiB & 250--500 MiB & Бичилтийн ачаалалтай өснө \\
-\texttt{grafana} & core & 512 MiB & 120--200 MiB & Самбарын тоогоор өснө \\
-\texttt{registry} & core & 384 MiB & 60--110 MiB & FastAPI + SQLite \\
-\texttt{nodered} & pipeline & 512 MiB & 120--200 MiB & Урсгалын нарийвчлалаас \\
-\texttt{dex} & app & 256 MiB & 30--60 MiB & \\
-\texttt{graphql-api} & app & 512 MiB & 80--150 MiB & Python/FastAPI \\
-\texttt{ollama} & ai & 4096 MiB & загвараас & qwen2.5:1.5b q4 ≈ 1.2--1.6 GiB + KV \\
-\texttt{thingsboard} & tb (сонголт) & 2500 MiB & 1200--1800 MiB & зөвхөн Лаб 2-ын харьцуулалт; албан ёсны заавар хөгжүүлэлтэд ч 4 GB RAM \\
 \end{longtable}\endgroup
 
 \hypertarget{ux43fux440ux43eux444ux430ux439ux43bux44bux43d-ux43dux438ux439ux43bux431ux44dux440}{%
@@ -137,16 +279,15 @@ Compose хязгаар
 
 \begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-Хослол & Хязгаарын нийлбэр & Практикт & Docker Desktop-д хэрэгтэй \\
+Хослол & Хязгаарын нийлбэр & Практикт & Docker Desktop-д хэрэгтэй\tabularnewline
 \midrule
 \endhead
+core & 2.9 GiB & 0.6--1.1 GiB & 4 GB\tabularnewline
+core + pipeline & 3.4 GiB & 0.7--1.3 GiB & 4 GB\tabularnewline
+core + pipeline + app & 4.2 GiB & 0.8--1.5 GiB & 4 GB\tabularnewline
++ ai (Лаб 8) & 8.2 GiB & 2.0--3.1 GiB & \textbf{6 GB}\tabularnewline
+core + tb (Лаб 2 сонголт) & 5.4 GiB & 1.8--2.9 GiB & \textbf{6 GB}\tabularnewline
 \bottomrule
-\endlastfoot
-core & 2.9 GiB & 0.6--1.1 GiB & 4 GB \\
-core + pipeline & 3.4 GiB & 0.7--1.3 GiB & 4 GB \\
-core + pipeline + app & 4.2 GiB & 0.8--1.5 GiB & 4 GB \\
-+ ai (Лаб 8) & 8.2 GiB & 2.0--3.1 GiB & \textbf{6 GB} \\
-core + tb (Лаб 2 сонголт) & 5.4 GiB & 1.8--2.9 GiB & \textbf{6 GB} \\
 \end{longtable}\endgroup
 
 "Практикт" ба "Хүлээгдэх хэрэглээ" багана нь \textbf{таамаг} --- \texttt{docker\ stats}-аар өөрсдөө хэмжинэ. Лаб 8-д үүн дээр K3s server VM (4 GB) нэмэгдэнэ → зөөврийн компьютерт \textbf{16 GB RAM тав тухтай} (§3).
@@ -163,39 +304,58 @@ K3s-ийн албан ёсны доод шаардлага: \textbf{server 2 ц�
 \hypertarget{pi-pi-3b-agent}{%
 \subsection{3.1 {[}Pi{]} Pi 3B (agent)}\label{pi-pi-3b-agent}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Хэсэг
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-MiB
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Эх сурвалж / тэмдэглэл
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Хэсэг\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+MiB\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Эх сурвалж / тэмдэглэл\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{MemTotal}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textasciitilde925\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+SETUP.md Б.3-т хэмжсэн утгаа бич\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+OS (Lite, headless)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+90--130\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+таамаг --- хэмжинэ\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+k3s agent (containerd + kubelet + flannel)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{≈ 268}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+K3s Resource Profiling-ийн \textbf{Pi 4B} хэмжилт (Pi 3B-д албан ёсны тоо алга)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{Pod-уудад бодитоор үлдэх}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{≈ 525--565}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+925 − OS − agent\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{MemTotal} & \textasciitilde925 & SETUP.md Б.3-т хэмжсэн утгаа бич \\
-OS (Lite, headless) & 90--130 & таамаг --- хэмжинэ \\
-k3s agent (containerd + kubelet + flannel) & \textbf{≈ 268} & K3s Resource Profiling-ийн \textbf{Pi 4B} хэмжилт (Pi 3B-д албан ёсны тоо алга) \\
-\textbf{Pod-уудад бодитоор үлдэх} & \textbf{≈ 525--565} & 925 − OS − agent \\
 \end{longtable}\endgroup
 
 Товлогч (scheduler) бодит RSS-ийг биш, \textbf{Allocatable} ба \texttt{requests}-ийн нийлбэрийг харьцуулна. K3s-ийн kubelet-д \textbf{reserved санах ой тавиагүй}, hard eviction нь зөвхөн дискний (\texttt{imagefs}/\allowbreak\texttt{nodefs} 5 \%) --- санах ойн босго \textbf{байхгүй} (K3s CIS Self-Assessment). Тиймээс \textbf{Allocatable ≈ Capacity ≈ 925 Mi}.
 
 \begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-Pod & \texttt{requests} \\
+Pod & \texttt{requests}\tabularnewline
 \midrule
 \endhead
+\texttt{mosquitto} & 32 Mi\tabularnewline
+\texttt{edge-agent} × N & 96 Mi × N (N = 1 → нийт \textbf{128 Mi})\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{mosquitto} & 32 Mi \\
-\texttt{edge-agent} × N & 96 Mi × N (N = 1 → нийт \textbf{128 Mi}) \\
 \end{longtable}\endgroup
 
 \textbf{HPA-ийн гол зөрчил (Лаб 8):} товлогчийн тооцоогоор \texttt{32\ +\ 96·N\ ≤\ 925} → \textbf{N\_sched ≈ 9} хүртэл "багтана". Гэтэл бодит ≈ 545 MiB-д \textasciitilde110 MiB-ийн агент \textbf{N\_real ≈ 4--5}-аас илүү багтахгүй. Үр дүн нь \texttt{Pending} биш --- цөмийн OOM killer (\texttt{OOMKilled}) эсвэл swap дээр мөлхөх. Аль нь болсныг \texttt{kubectl\ top} + \texttt{free\ -m} + \texttt{vmstat}-аар хэмжиж нотолно.
@@ -203,26 +363,16 @@ Pod & \texttt{requests} \\
 \hypertarget{vm-server-vm-ux431ux430-ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440}{%
 \subsection{3.2 {[}VM{]} Server VM ба {[}ЗК{]} зөөврийн компьютер}\label{vm-server-vm-ux431ux430-ux437ux43a-ux437ux4e9ux4e9ux432ux440ux438ux439ux43d-ux43aux43eux43cux43fux44cux44eux442ux435ux440}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Хэсэг
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Утга
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Эх сурвалж
-\end{minipage} \\
+Хэсэг & Утга & Эх сурвалж\tabularnewline
 \midrule
 \endhead
+K3s server + 1 agent (ачаалалгүй) & ≈ \textbf{1428 M} & K3s Resource Profiling (x86\_64)\tabularnewline
+VM-ийн RAM & доод \textbf{2 GB}, санал \textbf{4 GB}; ≥ 2 vCPU & K3s Requirements\tabularnewline
+Docker Desktop (үүлний стек + Ollama) & 6 GB & §2, SETUP.md А.2\tabularnewline
+\textbf{Зөөврийн компьютерт нийт} & 6 + 4 GB + хост OS → \textbf{16 GB} тав тухтай &\tabularnewline
 \bottomrule
-\endlastfoot
-K3s server + 1 agent (ачаалалгүй) & ≈ \textbf{1428 M} & K3s Resource Profiling (x86\_64) \\
-VM-ийн RAM & доод \textbf{2 GB}, санал \textbf{4 GB}; ≥ 2 vCPU & K3s Requirements \\
-Docker Desktop (үүлний стек + Ollama) & 6 GB & §2, SETUP.md А.2 \\
-\textbf{Зөөврийн компьютерт нийт} & 6 + 4 GB + хост OS → \textbf{16 GB} тав тухтай & \\
 \end{longtable}\endgroup
 
 \begin{quote}
@@ -249,32 +399,99 @@ Docker Desktop (үүлний стек + Ollama) & 6 GB & §2, SETUP.md А.2 \\
 \hypertarget{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}{%
 \section{Эх сурвалж}\label{ux44dux445-ux441ux443ux440ux432ux430ux43bux436}}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-\#
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Эх сурвалж
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Юуг баталгаажуулсан
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хандсан
-\end{minipage} \\
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+\#\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Эх сурвалж\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Юуг баталгаажуулсан\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хандсан\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+1\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/legacy_config_txt.html}{Legacy config.\allowbreak{}txt --- gpu\_\allowbreak{}mem} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/legacy_config_txt/legacy.adoc}{эх 1}, \href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/legacy_config_txt/memory.adoc}{эх 2})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+1 GB-д анхдагч 76; legacy, Bookworm+ дээр дэмжигдэхгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+2\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.k3s.io/installation/requirements}{K3s --- Requirements}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+server 2 цөм/2 GB, agent 1 цөм/512 MB; Raspberry Pi-гийн cgroup\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+3\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.k3s.io/reference/resource-profiling}{K3s --- Resource Profiling}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+agent (Pi 4B) ≈ 268 M; server + 1 agent (x86\_64) ≈ 1428 M\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+4\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.k3s.io/security/self-assessment-1.12}{K3s --- CIS 1.\allowbreak{}12 Self-Assessment}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+kubelet: reserved алга, \texttt{evictionHard} зөвхөн imagefs/nodefs\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+5\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/}{Kubernetes --- Reserve Compute Resources}, \href{https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/}{Resource Management for Pods}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+Allocatable = Capacity − reserved − eviction; товлогч \texttt{requests}-ээр шийднэ\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+6\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://thingsboard.io/docs/installation/docker/}{ThingsBoard CE --- Docker}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+PoC-д 4 GB RAM\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+7\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://docs.docker.com/reference/compose-file/deploy/}{Compose Deploy Specification --- resources}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{limits} нь платформ хуваарилахыг хориглох дээд хязгаар, \texttt{reservations} нь баталгаа\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+8\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://code.visualstudio.com/docs/remote/ssh}{VS Code --- Remote Development using SSH}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+алсын хостод 1 GB RAM шаардлагатай\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+9\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html\#frequency-management-and-thermal-control}{Frequency management and thermal control} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/raspberry-pi/frequency-management.adoc}{эх})\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+80--85 °C throttle\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+2026-09\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-1 & \href{https://www.raspberrypi.com/documentation/computers/legacy_config_txt.html}{Legacy config.\allowbreak{}txt --- gpu\_\allowbreak{}mem} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/legacy_config_txt/legacy.adoc}{эх 1}, \href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/legacy_config_txt/memory.adoc}{эх 2}) & 1 GB-д анхдагч 76; legacy, Bookworm+ дээр дэмжигдэхгүй & 2026-09 \\
-2 & \href{https://docs.k3s.io/installation/requirements}{K3s --- Requirements} & server 2 цөм/2 GB, agent 1 цөм/512 MB; Raspberry Pi-гийн cgroup & 2026-09 \\
-3 & \href{https://docs.k3s.io/reference/resource-profiling}{K3s --- Resource Profiling} & agent (Pi 4B) ≈ 268 M; server + 1 agent (x86\_64) ≈ 1428 M & 2026-09 \\
-4 & \href{https://docs.k3s.io/security/self-assessment-1.12}{K3s --- CIS 1.\allowbreak{}12 Self-Assessment} & kubelet: reserved алга, \texttt{evictionHard} зөвхөн imagefs/nodefs & 2026-09 \\
-5 & \href{https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/}{Kubernetes --- Reserve Compute Resources}, \href{https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/}{Resource Management for Pods} & Allocatable = Capacity − reserved − eviction; товлогч \texttt{requests}-ээр шийднэ & 2026-09 \\
-6 & \href{https://thingsboard.io/docs/installation/docker/}{ThingsBoard CE --- Docker} & PoC-д 4 GB RAM & 2026-09 \\
-7 & \href{https://docs.docker.com/reference/compose-file/deploy/}{Compose Deploy Specification --- resources} & \texttt{limits} нь платформ хуваарилахыг хориглох дээд хязгаар, \texttt{reservations} нь баталгаа & 2026-09 \\
-8 & \href{https://code.visualstudio.com/docs/remote/ssh}{VS Code --- Remote Development using SSH} & алсын хостод 1 GB RAM шаардлагатай & 2026-09 \\
-9 & \href{https://www.raspberrypi.com/documentation/computers/raspberry-pi.html\#frequency-management-and-thermal-control}{Frequency management and thermal control} (\href{https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/raspberry-pi/frequency-management.adoc}{эх}) & 80--85 °C throttle & 2026-09 \\
 \end{longtable}\endgroup

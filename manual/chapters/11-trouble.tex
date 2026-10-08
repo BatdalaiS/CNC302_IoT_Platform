@@ -8,52 +8,65 @@
 
 \textbf{Шинж тэмдэг:} \texttt{make\ link} → \texttt{bridge/state\ 0}, эсвэл огт мессеж гарахгүй.
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-\#
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шалгах
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Комманд ({[}Pi{]} Pi дээр)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Хэвийн бол
-\end{minipage} \\
+\# & Шалгах & Комманд ({[}Pi{]} Pi дээр) & Хэвийн бол\tabularnewline
 \midrule
 \endhead
+1 & Pi үүлийг харж байна уу & \texttt{ping\ -c3\ \$CLOUD\_\allowbreak{}HOST} & хариу ирнэ\tabularnewline
+2 & 1883 порт нээлттэй юу & \texttt{nc\ -vz\ \$CLOUD\_\allowbreak{}HOST\ 1883} & succeeded\tabularnewline
+3 & Гүүрний лог & \texttt{docker\ compose\ logs\ mosquitto\ \textbackslash{}\textbar{}\ tail\ -20} & "Connecting bridge"\tabularnewline
+4 & bridge.conf үүссэн үү & \texttt{cat\ mosquitto/\allowbreak{}conf.\allowbreak{}d/\allowbreak{}bridge.\allowbreak{}conf} & \texttt{address\ \textless{}IP\textgreater{}:\allowbreak{}1883}\tabularnewline
 \bottomrule
-\endlastfoot
-1 & Pi үүлийг харж байна уу & \texttt{ping\ -c3\ \$CLOUD\_\allowbreak{}HOST} & хариу ирнэ \\
-2 & 1883 порт нээлттэй юу & \texttt{nc\ -vz\ \$CLOUD\_\allowbreak{}HOST\ 1883} & succeeded \\
-3 & Гүүрний лог & \texttt{docker\ compose\ logs\ mosquitto\ \textbackslash{}\textbar{}\ tail\ -20} & "Connecting bridge" \\
-4 & bridge.conf үүссэн үү & \texttt{cat\ mosquitto/\allowbreak{}conf.\allowbreak{}d/\allowbreak{}bridge.\allowbreak{}conf} & \texttt{address\ \textless{}IP\textgreater{}:\allowbreak{}1883} \\
 \end{longtable}\endgroup
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Алдааны мөр
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шалтгаан
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шийдэл
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Алдааны мөр\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шалтгаан\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шийдэл\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{Connection\ refused}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+EMQX асаагүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+{[}ЗК{]} \texttt{cd\ stack\ \&\allowbreak{}\&\allowbreak{}\ make\ up}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{Broken\ pipe} дахин дахин\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Галт хана хааж байна\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+{[}ЗК{]} SETUP.md А.6\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{No\ route\ to\ host}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Өөр дэд сүлжээ\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Хоёуланг нэг свичид кабелиар\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{Error:\allowbreak{}\ Unknown\ configuration\ variable}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Тохиргооны түлхүүр буруу (эсвэл глобал түлхүүрийг bridge хэсэгт бичсэн)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{mosquitto.\allowbreak{}conf(5)}-тай тулга; \texttt{make\ bridge} дахин ажиллуул\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{address\ 192.\allowbreak{}168.\allowbreak{}1.\allowbreak{}100:\allowbreak{}1883}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{.env} засаагүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{nano\ .env} → CLOUD\_HOST\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{Connection\ refused} & EMQX асаагүй & {[}ЗК{]} \texttt{cd\ stack\ \&\allowbreak{}\&\allowbreak{}\ make\ up} \\
-\texttt{Broken\ pipe} дахин дахин & Галт хана хааж байна & {[}ЗК{]} SETUP.md А.6 \\
-\texttt{No\ route\ to\ host} & Өөр дэд сүлжээ & Хоёуланг нэг свичид кабелиар \\
-\texttt{Error:\allowbreak{}\ Unknown\ configuration\ variable} & Тохиргооны түлхүүр буруу (эсвэл глобал түлхүүрийг bridge хэсэгт бичсэн) & \texttt{mosquitto.\allowbreak{}conf(5)}-тай тулга; \texttt{make\ bridge} дахин ажиллуул \\
-\texttt{address\ 192.\allowbreak{}168.\allowbreak{}1.\allowbreak{}100:\allowbreak{}1883} & \texttt{.env} засаагүй & \texttt{nano\ .env} → CLOUD\_HOST \\
 \end{longtable}\endgroup
 
 \begin{quote}
@@ -71,10 +84,10 @@
 \FunctionTok{grep} \StringTok{\textquotesingle{}\^{}topic\textquotesingle{}}\NormalTok{ edge/mosquitto/conf.d/bridge.conf}
 
 \CommentTok{\# [Pi] агент юу нийтэлж байна}
-\FunctionTok{grep} \AttributeTok{{-}E} \StringTok{\textquotesingle{}\^{}(SITE|AREA|LINE|DEVICE\_ID)=\textquotesingle{}}\NormalTok{ edge/.env}
+\FunctionTok{grep}\NormalTok{ {-}E }\StringTok{\textquotesingle{}\^{}(SITE|AREA|LINE|DEVICE\_ID)=\textquotesingle{}}\NormalTok{ edge/.env}
 
 \CommentTok{\# [Pi] локал брокер дээр бодитоор юу байна}
-\ExtensionTok{mosquitto\_sub} \AttributeTok{{-}h}\NormalTok{ localhost }\AttributeTok{{-}t} \StringTok{\textquotesingle{}\#\textquotesingle{}} \AttributeTok{{-}v} \AttributeTok{{-}W}\NormalTok{ 5}
+\ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}\#\textquotesingle{}}\NormalTok{ {-}v {-}W 5}
 \end{Highlighting}
 \end{Shaded}
 
@@ -87,30 +100,47 @@
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{docker}\NormalTok{ inspect cnc302{-}mosquitto }\AttributeTok{{-}{-}format} \StringTok{\textquotesingle{}\{\{.State.OOMKilled\}\}\textquotesingle{}}   \CommentTok{\# true бол OOM}
-\FunctionTok{dmesg} \KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}i} \StringTok{\textquotesingle{}killed process\textquotesingle{}} \KeywordTok{|} \FunctionTok{tail} \AttributeTok{{-}5}
-\FunctionTok{free} \AttributeTok{{-}m}
+\ExtensionTok{docker}\NormalTok{ inspect cnc302{-}mosquitto {-}{-}format }\StringTok{\textquotesingle{}\{\{.State.OOMKilled\}\}\textquotesingle{}}\NormalTok{   \# true бол OOM}
+\FunctionTok{dmesg} \KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}i }\StringTok{\textquotesingle{}killed process\textquotesingle{}} \KeywordTok{|} \FunctionTok{tail}\NormalTok{ {-}5}
+\FunctionTok{free}\NormalTok{ {-}m}
 \end{Highlighting}
 \end{Shaded}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Шалтгаан
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шийдэл
-\end{minipage} \\
+\begin{minipage}[b]{0.47\columnwidth}\raggedright
+Шалтгаан\strut
+\end{minipage} & \begin{minipage}[b]{0.47\columnwidth}\raggedright
+Шийдэл\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+Swap тохируулаагүй\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+SETUP.md Б.5\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{MemTotal} хүлээснээс бага\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+SETUP.md Б.3 --- \texttt{gpu\_mem}-ийн нөлөөг хэмж (legacy тохиргоо, үр дүн баталгаагүй)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+VS Code сервер ажиллаж байна\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{pkill\ -f\ vscode-server}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+Ширээний орчинтой OS суулгасан\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+Lite (64-bit) дахин суулга\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+Үүлний үйлчилгээг Pi дээр асаах гэсэн\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+СТОП: Битгий. \texttt{stack/} нь \textbf{компьютер дээр}.\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-Swap тохируулаагүй & SETUP.md Б.5 \\
-\texttt{MemTotal} хүлээснээс бага & SETUP.md Б.3 --- \texttt{gpu\_mem}-ийн нөлөөг хэмж (legacy тохиргоо, үр дүн баталгаагүй) \\
-VS Code сервер ажиллаж байна & \texttt{pkill\ -f\ vscode-server} \\
-Ширээний орчинтой OS суулгасан & Lite (64-bit) дахин суулга \\
-Үүлний үйлчилгээг Pi дээр асаах гэсэн & СТОП: Битгий. \texttt{stack/} нь \textbf{компьютер дээр}. \\
 \end{longtable}\endgroup
 
 \hypertarget{exec-format-error-ux44dux441ux432ux44dux43b-no-matching-manifest}{%
@@ -120,8 +150,8 @@ Pi 3B нь \textbf{arm64}. 32-bit OS суулгасан бол олон дүрс
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{uname} \AttributeTok{{-}m}          \CommentTok{\# aarch64 байх ЁСТОЙ. armv7l бол 64{-}bit OS дахин суулга.}
-\ExtensionTok{docker}\NormalTok{ manifest inspect eclipse{-}mosquitto:2.0.22 }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}A2}\NormalTok{ arm64}
+\FunctionTok{uname}\NormalTok{ {-}m          \# aarch64 байх ЁСТОЙ. armv7l бол 64{-}bit OS дахин суулга.}
+\ExtensionTok{docker}\NormalTok{ manifest inspect eclipse{-}mosquitto:2.0.22 }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}A2 arm64}
 \end{Highlighting}
 \end{Shaded}
 
@@ -135,27 +165,53 @@ Pi 3B нь \textbf{arm64}. 32-bit OS суулгасан бол олон дүрс
 \end{Highlighting}
 \end{Shaded}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Утга
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Утга нь юу вэ
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Үйлдэл
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Утга\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Утга нь юу вэ\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Үйлдэл\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{0x0}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+хэвийн\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+цааш үргэлжлүүл\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{0x50000}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+ӨМНӨ НЬ хүчдэл дутсан (бит 16) + throttling болсон (бит 18)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+тэжээлийг шалга, дахин асаагаад дахин хэмж\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{0x50005}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+ЯГ ОДОО хүчдэл дутуу (бит 0) + throttled (бит 2), өмнө нь ч мөн\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+тэжээлээ соль (5 V / 2.5 A)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{0x40000} / \texttt{0x4}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+өмнө нь / одоо throttled (хүчдэл биш)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+хөргөгч, сэнс тавь\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+темп \textgreater{} 80 °C\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+албан ёсны баримтаар 80--85 °C-д давтамж буурна\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+хөргөгч, сэнс тавь\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-\texttt{0x0} & хэвийн & цааш үргэлжлүүл \\
-\texttt{0x50000} & ӨМНӨ НЬ хүчдэл дутсан (бит 16) + throttling болсон (бит 18) & тэжээлийг шалга, дахин асаагаад дахин хэмж \\
-\texttt{0x50005} & ЯГ ОДОО хүчдэл дутуу (бит 0) + throttled (бит 2), өмнө нь ч мөн & тэжээлээ соль (5 V / 2.5 A) \\
-\texttt{0x40000} / \texttt{0x4} & өмнө нь / одоо throttled (хүчдэл биш) & хөргөгч, сэнс тавь \\
-темп \textgreater{} 80 °C & албан ёсны баримтаар 80--85 °C-д давтамж буурна & хөргөгч, сэнс тавь \\
 \end{longtable}\endgroup
 
 \textbf{Throttling эхэлсэн хэмжилтийг тайланд бичиж болохгүй.} Хаяад дахин хий.
@@ -174,8 +230,8 @@ InfluxDB 3-ийн CLI түргэн өөрчлөгддөг. Нөөц хувилб
 \begin{Highlighting}[]
 \CommentTok{\# [ЗК] компьютер дээр}
 \BuiltInTok{cd}\NormalTok{ stack}
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}f}\NormalTok{ docker{-}compose.yml }\AttributeTok{{-}f}\NormalTok{ docker{-}compose.influx2.yml }\DataTypeTok{\textbackslash{}}
-  \AttributeTok{{-}{-}profile}\NormalTok{ core up }\AttributeTok{{-}d}
+\ExtensionTok{docker}\NormalTok{ compose {-}f docker{-}compose.yml {-}f docker{-}compose.influx2.yml }\KeywordTok{\textbackslash{}}
+  \ExtensionTok{{-}{-}profile}\NormalTok{ core up {-}d}
 \end{Highlighting}
 \end{Shaded}
 
@@ -197,7 +253,7 @@ InfluxDB 2.7-д API өөр: \texttt{/\allowbreak{}api/\allowbreak{}v2/\allowbrea
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\BuiltInTok{cd}\NormalTok{ edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ venv        }\CommentTok{\# .venv үүсгэж хамаарлыг суулгана}
+\BuiltInTok{cd}\NormalTok{ edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ venv        \# .venv үүсгэж хамаарлыг суулгана}
 \FunctionTok{make}\NormalTok{ agent}
 \end{Highlighting}
 \end{Shaded}
@@ -206,9 +262,9 @@ InfluxDB 2.7-д API өөр: \texttt{/\allowbreak{}api/\allowbreak{}v2/\allowbrea
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{uname} \AttributeTok{{-}m}                      \CommentTok{\# aarch64 байх ЁСТОЙ}
-\ExtensionTok{.venv/bin/pip}\NormalTok{ install }\AttributeTok{{-}{-}upgrade}\NormalTok{ pip}
-\ExtensionTok{.venv/bin/pip}\NormalTok{ install }\AttributeTok{{-}{-}only{-}binary}\OperatorTok{=}\NormalTok{:all: }\AttributeTok{{-}r}\NormalTok{ agent/requirements.txt}
+\FunctionTok{uname}\NormalTok{ {-}m                      \# aarch64 байх ЁСТОЙ}
+\ExtensionTok{.venv/bin/pip}\NormalTok{ install {-}{-}upgrade pip}
+\ExtensionTok{.venv/bin/pip}\NormalTok{ install {-}{-}only{-}binary=:all: {-}r agent/requirements.txt}
 \end{Highlighting}
 \end{Shaded}
 
@@ -217,7 +273,7 @@ InfluxDB 2.7-д API өөр: \texttt{/\allowbreak{}api/\allowbreak{}v2/\allowbrea
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{docker}\NormalTok{ info }\AttributeTok{{-}{-}format} \StringTok{\textquotesingle{}\{\{.MemTotal\}\}\textquotesingle{}} \KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}\{printf "\%.1f GB\textbackslash{}n", $1/1024/1024/1024\}\textquotesingle{}}
+\ExtensionTok{docker}\NormalTok{ info {-}{-}format }\StringTok{\textquotesingle{}\{\{.MemTotal\}\}\textquotesingle{}} \KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}\{printf "\%.1f GB\textbackslash{}n", $1/1024/1024/1024\}\textquotesingle{}}
 \end{Highlighting}
 \end{Shaded}
 
@@ -228,7 +284,7 @@ InfluxDB 2.7-д API өөр: \texttt{/\allowbreak{}api/\allowbreak{}v2/\allowbrea
 \begin{Shaded}
 \begin{Highlighting}[]
 \ExtensionTok{docker}\NormalTok{ compose stop nodered grafana dex graphql{-}api}
-\ExtensionTok{docker}\NormalTok{ compose }\AttributeTok{{-}{-}profile}\NormalTok{ ai up }\AttributeTok{{-}d}\NormalTok{ ollama}
+\ExtensionTok{docker}\NormalTok{ compose {-}{-}profile ai up {-}d ollama}
 \ExtensionTok{docker}\NormalTok{ compose exec ollama ollama pull qwen2.5:1.5b}
 \end{Highlighting}
 \end{Shaded}
@@ -241,40 +297,90 @@ K3s \textbf{server} нь зөөврийн компьютер дээрх VM, Pi �
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [VM] VM дээр}
-\ExtensionTok{kubectl}\NormalTok{ get nodes }\AttributeTok{{-}o}\NormalTok{ wide }\AttributeTok{{-}L}\NormalTok{ kubernetes.io/arch,cnc302/layer}
-\ExtensionTok{kubectl} \AttributeTok{{-}n}\NormalTok{ cnc302 describe pod }\OperatorTok{\textless{}}\NormalTok{нэр}\OperatorTok{\textgreater{}} \KeywordTok{|} \FunctionTok{tail} \AttributeTok{{-}25}
+\ExtensionTok{kubectl}\NormalTok{ get nodes {-}o wide {-}L kubernetes.io/arch,cnc302/layer}
+\ExtensionTok{kubectl}\NormalTok{ {-}n cnc302 describe pod }\OperatorTok{\textless{}}\NormalTok{нэр}\OperatorTok{\textgreater{}} \KeywordTok{|} \FunctionTok{tail}\NormalTok{ {-}25}
 \ExtensionTok{kubectl}\NormalTok{ top nodes}
-\ExtensionTok{kubectl}\NormalTok{ top pods }\AttributeTok{{-}n}\NormalTok{ cnc302}
+\ExtensionTok{kubectl}\NormalTok{ top pods {-}n cnc302}
 \CommentTok{\# [Pi] Pi дээр}
-\FunctionTok{sudo}\NormalTok{ journalctl }\AttributeTok{{-}u}\NormalTok{ k3s{-}agent }\AttributeTok{{-}n}\NormalTok{ 50}
+\FunctionTok{sudo}\NormalTok{ journalctl {-}u k3s{-}agent {-}n 50}
 \end{Highlighting}
 \end{Shaded}
 
-\begingroup\scriptsize\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{\linewidth}\raggedright
-Шинж
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шалтгаан
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Шийдэл
-\end{minipage} \\
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шинж\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шалтгаан\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Шийдэл\strut
+\end{minipage}\tabularnewline
 \midrule
 \endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Pod \texttt{Pending}, \texttt{didn\textquotesingle{}t\ match\ Pod\textquotesingle{}s\ node\ affinity/selector}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Pi-д \texttt{cnc302/layer} шошго алга\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{kubectl\ label\ nodes\ \textless{}pi\textgreater{}\ cnc302/\allowbreak{}layer=\allowbreak{}edge}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{edge-agent} эхлэхгүй, Events-д дүрсний алдаа\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+дүрс Pi-д импортлогдоогүй (\texttt{imagePullPolicy:\allowbreak{}\ Never})\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+компьютер дээр \texttt{docker\ save\ -\/\allowbreak{}-platform\ linux/\allowbreak{}arm64\ -o\ edge-agent-v1-arm64.\allowbreak{}tar\ cnc302/\allowbreak{}edge-agent:\allowbreak{}v1} → Pi-гийн \texttt{/\allowbreak{}var/\allowbreak{}lib/\allowbreak{}rancher/\allowbreak{}k3s/\allowbreak{}agent/\allowbreak{}images/\allowbreak{}} руу хуул; \texttt{sudo\ k3s\ ctr\ images\ ls\ \textbackslash{}\textbar{}\ grep\ edge-agent}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Pi дээрх pod DNS нэр шийдэж чадахгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+VM ↔ Pi хооронд \textbf{8472/udp} (Flannel VXLAN) хаагдсан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+галт ханаар 8472/udp нээ (зөвхөн LAN дотор)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{kubectl\ top\ nodes} дээр Pi гарахгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{10250/tcp} (kubelet) хаагдсан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+10250/tcp нээ\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+VM-ийн INTERNAL-IP \texttt{10.0.2.x}, Pi нэгдэхгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+VM NAT адаптертай\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+VirtualBox → Adapter 1 = \textbf{Bridged}, NAT-ыг хас, K3s-ийг дахин суулга\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{bridge/state} 0/1 анивчина, EMQX-д ижил client ID\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Pi дээр Compose-ийн mosquitto гүүр K3s-ийн pod-той зэрэг ажиллаж байна\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+{[}Pi{]} \texttt{cd\ \textasciitilde{}/cnc302/edge\ \&\&\ docker\ compose\ down}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{OOMKilled}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Pi-д бодит сул RAM дууссан (reserved алга тул товлогч мэдэхгүй)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+хувийн тоог бууруул; Docker-ийг зогсоо (\texttt{sudo\ systemctl\ stop\ docker.\allowbreak{}socket\ docker})\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+traefik/servicelb-ийг унтраах гэж "дахин суулгах"\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Энэ бол \textbf{server VM}-ийн тохиргоо, Pi биш\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Pi дээр юу ч хийхгүй --- \texttt{lab08/\allowbreak{}k3s/\allowbreak{}README.\allowbreak{}md}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+metrics-server байхгүй → HPA \texttt{\textless{}unknown\textgreater{}}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+metrics-server унтарсан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+metrics-server-ийг битгий унтраа\strut
+\end{minipage}\tabularnewline
 \bottomrule
-\endlastfoot
-Pod \texttt{Pending}, \texttt{didn\textquotesingle{}t\ match\ Pod\textquotesingle{}s\ node\ affinity/selector} & Pi-д \texttt{cnc302/layer} шошго алга & \texttt{kubectl\ label\ nodes\ \textless{}pi\textgreater{}\ cnc302/\allowbreak{}layer=\allowbreak{}edge} \\
-\texttt{edge-agent} эхлэхгүй, Events-д дүрсний алдаа & дүрс Pi-д импортлогдоогүй (\texttt{imagePullPolicy:\allowbreak{}\ Never}) & компьютер дээр \texttt{docker\ save\ -\/\allowbreak{}-platform\ linux/\allowbreak{}arm64\ -o\ edge-agent-v1-arm64.\allowbreak{}tar\ cnc302/\allowbreak{}edge-agent:\allowbreak{}v1} → Pi-гийн \texttt{/\allowbreak{}var/\allowbreak{}lib/\allowbreak{}rancher/\allowbreak{}k3s/\allowbreak{}agent/\allowbreak{}images/\allowbreak{}} руу хуул; \texttt{sudo\ k3s\ ctr\ images\ ls\ \textbackslash{}\textbar{}\ grep\ edge-agent} \\
-Pi дээрх pod DNS нэр шийдэж чадахгүй & VM ↔ Pi хооронд \textbf{8472/udp} (Flannel VXLAN) хаагдсан & галт ханаар 8472/udp нээ (зөвхөн LAN дотор) \\
-\texttt{kubectl\ top\ nodes} дээр Pi гарахгүй & \textbf{10250/tcp} (kubelet) хаагдсан & 10250/tcp нээ \\
-VM-ийн INTERNAL-IP \texttt{10.0.2.x}, Pi нэгдэхгүй & VM NAT адаптертай & VirtualBox → Adapter 1 = \textbf{Bridged}, NAT-ыг хас, K3s-ийг дахин суулга \\
-\texttt{bridge/state} 0/1 анивчина, EMQX-д ижил client ID & Pi дээр Compose-ийн mosquitto гүүр K3s-ийн pod-той зэрэг ажиллаж байна & {[}Pi{]} \texttt{cd\ \textasciitilde{}/cnc302/edge\ \&\&\ docker\ compose\ down} \\
-\texttt{OOMKilled} & Pi-д бодит сул RAM дууссан (reserved алга тул товлогч мэдэхгүй) & хувийн тоог бууруул; Docker-ийг зогсоо (\texttt{sudo\ systemctl\ stop\ docker.\allowbreak{}socket\ docker}) \\
-traefik/servicelb-ийг унтраах гэж "дахин суулгах" & Энэ бол \textbf{server VM}-ийн тохиргоо, Pi биш & Pi дээр юу ч хийхгүй --- \texttt{lab08/\allowbreak{}k3s/\allowbreak{}README.\allowbreak{}md} \\
-metrics-server байхгүй → HPA \texttt{\textless{}unknown\textgreater{}} & metrics-server унтарсан & metrics-server-ийг битгий унтраа \\
 \end{longtable}\endgroup
 
 \hypertarget{git-pi-ux431ux430-ux43aux43eux43cux43fux44cux44eux442ux435ux440-ux434ux44dux44dux440ux445-ux445ux443ux432ux438ux43bux431ux430ux440-ux437ux4e9ux440ux4e9ux432}{%
@@ -285,11 +391,11 @@ metrics-server байхгүй → HPA \texttt{\textless{}unknown\textgreater{}} 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# [Pi] Pi дээр}
-\FunctionTok{git}\NormalTok{ status }\AttributeTok{{-}{-}short}          \CommentTok{\# засвар байвал commit хийж push хийнэ}
-\FunctionTok{git}\NormalTok{ add }\AttributeTok{{-}A} \KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Лаб N: Pi дээрх засвар"} \KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push}
+\FunctionTok{git}\NormalTok{ status {-}{-}short          \# засвар байвал commit хийж push хийнэ}
+\FunctionTok{git}\NormalTok{ add {-}A }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ commit {-}m }\StringTok{"Лаб N: Pi дээрх засвар"} \KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push}
 
 \CommentTok{\# [ЗК] компьютер дээр}
-\FunctionTok{git}\NormalTok{ pull }\AttributeTok{{-}{-}rebase}
+\FunctionTok{git}\NormalTok{ pull {-}{-}rebase}
 \end{Highlighting}
 \end{Shaded}
 
@@ -300,8 +406,8 @@ metrics-server байхгүй → HPA \texttt{\textless{}unknown\textgreater{}} 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{git}\NormalTok{ rm }\AttributeTok{{-}{-}cached}\NormalTok{ stack/.env edge/mosquitto/conf.d/bridge.conf lab02/out/devices.csv}
-\FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Нууц файлыг устгав"}
+\FunctionTok{git}\NormalTok{ rm {-}{-}cached stack/.env edge/mosquitto/conf.d/bridge.conf lab02/out/devices.csv}
+\FunctionTok{git}\NormalTok{ commit {-}m }\StringTok{"Нууц файлыг устгав"}
 \end{Highlighting}
 \end{Shaded}
 
