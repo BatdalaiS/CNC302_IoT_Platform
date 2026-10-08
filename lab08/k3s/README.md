@@ -258,7 +258,7 @@ kubectl -n cnc302 logs -f deploy/edge-agent
 ```bash
 # 💻 зөөврийн компьютер
 mosquitto_sub -h localhost -t 'cnc302/shutis/#' -v -C 10
-mosquitto_sub -h localhost -t 'cnc302/shutis/mhts/lab/pi3b-01/bridge/state' -v -C 1   # 1 = холбогдсон
+mosquitto_sub -h localhost -t 'cnc302/shutis/mhts/lab/<DEVICE_ID>/bridge/state' -v -C 1   # 1 = холбогдсон
 ```
 
 ---

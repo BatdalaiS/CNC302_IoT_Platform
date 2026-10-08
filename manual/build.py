@@ -209,14 +209,14 @@ def postprocess(tex: str) -> str:
         # боломж нэмнэ (жишээ: http://influxdb:8181/api/v3/write_lp?db=…).
         # \allowbreak нь зөвхөн БОЛОМЖ өгнө — шаардлагагүй бол таслахгүй.
         if len(inner) > 16:
-            for sep in ("/", "?", "\\&", "=", ":", "."):
+            for sep in ("/", "?", "\\&", "=", ":", ".", "\\textbackslash{}"):
                 inner = inner.replace(sep, sep + "\\allowbreak{}")
             if "\\_\\allowbreak" not in inner:
                 inner = inner.replace("\\_", "\\_\\allowbreak{}")
         return "\\texttt{" + inner + "}"
     # pandoc нь <, >, [, ], … тэмдэгтийг \textless{}, \textgreater{}, {[}, {]}, \ldots{}
     # болгодог — эдгээр хаалт ч таарах ёстой, эс бөгөөс урт texttt алгасагдана.
-    TT_INNER = r"(?:[^{}]|\\[{}_&%#$]|\\text(?:less|greater)\{\}|\\ldots\{\}|\{\[\}|\{\]\})*"
+    TT_INNER = r"(?:[^{}]|\\[{}_&%#$]|\\text(?:less|greater)\{\}|\\ldots\{\}|\\textbackslash\{\}|\{\[\}|\{\]\})*"
     tex = re.sub(r"\\texttt\{(" + TT_INNER + r")\}", brk, tex)
     # \texttt{a}/\texttt{b}/… дарааллын "/"-ийн дараа таслах боломж
     tex = tex.replace("}/\\texttt{", "}/\\allowbreak\\texttt{")

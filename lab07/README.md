@@ -23,24 +23,92 @@
 
 ---
 
-## 2. Урьдчилсан нөхцөл
+## 2. Урьдчилсан нөхцөл ба бэлтгэл (15 мин)
 
-- Лаб 1–6 дууссан, `lab06-done` tag тавигдсан
-- Бие даалт XIV: OAuth2 / OIDC-ийн authorization code урсгалыг уншсан
+- Лаб 1–6 дууссан, `lab06-done` tag тавигдсан. Лаб 2-ын authenticator унтраалттай (`authn false`).
+- Бие даалт XIV: OAuth2 / OIDC-ийн authorization code урсгалыг уншсан.
 
+> 💡 **Алхмуудыг дарааллаар нь хий.** Алхам бүрийн төгсгөлд ✅ **Шалгах** хэсэг бий. Үр дүн нь таарахгүй бол **цааш бүү яв** — ❌ мөр эсвэл §8-аас шалтгааныг ол.
+
+### 2.1 Терминалууд
+
+Энэ лабын ихэнх ажил **зөөврийн компьютер** дээр. Pi зөвхөн өгөгдөл урсгана.
+
+| Цонх | Хаана | Үүрэг |
+|---|---|---|
+| **[🥧 Pi-1]** | Raspberry Pi (`ssh pi`) | ирмэгийн агент — лабын турш ажиллана |
+| **[💻 Ubuntu-1]** | Зөөврийн компьютер (WSL) | `curl`, `security_tests.py`, засвар |
+| **[💻 Ubuntu-2]** | Зөөврийн компьютер (WSL) | симулятор, лог |
+
+### 2.2 Орчноо бэлтгэх — **цонх нээх бүрт** ажиллуулна
+
+**[💻 Ubuntu-1]** ба **[💻 Ubuntu-2]**
 ```bash
-# 💻 үүлний давхаргыг app профайлтай асаана
-cd ~/cnc302/stack && docker compose --profile core --profile pipeline --profile app up -d --build
-make health                                          # бүх мөр 200
-curl -s localhost:8000/health | jq                   # {"status":"ok","checks":{...200}}
-curl -s localhost:5556/dex/.well-known/openid-configuration | jq .issuer
-
-# 🥧 Pi дээр агент ажиллаж, өгөгдөл урсаж байх ёстой
-cd ~/cnc302/edge && make up && make link             # bridge/state 1
+cd ~/cnc302 && source .venv/bin/activate
+tok() { curl -s -u cnc302:cnc302-lab-secret http://localhost:5556/dex/token \
+  --data-urlencode grant_type=password --data-urlencode scope='openid email profile groups' \
+  --data-urlencode username="$1@cnc302.mn" --data-urlencode password=cnc302 \
+  | jq -r .id_token; }
 ```
 
-Бүртгэлд төхөөрөмж байхгүй бол Лаб 2-ын bulk бүртгэлийг 💻 дээр дахин ажиллуул:
-`python3 lab02/provision.py bulk --count 50 --prefix dev --out lab02/out/devices.csv`
+`tok viewer` / `tok operator` / `tok admin` нь Dex-ээс тухайн хэрэглэгчийн ID токеныг авна (Алхам 2.1-д дэлгэрэнгүй).
+
+### 2.3 Нэг удаагийн бэлтгэл
+
+**[💻 Ubuntu-1]**
+```bash
+git pull
+pip install -r tools/requirements.txt websocket-client
+mkdir -p lab07/out
+```
+
+### 2.4 `app` профайлыг асаах
+
+`graphql-api` анх удаа баригдана (2–4 мин):
+
+**[💻 Ubuntu-1]**
+```bash
+cd ~/cnc302/stack
+docker compose --profile core --profile pipeline --profile app up -d --build
+sleep 20
+make health
+curl -s localhost:8000/health | jq
+curl -s localhost:5556/dex/.well-known/openid-configuration | jq .issuer
+cd ~/cnc302
+```
+
+✅
+- `make health` дөрвөн мөр `200`,
+- `/health` → `{"status":"ok","checks":{…: 200}}`,
+- issuer → `"http://dex:5556/dex"`.
+
+❌ `curl: (7) Failed to connect … 8000` → `docker compose logs graphql-api | tail -30` (§8).
+
+### 2.5 Өгөгдөл урсгах
+
+**[🥧 Pi-1]**
+```bash
+cd ~/cnc302/edge && make up && make agent
+```
+
+**[💻 Ubuntu-2]** — нэмэлт төхөөрөмжүүд (`dev0001` … `dev0005`):
+```bash
+python tools/sim_device.py --target cloud --host localhost --devices 5 --interval 2
+```
+
+Энэ хоёр цонх **лабын турш** ажиллана.
+
+### 2.6 Бүртгэлд төхөөрөмж байгаа эсэх
+
+**[💻 Ubuntu-1]**
+```bash
+curl -s 'localhost:8090/devices?limit=5' | jq '.devices | length'
+```
+
+✅ `5`. ❌ `0` бол Лаб 2-ын bulk бүртгэлийг дахин ажиллуул:
+```bash
+python lab02/provision.py bulk --count 50 --prefix dev --out lab02/out/devices.csv
+```
 
 ---
 
@@ -78,32 +146,75 @@ GraphQL :8000 ──┬──► registry :8090   төхөөрөмж, firmware, 
 
 ## 4. Алхмууд
 
+| Алхам | Юу хийх | Мин | Хүснэгт |
+|---|---|---|---|
+| 1 | Бэлтгэл ба схем судлах | 15 | — |
+| 2 | OIDC токен ба үүргийн эх сурвалж | 35 | 7.1, 7.2 |
+| 3 | REST ба GraphQL | 45 | 7.3 |
+| 4 | `deviceStats` ба нэгтгэлийн байрлал | 30 | 7.4 |
+| 5 | Polling ба WebSocket | 25 | 7.5 |
+| 6 | Аюулгүй байдлын шалгалт | 30 | 7.6 |
+| 7 | Засах ба дахин шалгах | 45 | 7.7 |
+| 8 | InfluxDB ба Zero Trust | 10 | 7.8 |
+| 9 | Git | 5 | — |
+
+Бүх алхам **[💻 Ubuntu-1]**-д, өөрөөр заагаагүй бол. API-гийн код: `lab07/graphql-api/main.py` — VS Code-оор нээ: `code lab07/graphql-api/main.py`. **Код засах бүрт** дахин барина:
+
+```bash
+cd ~/cnc302/stack && docker compose --profile app up -d --build graphql-api && cd ~/cnc302
+sleep 10; curl -s localhost:8000/health | jq .status
+```
+
+✅ `"ok"`. ❌ Өөр эсвэл холбогдохгүй бол `docker compose -f stack/docker-compose.yml logs graphql-api | tail -30` — Python-ий алдааны мөрийг (traceback) уншиж засна.
+
+---
+
 ### Алхам 1 — Бэлтгэл ба схемийг судлах (15 мин) 💻
 
-Хөтчөөр `http://localhost:8000/graphql` нээж GraphiQL-ийг үзнэ. Токенгүйгээр зөвхөн `{ whoami }` ажиллана. `{ devices(limit: 5) { id name } }` бичвэл **алдаа** гарна: `'device:read' эрх байхгүй. Таны үүрэг: []`. Энэ бол зөв зан төлөв — Zero Trust-ын анхдагч: **токенгүй хүсэлт нэг ч үүрэггүй**. Тиймээс эхлээд токен авах хэрэгтэй → Алхам 2.
+Windows-ийн хөтчөөр http://localhost:8000/graphql нээж GraphiQL-ийг үзнэ.
 
-Схемийг GraphiQL-ийн Docs самбараас судал: `devices`, `device`, `firmware`, `anomalies`, `deviceStats` (хараахан байхгүй), `sendCommand`.
+**1.1** Зүүн талын засварлагчид бичээд ▶ (Execute) дар:
+```graphql
+{ whoami }
+```
+✅ Хариу ирнэ (үүрэггүй).
+
+**1.2** Одоо:
+```graphql
+{ devices(limit: 5) { id name } }
+```
+✅ **Алдаа**: `'device:read' эрх байхгүй. Таны үүрэг: []`. Энэ бол зөв зан төлөв — Zero Trust-ын анхдагч: **токенгүй хүсэлт нэг ч үүрэггүй**. Тиймээс эхлээд токен авах хэрэгтэй → Алхам 2.
+
+**1.3** Зүүн дээд буланд **Docs** (номын дүрс) дарж схемийг судал: `devices`, `device`, `firmware`, `anomalies`, `deviceStats` (хараахан байхгүй), `sendCommand`.
 
 ---
 
 ### Алхам 2 — OIDC токен ба үүргийн эх сурвалж (35 мин) 💻
 
-**2.1 Токен авах.** Dex-д гурван статик хэрэглэгч бий: `viewer@`, `operator@`, `admin@cnc302.mn`, бүгд нууц үг `cnc302`. Токены endpoint нь `<issuer>/token`, клиент нь `cnc302` / `cnc302-lab-secret` (`stack/dex/config.yaml`). Dex-ийн баримтын жишээний адил клиентийн нууцыг HTTP Basic-ээр (`-u`) илгээнэ:
+**2.1 Токен авах.** Dex-д гурван статик хэрэглэгч бий: `viewer@`, `operator@`, `admin@cnc302.mn`, бүгд нууц үг `cnc302`. Токены endpoint нь `<issuer>/token`, клиент нь `cnc302` / `cnc302-lab-secret` (`stack/dex/config.yaml`). Dex-ийн баримтын жишээний адил клиентийн нууцыг HTTP Basic-ээр (`-u`) илгээнэ — §2.2-ын `tok` функц яг үүнийг хийдэг.
 
+**[💻 Ubuntu-1]**
 ```bash
 curl -s localhost:5556/dex/.well-known/openid-configuration | jq '{issuer, token_endpoint, jwks_uri}'
-tok() { curl -s -u cnc302:cnc302-lab-secret http://localhost:5556/dex/token \
-  --data-urlencode grant_type=password --data-urlencode scope='openid email profile groups' \
-  --data-urlencode username="$1@cnc302.mn" --data-urlencode password=cnc302 \
-  | jq -r .id_token; }
 TOKEN=$(tok admin) && echo "${TOKEN:0:40}…"
 ```
 
+✅ `eyJhbGciOiJSUzI1NiIs…` хэлбэрийн 40 тэмдэгт.
+
+❌ `null…` → `tok` функцийн `| jq -r .id_token`-ийг хасаж алдааг хар: `invalid_grant`/`Invalid username or password` бол `config.yaml`-ийн bcrypt hash нууц үгтэй таарахгүй; `unsupported_grant_type` бол `oauth2.grantTypes`-д `password` нэм.
+
 > Албан ёсны баримт: [Dex — Local connector, Obtaining a token](https://dexidp.io/docs/connectors/local/) · [Dex — OAuth2 grants](https://dexidp.io/docs/configuration/oauth2/). Password grant ажиллахын тулд `enablePasswordDB: true` ба `oauth2.passwordConnector: local` хоёулаа хэрэгтэй. Dex-ийн баримтад энэ grant-ыг *"not recommended"* гэж тэмдэглэсэн (OAuth 2.0 Security BCP) — лабораторид л ашиглана; яагаад гэдгийг тайланд бич.
 
-> `null` буцаавал `curl`-аас `| jq -r .id_token`-ийг хасаж алдааг хар: `invalid_grant`/`Invalid username or password` бол `config.yaml`-ийн bcrypt hash нууц үгтэй таарахгүй; `unsupported_grant_type` бол `oauth2.grantTypes`-д `password` нэм.
+**2.2 Токеныг задлан үзэх.** JWT нь `толгой.ачаалал.гарын үсэг` гурван хэсэгтэй, эхний хоёр нь base64url:
 
-**2.2 Токеныг API-д ашиглах. 2.3 Гурван хэрэглэгчээр давтах:**
+```bash
+echo "$TOKEN" | cut -d. -f1 | base64 -d 2>/dev/null; echo
+echo "$TOKEN" | cut -d. -f2 | base64 -d 2>/dev/null; echo
+```
+
+✅ Толгойд `"alg":"RS256","kid":"…"`; ачаалалд `iss`, `aud`, `exp`, `email`. `alg` ба `kid`-ийг тэмдэглэ. (base64url тул padding дутуу бол сүүлийн хаалт тасарч болно — `jq`-гүйгээр уншина.)
+
+**2.3 Гурван хэрэглэгчээр давтах.**
 
 ```bash
 for U in viewer operator admin; do
@@ -121,9 +232,9 @@ done
 | operator@cnc302.mn | | | |
 | admin@cnc302.mn | | | |
 
-Токеныг задлан үзэх: `echo "$TOKEN" | cut -d. -f2 | base64 -d 2>/dev/null | jq` (base64url тул padding дутуу бол `jq` алдаа өгч болно). Толгой: `echo "$TOKEN" | cut -d. -f1 | base64 -d 2>/dev/null` — `alg` ба `kid`-ийг тэмдэглэ.
+**Ажиглалт:** Dex-ийн статик хэрэглэгчид (`staticPasswords`: `email`, `hash`, `username`, `userID` — [Dex local connector](https://dexidp.io/docs/connectors/local/)) бүлгийн мэдээлэлгүй тул `groups` scope хүссэн ч токенд `groups` **ирэхгүй**. `decode_token` нь `groups` олдохгүй бол `["viewer"]`-д унана — тиймээс **гурвуулаа viewer** болно.
 
-**Ажиглалт:** Dex-ийн статик хэрэглэгчид (`staticPasswords`: `email`, `hash`, `username`, `userID` — [Dex local connector](https://dexidp.io/docs/connectors/local/)) бүлгийн мэдээлэлгүй тул `groups` scope хүссэн ч токенд `groups` **ирэхгүй**. `decode_token` нь `groups` олдохгүй бол `["viewer"]`-д унана — тиймээс **гурвуулаа viewer** болно. **2.4:** хоёр шийдлийг харьцуулж, нэгийг нь хэрэгжүүл.
+**2.4 Үүргийн эх сурвалжийг сонгож хэрэгжүүлэх.** Хоёр шийдлийг харьцуулж, нэгийг нь хэрэгжүүл.
 
 #### Хүснэгт 7.2 — Үүргийн эх сурвалжийн сонголт
 
@@ -135,11 +246,27 @@ done
 | Үйлдвэрлэлд тохирох уу | | |
 | **Бидний сонголт ба шалтгаан** | | |
 
-Лабораторийн цагт (б)-г хэрэгжүүлэх нь бодитой: `decode_token`-д `claims.get("email")`-ээс `admin@` → `admin`, `operator@` → `operator` зурвасжуулна. Гэхдээ тайландаа **(а) яагаад илүү зөв болохыг** заавал бич.
+Лабораторийн цагт (б)-г хэрэгжүүлэх нь бодитой: `main.py`-ийн `decode_token`-д `roles = …` мөрийн **дараа** нэмнэ:
+
+```python
+    email = claims.get("email", "")
+    if email.startswith("admin@"):
+        roles = ["admin"]
+    elif email.startswith("operator@"):
+        roles = ["operator"]
+```
+
+Дахин барьж (дээрх команд), 2.3-ыг давт.
+
+✅ `viewer → roles=viewer`, `operator → roles=operator`, `admin → roles=admin`. Тайландаа **(а) яагаад илүү зөв болохыг** заавал бич.
 
 ---
 
 ### Алхам 3 — REST ба GraphQL-ийн харьцуулалт (45 мин) 💻
+
+```bash
+TOKEN=$(tok admin)
+```
 
 **3.1 GraphQL — нэг хүсэлт:**
 
@@ -148,9 +275,12 @@ time curl -s -X POST localhost:8000/graphql -H "Authorization: Bearer $TOKEN" \
   -H 'Content-Type: application/json' -o /tmp/gql5.json \
   -d '{"query":"{ devices(limit:5){ name state readings(limit:10){ time temperature vibrationRms } } }"}'
 wc -c /tmp/gql5.json
+jq '.data.devices[0]' /tmp/gql5.json
 ```
 
-**3.2 REST — 1 + N хүсэлт.** Эхлээд жагсаалт (`/rest/devices` нь ЗӨВХӨН жагсаалт буцаана), дараа нь төхөөрөмж тус бүрийн хэмжилт:
+✅ `real 0m0.XXXs`, файлын хэмжээ, эхний төхөөрөмжийн `readings` массив. ❌ `readings: []` — тухайн төхөөрөмж өгөгдөл илгээгээгүй (§2.5-ын симулятор ажиллаж байна уу?).
+
+**3.2 REST — 1 + N хүсэлт.** Эхлээд жагсаалт (`/rest/devices` нь ЗӨВХӨН жагсаалт буцаана), дараа нь төхөөрөмж тус бүрийн хэмжилт. Блокийг **бүтнээр нь** буулга:
 
 ```bash
 curl -s -H "Authorization: Bearer $TOKEN" \
@@ -162,7 +292,9 @@ done < /tmp/devs.txt) > /tmp/rest5.json
 wc -l /tmp/devs.txt && wc -c /tmp/rest5.json
 ```
 
-**3.3 50 төхөөрөмж дээр давт** (`limit:5` → `limit:50`). Ялгаа шугаман өсөв үү?
+✅ `/tmp/devs.txt` 5 мөр; REST хүсэлтийн тоо = 1 + 5.
+
+**3.3 50 төхөөрөмж дээр давт** — 3.1-д `limit:5` → `limit:50`, 3.2-т `limit=5` → `limit=50`, файлын нэрийг `gql50`, `rest50` болго. Ялгаа шугаман өсөв үү?
 
 #### Хүснэгт 7.3 — REST ба GraphQL
 
@@ -181,10 +313,10 @@ wc -l /tmp/devs.txt && wc -c /tmp/rest5.json
 
 ### Алхам 4 — `deviceStats` ба нэгтгэлийн байрлал (30 мин) 💻
 
-`main.py` дотор `# TODO(оюутан)` гэсэн тэмдэглэгээ бий. Дараах талбарыг нэмнэ:
+**4.1** `main.py` дотор `# TODO(оюутан): deviceStats(...)` гэсэн тэмдэглэгээг ол (VS Code: `Ctrl + F` → `deviceStats`). Дараах талбарыг нэмнэ:
 
 ```graphql
-{ deviceStats(device: "dev0001", hours: 24) { avg min max samples } }
+{ deviceStats(device: "dev0003", hours: 24) { avg min max samples } }
 ```
 
 **Дүрэм:** нэгтгэлийг **InfluxDB-д хийлгэнэ** (SQL-ийн `avg/min/max/count`), Python дээр биш:
@@ -195,9 +327,18 @@ SELECT avg(temperature) AS avg, min(temperature) AS min, max(temperature) AS max
 FROM telemetry WHERE device = '<...>' AND time > now() - INTERVAL '24 hours'
 ```
 
-Дараа нь дахин барина: `docker compose --profile app up -d --build graphql-api`
+(`'<...>'`-ийн оронд Алхам 7.3-ын **параметржүүлсэн** хэлбэрийг одооноос хэрэглэвэл илүү.)
 
-**Хоёр хувилбарыг хэмж:** (а) SQL-д нэгтгэх, (б) бүх мөрийг татаад Python дээр нэгтгэх.
+**4.2** Дахин барьж (§4-ийн эхэнд), GraphiQL-д эсвэл `curl`-ээр шалга:
+
+```bash
+curl -s -X POST localhost:8000/graphql -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"query":"{ deviceStats(device:\"dev0003\", hours:24){ avg min max samples } }"}' | jq
+```
+
+✅ `samples` > 0 ба `min ≤ avg ≤ max`.
+
+**4.3 Хоёр хувилбарыг хэмж:** (а) SQL-д нэгтгэх, (б) бүх мөрийг татаад Python дээр нэгтгэх (тусдаа `deviceStatsPy` талбар болгож туршиж болно). `time curl …`-аар хугацааг, `wc -c`-ээр хэмжээг ав.
 
 #### Хүснэгт 7.4 — Нэгтгэлийг хаана хийх вэ
 
@@ -214,7 +355,7 @@ FROM telemetry WHERE device = '<...>' AND time > now() - INTERVAL '24 hours'
 
 ### Алхам 5 — Бодит хугацааны шинэчлэл: polling ба WebSocket (25 мин) 💻
 
-**5.1 Одоогийн байдал — polling.** 1 секунд тутам асуух:
+**5.1 Одоогийн байдал — polling.** 1 секунд тутам асуух (60 сек). Блокийг **бүтнээр нь** буулга:
 
 ```bash
 timeout 60 bash -c 'while true; do
@@ -224,19 +365,23 @@ timeout 60 bash -c 'while true; do
 done' | tr ' ' '\n' | awk '{s+=$1; n++} END {print n " хүсэлт, " s " байт"}'
 ```
 
+✅ 60 секундын дараа `≈60 хүсэлт, NNNN байт`.
+
 **5.2 ОЮУТНЫ ДААЛГАВАР — WebSocket.** `main.py` дотор одоо WebSocket **байхгүй**. Хоёр замын аль нэгийг сонгож нэмнэ:
 
 - (а) Strawberry-гийн `@strawberry.subscription` (async generator буцаадаг resolver) + `strawberry.Schema(..., subscription=Subscription)`. `GraphQLRouter` анхдагчаар `graphql-transport-ws` ба хуучин `graphql-ws` хоёр протоколыг хоёуланг нь идэвхжүүлсэн байдаг ([Strawberry — Subscriptions](https://strawberry.rocks/docs/general/subscriptions), [FastAPI integration](https://strawberry.rocks/docs/integrations/fastapi)).
-- (б) FastAPI-гийн `@app.websocket("/ws/telemetry")` — `await websocket.accept()`, дараа нь `await websocket.send_text(...)`; клиент салахад `WebSocketDisconnect` шидэгдэнэ ([FastAPI — WebSockets](https://fastapi.tiangolo.com/advanced/websockets/)). EMQX-д paho-mqtt-ээр захиалж, ирсэн мессежийг клиент рүү түлхэнэ. paho-гийн callback тусдаа thread-д ажилладаг тул мессежийг `asyncio.Queue`-д `loop.call_soon_threadsafe(queue.put_nowait, msg)`-ээр дамжуул.
+- (б) FastAPI-гийн `@app.websocket("/ws/telemetry")` — `await websocket.accept()`, дараа нь `await websocket.send_text(...)`; клиент салахад `WebSocketDisconnect` шидэгдэнэ ([FastAPI — WebSockets](https://fastapi.tiangolo.com/advanced/websockets/)). EMQX-д paho-mqtt-ээр захиалж (контейнер дотроос хаяг нь `emqx:1883`), ирсэн мессежийг клиент рүү түлхэнэ. paho-гийн callback тусдаа thread-д ажилладаг тул мессежийг `asyncio.Queue`-д `loop.call_soon_threadsafe(queue.put_nowait, msg)`-ээр дамжуул. **(б)-д `paho-mqtt>=2.1,<3`-ийг `lab07/graphql-api/requirements.txt`-д нэмэхээ бүү март.**
 
 > WebSocket endpoint-д ч `Depends`, `Header`, `Query` ажилладаг (FastAPI баримт) — **токен шалгахаа бүү март**: Zero Trust нь WebSocket-д ч хамаатай.
 
-(б) нь энэ архитектурт илүү шууд: 🥧 Pi-гийн агент → гүүр → EMQX → API → хөтөч. Дараа нь хэмжинэ:
+(б) нь энэ архитектурт илүү шууд: 🥧 Pi-гийн агент → гүүр → EMQX → API → хөтөч.
+
+**5.3 Хэмжих.** Дахин барьсны дараа (WebSocket-ийн токеныг query параметрээр, `?token=…` гэж хүлээж авсан гэж үзвэл):
 
 ```bash
-python3 - <<'EOF'
-import json, time, websocket        # pip install websocket-client
-ws = websocket.create_connection("ws://localhost:8000/ws/telemetry")
+python - <<EOF
+import time, websocket
+ws = websocket.create_connection("ws://localhost:8000/ws/telemetry?token=$TOKEN")
 t0, n, b = time.time(), 0, 0
 while time.time() - t0 < 60:
     m = ws.recv(); n += 1; b += len(m)
@@ -244,6 +389,8 @@ ws.close()
 print(f"{n} мессеж, {b} байт, 60 сек")
 EOF
 ```
+
+✅ 60 секундын дараа `N мессеж, … байт`. ❌ `Handshake status 404` → endpoint бүртгэгдээгүй / дахин бариагүй; `403` → токен шалгалт татгалзсан.
 
 #### Хүснэгт 7.5 — Polling ба WebSocket (60 секунд, 5 төхөөрөмж)
 
@@ -259,22 +406,25 @@ EOF
 
 `security_tests.py` нь **9 шалгалт** ажиллуулна. Анхаар: `--tb` тугийг `--registry` **орлосон** — ThingsBoard энэ архитектурт байхгүй.
 
+**6.1 Автомат шалгалт.**
+
 ```bash
-mkdir -p lab07/out
-python3 lab07/security_tests.py --api http://localhost:8000 \
+python lab07/security_tests.py --api http://localhost:8000 \
     --influx http://localhost:8181 --registry http://localhost:8090 \
-    --json lab07/out/security-before.json
+    --json lab07/out/security-before.json | tee lab07/out/security-before.txt
 ```
 
 Гаралт **хоёр бүлэгт** тусгаарлагдана:
 
 - **САНААТАЙ ЭМЗЭГ БАЙДАЛ** — `main.py`-ийн `decode_token`-д зориудаар үлдээсэн. **ЯГ 2** байх ёстой; өөр тоо гарвал шалгалт эсвэл API буруу ажиллаж байна.
-- **Дэд бүтцийн ноцтой олдвор** — код биш, тохиргоо. Танилтгүй InfluxDB бол **бодит** асуудал, гэхдээ "тэр хоёрын" нэг **биш**. Энэ ялгааг тайланд заавал хадгал.
+- **Дэд бүтцийн ноцтой олдвор** — код биш, тохиргоо. Танилтгүй InfluxDB бол **бодит** асуудал, гэхдээ «тэр хоёрын» нэг **биш**. Энэ ялгааг тайланд заавал хадгал.
 
-**Гараар давтаж батал** — гарын үсгийн шалгалт:
+✅ `САНААТАЙ ЭМЗЭГ БАЙДАЛ: 2`.
+
+**6.2 Гараар батлах — гарын үсгийн шалгалт.** Блокийг **бүтнээр нь** буулга:
 
 ```bash
-python3 - <<'EOF'
+python - <<'EOF'
 import base64, json, time, httpx
 b = lambda d: base64.urlsafe_b64encode(json.dumps(d).encode()).rstrip(b'=').decode()
 sig = base64.urlsafe_b64encode(b'not-a-real-signature').rstrip(b'=').decode()
@@ -285,9 +435,20 @@ print(r.json())
 EOF
 ```
 
-`roles=admin` гэж гарвал — **та ямар ч нууц үггүйгээр админ боллоо**.
+✅ (засварын **өмнө**) `roles=admin` — **та ямар ч нууц үггүйгээр админ боллоо**.
 
-Хугацаа дууссан токеныг ч давт (`'exp': time.time() - 7200`) — мөн адил `admin` гарах ёстой. Гурав дахь халдлага: 200 давхар нэрлэсэн талбартай нэг асуулга. `security_tests.py` нь эрх шаарддаггүй `a0: whoami … a199: whoami`-г илгээдэг — ингэснээр шалгалт токен ба registry-ээс хамаарахгүй, зөвхөн GraphQL-ийн **валидацийн** хязгаарыг шалгана. Бодит DoS-ийг гараар давт: хүчинтэй `viewer` токентой `a0: devices(limit:50){ name readings(limit:500){ time } } …` илгээж хариу ирэх хугацааг тэмдэглэ.
+**6.3 Хугацаа дууссан токен.** 6.2-ын кодонд `'exp': time.time()+3600`-ийг `'exp': time.time()-7200` болгож давт — мөн адил `admin` гарах ёстой.
+
+**6.4 Нийлмэл байдлын халдлага.** `security_tests.py` нь эрх шаарддаггүй `a0: whoami … a199: whoami`-г илгээдэг — ингэснээр шалгалт токен ба registry-ээс хамаарахгүй, зөвхөн GraphQL-ийн **валидацийн** хязгаарыг шалгана. Бодит DoS-ийг гараар давт: хүчинтэй `viewer` токентой 20 alias бүхий хүнд асуулга:
+
+```bash
+Q=$(python -c "print('{' + ' '.join(f'a{i}: devices(limit:50){{ name readings(limit:500){{ time }} }}' for i in range(20)) + '}')")
+time curl -s -o /dev/null -w '%{http_code} %{size_download}\n' -X POST localhost:8000/graphql \
+  -H "Authorization: Bearer $(tok viewer)" -H 'Content-Type: application/json' \
+  -d "$(jq -n --arg q "$Q" '{query:$q}')"
+```
+
+Хариу ирэх хугацааг тэмдэглэ.
 
 #### Хүснэгт 7.6 — Аюулгүй байдлын 9 шалгалтын бүртгэл ⭐
 
@@ -307,7 +468,9 @@ EOF
 
 ### Алхам 7 — ЗАСАХ ба дахин шалгах (45 мин) 💻
 
-**7.1 Гарын үсэг ба хугацааны шалгалт** (санаатай эмзэг байдал А). `jwt.get_unverified_claims(token)` мөрийг солино. python-jose-ийн `jwt.decode(token, key, algorithms=None, options=None, audience=None, issuer=None, subject=None, access_token=None)` нь `key`-д JWK Set (`{"keys": [...]}`) хүлээн авна ([python-jose](https://pypi.org/project/python-jose/), `help(jose.jwt.decode)`):
+Гурван засварыг `main.py`-д хийгээд, **нэг удаа** дахин барина (7.4).
+
+**7.1 Гарын үсэг ба хугацааны шалгалт** (санаатай эмзэг байдал А). `decode_token`-ийн `jwt.get_unverified_claims(token)` мөрийг (`# ← ЭМЗЭГ` тэмдэгтэй) солино. python-jose-ийн `jwt.decode(token, key, algorithms=None, options=None, audience=None, issuer=None, subject=None, access_token=None)` нь `key`-д JWK Set (`{"keys": [...]}`) хүлээн авна ([python-jose](https://pypi.org/project/python-jose/), `help(jose.jwt.decode)`):
 
 ```python
 import time
@@ -347,8 +510,10 @@ def decode_token(token: str) -> Principal:
 - **`require_exp: True`** — python-jose-ийн анхдагч `require_exp: False`: `exp`-гүй токен ч хүлээн авагдана. `verify_exp` нь анхдагчаар асаалттай, гэхдээ `exp` **байгаа** үед л шалгана.
 - **`verify_at_hash: False`** — Dex-ийн ID токенд `at_hash` (access token-ы hash) байж болно ([Dex — Tokens](https://dexidp.io/docs/configuration/tokens/)-ийн жишээнд бий). python-jose `at_hash` байхад `access_token=` дамжуулахыг шаарддаг, эс бөгөөс *"No access_token provided to compare against at_hash claim"* алдаа өгнө (бид python-jose 3.5.0 дээр туршсан). Манай API зөвхөн ID токеныг Bearer болгон авдаг тул харьцуулах access token байхгүй — энэ шалгалтыг ухамсартайгаар унтраана. Үлдсэн шалгалт (гарын үсэг, `iss`, `aud`, `exp`) хэвээр.
 - **`kid`** — python-jose JWKS-ийн түлхүүрүүдийг нэг нэгээр туршина; `kid` зөвхөн түлхүүр солигдсоныг илрүүлэхэд (дээрх дахин татах логик) хэрэгтэй.
+- Алхам 2.4-ийн имэйлээс үүрэг гаргах мөрүүдийг **хадгал**.
+- `decode_token`-ийг дуудаж буй газар `JWTError`-ийг барьж **401** буцааж байгаа эсэхийг шалга (эс бөгөөс 500 гарна).
 
-**7.2 Introspection ба нийлмэл байдал** (санаатай эмзэг байдал Б). Strawberry-д бэлэн өргөтгөлүүд ([Strawberry extensions](https://strawberry.rocks/docs/extensions/max-aliases-limiter)):
+**7.2 Introspection ба нийлмэл байдал** (санаатай эмзэг байдал Б). Strawberry-д бэлэн өргөтгөлүүд ([Strawberry extensions](https://strawberry.rocks/docs/extensions/max-aliases-limiter)). `schema = strawberry.Schema(query=Query, mutation=Mutation)` мөрийг доорхоор соль:
 
 ```python
 import os
@@ -363,7 +528,7 @@ if os.environ.get("ENV", "production") == "production":
 schema = strawberry.Schema(query=Query, mutation=Mutation, extensions=exts)
 ```
 
-> `QueryDepthLimiter` нь **гүнийг** л хязгаарлана — 200 alias нэг түвшинд байгаа тул түүнийг зогсоохгүй. Шалгалт №6-г `MaxAliasesLimiter` (эсвэл `MaxTokensLimiter`) хаана. Тайландаа энэ ялгааг бич. `DisableIntrospection` идэвхтэй бол GraphiQL-ийн Docs самбар ажиллахгүй — хөгжүүлэлтэд `ENV=dev` өг.
+> `QueryDepthLimiter` нь **гүнийг** л хязгаарлана — 200 alias нэг түвшинд байгаа тул түүнийг зогсоохгүй. Шалгалт №6-г `MaxAliasesLimiter` (эсвэл `MaxTokensLimiter`) хаана. Тайландаа энэ ялгааг бич. `DisableIntrospection` идэвхтэй бол GraphiQL-ийн Docs самбар ажиллахгүй — хөгжүүлэлтэд `stack/docker-compose.yml`-ийн `graphql-api` орчинд `ENV: dev` нэм.
 
 **7.3 SQL мөр залгалт.** `Device.readings` дотор `self.name` шууд SQL-д залгагдаж байна. `self.name` нь бүртгэлээс ирдэг, харин бүртгэлийн `claim` нь дурын `device_id` хүлээн авдаг (Лаб 2) — тиймээс `x' OR '1'='1` гэсэн нэртэй төхөөрөмж бүртгүүлж болно. Зөв засвар нь **параметржүүлсэн асуулга**: InfluxDB 3 `/api/v3/query_sql` нь `params` объект хүлээн авч, `WHERE device = $device` хэлбэрээр **зөвхөн WHERE-д** ашиглана ([InfluxDB 3 — Parameterized queries](https://docs.influxdata.com/influxdb3/core/query-data/sql/parameterized-queries/)):
 
@@ -372,29 +537,39 @@ json={"db": INFLUX_DB, "q": "SELECT … FROM telemetry WHERE device = $device OR
       "params": {"device": self.name}, "format": "json"}
 ```
 
-`LIMIT` нь WHERE биш тул параметрээр өгөх боломжгүй — `int()`-ээр хөрвүүлж, `min(limit, 500)` хэвээр үлдээ. (`Query.device` нь Python дээр шүүдэг тул тарилгын гадаргуугүй — яагаад болохыг тайланд бич.) Шалгалт №7 нь энэ засварыг автоматаар илрүүлдэггүй (үргэлж АНХААР) — засварыг кодоор нотол.
+`LIMIT` нь WHERE биш тул параметрээр өгөх боломжгүй — `int()`-ээр хөрвүүлж, `min(limit, 500)` хэвээр үлдээ. (`Query.device` нь Python дээр шүүдэг тул тарилгын гадаргуугүй — яагаад болохыг тайланд бич.) Шалгалт №7 нь энэ засварыг автоматаар илрүүлдэггүй (үргэлж АНХААР) — засварыг кодоор нотол. Алхам 4-ийн `deviceStats`-д ч ижил засвар.
 
-**7.4 Дахин барьж, дахин шалгана:**
+**7.4 Дахин барьж, дахин шалгах.**
 
 ```bash
-docker compose --profile app up -d --build graphql-api
+cd ~/cnc302/stack && docker compose --profile app up -d --build graphql-api && cd ~/cnc302
 sleep 10
-python3 lab07/security_tests.py --api http://localhost:8000 \
+python lab07/security_tests.py --api http://localhost:8000 \
     --influx http://localhost:8181 --registry http://localhost:8090 \
-    --json lab07/out/security-after.json
+    --json lab07/out/security-after.json | tee lab07/out/security-after.txt
 ```
 
-**Хүлээгдэх:** `✓ Санаатай эмзэг байдал илрээгүй — засвар ажиллаж байна.`, Introspection ба нийлмэл байдлын мөрүүд ТЭНЦСЭН. Бүх бодит токен татгалзвал `aud`/`iss` таарахгүй байна: токеныг хостоос `localhost:5556`-аар авсан ч `iss` нь config-ийн `issuer: http://dex:5556/dex` байдаг тул `OIDC_ISSUER` яг тэр утгатай байх ёстой; `aud` нь `client_id` (`cnc302`). API-гийн логийг `docker compose logs graphql-api`-аар хар.
+✅ `✓ Санаатай эмзэг байдал илрээгүй — засвар ажиллаж байна.`, Introspection ба нийлмэл байдлын мөрүүд ТЭНЦСЭН. 6.2-ын хуурамч токен одоо **401**.
 
-**7.5 RBAC-ыг бодитоор турш:**
+❌ Бүх бодит токен татгалзвал `aud`/`iss` таарахгүй байна: токеныг хостоос `localhost:5556`-аар авсан ч `iss` нь config-ийн `issuer: http://dex:5556/dex` байдаг тул `OIDC_ISSUER` яг тэр утгатай байх ёстой; `aud` нь `client_id` (`cnc302`). API-гийн логийг `docker compose -f stack/docker-compose.yml logs graphql-api | tail -30`-аар хар.
+
+**7.5 RBAC-ыг бодитоор турш.**
 
 ```bash
 for U in viewer operator admin; do
   echo "── $U ──"
   curl -s -X POST localhost:8000/graphql -H "Authorization: Bearer $(tok $U)" \
     -H 'Content-Type: application/json' \
-    -d '{"query":"mutation { sendCommand(device:\"dev0001\", command:\"reboot\") }"}' | jq -c
+    -d '{"query":"mutation { sendCommand(device:\"dev0003\", command:\"reboot\") }"}' | jq -c
 done
+```
+
+✅ viewer → эрхийн алдаа; operator, admin → амжилттай.
+
+**7.6 Бүртгэлд шууд хандах** (Хүснэгт 7.7-ийн сүүлийн мөр):
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' localhost:8090/devices
 ```
 
 #### Хүснэгт 7.7 — RBAC матриц
@@ -420,7 +595,11 @@ curl -s -X POST localhost:8181/api/v3/query_sql -H 'Content-Type: application/js
   -d '{"db":"cnc302","q":"SELECT count(*) FROM telemetry","format":"json"}' | jq
 ```
 
+✅ Токенгүйгээр тоо буцаана — **энэ бол асуудал**.
+
 #### Хүснэгт 7.8 — Засварын өмнөх/дараах дүн
+
+`security-before.json` ба `security-after.json`-оос: `jq '{passed, warned, failed, deliberate_criticals, infra_criticals}' lab07/out/security-*.json` (талбарын нэр өөр бол `jq 'keys'`-ээр шалга).
 
 | | Өмнө (`security-before.json`) | Дараа (`security-after.json`) |
 |---|---|---|
@@ -436,14 +615,29 @@ curl -s -X POST localhost:8181/api/v3/query_sql -H 'Content-Type: application/js
 
 ### Алхам 9 — Git commit (5 мин)
 
-```bash
-cd ~/cnc302 && git add lab07/ stack/dex/
-git commit -m "Лаб 7: GraphQL давхарга, OIDC, хоёр эмзэг байдал засагдсан"
-git tag lab07-done && git push && git push --tags
+**9.1 Нэмэх.** `lab07/out/` нь `.gitignore`-д — шалгалтын үр дүнг **зориуд** нэмнэ:
 
-# ⚠ Нууц ороогүйг ЗААВАЛ шалга — хоёулаа хоосон байх ЁСТОЙ
-git ls-files | grep -E '\.env$|\.key$|devices\.csv'
-grep -rn 'eyJ' lab07/out/ | head          # JWT-г тайланд бүү үлдээ
+```bash
+cp docs/report-template.md lab07/report.md   # тайлангаа бөглө: code lab07/report.md
+git add lab07/report.md lab07/graphql-api/
+git add -f lab07/out/security-*.json lab07/out/security-*.txt
+git status --short
+```
+
+**9.2 Нууц ороогүйг ЗААВАЛ шалга** — хоёулаа **хоосон** байх ёстой:
+
+```bash
+git diff --cached --name-only | grep -E '\.env$|\.key$|devices\.csv'
+grep -rln 'eyJ' lab07/out/ lab07/report.md
+```
+
+✅ Юу ч хэвлэхгүй. ❌ JWT (`eyJ…`) олдвол тэр файлаас токеныг устгаад дахин `git add`.
+
+**9.3 Commit ба push.**
+```bash
+git commit -m "Лаб 7: GraphQL давхарга, OIDC, хоёр эмзэг байдал засагдсан"
+git tag lab07-done
+git push && git push --tags
 ```
 
 ---
@@ -509,6 +703,12 @@ grep -rn 'eyJ' lab07/out/ | head          # JWT-г тайланд бүү үлд�
 | JWKS татагдахгүй | `OIDC_ISSUER` буруу | контейнер дотроос `http://dex:5556/dex` байх ёстой |
 | `readings` хоосон | 🥧 агент зогссон / гүүр тасарсан | 🥧 `make link` → `bridge/state 1` |
 | Шалгалт "санаатай 0" гэнэ (засварын өмнө) | API дахин баригдаагүй | `up -d --build graphql-api` |
+| `No module named 'httpx'` / `'websocket'` | хамаарал суугаагүй / venv идэвхгүй | §2.3 |
+| `tok: command not found` | шинэ цонхонд функц тодорхойлогдоогүй | §2.2-ын блок |
+| `readings` хоосон бүх төхөөрөмжид | симулятор зогссон | §2.5 (Ubuntu-2) |
+| Засварын дараа API 500 буцаана | `JWTError`-ийг барьж 401 болгоогүй, эсвэл синтаксийн алдаа | `docker compose -f stack/docker-compose.yml logs graphql-api` |
+| GraphiQL-ийн Docs самбар алга болов | `DisableIntrospection` идэвхтэй (зөв!) | хөгжүүлэлтэд `ENV: dev` (Алхам 7.2) |
+| WebSocket: `Handshake status 404` | endpoint нэмээгүй эсвэл дахин бариагүй | Алхам 5.2, §4-ийн дахин барих команд |
 
 ---
 

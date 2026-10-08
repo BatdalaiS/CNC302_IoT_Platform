@@ -66,50 +66,126 @@ IX\strut
 \textbf{Анхаар:} энэ лабораторийг \textbf{үзүүлэнгээр} үнэлнэ. Багийн гурван гишүүн бүгд ярина. Слайд шаардлагагүй --- ажиллаж буй график ба тоо хангалттай.
 \end{quote}
 
-\hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}{%
-\section{2. Урьдчилсан нөхцөл}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}}
+\hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b-ux431ux430-ux431ux44dux43bux442ux433ux44dux43b-20-ux43cux438ux43d}{%
+\section{2. Урьдчилсан нөхцөл ба бэлтгэл (20 мин)}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b-ux431ux430-ux431ux44dux43bux442ux433ux44dux43b-20-ux43cux438ux43d}}
 
 \begin{itemize}
 \tightlist
 \item
   Лаб 1--3 дууссан. \textbf{Лаб 1-ийн Хүснэгт 1.5 (ирмэгийн ачааллын хариу үйлдэл) ба Лаб 3-ын Хүснэгт 3.6 (ачааллын хэмжээний нөлөө) гар дор байх ёстой} --- өнөөдөр тэдгээрээс таамаг гаргана.
 \item
-  {[}ЗК{]} Файлын дескрипторын хязгаар өргөжсөн, дүрс татагдсан:
+  Лаб 2-ын authenticator унтраалттай (\texttt{authn\ false}).
 \end{itemize}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\BuiltInTok{ulimit}\NormalTok{ {-}n                     \# 1024 бол хангалтгүй (binary{-}ээр ажиллуулах үед)}
-\BuiltInTok{ulimit}\NormalTok{ {-}n 65535               \# Linux/macOS}\KeywordTok{;} \ExtensionTok{Windows}\NormalTok{ дээр WSL2 дотор}
-\ExtensionTok{docker}\NormalTok{ pull emqx/emqtt{-}bench:0.6.3   \# amd64 ба arm64 дүрс бий}
-\end{Highlighting}
-\end{Shaded}
 
 \begin{quote}
-Албан ёсны баримт: \href{https://github.com/emqx/emqtt-bench}{emqtt-bench README} --- \texttt{conn} / \texttt{sub} / \texttt{pub} дэд команд; \texttt{-c} клиентийн тоо, \texttt{-i} холбогдох завсар (мс), \texttt{-I} нийтлэх завсар (мс), \texttt{-s} ачааллын хэмжээ, \texttt{-q} QoS, \texttt{-t} сэдэв (\texttt{\%i} = клиентийн дэс дугаар); анхдагчаар MQTT 5.0 (\texttt{-V\ 5}). Docker-гүй бол \href{https://github.com/emqx/emqtt-bench/releases}{releases} хуудаснаас OS-д тохирох багцыг татаж, \texttt{bin/}-ийг \texttt{PATH}-д нэмнэ; \texttt{loadtest.sh} Docker демон олдохгүй бол \texttt{emqtt\_bench}-ийг өөрөө ашиглана. Docker-оор ажиллуулахад хостын \texttt{ulimit\ -n} контейнерт шилждэггүй тул скрипт \texttt{-\/\allowbreak{}-ulimit\ nofile=\allowbreak{}65535:\allowbreak{}65535} өгдөг.
+☞ \textbf{Алхмуудыг дарааллаар нь хий.} Алхам бүрийн төгсгөлд ✓ \textbf{Шалгах} хэсэг бий. Үр дүн нь таарахгүй бол \textbf{цааш бүү яв} --- ✗ мөр эсвэл §8-аас шалтгааныг ол.
 \end{quote}
 
-\begin{itemize}
-\tightlist
-\item
-  {[}Pi{]} Pi бэлэн: \texttt{cd\ \textasciitilde{}/cnc302/edge\ \&\&\ make\ check\ \&\&\ make\ mem} → бүгд OK, throttle \texttt{0x0}
-\item
-  {[}ЗК{]} EMQX-ийн нууц үг терминалд бэлэн:
-\end{itemize}
+\hypertarget{ux442ux435ux440ux43cux438ux43dux430ux43bux443ux443ux434}{%
+\subsection{2.1 Терминалууд}\label{ux442ux435ux440ux43cux438ux43dux430ux43bux443ux443ux434}}
+
+Энэ лабд \textbf{таван} терминал хэрэгтэй --- Алхам 3-т гурван Pi цонх зэрэг ажиллана:
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+Цонх & Хаана & Хэрхэн нээх\tabularnewline
+\midrule
+\endhead
+\textbf{{[}Pi-1{]}} & Raspberry Pi & PowerShell таб → \texttt{ssh\ pi}\tabularnewline
+\textbf{{[}Pi-2{]}} & Raspberry Pi & шинэ PowerShell таб → \texttt{ssh\ pi}\tabularnewline
+\textbf{{[}Pi-3{]}} & Raspberry Pi & шинэ PowerShell таб → \texttt{ssh\ pi}\tabularnewline
+\textbf{{[}ЗК · Ubuntu-1{]}} & Зөөврийн компьютер (WSL) & Terminal-ын \texttt{▼} → \textbf{Ubuntu}\tabularnewline
+\textbf{{[}ЗК · Ubuntu-2{]}} & Зөөврийн компьютер (WSL) & дахин \texttt{▼} → \textbf{Ubuntu}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+\texttt{\textless{}PI\_\allowbreak{}IP\textgreater{}} --- \textbf{{[}Pi-1{]}} \texttt{hostname\ -I}. \texttt{\textless{}LAPTOP\_\allowbreak{}IP\textgreater{}} --- \textbf{{[}ЗК · PowerShell{]}} \texttt{ipconfig}.
+
+\hypertarget{ux43eux440ux447ux43dux43eux43e-ux431ux44dux43bux442ux433ux44dux445-ux446ux43eux43dux445-ux43dux44dux44dux445-ux431ux4afux440ux442-ux430ux436ux438ux43bux43bux443ux443ux43bux43dux430}{%
+\subsection{\texorpdfstring{2.2 Орчноо бэлтгэх --- \textbf{цонх нээх бүрт} ажиллуулна}{2.2 Орчноо бэлтгэх --- цонх нээх бүрт ажиллуулна}}\label{ux43eux440ux447ux43dux43eux43e-ux431ux44dux43bux442ux433ux44dux445-ux446ux43eux43dux445-ux43dux44dux44dux445-ux431ux4afux440ux442-ux430ux436ux438ux43bux43bux443ux443ux43bux43dux430}}
+
+\textbf{{[}ЗК · Ubuntu-1{]}} ба \textbf{{[}ЗК · Ubuntu-2{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# EMQX 5{-}ын REST API самбарын нэр/нууц үгээр Basic auth ХҮЛЭЭН АВАХГҮЙ.}
-\CommentTok{\# collect\_metrics.py эхлээд API түлхүүрийг (Лаб 2), байхгүй бол /api/v5/login{-}ийг ашиглана.}
-\KeywordTok{set} \ExtensionTok{{-}a} \KeywordTok{\&\&} \BuiltInTok{source}\NormalTok{ \textasciitilde{}/cnc302/stack/.env }\KeywordTok{\&\&} \KeywordTok{set} \ExtensionTok{+a}\NormalTok{   \# EMQX\_API\_KEY, EMQX\_API\_SECRET, EMQX\_DASHBOARD\_PASSWORD}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \BuiltInTok{source}\NormalTok{ .venv/bin/activate}
+\KeywordTok{set} \ExtensionTok{{-}a} \KeywordTok{\&\&} \BuiltInTok{source}\NormalTok{ \textasciitilde{}/cnc302/stack/.env }\KeywordTok{\&\&} \KeywordTok{set} \ExtensionTok{+a}
+\FunctionTok{mkdir}\NormalTok{ {-}p measurements}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{itemize}
-\tightlist
-\item
-  {[}Pi{]} Pi дээр терминал бүрд: \texttt{set\ -a\ \&\&\ source\ \textasciitilde{}/cnc302/edge/.env\ \&\&\ set\ +a}
-\end{itemize}
+\texttt{stack/.env}-ийг ачаалснаар \texttt{EMQX\_\allowbreak{}API\_\allowbreak{}KEY}, \texttt{EMQX\_\allowbreak{}API\_\allowbreak{}SECRET}, \texttt{EMQX\_\allowbreak{}DASHBOARD\_\allowbreak{}PASSWORD} бэлэн болно. EMQX 5-ын REST API самбарын нэр/нууц үгээр Basic auth \textbf{хүлээн авдаггүй} тул \texttt{collect\_\allowbreak{}metrics.\allowbreak{}py} эхлээд API түлхүүрийг (Лаб 2), байхгүй бол \texttt{/api/v5/login}-ийг ашиглана.
+
+\textbf{{[}Pi-1{]}}, \textbf{{[}Pi-2{]}}, \textbf{{[}Pi-3{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\VariableTok{PY=}\NormalTok{\textasciitilde{}/cnc302/edge/.venv/bin/python}
+\KeywordTok{set} \ExtensionTok{{-}a} \KeywordTok{\&\&} \BuiltInTok{source}\NormalTok{ \textasciitilde{}/cnc302/edge/.env }\KeywordTok{\&\&} \KeywordTok{set} \ExtensionTok{+a}
+\FunctionTok{mkdir}\NormalTok{ {-}p measurements}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux43dux44dux433-ux443ux434ux430ux430ux433ux438ux439ux43d-ux431ux44dux43bux442ux433ux44dux43b}{%
+\subsection{2.3 Нэг удаагийн бэлтгэл}\label{ux43dux44dux433-ux443ux434ux430ux430ux433ux438ux439ux43d-ux431ux44dux43bux442ux433ux44dux43b}}
+
+\textbf{(а) Pi дээр \texttt{requests} сан.} \texttt{lab04/\allowbreak{}collect\_\allowbreak{}metrics.\allowbreak{}py} нь \texttt{requests}-ийг ашигладаг, харин ирмэгийн venv-д зөвхөн \texttt{paho-mqtt} бий:
+
+\textbf{{[}Pi-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ pull}
+\VariableTok{$PY} \ExtensionTok{{-}m}\NormalTok{ pip install }\StringTok{"requests\textgreater{}=2.31,\textless{}3"}
+\VariableTok{$PY} \ExtensionTok{{-}c} \StringTok{"import requests, paho.mqtt; print(\textquotesingle{}OK\textquotesingle{})"}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{OK}.
+
+\textbf{(б) Компьютер дээр emqtt-bench дүрс.} Ачаалал үүсгэгч \texttt{emqtt-bench}-ийг Docker-оор ажиллуулна:
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ pull}
+\ExtensionTok{docker}\NormalTok{ pull emqx/emqtt{-}bench:0.6.3}
+\ExtensionTok{docker}\NormalTok{ run {-}{-}rm emqx/emqtt{-}bench:0.6.3 pub {-}{-}help }\KeywordTok{|} \FunctionTok{head}\NormalTok{ {-}3}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{Usage:\allowbreak{}\ emqtt\_\allowbreak{}bench\ pub\ \ldots{}}. Дүрс amd64 ба arm64-д бий.
+
+\begin{quote}
+Албан ёсны баримт: \href{https://github.com/emqx/emqtt-bench}{emqtt-bench README} --- \texttt{conn} / \texttt{sub} / \texttt{pub} дэд команд; \texttt{-c} клиентийн тоо, \texttt{-i} холбогдох завсар (мс), \texttt{-I} нийтлэх завсар (мс), \texttt{-s} ачааллын хэмжээ, \texttt{-q} QoS, \texttt{-t} сэдэв (\texttt{\%i} = клиентийн дэс дугаар); анхдагчаар MQTT 5.0 (\texttt{-V\ 5}). Docker-оор ажиллуулахад хостын \texttt{ulimit\ -n} контейнерт шилждэггүй тул \texttt{loadtest.sh} \texttt{-\/\allowbreak{}-ulimit\ nofile=\allowbreak{}65535:\allowbreak{}65535} өгдөг --- Ubuntu дээр \texttt{ulimit}-ыг өөрчлөх шаардлагагүй.
+\end{quote}
+
+\hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux448ux430ux43bux433ux430ux43bux442}{%
+\subsection{2.4 Урьдчилсан шалгалт}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux448ux430ux43bux433ux430ux43bux442}}
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ up }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ health}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\end{Highlighting}
+\end{Shaded}
+
+✓ Дөрвөн мөр \texttt{200}.
+
+\textbf{{[}Pi-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ check }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ up }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ mem}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\end{Highlighting}
+\end{Shaded}
+
+✓ Бүгд \texttt{OK}, \texttt{throttled=0x0}.
 
 \hypertarget{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}{%
 \section{3. Онолын сануулга}\label{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}}
@@ -318,21 +394,56 @@ Pi-гийн CPU/RAM хязгаартай\strut
 \caption{Зураг 4.1 --- Ачааллын туршилтын бүтэц: emqtt-bench (зөөврийн компьютер) → ирмэгийн Mosquitto (Pi 3B) ба үүлний EMQX, хэмжүүр цуглуулалт}
 \end{figure}
 
+\begingroup\scriptsize\begin{longtable}[]{@{}lllll@{}}
+\toprule
+Алхам & Хаана & Юу хийх & Мин & Хүснэгт\tabularnewline
+\midrule
+\endhead
+1 & {[}Pi{]}{[}ЗК{]} & Суурь төлөв & 20 & 4.1\tabularnewline
+2 & {[}ЗК{]} & Таамаг (хэмжихээс өмнө) & 25 & 4.2\tabularnewline
+3 & {[}ЗК{]}{[}Pi{]} & Ирмэгийн ачааллын тест & 60 & 4.3, 4.4\tabularnewline
+4 & {[}ЗК{]} & Үүлний ачааллын тест & 45 & 4.5\tabularnewline
+5 & {[}ЗК{]} & EMQX rule engine & 30 & 4.6\tabularnewline
+6 & {[}ЗК{]} & Ханалтын шинжилгээ & 30 & 4.7, 4.8\tabularnewline
+7 & {[}ЗК{]} & Багтаамжийн томьёо & 15 & ---\tabularnewline
+8 & {[}ЗК{]} & Үзүүлэн ба Git & 15 & ---\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+\begin{quote}
+⚠ \textbf{Ачаалал ҮРГЭЛЖ өөр хостоос ирнэ.} \texttt{loadtest.sh} нь \textbf{зөвхөн компьютер дээр} ажиллана --- Pi дээр ажиллуулбал Pi өөрийгөө ачаална.
+\end{quote}
+
 \hypertarget{ux430ux43bux445ux430ux43c-1-ux441ux443ux443ux440ux44c-ux442ux4e9ux43bux4e9ux432-ux445ux43eux451ux440-ux445ux43eux441ux442-ux434ux44dux44dux440-20-ux43cux438ux43d-piux437ux43a}{%
 \subsection{Алхам 1 --- Суурь төлөв, хоёр хост дээр (20 мин) {[}Pi{]}{[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-1-ux441ux443ux443ux440ux44c-ux442ux4e9ux43bux4e9ux432-ux445ux43eux451ux440-ux445ux43eux441ux442-ux434ux44dux44dux440-20-ux43cux438ux43d-piux437ux43a}}
 
 Ачаалал өгөхийн өмнөх төлөв. Дараагийн бүх тоо үүнтэй харьцуулагдана.
 
+\textbf{1.1 Pi.} Ирмэгийн агент ажиллаж байвал зогсоо (\texttt{Ctrl\ +\ C}):
+
+\textbf{{[}Pi-1{]}}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [Pi] Pi дээр}
-\ExtensionTok{pkill}\NormalTok{ {-}f vscode{-}server                       \# 150–250 MiB чөлөөлнө}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \ExtensionTok{./tools/measure\_stack.sh}\NormalTok{ {-}{-}role edge}
+\ExtensionTok{pkill}\NormalTok{ {-}f vscode{-}server}
+\FunctionTok{bash}\NormalTok{ tools/measure\_stack.sh {-}{-}role edge }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ measurements/l4{-}01{-}edge.txt}
 \ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}$SYS/broker/clients/connected\textquotesingle{}}\NormalTok{ {-}C 1}
-\ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}$SYS/broker/store/messages/count\textquotesingle{}}\NormalTok{ {-}C 1   \# (хуучин нэр: messages/stored)}
+\ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}$SYS/broker/store/messages/count\textquotesingle{}}\NormalTok{ {-}C 1}
 \ExtensionTok{docker}\NormalTok{ stats {-}{-}no{-}stream {-}{-}format }\StringTok{\textquotesingle{}\{\{.Name\}\} \{\{.MemUsage\}\} \{\{.MemPerc\}\}\textquotesingle{}}\NormalTok{ cnc302{-}mosquitto}
-\CommentTok{\# [ЗК] компьютер дээр}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \ExtensionTok{./tools/measure\_stack.sh}\NormalTok{ {-}{-}role cloud}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{\$SYS/\allowbreak{}broker/\allowbreak{}clients/\allowbreak{}connected} нь 1--2 (гүүр ба таны \texttt{mosquitto\_sub}); \texttt{cnc302-mosquitto\ \ldots{}\ /\allowbreak{}\ 128MiB\ \ldots{}\%}.
+
+✗ \texttt{\$SYS/\allowbreak{}broker/\allowbreak{}store/\allowbreak{}messages/\allowbreak{}count} юу ч хэвлэхгүй гацвал \texttt{Ctrl\ +\ C} --- хуучин хувилбарт нэр нь \texttt{\$SYS/\allowbreak{}broker/\allowbreak{}messages/\allowbreak{}stored}.
+
+\textbf{1.2 Компьютер.}
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{bash}\NormalTok{ tools/measure\_stack.sh {-}{-}role cloud }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ measurements/l4{-}01{-}cloud.txt}
 \end{Highlighting}
 \end{Shaded}
 
@@ -358,7 +469,7 @@ CPU \% (сул үед) & &\tabularnewline
 
 Багаараа цаасан дээр тооцоолж, \textbf{дараа нь битгий засаарай}. Буруу таамаг бол сонирхолтой үр дүн; засварласан таамаг бол оноогүй.
 
-\textbf{2.1 Өгсөх урсгалын (uplink) таазыг тооцоол} (200 байт ачаалал, 1 мсж/с нэг холболтод, §3-ын томьёо):
+\textbf{2.1 Өгсөх урсгалын (uplink) таазыг тооцоол} (200 байт ачаалал, 1 мсж/с нэг холболтод, §3-ын томьёо). \texttt{loadtest.sh}-ийн анхдагч сэдэв нь \texttt{cnc302/\allowbreak{}bench/\allowbreak{}\%i/\allowbreak{}telemetry}:
 
 \begin{verbatim}
 Сэдвийн урт L (өөрийн TOPIC)            = ______ Б
@@ -401,55 +512,102 @@ microSD (persistence) & &\tabularnewline
 \bottomrule
 \end{longtable}\endgroup
 
+✓ Хүснэгт 4.2-ыг \textbf{гэрэл зургаар} авч хадгал (эсвэл \texttt{git\ commit}) --- дараа нь засаагүйгээ нотлох баримт.
+
 \hypertarget{ux430ux43bux445ux430ux43c-3-ux438ux440ux43cux44dux433ux438ux439ux43d-ux430ux447ux430ux430ux43bux43bux44bux43d-ux442ux435ux441ux442-60-ux43cux438ux43d-ux437ux43api}{%
 \subsection{Алхам 3 --- Ирмэгийн ачааллын тест (60 мин) {[}ЗК{]}{[}Pi{]}}\label{ux430ux43bux445ux430ux43c-3-ux438ux440ux43cux44dux433ux438ux439ux43d-ux430ux447ux430ux430ux43bux43bux44bux43d-ux442ux435ux441ux442-60-ux43cux438ux43d-ux437ux43api}}
 
 \textbf{3.1 Дасгал ажиллуулалт} --- бүх зүйл холбогдож байгааг батлах:
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# [ЗК] компьютер дээрээс Pi рүү (ачаалал ҮРГЭЛЖ өөр хостоос ирнэ)}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \FunctionTok{bash}\NormalTok{ lab04/loadtest.sh {-}{-}target edge pub }\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{ 10 1}
-\end{Highlighting}
-\end{Shaded}
-
-30 секунд ажиллуулаад Ctrl+C. {[}Pi{]} Pi дээр холболт харагдах ёстой:
+\textbf{{[}ЗК · Ubuntu-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}$SYS/broker/clients/connected\textquotesingle{}}\NormalTok{ {-}C 1   \# ≈ 10}
+\FunctionTok{bash}\NormalTok{ lab04/loadtest.sh {-}{-}target edge pub }\OperatorTok{\textless{}}\NormalTok{PI\_IP}\OperatorTok{\textgreater{}}\NormalTok{ 10 1}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{3.2 Бүтэн шат дараалсан тест.} Гурван терминалыг \textbf{зэрэг} ажиллуулна:
+✓ \texttt{→\ {[}edge{]}\ 10\ нийтлэгч\ ×\ 1\ мсж/\allowbreak{}с\ =\allowbreak{}\ 10\ мсж/\allowbreak{}с\ зорилтот} гарч, emqtt-bench \texttt{connected:\ 10} хэлбэрийн мөр хэвлэнэ.
+
+Ажиллаж байх \textbf{зуур} Pi дээр шалга:
+
+\textbf{{[}Pi-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [Pi] терминал 1 — систем хэмжилт}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \ExtensionTok{./tools/measure\_stack.sh}\NormalTok{ {-}{-}role edge {-}{-}watch 900 5}
-
-\CommentTok{\# [Pi] терминал 2 — үзүүлэлт цуглуулагч (CSV{-}д \textasciigrave{}target=edge\textasciigrave{}; mosquitto{-}г $SYS{-}ээр уншина)}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \ExtensionTok{python3}\NormalTok{ lab04/collect\_metrics.py {-}{-}target edge {-}{-}label ramp {-}{-}seconds 900}
-
-\CommentTok{\# [Pi] терминал 3 — swap{-}ын хяналт. si/so \textgreater{} 0 бол ХЯЗГААР ОЛДЛОО}
-\FunctionTok{vmstat}\NormalTok{ 1}
-
-\CommentTok{\# [ЗК] ачаалал үүсгэгч — шатууд: 10 25 50 100 200 350 500}
-\FunctionTok{bash}\NormalTok{ lab04/loadtest.sh {-}{-}target edge ramp }\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}
+\FunctionTok{sleep}\NormalTok{ 15}\KeywordTok{;} \ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}$SYS/broker/clients/connected\textquotesingle{}}\NormalTok{ {-}C 1}
 \end{Highlighting}
 \end{Shaded}
+
+✓ ≈ \texttt{11}--\texttt{12} (10 + гүүр + таны клиент). Дараа нь \textbf{{[}ЗК · Ubuntu-1{]}}-д \texttt{Ctrl\ +\ C}.
+
+✗ emqtt-bench \texttt{econnrefused} / \texttt{timeout} → \texttt{\textless{}PI\_\allowbreak{}IP\textgreater{}} буруу эсвэл Pi-гийн mosquitto асаагүй (\texttt{cd\ \textasciitilde{}/cnc302/edge\ \&\&\ make\ up}).
+
+\textbf{3.2 Бүтэн шат дараалсан тест.} Шатууд \textbf{10 25 50 100 200 350 500} холболт, шат бүр 120 сек + 20 сек амралт ≈ \textbf{17 минут}. Дөрвөн цонхыг \textbf{дарааллаар} асаана:
+
+\textbf{{[}Pi-1{]}} --- систем хэмжилт (1100 сек):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{bash}\NormalTok{ tools/measure\_stack.sh {-}{-}role edge {-}{-}watch 1100 5 }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ measurements/l4{-}03{-}edge{-}watch.txt}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{{[}Pi-2{]}} --- үзүүлэлт цуглуулагч (CSV-д \texttt{target=edge}; mosquitto-г \texttt{\$SYS}-ээр уншина):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{$PY} \ExtensionTok{lab04/collect\_metrics.py}\NormalTok{ {-}{-}target edge {-}{-}label ramp {-}{-}seconds 1100}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{{[}Pi-3{]}} --- swap-ын хяналт. \texttt{si}/\allowbreak\texttt{so} \textgreater{} 0 бол \textbf{ХЯЗГААР ОЛДЛОО}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{vmstat}\NormalTok{ 5 }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ measurements/l4{-}03{-}vmstat.txt}
+\end{Highlighting}
+\end{Shaded}
+
+✓ Гурван цонх бүгд мөр хэвлэж эхэлсэн. Одоо л ачааллыг асаа:
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{bash}\NormalTok{ lab04/loadtest.sh {-}{-}target edge ramp }\OperatorTok{\textless{}}\NormalTok{PI\_IP}\OperatorTok{\textgreater{}}
+\end{Highlighting}
+\end{Shaded}
+
+Скрипт \texttt{collect\_\allowbreak{}metrics.\allowbreak{}py\ ажиллаж\ эхэлсэн\ үү?\allowbreak{}\ {[}enter{]}} гэж асуухад \texttt{Enter} дар.
+
+✓ Шат бүрд \texttt{────────\ ШАТ:\allowbreak{}\ N\ төхөөрөмж\ \ldots{}} ба \texttt{────────\ N\ дууслаа\ (брокер\ амьд)\ \ldots{}}.
 
 \begin{quote}
-⚠ \textbf{\texttt{vmstat\ 1}-ийн \texttt{si}/\allowbreak\texttt{so} багана тэгээс өссөн мөчид зогсоо.} Тэр бол хязгаар. Цааш шахах нь Pi-г царцааж, microSD-г элээнэ. Энэ нь алдаа биш --- \textbf{энэ бол таны хэмжилт}.
+⚠ \textbf{{[}Pi-3{]}-ын \texttt{si}/\allowbreak\texttt{so} багана тэгээс өссөн мөчид {[}ЗК · Ubuntu-1{]}-д \texttt{Ctrl\ +\ C} дарж ачааллыг зогсоо.} Тэр бол хязгаар. Цааш шахах нь Pi-г царцааж, microSD-г элээнэ. Энэ нь алдаа биш --- \textbf{энэ бол таны хэмжилт}. Аль шатанд зогсоосноо тэмдэглэ.
 \end{quote}
 
+Ачаалал дууссаны (эсвэл зогсоосны) дараа Pi-1, Pi-2, Pi-3-т \texttt{Ctrl\ +\ C}.
+
+✓ \textbf{{[}Pi-2{]}}-ийн төгсгөлд \texttt{measurements/\allowbreak{}loadtest-edge-ramp-YYYYmmdd-HHMMSS.\allowbreak{}csv} бичигдсэн гэж гарна.
+
 \begin{quote}
-\textbf{Санамж:} \texttt{-\/-target\ edge} үед CSV-ийн \texttt{broker\_\allowbreak{}connections} ба \texttt{broker\_\allowbreak{}msg\_\allowbreak{}in\_\allowbreak{}rate} нь ирмэгийн mosquitto-гийн \texttt{\$SYS/\allowbreak{}broker/\allowbreak{}clients/\allowbreak{}connected} ба \texttt{\$SYS/\allowbreak{}broker/\allowbreak{}publish/\allowbreak{}messages/\allowbreak{}received}-ээс ирнэ (mosquitto \texttt{sys\_interval} тутам, анхдагч 10 с шинэчилнэ). Цуглуулагч өөрөө нэг холболт эзэлдэг --- холболтын тоо шатнаас 1--2-оор их байна. \texttt{emqx\_*} баганууд edge дээр хоосон (эсвэл \texttt{-\/-emqx} өгвөл \textbf{үүлнийх}). Хэмжилтийн хэрэгсэл юуг хэмжиж байгааг үргэлж мэдэж бай.
+\textbf{Санамж:} \texttt{-\/-target\ edge} үед CSV-ийн \texttt{broker\_\allowbreak{}connections} ба \texttt{broker\_\allowbreak{}msg\_\allowbreak{}in\_\allowbreak{}rate} нь ирмэгийн mosquitto-гийн \texttt{\$SYS/\allowbreak{}broker/\allowbreak{}clients/\allowbreak{}connected} ба \texttt{\$SYS/\allowbreak{}broker/\allowbreak{}publish/\allowbreak{}messages/\allowbreak{}received}-ээс ирнэ (mosquitto \texttt{sys\_interval} тутам, анхдагч 10 с шинэчилнэ). Цуглуулагч өөрөө нэг холболт эзэлдэг --- холболтын тоо шатнаас 1--2-оор их байна. \texttt{emqx\_*} баганууд edge дээр хоосон. Хэмжилтийн хэрэгсэл юуг хэмжиж байгааг үргэлж мэдэж бай.
 
 Албан ёсны баримт: \href{https://mosquitto.org/man/mosquitto-8.html}{mosquitto(8) --- \$SYS topics}.
 \end{quote}
 
-Шат бүрд \texttt{emqtt-bench}-ийн гаралт (илгээсэн хурд) ба Pi-гийн үзүүлэлтийг бичнэ:
+\textbf{3.3 Хүснэгт 4.3-ыг бөглө.} CSV-г шат бүрээр нь харах:
+
+\textbf{{[}Pi-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{column}\NormalTok{ {-}s, {-}t }\OperatorTok{\textless{}} \VariableTok{$(}\FunctionTok{ls}\NormalTok{ {-}t measurements/loadtest{-}edge{-}ramp{-}*.csv }\KeywordTok{|} \FunctionTok{head}\NormalTok{ {-}1}\VariableTok{)} \KeywordTok{|} \FunctionTok{less}\NormalTok{ {-}S}
+\end{Highlighting}
+\end{Shaded}
+
+(\texttt{q}-ээр гарна; сум баруун/зүүн.) «Бодит илгээсэн»-ийг \textbf{{[}ЗК · Ubuntu-1{]}}-ийн emqtt-bench гаралтаас, \texttt{si/so}-г \texttt{measurements/\allowbreak{}l4-03-vmstat.\allowbreak{}txt}-ээс ав.
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-4.3-ux438ux440ux43cux44dux433-pi-3b-mosquitto-ux448ux430ux442ux443ux443ux434}{%
 \subsubsection{Хүснэгт 4.3 --- Ирмэг (Pi 3B, mosquitto): шатууд}\label{ux445ux4afux441ux43dux44dux433ux442-4.3-ux438ux440ux43cux44dux433-pi-3b-mosquitto-ux448ux430ux442ux443ux443ux434}}
@@ -647,26 +805,45 @@ tx Mbit/с\strut
 
 \textbf{Хэзээ зогсоох вэ:} сул RAM \textless{} 150 MiB, \texttt{si/so} \textgreater{} 0, \texttt{throttled} ≠ \texttt{0x0}, mosquitto контейнер дахин асав (\texttt{docker\ inspect\ -f\ \textquotesingle{}\{\{.State.OOMKilled\}\}\ \{\{.RestartCount\}\}\textquotesingle{}\ cnc302-mosquitto}), брокер шинэ холболт авахаа больсон (скрипт өөрөө илрүүлж зогсоно), эсвэл хүлээн авалт илгээсний 95\%-иас доош.
 
-\textbf{3.3 Өгсөх урсгалыг (uplink) зориудаар ачаалах.} Дээрх шатууд өгсөх урсгалыг \textbf{хөндөөгүй} (яагаад? --- §3-ын урхи). Одоо сэдвийг гүүрээр дамжих угтвартай болгож, ачааллыг том болгоно:
+\textbf{3.4 Өгсөх урсгалыг (uplink) зориудаар ачаалах.} Дээрх шатууд өгсөх урсгалыг \textbf{хөндөөгүй} (яагаад? --- §3-ын урхи: анхдагч сэдэв \texttt{cnc302/\allowbreak{}bench/\allowbreak{}\ldots{}} гүүрийн \texttt{cnc302/shutis/\#} дүрэмд багтахгүй). Одоо сэдвийг гүүрээр дамжих угтвартай болгож, ачааллыг том болгоно. 200 холболт × 5 мсж/с × 2000 Б: зөвхөн ачаалал 16 Mbit/с, утсан дээр ≈ 17.8 Mbit/с.
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [ЗК] компьютер дээрээс (SITE/AREA/LINE{-}ийг edge/.env{-}ээс хуул).}
-\CommentTok{\# 200 холболт × 5 мсж/с × 2000 Б: зөвхөн ачаалал 16 Mbit/с, утсан дээр ≈ 17.8 Mbit/с}
-\VariableTok{TOPIC=}\StringTok{"cnc302/}\VariableTok{$SITE}\StringTok{/}\VariableTok{$AREA}\StringTok{/}\VariableTok{$LINE}\StringTok{/bench{-}\%i/telemetry"} \VariableTok{PAYLOAD\_SIZE=}\NormalTok{2000 }\KeywordTok{\textbackslash{}}
-  \FunctionTok{bash}\NormalTok{ lab04/loadtest.sh {-}{-}target edge pub }\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{ 200 5}
+\VariableTok{TOPIC=}\StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/bench{-}\%i/telemetry\textquotesingle{}} \VariableTok{PAYLOAD\_SIZE=}\NormalTok{2000 }\KeywordTok{\textbackslash{}}
+  \FunctionTok{bash}\NormalTok{ lab04/loadtest.sh {-}{-}target edge pub }\OperatorTok{\textless{}}\NormalTok{PI\_IP}\OperatorTok{\textgreater{}}\NormalTok{ 200 5}
 \end{Highlighting}
 \end{Shaded}
 
-{[}Pi{]} зэрэг ажиглана (\texttt{collect\_\allowbreak{}metrics.\allowbreak{}py}-ийн \texttt{tx\ Mbit} багана, \texttt{docker\ stats}-ийн NET I/O өсөлт):
+(\texttt{SITE} нь \texttt{shutis}-ээс өөр бол сэдвийг өөрийн \texttt{edge/.env}-ийн утгаар соль.)
+
+60 секундын дараа, ачаалал ажиллаж байх \textbf{зуур}:
+
+\textbf{{[}Pi-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \ExtensionTok{docker}\NormalTok{ stats {-}{-}no{-}stream {-}{-}format }\StringTok{\textquotesingle{}table \{\{.Name\}\}\textbackslash{}t\{\{.NetIO\}\}\textbackslash{}t\{\{.MemUsage\}\}\textbackslash{}t\{\{.CPUPerc\}\}\textquotesingle{}}
+\FunctionTok{sleep}\NormalTok{ 10}
+\ExtensionTok{docker}\NormalTok{ stats {-}{-}no{-}stream {-}{-}format }\StringTok{\textquotesingle{}table \{\{.Name\}\}\textbackslash{}t\{\{.NetIO\}\}\textbackslash{}t\{\{.MemUsage\}\}\textbackslash{}t\{\{.CPUPerc\}\}\textquotesingle{}}
+\FunctionTok{free}\NormalTok{ {-}m}
 \end{Highlighting}
 \end{Shaded}
 
-Ачааллыг 5 → 10 мсж/с болгож давт (≈ 35.7 Mbit/с утсан дээр). Дараа нь онолын таазад ойртуулъя: 500 × 10 × 2000 ≈ 89 Mbit/с. Өгсөх урсгал тэр хэмжээнд хүрэв үү, эсвэл түүнээс өмнө RAM (контейнер/хост) эсвэл CPU ханав уу?
+\textbf{Хэмжсэн Mbit/с} = (хоёр дахь NET I/O-ийн «гарсан» − эхнийх) × 8 / 10 сек. Мөн компьютер дээр гүүрээр ирж байгааг шалга:
+
+\textbf{{[}ЗК · Ubuntu-2{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/bench{-}1/telemetry\textquotesingle{}}\NormalTok{ {-}C 3 }\KeywordTok{|} \FunctionTok{wc}\NormalTok{ {-}c}
+\end{Highlighting}
+\end{Shaded}
+
+✓ 0-ээс их тоо = гүүрээр үүлэнд \textbf{хүрсэн}.
+
+\textbf{{[}ЗК · Ubuntu-1{]}}-д \texttt{Ctrl\ +\ C}, дараа нь \texttt{\ldots{}\ pub\ \textless{}PI\_\allowbreak{}IP\textgreater{}\ 200\ 10}, тэгээд \texttt{\ldots{}\ pub\ \textless{}PI\_\allowbreak{}IP\textgreater{}\ 500\ 10}-оор давт (≈ 35.7 ба ≈ 89 Mbit/с). Өгсөх урсгал тэр хэмжээнд хүрэв үү, эсвэл түүнээс өмнө RAM (контейнер/хост) эсвэл CPU ханав уу? Сул RAM 150 MiB-ээс доош унавал \textbf{зогсоо}.
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-4.4-ux4e9ux433ux441ux4e9ux445-ux443ux440ux441ux433ux430ux43bux44bux43d-uplink-ux430ux447ux430ux430ux43bux430ux43b-ux441ux44dux434ux44dux432-ux433ux4afux4afux440ux44dux44dux440-ux434ux430ux43cux436ux438ux43dux430}{%
 \subsubsection{Хүснэгт 4.4 --- Өгсөх урсгалын (uplink) ачаалал (сэдэв гүүрээр дамжина)}\label{ux445ux4afux441ux43dux44dux433ux442-4.4-ux4e9ux433ux441ux4e9ux445-ux443ux440ux441ux433ux430ux43bux44bux43d-uplink-ux430ux447ux430ux430ux43bux430ux43b-ux441ux44dux434ux44dux432-ux433ux4afux4afux440ux44dux44dux440-ux434ux430ux43cux436ux438ux43dux430}}
@@ -746,17 +923,35 @@ ule{1.5cm}{0.4pt}\strut
 \hypertarget{ux430ux43bux445ux430ux43c-4-ux4afux4afux43bux43dux438ux439-ux430ux447ux430ux430ux43bux43bux44bux43d-ux442ux435ux441ux442-45-ux43cux438ux43d-ux437ux43a}{%
 \subsection{Алхам 4 --- Үүлний ачааллын тест (45 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-4-ux4afux4afux43bux43dux438ux439-ux430ux447ux430ux430ux43bux43bux44bux43d-ux442ux435ux441ux442-45-ux43cux438ux43d-ux437ux43a}}
 
-Ижил аргачлал, өөр зорилт. Шатууд \textbf{50 100 250 500 1000 2000}.
+Ижил аргачлал, өөр зорилт. Шатууд \textbf{50 100 250 500 1000 2000}, ≈ 14 минут.
+
+\textbf{4.1 Цуглуулагч} (CSV-д \texttt{target=cloud}):
+
+\textbf{{[}ЗК · Ubuntu-2{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [ЗК] терминал 1 — цуглуулагч (CSV{-}д \textasciigrave{}target=cloud\textasciigrave{})}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \ExtensionTok{python3}\NormalTok{ lab04/collect\_metrics.py {-}{-}target cloud {-}{-}label ramp {-}{-}seconds 900}
-
-\CommentTok{\# [ЗК] терминал 2 — ачаалал}
-\FunctionTok{bash}\NormalTok{ lab04/loadtest.sh {-}{-}target cloud ramp localhost}
+\ExtensionTok{python}\NormalTok{ lab04/collect\_metrics.py {-}{-}target cloud {-}{-}label ramp {-}{-}seconds 900}
 \end{Highlighting}
 \end{Shaded}
+
+✓ 5 сек тутам мөр хэвлэнэ; \texttt{emqx\_\allowbreak{}connections} багана тоо агуулна. ✗ \texttt{401} → API түлхүүр (§2.2, Лаб 2 Алхам 0).
+
+\textbf{4.2 Ачаалал.} Хаягт \texttt{localhost} \textbf{биш}, \texttt{\textless{}LAPTOP\_\allowbreak{}IP\textgreater{}}-ийг өг --- emqtt-bench Docker Desktop-ийн дотоод VM-д ажилладаг тул тэндээс \texttt{localhost} нь Windows-ийн EMQX биш:
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{bash}\NormalTok{ lab04/loadtest.sh {-}{-}target cloud ramp }\OperatorTok{\textless{}}\NormalTok{LAPTOP\_IP}\OperatorTok{\textgreater{}}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{{[}enter{]}} асуухад \texttt{Enter}.
+
+✓ Шат бүрд \texttt{\ldots{}\ дууслаа\ (брокер\ амьд)}. Дууссаны дараа \textbf{{[}ЗК · Ubuntu-2{]}} CSV бичигдэнэ (эсвэл \texttt{Ctrl\ +\ C}).
+
+✗ \texttt{✗\ \textless{}LAPTOP\_\allowbreak{}IP\textgreater{}:\allowbreak{}1883\ хариу\ өгөхгүй} → IP өөрчлөгдсөн (\texttt{ipconfig}) эсвэл галт хана (SETUP А.6).
 
 \begin{quote}
 Ачаалал үүсгэгч ба брокер нэг машин дээр байвал \textbf{компьютер өөрөө хязгаарлагч} болж мэднэ. Хоёр дахь машинаас (эсвэл багийн нөгөө гишүүний компьютерээс) ачаалж чадвал илүү зөв. Аль нөхцөлд хэмжсэнээ үзүүлэнд заавал хэл.
@@ -880,7 +1075,18 @@ CPU \%\strut
 \hypertarget{ux430ux43bux445ux430ux43c-5-emqx-rule-engine-ux43cux435ux441ux441ux435ux436ux438ux439ux433-ux431ux440ux43eux43aux435ux440-ux434ux44dux44dux440-ux447ux438ux433ux43bux4afux4afux43bux44dux445-30-ux43cux438ux43d-ux437ux43a}{%
 \subsection{Алхам 5 --- EMQX rule engine: мессежийг брокер дээр чиглүүлэх (30 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-5-emqx-rule-engine-ux43cux435ux441ux441ux435ux436ux438ux439ux433-ux431ux440ux43eux43aux435ux440-ux434ux44dux44dux440-ux447ux438ux433ux43bux4afux4afux43bux44dux445-30-ux43cux438ux43d-ux437ux43a}}
 
-\textbf{5.1} EMQX самбар (\texttt{:18083}) → \textbf{Integration → Rules → Create} (5.8-ын цэсний нэр; хувилбараас хамаарч «Data Integration» гэж бичигдэж болно). Чичиргээний хэт өндөр утгыг шүүх дүрэм:
+\textbf{5.1 Дүрэм үүсгэх.} Windows-ийн хөтчөөр http://localhost:18083 →
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Зүүн цэс \textbf{Integration → Rules} (хувилбараас хамаарч «Data Integration») → \textbf{+ Create}.
+\item
+  \textbf{Name} (хувилбараас хамаарч \textbf{Rule ID}): \texttt{vibration\_alert}.
+\item
+  \textbf{SQL Editor}-т байгаа текстийг устгаж, доорхийг буулга:
+\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -897,34 +1103,70 @@ CPU \%\strut
 \end{Highlighting}
 \end{Shaded}
 
-Үйлдэл (Action): \textbf{Republish} → Topic \texttt{cnc302/\allowbreak{}alerts/\allowbreak{}vibration}, QoS 1, Payload \texttt{\$\{.\}} (SELECT-ийн бүх талбарыг JSON болгоно). JSON ачааллын талбарт \texttt{payload.\allowbreak{}\textless{}нэр\textgreater{}}-ээр шууд хандана.
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  Баруун талд \textbf{+ Add Action} → Type of Action: \textbf{Republish} → Topic \texttt{cnc302/\allowbreak{}alerts/\allowbreak{}vibration}, QoS \texttt{1}, Payload \texttt{\$\{.\}} (SELECT-ийн бүх талбарыг JSON болгоно) → \textbf{Add}.
+\item
+  Доод талд \textbf{Save} (эсвэл \textbf{Create}).
+\end{enumerate}
+
+✓ Rules жагсаалтад \texttt{vibration\_alert} \textbf{Enabled}.
 
 \begin{quote}
 EMQX 5.8.6 дээр шууд туршсан: энэ дүрэм \texttt{sim\_\allowbreak{}device.\allowbreak{}py\ -\/\allowbreak{}-anomaly-rate\ 0.\allowbreak{}5} урсгал дээр \texttt{\{"vibration":\allowbreak{}3.\allowbreak{}37,"ts":\allowbreak{}\ldots{},"temperature":\allowbreak{}32.\allowbreak{}1,"source":\allowbreak{}"dev0002","device\_\allowbreak{}id":\allowbreak{}"dev0002"\}} хэлбэрийн дохиолол гаргав. \texttt{cnc302/\allowbreak{}alerts/\allowbreak{}\ldots{}} нь 6 хэсэгтэй UNS схемд багтахгүй (Лаб 3, \texttt{uns\_\allowbreak{}tree.\allowbreak{}py\ -\/\allowbreak{}-strict}) --- багийн схемд хаана байрлуулахаа шийд.
 \end{quote}
 
-\textbf{5.2 Туршина:}
+\textbf{5.2 Туршина.} Эхлээд дохиоллыг сонс:
+
+\textbf{{[}ЗК · Ubuntu-2{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [ЗК] терминал 1 — дохиоллыг сонсоно; терминал 2 — гажилтай өгөгдөл илгээнэ}
 \ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}cnc302/alerts/\#\textquotesingle{}}\NormalTok{ {-}v}
-\ExtensionTok{python3}\NormalTok{ tools/sim\_device.py {-}{-}target cloud {-}{-}host localhost {-}{-}devices 5 {-}{-}interval 1 {-}{-}anomaly{-}rate 0.2}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{5.3 Ачаалалтай үед дүрэм ажиллаж байна уу?} Алхам 4-ийн 500 холболтын шатыг дахин ажиллуулж, дүрмийн статистик ба EMQX-ийн CPU-г дүрэмгүй үетэй харьцуул. Самбарын дүрмийн хуудас эсвэл REST API-аас уншина:
+Дараа нь гажилтай өгөгдөл илгээ:
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ tools/sim\_device.py {-}{-}target cloud {-}{-}host localhost {-}{-}devices 5 {-}{-}interval 1 {-}{-}anomaly{-}rate 0.2}
+\end{Highlighting}
+\end{Shaded}
+
+✓ (5.3-ын эхэнд \texttt{RULE=} хоосон бол 5.1-ийн нэрийг шалга.) \textbf{{[}ЗК · Ubuntu-2{]}}-д хэдэн секунд тутам \texttt{cnc302/\allowbreak{}alerts/\allowbreak{}vibration\ \{"vibration":\allowbreak{}\ldots{}\}} гарна. 30 секундын дараа хоёуланд \texttt{Ctrl\ +\ C}.
+
+\textbf{5.3 Ачаалалтай үед дүрэм ажиллаж байна уу?} Дүрмийн ID-г олж, тоолуурыг унш:
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{RULE=$(}\ExtensionTok{curl}\NormalTok{ {-}s {-}u }\StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"}\NormalTok{ http://localhost:18083/api/v5/rules }\KeywordTok{\textbackslash{}}
+  \KeywordTok{|} \ExtensionTok{jq}\NormalTok{ {-}r }\StringTok{\textquotesingle{}.data[] | select(.name=="vibration\_alert" or .id=="vibration\_alert") | .id\textquotesingle{}}\VariableTok{)}
+\BuiltInTok{echo} \StringTok{"RULE=}\VariableTok{$RULE}\StringTok{"}
 \ExtensionTok{curl}\NormalTok{ {-}s {-}u }\StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"} \KeywordTok{\textbackslash{}}
-  \ExtensionTok{http}\NormalTok{://localhost:18083/api/v5/rules/}\OperatorTok{\textless{}}\NormalTok{дүрмийн{-}id}\OperatorTok{\textgreater{}}\NormalTok{/metrics }\KeywordTok{|} \ExtensionTok{python3}\NormalTok{ {-}m json.tool}
+  \ExtensionTok{http}\NormalTok{://localhost:18083/api/v5/rules/}\VariableTok{$RULE}\NormalTok{/metrics }\KeywordTok{|} \ExtensionTok{jq} \StringTok{\textquotesingle{}.metrics\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+Одоо Алхам 4-ийн \textbf{500 холболтын} шатыг дүрэмтэй үед дахин ажиллуул (2 мин), тоолуур ба EMQX-ийн CPU-г (\texttt{docker\ stats\ -\/\allowbreak{}-no-stream\ cnc302-emqx}) дүрэмгүй үетэй (Хүснэгт 4.5) харьцуул:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{TOPIC=}\StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/bench{-}\%i/telemetry\textquotesingle{}} \ExtensionTok{timeout}\NormalTok{ 120 }\KeywordTok{\textbackslash{}}
+  \FunctionTok{bash}\NormalTok{ lab04/loadtest.sh {-}{-}target cloud pub }\OperatorTok{\textless{}}\NormalTok{LAPTOP\_IP}\OperatorTok{\textgreater{}}\NormalTok{ 500 1}
 \end{Highlighting}
 \end{Shaded}
 
 Гол тоолуурууд: \texttt{matched} (FROM-д таарсан), \texttt{passed} (WHERE үнэн), \texttt{failed.\allowbreak{}no\_\allowbreak{}result} (WHERE худал --- \textbf{алдаа биш}, шүүгдсэн мессеж), \texttt{failed.exception} (жинхэнэ алдаа), \texttt{actions.success} / \texttt{actions.failed}, \texttt{matched.rate}. Анхаар: \texttt{failed} нь \texttt{failed.\allowbreak{}no\_\allowbreak{}result}-ийг агуулдаг тул «Failed» өндөр байх нь шүүлтүүр ажиллаж байгааг л илэрхийлж болно.
 
-\textbf{5.4 Цонхны нэгтгэл.} EMQX-ийн rule SQL доорх бичлэгийг хүлээн авах эсэхийг \textbf{шалгаж, самбарын буцаасан мессежийг үгчлэн бич} --- хүлээн авахгүй бол энэ нь Лаб 5-д Node-RED хэрэгтэй болох шалтгаан:
+\textbf{5.4 Цонхны нэгтгэл.} 5.1-ийн адил \textbf{шинэ} дүрэм үүсгэх гэж оролдож, доорх SQL-ийг буулгаад \textbf{Save} дар. EMQX хүлээн авах эсэхийг шалгаж, самбарын буцаасан мессежийг \textbf{үгчлэн} тайландаа бич --- хүлээн авахгүй бол энэ нь Лаб 5-д Node-RED хэрэгтэй болох шалтгаан:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -993,22 +1235,35 @@ Node-RED ({[}ЗК{]}, Лаб 5-д хэмжинэ)\strut
 \hypertarget{ux430ux43bux445ux430ux43c-6-ux445ux43eux451ux440-ux43cux443ux440ux443ux439-ux43dux44dux433-ux442ux44dux43dux445ux43bux44dux433-ux445ux430ux43dux430ux43bux442ux44bux43d-ux448ux438ux43dux436ux438ux43bux433ux44dux44d-30-ux43cux438ux43d-ux437ux43a}{%
 \subsection{Алхам 6 --- Хоёр муруй, нэг тэнхлэг: ханалтын шинжилгээ (30 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-6-ux445ux43eux451ux440-ux43cux443ux440ux443ux439-ux43dux44dux433-ux442ux44dux43dux445ux43bux44dux433-ux445ux430ux43dux430ux43bux442ux44bux43d-ux448ux438ux43dux436ux438ux43bux433ux44dux44d-30-ux43cux438ux43d-ux437ux43a}}
 
+\textbf{6.1 Pi-гийн CSV-г компьютер руу хуулах.} (Лаб 1 Алхам 8.1-д SSH түлхүүрээ \texttt{\textasciitilde{}/.ssh/cnc302}-д хуулсан.)
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [ЗК] хоёр хостын CSV{-}г нэг дор өгнө (Pi{-}гийнхийг эхлээд хуулж ав)}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\FunctionTok{scp}\NormalTok{ pi@}\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{:\textasciitilde{}/cnc302/measurements/loadtest{-}edge{-}ramp{-}*.csv measurements/}
-\ExtensionTok{python3}\NormalTok{ lab04/plot\_scaling.py measurements/loadtest{-}edge{-}*.csv }\KeywordTok{\textbackslash{}}
-        \ExtensionTok{measurements/loadtest{-}cloud{-}*.csv}\NormalTok{ {-}{-}out lab04/scaling.png}
+\FunctionTok{scp}\NormalTok{ {-}i \textasciitilde{}/.ssh/cnc302 }\StringTok{\textquotesingle{}cnc302@\textless{}PI\_IP\textgreater{}:cnc302/measurements/loadtest{-}edge{-}ramp{-}*.csv\textquotesingle{}} \KeywordTok{\textbackslash{}}
+    \StringTok{\textquotesingle{}cnc302@\textless{}PI\_IP\textgreater{}:cnc302/measurements/l4{-}*.txt\textquotesingle{}} \ExtensionTok{measurements/}
+\FunctionTok{ls}\NormalTok{ measurements/}
 \end{Highlighting}
 \end{Shaded}
 
-matplotlib байхгүй бол ASCII график гарна (edge = ●, cloud = ○) --- үзүүлэнд ч хангалттай.
+✓ \texttt{loadtest-edge-ramp-\ldots{}csv} ба \texttt{loadtest-cloud-ramp-\ldots{}csv} хоёулаа байна.
+
+\textbf{6.2 График.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab04/plot\_scaling.py measurements/loadtest{-}edge{-}*.csv }\KeywordTok{\textbackslash{}}
+       \ExtensionTok{measurements/loadtest{-}cloud{-}*.csv}\NormalTok{ {-}{-}out lab04/scaling.png}
+\end{Highlighting}
+\end{Shaded}
+
+matplotlib байхгүй бол ASCII график гарна (edge = ●, cloud = ○) --- үзүүлэнд ч хангалттай. PNG хэрэгтэй бол: \texttt{pip\ install\ "matplotlib\textgreater{}=\allowbreak{}3.\allowbreak{}8,\textless{}4"} → дахин ажиллуул.
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-4.7-ux430ux43bux44c-ux43dux4e9ux4e9ux446-ux442ux4afux440ux4afux4afux43bux436-ux445ux430ux43dux430ux432}{%
 \subsubsection{Хүснэгт 4.7 --- Аль нөөц түрүүлж ханав}\label{ux445ux4afux441ux43dux44dux433ux442-4.7-ux430ux43bux44c-ux43dux4e9ux4e9ux446-ux442ux4afux440ux4afux4afux43bux436-ux445ux430ux43dux430ux432}}
 
-Багана бүрд \textbf{тоо ба эх сурвалж} бич. "RAM ханасан" гэсэн ганц үг оноо авахгүй.
+Багана бүрд \textbf{тоо ба эх сурвалж} бич. «RAM ханасан» гэсэн ганц үг оноо авахгүй.
 
 \begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
 \toprule
@@ -1088,6 +1343,8 @@ microSD (I/O хүлээлт \texttt{wa})\strut
 \end{minipage}\tabularnewline
 \bottomrule
 \end{longtable}\endgroup
+
+\texttt{wa} (I/O хүлээлт) нь \texttt{measurements/\allowbreak{}l4-03-vmstat.\allowbreak{}txt}-ийн \texttt{wa} багана.
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-4.8-ux442ux430ux430ux43cux430ux433-ux431ux430-ux431ux43eux434ux438ux442}{%
 \subsubsection{Хүснэгт 4.8 --- Таамаг ба бодит}\label{ux445ux4afux441ux43dux44dux433ux442-4.8-ux442ux430ux430ux43cux430ux433-ux431ux430-ux431ux43eux434ux438ux442}}
@@ -1171,17 +1428,30 @@ C_edge (70%) = ______ мсж/с      C_cloud (70%) = ______ мсж/с
 
 \textbf{Заавал үзүүлэх:} ханалтын график, хязгаарын цэг, таамаг--бодит зөрүү, ханасан нөөцийн \textbf{нотолгоо}.
 
+\textbf{8.1 Нэмэх ба шалгах.} \texttt{measurements/} нь \texttt{.gitignore}-д --- тайланд хэрэгтэй CSV-г \textbf{зориуд} \texttt{-f}-ээр нэмнэ:
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\FunctionTok{git}\NormalTok{ add lab04/}
-\CommentTok{\# measurements/ нь .gitignore{-}д — тайланд хэрэгтэй CSV{-}г зориудаар албадан нэмнэ}
-\FunctionTok{git}\NormalTok{ add {-}f measurements/loadtest{-}edge{-}ramp{-}*.csv measurements/loadtest{-}cloud{-}ramp{-}*.csv}
+\FunctionTok{cp}\NormalTok{ docs/report{-}template.md lab04/report.md     \# үзүүлэнгийн тэмдэглэлээ энд}
+\FunctionTok{git}\NormalTok{ add lab04/report.md}
+\BuiltInTok{[} \OtherTok{{-}f}\NormalTok{ lab04/scaling.png}\BuiltInTok{ ]} \KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ add lab04/scaling.png}
+\FunctionTok{git}\NormalTok{ add {-}f measurements/loadtest{-}edge{-}ramp{-}*.csv measurements/loadtest{-}cloud{-}ramp{-}*.csv measurements/l4{-}*.txt}
 \FunctionTok{git}\NormalTok{ status {-}{-}short}
+\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}E }\StringTok{\textquotesingle{}\textbackslash{}.env$|bridge\textbackslash{}.conf$|\textbackslash{}.key$|\textbackslash{}.crt$|devices\textbackslash{}.csv\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+✓ Сүүлийн команд \textbf{юу ч хэвлэхгүй}.
+
+\textbf{8.2 Commit ба push.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{git}\NormalTok{ commit {-}m }\StringTok{"Лаб 4: ирмэг ба үүлний багтаамжийн хязгаар"}
-\FunctionTok{git}\NormalTok{ tag lab04{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push {-}{-}tags}
-\CommentTok{\# Нууц файл ороогүйг ЗААВАЛ шалга}
-\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}E }\StringTok{\textquotesingle{}\textbackslash{}.env$|bridge\textbackslash{}.conf$|\textbackslash{}.key$|\textbackslash{}.crt$|devices\textbackslash{}.csv\textquotesingle{}}\NormalTok{   \# хоосон байх ЁСТОЙ}
+\FunctionTok{git}\NormalTok{ tag lab04{-}done}
+\FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push {-}{-}tags}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1335,14 +1605,14 @@ Docker-ийг асаа, эсвэл \texttt{USE\_DOCKER=0} + releases-ийн \tex
 \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
 ачаалал үүлний EMQX рүү явж байна\strut
 \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
-\texttt{-\/-target\ edge} ба \texttt{\textless{}PI-IP\textgreater{}}-ээ шалга\strut
+\texttt{-\/-target\ edge} ба \texttt{\textless{}PI\_\allowbreak{}IP\textgreater{}}-ээ шалга\strut
 \end{minipage}\tabularnewline
 \begin{minipage}[t]{0.30\columnwidth}\raggedright
 Өгсөх урсгал (tx) огт ачаалагдахгүй\strut
 \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
 сэдэв \texttt{cnc302/\allowbreak{}\textless{}SITE\textgreater{}/\allowbreak{}} угтваргүй\strut
 \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
-Алхам 3.3-ын \texttt{TOPIC=}\strut
+Алхам 3.4-ийн \texttt{TOPIC=}\strut
 \end{minipage}\tabularnewline
 \begin{minipage}[t]{0.30\columnwidth}\raggedright
 \texttt{collect\_\allowbreak{}metrics.\allowbreak{}py} EMQX API алдаа \texttt{401}\strut
@@ -1392,6 +1662,48 @@ CPU 400\% харагдана\strut
 ачаалал үүсгэгч нэг машин дээр\strut
 \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
 өөр машинаас ачаал, эсвэл \texttt{-c} багасгаж хурдыг нэмэгдүүл\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{collect\_\allowbreak{}metrics.\allowbreak{}py} (Pi): \texttt{No\ module\ named\ \textquotesingle{}requests\textquotesingle{}}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+ирмэгийн venv-д \texttt{requests} алга\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+§2.3 (а)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{collect\_\allowbreak{}metrics.\allowbreak{}py} (Pi): \texttt{No\ module\ named\ \textquotesingle{}paho\textquotesingle{}}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{python3} гэж бичсэн\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{\$PY} (§2.2)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{measure\_\allowbreak{}stack.\allowbreak{}sh}: \texttt{Permission\ denied}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{./tools/\ldots{}} гэж ажиллуулсан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{bash\ tools/\allowbreak{}measure\_\allowbreak{}stack.\allowbreak{}sh\ \ldots{}}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Үүлний тест: \texttt{localhost:\allowbreak{}1883\ хариу\ өгөхгүй}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+emqtt-bench Docker Desktop-ийн VM-д ажилладаг\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{\textless{}LAPTOP\_\allowbreak{}IP\textgreater{}} өг (Алхам 4.2)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Шатны тест дуусахаас өмнө Pi-гийн цонхнууд зогсов\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{-\/-watch} / \texttt{-\/-seconds} хугацаа богино\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+1100 сек (Алхам 3.2)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{scp}: \texttt{Permission\ denied\ (publickey)}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+хэрэглэгч \texttt{pi@} гэж бичсэн\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{cnc302@\textless{}PI\_\allowbreak{}IP\textgreater{}}\strut
 \end{minipage}\tabularnewline
 \bottomrule
 \end{longtable}\endgroup

@@ -33,37 +33,121 @@
 
 ## 2. Урьдчилсан нөхцөл — БИЕ ДААЛТААР УРЬДЧИЛАН ХИЙНЭ
 
-Лабораторийн цагаар загвар сургах хугацаа **байхгүй**. Дараах зүйлс бэлэн байх ёстой.
+Лабораторийн цагаар загвар сургах хугацаа **байхгүй**. Доорх 2.1–2.6-г X–XI долоо хоногийн бие даалтаар хийж, лабд ирэхэд **2.7-ийн шалгалт бүгд ✅** байх ёстой.
 
-### X долоо хоног — өгөгдөл цуглуулах 🥧
+> 💡 **Алхмуудыг дарааллаар нь хий.** Алхам бүрийн төгсгөлд ✅ **Шалгах** хэсэг бий. Үр дүн нь таарахгүй бол **цааш бүү яв** — ❌ мөр эсвэл §8-аас шалтгааныг ол.
+
+### 2.0 Терминалууд ба орчин
+
+| Цонх | Хаана |
+|---|---|
+| **[🥧 Pi-1]**, **[🥧 Pi-2]** | Raspberry Pi (`ssh pi`) |
+| **[💻 Ubuntu-1]**, **[💻 Ubuntu-2]** | Зөөврийн компьютер (WSL) |
+
+Цонх **нээх бүрт**:
+
+**[🥧 Pi-1]** ба **[🥧 Pi-2]**
+```bash
+cd ~/cnc302
+PY=~/cnc302/edge/.venv/bin/python
+set -a && source ~/cnc302/edge/.env && set +a
+echo "төхөөрөмж=$DEVICE_ID"
+```
+
+**[💻 Ubuntu-1]** ба **[💻 Ubuntu-2]**
+```bash
+cd ~/cnc302 && source .venv/bin/activate
+export DEV=pi3b-team<NN>
+```
+
+### 2.1 Pi дээр орчин бэлдэх 🥧 (X долоо хоног)
+
+**[🥧 Pi-1]**
+```bash
+git pull
+mkdir -p lab06/data lab06/models lab06/out
+$PY -m pip install numpy ai-edge-litert
+$PY -c "from ai_edge_litert.interpreter import Interpreter; print('OK')"
+```
+
+✅ `OK`. (SETUP Б.8-д суулгасан бол `Requirement already satisfied`.)
+
+LiteRT бол TensorFlow Lite-ийн шинэ нэр; Python-ы interpreter багц нь `tflite-runtime`-аас `ai-edge-litert` болж солигдсон (`from ai_edge_litert.interpreter import Interpreter`). PyPI-д cp311 (Bookworm) ба cp313 (Trixie) `manylinux_2_27_aarch64` wheel бий. **32-бит OS дээр суухгүй** (`uname -m` → `aarch64` байх ёстой). Хуучин `tflite-runtime`-ийн сүүлийн хувилбар 2.14 (2023) — нөөц хувилбар болгон л ашигла; скриптүүд аль алиныг нь танина.
+
+> Албан ёсны баримт: [LiteRT — Migrate (tflite-runtime → ai-edge-litert)](https://ai.google.dev/edge/litert/migration), [pypi: ai-edge-litert](https://pypi.org/project/ai-edge-litert/)
+
+### 2.2 Өгөгдөл цуглуулах 🥧 (X долоо хоног)
 
 Ирмэгийн агент нь `telemetry` суваг руу `proc_temp_c`, `vibration_g`, `rpm` гурван талбар нийтэлдэг. Загвар яг эдгээр дээр сурна. Агентын `--detector` нь **оролт `[1, 3]`** (энэ гурван утга, энэ дарааллаар), **гаралт нь 0..1 гажлын оноо** бүхий `.tflite` загвар хүлээдэг — сургалтын аль ч зам энэ гэрээг хангах ёстой.
 
-```bash
-# 🥧 терминал 1 — агент, хэвийн ажиллагаа  (дараа нь --anomaly-rate 1.0-оор давт)
-cd ~/cnc302/edge && .venv/bin/python agent/edge_agent.py --interval 0.5 --anomaly-rate 0.0
+**(а) Хэвийн өгөгдөл — 5 минут.** Эхлээд агент:
 
-# 🥧 терминал 2 — цуглуулагч (ирмэгийн брокероос)
-cd ~/cnc302
-python3 lab06/collect_data.py --label normal  --seconds 300 --device pi3b-01
-python3 lab06/collect_data.py --label anomaly --seconds 120 --device pi3b-01
+**[🥧 Pi-1]**
+```bash
+cd ~/cnc302/edge && $PY agent/edge_agent.py --interval 0.5 --anomaly-rate 0.0 --detector ''
 ```
 
-Гаралт: `lab06/data/normal-*.csv`, `lab06/data/anomaly-*.csv`.
+Дараа нь цуглуулагч:
 
-### XI долоо хоног — сургалт 💻 зөөврийн компьютер дээр
+**[🥧 Pi-2]**
+```bash
+$PY lab06/collect_data.py --label normal --seconds 300 --device $DEVICE_ID
+```
+
+✅ 5 минутын дараа `lab06/data/normal-….csv` бичигдсэн гэж гарна. **[🥧 Pi-1]**-д `Ctrl + C`.
+
+**(б) Гажилтай өгөгдөл — 2 минут.** Агентыг `--anomaly-rate 1.0`-аар:
+
+**[🥧 Pi-1]**
+```bash
+$PY agent/edge_agent.py --interval 0.5 --anomaly-rate 1.0 --detector ''
+```
+
+**[🥧 Pi-2]**
+```bash
+$PY lab06/collect_data.py --label anomaly --seconds 120 --device $DEVICE_ID
+ls -l lab06/data/
+wc -l lab06/data/*.csv
+```
+
+✅ `normal-*.csv` (~600 мөр) ба `anomaly-*.csv` (~240 мөр). **[🥧 Pi-1]**-д `Ctrl + C`, `cd ~/cnc302`.
+
+❌ CSV хоосон (1 мөр = толгой) → `--device` буруу: агент ажиллаж байх үед `mosquitto_sub -h localhost -t 'cnc302/#' -v -C 3` → сэдвийн 5-р хэсэг таны `DEVICE_ID` мөн эсэхийг шалга.
+
+**(в) Өгөгдлийг компьютер руу хуулах.** `lab06/data/` нь `.gitignore`-д тул `scp`-ээр:
+
+**[💻 Ubuntu-1]**
+```bash
+mkdir -p lab06/data lab06/models lab06/out
+scp -i ~/.ssh/cnc302 'cnc302@<PI_IP>:cnc302/lab06/data/*.csv' lab06/data/
+ls lab06/data/
+```
+
+### 2.3 Сургалт 💻 зөөврийн компьютер дээр (XI долоо хоног)
 
 Сургалт **үүлний давхаргад** явагдана. Pi 3B дээр сургах гэж бүү оролд.
 
-**А зам (үндсэн) — Keras + LiteRT converter.** `lab06/train_tiny_model.py` нь CSV-г уншиж `Normalization → Dense(16) → Dense(8) → Dense(1, sigmoid)` загварыг сургаад LiteRT-ийн албан ёсны post-training quantization-оор хоёр файл гаргана:
+**А зам (үндсэн) — Keras + LiteRT converter.** `lab06/train_tiny_model.py` нь CSV-г уншиж `Normalization → Dense(16) → Dense(8) → Dense(1, sigmoid)` загварыг сургаад LiteRT-ийн албан ёсны post-training quantization-оор хоёр файл гаргана.
+
+TensorFlow хэдэн зуун MB тул **тусдаа** venv-д суулгана (10–20 мин):
+
+**[💻 Ubuntu-1]**
+```bash
+python3 -m venv ~/tf
+~/tf/bin/pip install --upgrade pip
+~/tf/bin/pip install tensorflow
+~/tf/bin/python -c "import tensorflow as tf; print(tf.__version__)"
+```
+
+✅ `2.x.x`. Дараа нь сурга:
 
 ```bash
-# 💻 зөөврийн компьютер дээр (TensorFlow ~ хэдэн зуун MB)
-python3 -m venv ~/tf && ~/tf/bin/pip install tensorflow
-cd ~/cnc302 && ~/tf/bin/python lab06/train_tiny_model.py --data lab06/data --out lab06/models
-#   → lab06/models/model_float32.tflite, lab06/models/model_int8.tflite
-#   float32 ба int8 validation нарийвчлалыг хэвлэнэ — Хүснэгт 6.2-т бич
+cd ~/cnc302
+~/tf/bin/python lab06/train_tiny_model.py --data lab06/data --out lab06/models
+ls -l lab06/models/
 ```
+
+✅ `model_float32.tflite` ба `model_int8.tflite` үүсэж, float32 ба int8 validation нарийвчлал хэвлэгдэнэ — **Хүснэгт 6.2-т бич**.
 
 Бүрэн бүхэл тоон (full integer) квантчлалын гол мөрүүд (скрипт дотор):
 
@@ -83,29 +167,47 @@ converter.inference_output_type = tf.int8
 - Агентад ашиглах бол impulse нь дээрх `[1, 3]` гэрээг хангах ёстой: TFLite экспортын оролтын хэлбэрийг `benchmark_inference.py --backend tflite` хэвлэдэг `оролт=(…)`-оор шалга. Хэрэв `(1, 3)` биш бол (жишээ нь Spectral Analysis блокийн шинж чанар хүлээж байвал) агент ачаалахгүй — А замыг ашигла.
 - Studio-гийн **Model testing** нарийвчлалыг Хүснэгт 6.2-т бичиж болно.
 
-### XI долоо хоног — сөрөг жишээний загвар (MobileNet) 💻
+### 2.4 Сөрөг жишээний загвар (MobileNet) 💻 (XI долоо хоног)
 
-Өмнө нь хэрэглэж байсан `download.tensorflow.org/models/tflite_11_05_08/mobilenet_v1_1.0_224_quant.tgz` холбоос **ажиллахаа больсон** (2026-09-д HTTP 403). Оронд нь Keras-ын албан ёсны `MobileNetV2`-ийг (224×224×3, ImageNet жин) ижил converter-ээр бүрэн int8 болгоно:
+Өмнө нь хэрэглэж байсан `download.tensorflow.org/models/tflite_11_05_08/mobilenet_v1_1.0_224_quant.tgz` холбоос **ажиллахаа больсон** (2026-09-д HTTP 403). Оронд нь Keras-ын албан ёсны `MobileNetV2`-ийг (224×224×3, ImageNet жин) ижил converter-ээр бүрэн int8 болгоно (ImageNet жинг анх удаа ~14 MB татна):
 
+**[💻 Ubuntu-1]**
 ```bash
-# 💻 компьютер дээр (ImageNet жинг анх удаа ~14 MB татна)
 ~/tf/bin/python lab06/train_tiny_model.py --skip-tiny --mobilenet --out lab06/models
-scp lab06/models/*.tflite <хэрэглэгч>@<PI-IP>:~/cnc302/lab06/models/
+ls -l lab06/models/
 ```
+
+✅ `mobilenet_224_quant.tflite` нэмэгдэнэ (~3–4 MB).
 
 > Representative dataset нь санамсаргүй зураг тул энэ загварын **нарийвчлал утгагүй** — бидэнд зөвхөн **саатал ба санах ой** хэрэгтэй. Албан ёсны баримт: [tf.keras.applications.MobileNetV2](https://www.tensorflow.org/api_docs/python/tf/keras/applications/MobileNetV2)
 
-### Pi дээр орчин бэлдэх 🥧
+### 2.5 Загваруудыг Pi руу хуулах
 
+**[💻 Ubuntu-1]**
 ```bash
-cd ~/cnc302/edge && make venv          # .venv байхгүй бол үүсгэнэ
-.venv/bin/pip install numpy ai-edge-litert
-.venv/bin/python -c "from ai_edge_litert.interpreter import Interpreter; print('OK')"
+scp -i ~/.ssh/cnc302 lab06/models/*.tflite cnc302@<PI_IP>:cnc302/lab06/models/
 ```
 
-LiteRT бол TensorFlow Lite-ийн шинэ нэр; Python-ы interpreter багц нь `tflite-runtime`-аас `ai-edge-litert` болж солигдсон (`from ai_edge_litert.interpreter import Interpreter`). PyPI дээр `ai-edge-litert` нь Python 3.11-д зориулсан `manylinux_2_27_aarch64` wheel-тэй тул Raspberry Pi OS Bookworm (64-бит, Python 3.11) болон Trixie (Python 3.13) дээр шууд суулгана (PyPI-д cp311, cp313 aarch64 wheel бий). **32-бит OS дээр суухгүй** (`uname -m` → `aarch64` байх ёстой). Хуучин `tflite-runtime`-ийн сүүлийн хувилбар 2.14 (2023) — нөөц хувилбар болгон л ашигла; скриптүүд аль алиныг нь танина.
+### 2.6 Компьютер дээр LiteRT (Алхам 5-д)
 
-> Албан ёсны баримт: [LiteRT — Migrate (tflite-runtime → ai-edge-litert)](https://ai.google.dev/edge/litert/migration), [pypi: ai-edge-litert](https://pypi.org/project/ai-edge-litert/)
+**[💻 Ubuntu-1]**
+```bash
+pip install -r tools/requirements.txt ai-edge-litert
+python -c "from ai_edge_litert.interpreter import Interpreter; import numpy; print('OK')"
+```
+
+✅ `OK`.
+
+### 2.7 Лабд ирэхээс өмнөх шалгалт
+
+**[🥧 Pi-1]**
+```bash
+ls -l lab06/models/
+$PY -c "from ai_edge_litert.interpreter import Interpreter; print('LiteRT OK')"
+cd ~/cnc302/edge && make check && make up && cd ~/cnc302
+```
+
+✅ Гурван `.tflite` (`model_float32`, `model_int8`, `mobilenet_224_quant`), `LiteRT OK`, `make check` бүгд OK.
 
 > **Загвар бэлэн болоогүй бол** бүх алхмыг `--backend synthetic`-ээр гүйцэтгэж болно. Аргачлал бүрэн хадгалагдана, гэхдээ дээд оноо **7** болно.
 
@@ -141,28 +243,49 @@ float32 жинг int8 болгоно. LiteRT-ийн баримтад бүрэн 
 
 ## 4. Алхмууд
 
+| Алхам | Хаана | Юу хийх | Мин | Хүснэгт |
+|---|---|---|---|---|
+| 1 | 🥧 | Бэлэн байдал, халаалтын нөлөө | 25 | 6.1 |
+| 2 | 🥧 | float32 ба int8 | 35 | 6.2 |
+| 3 | 🥧💻 | Урсгалын тоо 1 / 2 / 4 | 35 | 6.3 |
+| 4 | 🥧 | Зориудаар хэт хүнд загвар | 30 | 6.4 |
+| 5 | 🥧💻 | Гурван төмрийн харьцуулалт | 25 | 6.5 |
+| 6 | 🥧💻 | **Ирмэгийн шүүлт** | 60 | 6.6 |
+| 7 | 💻 | Өгсөх урсгалын багтаамж | 20 | 6.7 |
+| 8 | 💻🥧 | Дүн шинжилгээ ба Git | 10 | — |
+
+> ⚠️ Pi дээрх бүх хэмжилт `lab06/out/bench.csv`-д **нэмэгдэж** бичигдэнэ (`--csv` файлыг дарж бичихгүй). Компьютер дээрх хэмжилт `lab06/out/bench-laptop.csv`-д. Алхам 8-д хоёрыг нийлүүлнэ.
+
+---
+
 ### Алхам 1 — Бэлэн байдал ба аргачлалыг батлах (25 мин) 🥧
 
+**1.1 Pi-г чөлөөлж, төлөвийг хэмжих.** Ирмэгийн агент ажиллаж байвал зогсоо (`Ctrl + C`):
+
+**[🥧 Pi-1]**
 ```bash
-cd ~/cnc302
-pkill -f vscode-server              # 150–250 MiB чөлөөлнө
-./tools/measure_stack.sh --role edge
-vcgencmd get_throttled              # 0x0 байх ЁСТОЙ
+pkill -f vscode-server
+bash tools/measure_stack.sh --role edge | tee lab06/out/01-edge.txt
+vcgencmd get_throttled
 ```
 
-Загваргүйгээр аргачлалыг шалгана:
+✅ `throttled=0x0`. ❌ Өөр бол Pi-г 5 мин хөргөж, тэжээлийг шалга — throttling-тай хэмжилт хүчингүй.
+
+**1.2 Загваргүйгээр аргачлалыг шалгах.**
 
 ```bash
-python3 lab06/benchmark_inference.py --backend synthetic --runs 500 \
+$PY lab06/benchmark_inference.py --backend synthetic --runs 500 \
     --threads 2 --device-label pi3b --label synth-t2 --csv lab06/out/bench.csv
 ```
 
-**Халаалтын нөлөөг тусад нь харна** (`--cold` vs хэвийн):
+✅ p50, p99, max, σ, дүгнэлт/с хэвлэгдэж, `lab06/out/bench.csv` үүснэ.
+
+**1.3 Халаалтын нөлөөг тусад нь харах** (`--cold` vs хэвийн):
 
 ```bash
-python3 lab06/benchmark_inference.py --backend synthetic --runs 200 --cold \
+$PY lab06/benchmark_inference.py --backend synthetic --runs 200 --cold \
     --device-label pi3b --label synth-cold --csv lab06/out/bench.csv
-python3 lab06/benchmark_inference.py --backend synthetic --runs 200 \
+$PY lab06/benchmark_inference.py --backend synthetic --runs 200 \
     --device-label pi3b --label synth-warm --csv lab06/out/bench.csv
 ```
 
@@ -180,15 +303,18 @@ python3 lab06/benchmark_inference.py --backend synthetic --runs 200 \
 
 ### Алхам 2 — float32 ба int8 (35 мин) 🥧
 
+**[🥧 Pi-1]**
 ```bash
-python3 lab06/benchmark_inference.py --backend tflite \
+$PY lab06/benchmark_inference.py --backend tflite \
     --model lab06/models/model_float32.tflite --runs 300 --threads 1 \
     --device-label pi3b --label f32-t1 --csv lab06/out/bench.csv
-
-python3 lab06/benchmark_inference.py --backend tflite \
+sleep 30
+$PY lab06/benchmark_inference.py --backend tflite \
     --model lab06/models/model_int8.tflite --runs 300 --threads 1 \
     --device-label pi3b --label int8-t1 --csv lab06/out/bench.csv
 ```
+
+✅ Хоёулаа `оролт=(1, 3)` ба хугацааны статистик хэвлэнэ. ❌ `TFLite орчин олдсонгүй` → §2.1; ❌ `No such file` → §2.5 (загвар Pi руу хуулагдаагүй).
 
 #### Хүснэгт 6.2 — Загварын мэдээлэл ба квантчилалын ашиг
 
@@ -207,16 +333,21 @@ python3 lab06/benchmark_inference.py --backend tflite \
 
 ---
 
-### Алхам 3 — Урсгалын тоо: 1 vs 2 vs 4 (35 мин) 🥧
+### Алхам 3 — Урсгалын тоо: 1 vs 2 vs 4 (35 мин) 🥧💻
 
+**3.1 Сул үед.** Блокийг **бүтнээр нь** буулга (≈ 3–4 мин, хооронд нь 60 сек хөргөнө — эс тэгвээс throttling гажуулна):
+
+**[🥧 Pi-1]**
 ```bash
 for T in 1 2 4; do
-  python3 lab06/benchmark_inference.py --backend tflite \
+  $PY lab06/benchmark_inference.py --backend tflite \
       --model lab06/models/model_int8.tflite --runs 300 --threads $T \
       --device-label pi3b --label int8-t$T --csv lab06/out/bench.csv
-  sleep 60          # хооронд нь хөргөнө — эс тэгвээс throttling гажуулна
+  sleep 60
 done
 ```
+
+✅ `int8-t1`, `int8-t2`, `int8-t4` гурван үр дүн.
 
 #### Хүснэгт 6.3 — Урсгалын тооны нөлөө (int8)
 
@@ -228,37 +359,51 @@ done
 
 4 урсгал 4× хурдан болов уу: ______  ·  Хамгийн сайн урсгалын тоо: ______
 
+`cpu_efficiency`, `temp_delta_c` нь `lab06/out/bench.csv`-ийн багана: `column -s, -t < lab06/out/bench.csv | less -S`.
+
 > **Хүлээгдэх ажиглалт (таамаглал — өөрөө батал):** жижиг загварт 4 урсгал 2-оос **хурдан биш**, бүр удаан гарч болно. Боломжит шалтгаанууд: (1) маш жижиг загварт урсгалуудыг зохицуулах зардал тооцооллоос их, (2) 4 цөм нэг санах ойг хуваалцана, (3) дөрвөн цөм зэрэг ачаалагдахад дулаан хурдан өсч throttling эхэлнэ. Аль нь давамгайлж байгааг `cpu_efficiency` ба `temp_delta_c` баганаар тоогоор нотол.
 
-**Нэмэлт — ачаалалтай үеийн хэмжилт.** 💻 компьютерээс Pi рүү флот илгээж, дахин хэмжинэ:
+**3.2 Ачаалалтай үед.** Компьютерээс Pi-гийн брокер руу флот илгээнэ:
 
+**[💻 Ubuntu-1]**
 ```bash
-# 💻 компьютер дээр
-python3 tools/sim_device.py --host <PI-IP> --devices 50 --interval 1.0
+python tools/sim_device.py --target edge --host <PI_IP> --devices 50 --interval 1.0
+```
 
-# 🥧 зэрэгцүүлэн
-python3 lab06/benchmark_inference.py --backend tflite \
+30 секундын дараа, флот ажиллаж байх **зуур**:
+
+**[🥧 Pi-1]**
+```bash
+$PY lab06/benchmark_inference.py --backend tflite \
     --model lab06/models/model_int8.tflite --runs 300 --threads 2 \
     --device-label pi3b --label int8-t2-loaded --csv lab06/out/bench.csv
 ```
 
-Чөлөөт vs ачаалалтай p99-ийн ялгаа: ______ %
+Дараа нь **[💻 Ubuntu-1]**-д `Ctrl + C`.
+
+Чөлөөт (`int8-t2`) vs ачаалалтай (`int8-t2-loaded`) p99-ийн ялгаа: ______ %
 
 ---
 
 ### Алхам 4 — Зориудаар хэт хүнд загвар (30 мин) 🥧
 
-Одоо **буруу загварыг** ажиллуулж, хэр буруу болохыг хэмжинэ. `--runs`-ыг багасгана — эс тэгвээс энэ алхам ганцаараа хагас цаг иднэ:
+Одоо **буруу загварыг** ажиллуулж, хэр буруу болохыг хэмжинэ. `--runs`-ыг 30 болгож багасгана — эс тэгвээс энэ алхам ганцаараа хагас цаг иднэ. Хэмжилт бүр **1–3 мин** — дэлгэц хөдлөхгүй байсан ч **бүү тасал**.
 
+**[🥧 Pi-1]**
 ```bash
-python3 lab06/benchmark_inference.py --backend tflite \
+free -m
+$PY lab06/benchmark_inference.py --backend tflite \
     --model lab06/models/mobilenet_224_quant.tflite --runs 30 --threads 2 \
     --device-label pi3b --label mnet-t2 --csv lab06/out/bench.csv
-
-python3 lab06/benchmark_inference.py --backend tflite \
+sleep 60
+$PY lab06/benchmark_inference.py --backend tflite \
     --model lab06/models/mobilenet_224_quant.tflite --runs 30 --threads 4 \
     --device-label pi3b --label mnet-t4 --csv lab06/out/bench.csv
 ```
+
+✅ `оролт=(1, 224, 224, 3)` ба хэдэн зуун мс-ийн p50.
+
+❌ `Killed` (OOM) → `free -m`-ийн `available` 300 MiB-аас бага байна: **[🥧 Pi-1]** `cd ~/cnc302/edge && make down` (mosquitto-г түр зогсооно), дахин оролд, дараа нь `make up`.
 
 #### Хүснэгт 6.4 — Жижиг гажил илрүүлэгч vs зурган загвар
 
@@ -280,19 +425,29 @@ python3 lab06/benchmark_inference.py --backend tflite \
 
 ### Алхам 5 — Хөндлөн харьцуулалт: гурван төмөр (25 мин) 🥧💻
 
-Ижил `--label`-тай хэмжилтийг **өөр төмөр** дээр авч, нэг CSV-д цуглуулна. `--device-label` нь ялгах багана.
+Ижил `--label`-тай хэмжилтийг **өөр төмөр** дээр авна. `--device-label` нь ялгах багана.
 
+**5.1 Pi 3B дээр.**
+
+**[🥧 Pi-1]**
 ```bash
-# 🥧 Pi 3B дээр (аль хэдийн хийсэн)
-python3 lab06/benchmark_inference.py --backend synthetic --runs 500 \
+$PY lab06/benchmark_inference.py --backend synthetic --runs 500 \
     --device-label pi3b --label xdev --csv lab06/out/bench.csv
-
-# 💻 зөөврийн компьютер дээр, ЯГ ижил комманд
-python3 lab06/benchmark_inference.py --backend synthetic --runs 500 \
-    --device-label laptop-cpu --label xdev --csv lab06/out/bench.csv
+$PY lab06/benchmark_inference.py --backend tflite --model lab06/models/model_int8.tflite --runs 300 \
+    --device-label pi3b --label int8-xdev --csv lab06/out/bench.csv
 ```
 
-Загвартай хувилбарыг ч давт: `--backend tflite --model lab06/models/model_int8.tflite --device-label laptop-cpu --label int8-xdev`.
+**5.2 Зөөврийн компьютер дээр — ЯГ ижил команд**, зөвхөн `--device-label` ба CSV өөр (§2.6-д LiteRT суулгасан):
+
+**[💻 Ubuntu-1]**
+```bash
+python lab06/benchmark_inference.py --backend synthetic --runs 500 \
+    --device-label laptop-cpu --label xdev --csv lab06/out/bench-laptop.csv
+python lab06/benchmark_inference.py --backend tflite --model lab06/models/model_int8.tflite --runs 300 \
+    --device-label laptop-cpu --label int8-xdev --csv lab06/out/bench-laptop.csv
+```
+
+✅ Хоёулаа үр дүн хэвлэнэ. ❌ `TFLite орчин олдсонгүй` → §2.6.
 
 #### Хүснэгт 6.5 — Төмрийн харьцуулалт (ижил загвар, ижил `--runs`)
 
@@ -302,7 +457,7 @@ python3 lab06/benchmark_inference.py --backend synthetic --runs 500 \
 | `laptop-cpu` | | | | | өөрсдийн хэмжилт |
 | `reference` (Pi 5 + AI Kit) | | | | | **багшийн лавлагаа** |
 
-> Гурав дахь мөрийг **өөрсдөө хэмжихгүй** — Pi 3B-д PCIe байхгүй. Багш тэнхимийн лавлагаа өгвөл `--device-label reference` гэж нэг CSV-д нэмнэ. Өгөөгүй бол мөрийг хоосон үлдээж, тайланд "хэмжих боломжгүй, шалтгаан: PCIe байхгүй" гэж бич.
+> Гурав дахь мөрийг **өөрсдөө хэмжихгүй** — Pi 3B-д PCIe байхгүй. Багш тэнхимийн лавлагаа өгвөл `--device-label reference` гэж нэг CSV-д нэмнэ. Өгөөгүй бол мөрийг хоосон үлдээж, тайланд «хэмжих боломжгүй, шалтгаан: PCIe байхгүй» гэж бич.
 
 ---
 
@@ -310,44 +465,73 @@ python3 lab06/benchmark_inference.py --backend synthetic --runs 500 \
 
 Энэ бол лабораторийн төлбөр. Дүгнэлтийг ирмэг дээр хийснээр **өгсөх урсгалаар юу явахгүй болохыг** хэмжинэ.
 
-**6.1 Өгсөх урсгалын тоолуурыг тэглэж эхлэх.** 🥧 Ethernet интерфэйсийн байтын тоолуурыг ашиглана. `/sys/class/net/eth0/statistics/tx_bytes` нь тухайн сүлжээний төхөөрөмжийн **илгээсэн нийт байт** (цөмийн баримт: яг юуг тоолох нь драйвераас хамаарна). Энэ нь **бүх** гарах урсгалыг — SSH, `apt`, гүүрний MQTT — тоолно; тиймээс хэмжилтийн үед бусад ачааллыг зогсоож, SSH сешнийг идэвхгүй байлга.
-
 ![Зураг 6.1 — Ирмэгийн шүүлт: бүх өгөгдлийг үүл рүү илгээх vs Pi 3B дээр TFLite-аар шүүж зөвхөн аномали ба үе үеийн хураангуйг илгээх](../docs/img/fig-edge-ai.svg)
 
+Ethernet интерфэйсийн байтын тоолуурыг ашиглана: `/sys/class/net/eth0/statistics/tx_bytes` нь тухайн сүлжээний төхөөрөмжийн **илгээсэн нийт байт** (цөмийн баримт: яг юуг тоолох нь драйвераас хамаарна). Энэ нь **бүх** гарах урсгалыг — SSH, `apt`, гүүрний MQTT — тоолно. Тиймээс:
+
+- **[🥧 Pi-2]**-ийг **хаа** (`exit`), VS Code-ийн Pi холболтыг таслах — зөвхөн **[🥧 Pi-1]** үлдэнэ.
+- Хэмжилтийн үед **[🥧 Pi-1]** цонхонд юу ч бүү бич.
+- Флот (Алхам 3.2) зогссон байх ёстой.
+
+**6.0 Интерфэйсийн нэрийг шалгах.**
+
+**[🥧 Pi-1]**
 ```bash
-cat /sys/class/net/eth0/statistics/tx_bytes      # эхлэлийн утга
+ls /sys/class/net/
 ```
 
-**6.2 ШҮҮЛТГҮЙ — бүх мессежийг үүл рүү.** 🥧
+✅ `eth0` байна. Wi-Fi-аар холбогдсон бол (`wlan0`) доорх командуудад `eth0`-ийг `wlan0`-оор соль — гэхдээ Лаб 1-ийн дагуу кабель зөвлөмжтэй.
 
+**6.1 Үүлний талаас сонсож эхлэх.** Хоёр ажиллалтын турш:
+
+**[💻 Ubuntu-1]**
+```bash
+mosquitto_sub -h localhost -t "cnc302/shutis/mhts/lab/$DEV/#" -v | tee /tmp/l6-nofilter.log
+```
+
+**6.2 ШҮҮЛТГҮЙ — бүх мессежийг үүл рүү** (600 мөчлөг × 0.5 сек = **5 мин**). Блокийг **бүтнээр нь** буулга:
+
+**[🥧 Pi-1]**
 ```bash
 cd ~/cnc302/edge
 TX0=$(cat /sys/class/net/eth0/statistics/tx_bytes)
-.venv/bin/python agent/edge_agent.py --detector ../lab06/models/model_int8.tflite \
+$PY agent/edge_agent.py --detector ../lab06/models/model_int8.tflite \
     --threads 2 --interval 0.5 --anomaly-rate 0.05 --count 600
 TX1=$(cat /sys/class/net/eth0/statistics/tx_bytes)
-echo "шүүлтгүй tx = $((TX1-TX0)) байт"
+echo "шүүлтгүй tx = $((TX1-TX0)) байт" | tee -a ~/cnc302/lab06/out/06-filter.txt
+cd ~/cnc302
 ```
 
-Агент төгсгөлд `илгээсэн N, дарсан M, дүгнэлт дундаж X мс` гэж хэвлэнэ. Тэр тоог бич.
+✅ Эхэнд `[detector] загвар ачаалагдлаа: …model_int8.tflite`; төгсгөлд `илгээсэн N, дарсан M, дүгнэлт дундаж X мс` ба `шүүлтгүй tx = … байт`. Эдгээрийг бич.
 
-**6.3 ШҮҮЛТТЭЙ — зөвхөн гажил + үе үе хураангуй.** 🥧
+❌ `[detector] ачаалж чадсангүй … босгын горимд шилжлээ` → загварын зам буруу (`ls ../lab06/models/`).
+
+**[💻 Ubuntu-1]**-д `Ctrl + C`, дараа нь:
+```bash
+wc -l /tmp/l6-nofilter.log && wc -c /tmp/l6-nofilter.log
+```
+
+**6.3 ШҮҮЛТТЭЙ — зөвхөн гажил + үе үе хураангуй.** **[💻 Ubuntu-1]**-д сонсогчийг шинэ файлаар асаа:
 
 ```bash
+mosquitto_sub -h localhost -t "cnc302/shutis/mhts/lab/$DEV/#" -v | tee /tmp/l6-filter.log
+```
+
+**[🥧 Pi-1]**
+```bash
+cd ~/cnc302/edge
 TX0=$(cat /sys/class/net/eth0/statistics/tx_bytes)
-.venv/bin/python agent/edge_agent.py --detector ../lab06/models/model_int8.tflite \
+$PY agent/edge_agent.py --detector ../lab06/models/model_int8.tflite \
     --threads 2 --interval 0.5 --anomaly-rate 0.05 --count 600 \
     --filter --health-every 15
 TX1=$(cat /sys/class/net/eth0/statistics/tx_bytes)
-echo "шүүлттэй tx = $((TX1-TX0)) байт"
+echo "шүүлттэй tx = $((TX1-TX0)) байт" | tee -a ~/cnc302/lab06/out/06-filter.txt
+cd ~/cnc302
 ```
 
-**6.4 Үүлний талаас батлах.** 💻 хоёр ажиллалтын үед зэрэг сонсоно:
+**[💻 Ubuntu-1]**-д `Ctrl + C`, дараа нь `wc -l /tmp/l6-filter.log && wc -c /tmp/l6-filter.log`.
 
-```bash
-mosquitto_sub -h localhost -t 'cnc302/shutis/mhts/lab/pi3b-01/#' -v | tee /tmp/f.log
-wc -l /tmp/f.log && wc -c /tmp/f.log
-```
+✅ `дарсан` тоо 0-ээс их, `wc -l` нь 6.2-оос хамаагүй бага.
 
 #### Хүснэгт 6.6 — Ирмэгийн шүүлтийн үр ашиг (600 мөчлөг, `--interval 0.5`)
 
@@ -357,13 +541,30 @@ wc -l /tmp/f.log && wc -c /tmp/f.log
 | Дарагдсан мессеж (`дарсан`) | 0 | | — |
 | `eth0` tx_bytes (байт) | | | |
 | Үүлэнд хүрсэн мөр (`wc -l`) | | | |
-| Байт/секунд | | | |
+| Байт/секунд (tx_bytes / 300) | | | |
 | Дүгнэлтийн дундаж саатал (мс) | | | — |
-| Pi-гийн CPU % (`make mem`, `top`) | | | |
+| Pi-гийн CPU % (ажиллах үед **шинэ** цонхонд `top`) | | | |
 
-> **Анхаар — `--filter` нь зөвхөн гажлыг илгээдэггүй.** `--health-every 15` тутамд "би амьд байна" хураангуй явна. Үүнгүй бол үүл нь **чимээгүй** ирмэгийг **үхсэн** ирмэгээс ялгаж чадахгүй. Тайландаа энэ солилцоог тайлбарла: шүүлт хэдий чинээ хатуу байна, ирмэгийн ажиглагдах чанар төдий чинээ муу.
+> **Анхаар — `--filter` нь зөвхөн гажлыг илгээдэггүй.** `--health-every 15` тутамд «би амьд байна» хураангуй явна. Үүнгүй бол үүл нь **чимээгүй** ирмэгийг **үхсэн** ирмэгээс ялгаж чадахгүй. Тайландаа энэ солилцоог тайлбарла: шүүлт хэдий чинээ хатуу байна, ирмэгийн ажиглагдах чанар төдий чинээ муу.
 
-**6.5 Босгын горимтой харьцуул.** `--detector`-гүй ажиллуулбал агент энгийн босго ашиглана (0.6). Ижил `--count`-оор давтаж, шүүлтийн үр ашиг ML загвартай харьцуулахад ялгаатай эсэхийг хэмж. Дүгнэлтийг агентаас **тусад нь** ажиллуулж, зөвхөн `anomaly` суваг руу нийтлэх хувилбарыг ч үз: `edge/.venv/bin/python lab06/anomaly_publish.py --backend tflite --model lab06/models/model_int8.tflite --threads 2 --threshold 0.8` (🥧 Pi дээр, ирмэгийн брокероос). Загварын оролт `[1, 3]` тул скрипт мессеж бүрийн `proc_temp_c, vibration_g, rpm`-ийг шууд дүгнэнэ (ВЕКТОР горим). Аль архитектур нь дээр вэ — агент дотор шүүх үү, тусдаа процесс уу?
+**6.4 Босгын горимтой харьцуулах.** `--detector ''` (хоосон) өгвөл агент энгийн босго ашиглана (0.6). 6.3-ыг яг ижлээр, зөвхөн `--detector ''`-оор давтаж (`tee -a … 06-filter.txt` мөрөнд «босго» гэж бич), шүүлтийн үр ашиг ML загвартай харьцуулахад ялгаатай эсэхийг хэмж.
+
+> ⚠️ `--detector`-ийг **огт өгөхгүй** бол агент `.env`-ийн `MODEL_PATH`-ийг ашиглана — тиймээс босгын горимд заавал `--detector ''`.
+
+**6.5 Тусдаа процесс.** Дүгнэлтийг агентаас **тусад нь** ажиллуулж, зөвхөн `anomaly` суваг руу нийтлэх хувилбар. Хоёр Pi цонх хэрэгтэй — **[🥧 Pi-2]**-ийг дахин нээж §2.0-ын блокийг буулга:
+
+**[🥧 Pi-2]** — агент, шүүлтгүй:
+```bash
+cd ~/cnc302/edge && $PY agent/edge_agent.py --detector '' --interval 0.5 --anomaly-rate 0.05 --count 240
+```
+
+**[🥧 Pi-1]** — тусдаа дүгнэгч (2 мин):
+```bash
+$PY lab06/anomaly_publish.py --backend tflite --model lab06/models/model_int8.tflite \
+    --threads 2 --threshold 0.8 --device $DEVICE_ID --seconds 120
+```
+
+Загварын оролт `[1, 3]` тул скрипт мессеж бүрийн `proc_temp_c, vibration_g, rpm`-ийг шууд дүгнэнэ (ВЕКТОР горим). Аль архитектур нь дээр вэ — агент дотор шүүх үү, тусдаа процесс уу? (Санамж: тусдаа процесс нь мессеж бүрийг брокероор **хоёр удаа** дамжуулна.)
 
 ---
 
@@ -392,12 +593,25 @@ wc -l /tmp/f.log && wc -c /tmp/f.log
 
 ---
 
-### Алхам 8 — Дүн шинжилгээ ба Git commit (10 мин)
+### Алхам 8 — Дүн шинжилгээ ба Git commit (10 мин) 💻🥧
 
-Бүх хэмжилт нэг CSV-д байгаа. Нэг харцаар:
+**8.1 Pi-гийн хэмжилтийг компьютер руу хуулж, нэг CSV болгох.**
+
+**[💻 Ubuntu-1]**
+```bash
+scp -i ~/.ssh/cnc302 'cnc302@<PI_IP>:cnc302/lab06/out/*' lab06/out/
+tail -n +2 lab06/out/bench-laptop.csv >> lab06/out/bench.csv
+wc -l lab06/out/bench.csv
+```
+
+✅ Pi-гийн бүх мөр + компьютерийн 2 мөр.
+
+> ⚠️ `tail … >> bench.csv`-ийг **нэг л удаа** ажиллуул — давтвал компьютерийн мөрүүд давхардана.
+
+**8.2 Нэг харцаар.** Блокийг **бүтнээр нь** буулга:
 
 ```bash
-python3 - <<'EOF'
+python - <<'EOF'
 import csv
 rows = list(csv.DictReader(open('lab06/out/bench.csv')))
 w = max(len(r['label']) for r in rows)
@@ -408,17 +622,24 @@ for r in rows:
 EOF
 ```
 
+**8.3 Тайлан, нэмэх, шалгах.** `lab06/out/` нь `.gitignore`-д — `bench.csv`-г **зориуд** нэмнэ. Загвар, өгөгдөл **орохгүй**:
+
 ```bash
-cd ~/cnc302
-# lab06/out/ нь .gitignore-д — bench.csv-г албадан нэмнэ
-git add lab06/report.md && git add -f lab06/out/bench.csv
-git commit -m "Лаб 6: CPU дээрх ирмэгийн дүгнэлт, шүүлтийн үр ашиг"
-git tag lab06-done && git push && git push --tags
+cp docs/report-template.md lab06/report.md
+code lab06/report.md
+git add lab06/report.md
+git add -f lab06/out/bench.csv lab06/out/06-filter.txt
+git status --short
+git ls-files | grep -E '\.tflite$|\.eim$|lab06/data/|\.env$'
 ```
 
-⚠ Загвар, өгөгдөл, нууц файл **орохгүй** байгааг шалга:
+✅ Сүүлийн команд **юу ч хэвлэхгүй**.
+
+**8.4 Commit ба push.**
 ```bash
-git ls-files | grep -E '\.tflite$|\.eim$|lab06/data/|\.env$'   # хоосон байх ЁСТОЙ
+git commit -m "Лаб 6: CPU дээрх ирмэгийн дүгнэлт, шүүлтийн үр ашиг"
+git tag lab06-done
+git push && git push --tags
 ```
 
 ---
@@ -475,7 +696,7 @@ git ls-files | grep -E '\.tflite$|\.eim$|lab06/data/|\.env$'   # хоосон б
 
 | Шинж | Шалтгаан | Шийдэл |
 |---|---|---|
-| `TFLite орчин олдсонгүй` | сан суулгаагүй | 🥧 `edge/.venv/bin/pip install ai-edge-litert` |
+| `TFLite орчин олдсонгүй` | сан суулгаагүй | 🥧 `$PY -m pip install ai-edge-litert` (§2.1); 💻 §2.6 |
 | `pip`: `No matching distribution found for ai-edge-litert` | 32-бит OS (`armv7l`) эсвэл дэмжигдээгүй Python | `uname -m` → `aarch64` байх ёстой; 64-бит Raspberry Pi OS суулга |
 | Агент `[detector] ачаалж чадсангүй` / оролтын хэлбэр `(1, 3)` биш | Edge Impulse-ийн DSP блоктой экспорт | А замаар (`train_tiny_model.py`) дахин гарга |
 | Скрипт гаралтын код 4 буцаав | ажиллалтын явцад throttling эхэлсэн | 5 мин хөргөж, 5V/2.5A тэжээл шалгаад давт |
@@ -486,6 +707,12 @@ git ls-files | grep -E '\.tflite$|\.eim$|lab06/data/|\.env$'   # хоосон б
 | `--filter`-тэй ч мессеж багасахгүй | `--anomaly-rate` хэт өндөр | 0.02–0.05 болго |
 | `eth0` олдохгүй | Wi-Fi ашиглаж байна | `ls /sys/class/net/`; кабельд шилжих (Лаб 1) |
 | `mobilenet` ажиллуулахад OOM | 224×224×3 буфер + загвар | `--runs` 30 болго, Docker-ыг зогсоо |
+| `No module named 'paho'` / `'numpy'` (Pi) | `python3` гэж бичсэн | `$PY` (§2.0) |
+| `collect_data.py` CSV хоосон | `--device` нь агентын `DEVICE_ID`-тай зөрсөн | §2.2 (в)-ийн ❌ |
+| Компьютер дээр `lab06/data` хоосон тул сургалт унав | Pi-гаас CSV хуулаагүй | §2.2 (в) |
+| `pip install tensorflow` маш удаан / зай дутуу | TF ~600 MB | WSL-д ≥ 3 GB сул зай; хурдан сүлжээ |
+| Босгын горим гэж бодсон ч `[detector] загвар ачаалагдлаа` | `--detector` өгөөгүй тул `.env`-ийн `MODEL_PATH` ашиглагдсан | `--detector ''` (Алхам 6.4) |
+| `bench.csv`-д компьютерийн мөр давхардсан | 8.1-ийн `tail >>`-ийг хоёр удаа ажиллуулсан | давхар мөрийг гараар устга |
 
 ---
 

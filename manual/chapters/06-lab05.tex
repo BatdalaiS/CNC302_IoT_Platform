@@ -43,35 +43,164 @@
 \textbf{⚠ ЭНЭ ЛАБОРАТОРИЙН ХАМГИЙН ЧУХАЛ УРХИ.} Өгсөх урсгал сэргэхэд гүүр хуримтлагдсан мессежээ \textbf{нэг тэсрэлтээр} урсгана. Хэрэв та \texttt{mosquitto\_sub}-ыг тэр тэсрэлтийн \textbf{дараа} асаавал юу ч харагдахгүй --- MQTT нь өнгөрсөн мессежийг шинэ захиалагчид дахин илгээхгүй. Тэгээд "store-and-forward ажиллаагүй" гэсэн \textbf{буруу дүгнэлт} гарна. Дахин илгээлт болсон эсэхийг \textbf{зөвхөн InfluxDB дотор} (эсвэл эхнээс нь ажиллаж байсан тогтвортой session-тэй захиалагчаар) шалгана.
 \end{quote}
 
-\hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}{%
-\section{2. Урьдчилсан нөхцөл}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}}
+\hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b-ux431ux430-ux431ux44dux43bux442ux433ux44dux43b-20-ux43cux438ux43d}{%
+\section{2. Урьдчилсан нөхцөл ба бэлтгэл (20 мин)}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b-ux431ux430-ux431ux44dux43bux442ux433ux44dux43b-20-ux43cux438ux43d}}
 
 \begin{itemize}
 \tightlist
 \item
-  Лаб 1--4 дууссан, \texttt{lab04-done} тэмдэглэгээ тавигдсан
-\item
-  {[}ЗК{]} \texttt{pipeline} профайл нэмж асаана:
+  Лаб 1--4 дууссан, \texttt{lab04-done} tag тавигдсан. Лаб 2-ын authenticator унтраалттай (\texttt{authn\ false}).
 \end{itemize}
+
+\begin{quote}
+☞ \textbf{Алхмуудыг дарааллаар нь хий.} Алхам бүрийн төгсгөлд ✓ \textbf{Шалгах} хэсэг бий. Үр дүн нь таарахгүй бол \textbf{цааш бүү яв} --- ✗ мөр эсвэл §8-аас шалтгааныг ол.
+\end{quote}
+
+\hypertarget{ux442ux435ux440ux43cux438ux43dux430ux43bux443ux443ux434-ux442ux430ux432ux430ux43d-ux446ux43eux43dux445}{%
+\subsection{\texorpdfstring{2.1 Терминалууд --- \textbf{таван} цонх}{2.1 Терминалууд --- таван цонх}}\label{ux442ux435ux440ux43cux438ux43dux430ux43bux443ux443ux434-ux442ux430ux432ux430ux43d-ux446ux43eux43dux445}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Цонх\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Хаана\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Үүрэг энэ лабд\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{{[}Pi-1{]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Raspberry Pi (\texttt{ssh\ pi})\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+гүүрийн төлөвийг \texttt{bridge.jsonl}-д бичнэ --- \textbf{Алхам 3-аас лабын төгсгөл хүртэл бүү хаа}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{{[}Pi-2{]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Raspberry Pi (\texttt{ssh\ pi})\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{data\_\allowbreak{}integrity.\allowbreak{}py\ publish} / \texttt{verify}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{{[}Pi-3{]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Raspberry Pi (\texttt{ssh\ pi})\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+эвдрэл үүсгэх (\texttt{failure\_\allowbreak{}inject.\allowbreak{}sh}), ажиглалт\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{{[}ЗК · Ubuntu-1{]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Зөөврийн компьютер (WSL)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+стек, InfluxDB, Node-RED\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\textbf{{[}ЗК · Ubuntu-2{]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Зөөврийн компьютер (WSL)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+симулятор, ажиглалт\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+\hypertarget{ux43eux440ux447ux43dux43eux43e-ux431ux44dux43bux442ux433ux44dux445-ux446ux43eux43dux445-ux43dux44dux44dux445-ux431ux4afux440ux442-ux430ux436ux438ux43bux43bux443ux443ux43bux43dux430}{%
+\subsection{\texorpdfstring{2.2 Орчноо бэлтгэх --- \textbf{цонх нээх бүрт} ажиллуулна}{2.2 Орчноо бэлтгэх --- цонх нээх бүрт ажиллуулна}}\label{ux43eux440ux447ux43dux43eux43e-ux431ux44dux43bux442ux433ux44dux445-ux446ux43eux43dux445-ux43dux44dux44dux445-ux431ux4afux440ux442-ux430ux436ux438ux43bux43bux443ux443ux43bux43dux430}}
+
+\textbf{{[}ЗК · Ubuntu-1{]}} ба \textbf{{[}ЗК · Ubuntu-2{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \BuiltInTok{source}\NormalTok{ .venv/bin/activate}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{{[}Pi-1{]}}, \textbf{{[}Pi-2{]}}, \textbf{{[}Pi-3{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\VariableTok{PY=}\NormalTok{\textasciitilde{}/cnc302/edge/.venv/bin/python}
+\KeywordTok{set} \ExtensionTok{{-}a} \KeywordTok{\&\&} \BuiltInTok{source}\NormalTok{ \textasciitilde{}/cnc302/edge/.env }\KeywordTok{\&\&} \KeywordTok{set} \ExtensionTok{+a}
+\BuiltInTok{echo} \StringTok{"}\VariableTok{$CLOUD\_HOST}\StringTok{ / }\VariableTok{$SITE}\StringTok{"}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{192.\allowbreak{}168.\allowbreak{}1.\allowbreak{}100\ /\allowbreak{}\ shutis}.
+
+\begin{quote}
+⚠ \texttt{data\_\allowbreak{}integrity.\allowbreak{}py} нь сэдвийг \texttt{cnc302/\allowbreak{}shutis/\allowbreak{}mhts/\allowbreak{}lab/\allowbreak{}integrity/\allowbreak{}telemetry} гэж \textbf{тогтмол} бичдэг. Таны \texttt{SITE} нь \texttt{shutis}-ээс өөр бол гүүр мессежийг дамжуулахгүй --- багшид хандана.
+\end{quote}
+
+\hypertarget{ux43dux44dux433-ux443ux434ux430ux430ux433ux438ux439ux43d-ux431ux44dux43bux442ux433ux44dux43b}{%
+\subsection{2.3 Нэг удаагийн бэлтгэл}\label{ux43dux44dux433-ux443ux434ux430ux430ux433ux438ux439ux43d-ux431ux44dux43bux442ux433ux44dux43b}}
+
+\textbf{{[}Pi-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ pull}
+\FunctionTok{mkdir}\NormalTok{ {-}p lab05/out}
+\FunctionTok{sudo}\NormalTok{ apt install {-}y stress{-}ng iptables}
+\VariableTok{$PY} \ExtensionTok{{-}m}\NormalTok{ pip install }\StringTok{"requests\textgreater{}=2.31,\textless{}3"}
+\VariableTok{$PY} \ExtensionTok{{-}c} \StringTok{"import requests, paho.mqtt; print(\textquotesingle{}OK\textquotesingle{})"}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{OK}. (\texttt{requests}-ийг Лаб 4-т суулгасан бол \texttt{Requirement\ already\ satisfied}.)
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{failure\_\allowbreak{}inject.\allowbreak{}sh} нь \texttt{iptables} (байхгүй бол \texttt{nft})-ээр Pi → компьютер 1883 портыг хаана, \texttt{sudo} шаарддаг.
+\item
+  \texttt{data\_\allowbreak{}integrity.\allowbreak{}py\ verify} нь компьютер дээрх InfluxDB-г (\texttt{\$CLOUD\_\allowbreak{}HOST:\allowbreak{}8181}) шууд асуудаг --- SETUP А.6-ийн галт ханын дүрэмд 8181 нээгдсэн.
+\end{itemize}
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ pull}
+\FunctionTok{mkdir}\NormalTok{ {-}p lab05/out}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{pipeline-ux43fux440ux43eux444ux430ux439ux43bux44bux433-ux430ux441ux430ux430ux445}{%
+\subsection{\texorpdfstring{2.4 \texttt{pipeline} профайлыг асаах}{2.4 pipeline профайлыг асаах}}\label{pipeline-ux43fux440ux43eux444ux430ux439ux43bux44bux433-ux430ux441ux430ux430ux445}}
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ up{-}pipeline }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ health}
-\ExtensionTok{docker}\NormalTok{ compose ps       \# nodered }\StringTok{"healthy"}\NormalTok{ болтол 40 сек хүлээнэ}
+\FunctionTok{sleep}\NormalTok{ 40}\KeywordTok{;} \ExtensionTok{docker}\NormalTok{ compose ps}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{itemize}
-\tightlist
-\item
-  {[}Pi{]} Pi дээр \texttt{sudo} эрх (\texttt{uplink-down} нь iptables/nft, \texttt{disk} нь mount шаарддаг)
-\item
-  {[}Pi{]} \texttt{stress-ng} суусан: \texttt{sudo\ apt\ install\ -y\ stress-ng}
-\item
-  {[}Pi{]} Гүүр ажиллаж байна: \texttt{cd\ \textasciitilde{}/cnc302/edge\ \&\&\ make\ link} → \texttt{bridge/state\ 1}
-\item
-  {[}Pi{]} Терминал бүрд: \texttt{set\ -a\ \&\&\ source\ \textasciitilde{}/cnc302/edge/.env\ \&\&\ set\ +a}
-\end{itemize}
+✓ \texttt{make\ health} дөрвөн мөр \texttt{200}; \texttt{docker\ compose\ ps}-д \texttt{cnc302-nodered} → \texttt{Up\ (healthy)}. \texttt{starting} бол 30 сек хүлээгээд дахин \texttt{docker\ compose\ ps}.
+
+\hypertarget{ux433ux4afux4afux440-ux431ux430-ux446ux430ux433}{%
+\subsection{2.5 Гүүр ба цаг}\label{ux433ux4afux4afux440-ux431ux430-ux446ux430ux433}}
+
+\textbf{{[}Pi-3{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ check }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ up }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ link}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{make\ check} бүгд \texttt{OK} (NTP мөр \textbf{заавал} OK), \texttt{bridge/state\ 1} → \texttt{Ctrl\ +\ C}, \texttt{cd\ \textasciitilde{}/cnc302}.
+
+\begin{quote}
+\textbf{Цагийн тохирол.} MTTR-ыг Pi-гийн цаг (тасалдлын цаг) ба зөөврийн компьютерийн цаг (\texttt{rx\_ms}) хоёрыг харьцуулж тооцдог. Хоёр хост дээр \texttt{timedatectl} → \texttt{System\ clock\ synchronized:\allowbreak{}\ yes} байх ёстой (\textbf{{[}ЗК · Ubuntu-1{]}} дээр ч шалга).
+\end{quote}
 
 \hypertarget{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}{%
 \section{3. Онолын сануулга}\label{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}}
@@ -200,35 +329,62 @@ mosquitto.conf (\textbf{глобал})\strut
 \hypertarget{ux430ux43bux445ux43cux443ux443ux434}{%
 \section{4. Алхмууд}\label{ux430ux43bux445ux43cux443ux443ux434}}
 
+\begingroup\scriptsize\begin{longtable}[]{@{}lllll@{}}
+\toprule
+Алхам & Хаана & Юу хийх & Мин & Хүснэгт\tabularnewline
+\midrule
+\endhead
+1 & {[}ЗК{]} & InfluxDB бэлтгэх, бичилтийг гараар шалгах & 25 & 5.1\tabularnewline
+2 & {[}ЗК{]}{[}Pi{]} & Node-RED шугам ба Grafana самбар & 45 & 5.2\tabularnewline
+3 & {[}Pi{]} & Суурь бүрэн бүтэн байдал & 30 & 5.3\tabularnewline
+4 & {[}Pi{]} & Өгсөх урсгал тасрах: RPO ба MTTR & 60 & 5.4, 5.5\tabularnewline
+5 & {[}Pi{]} & \texttt{cleansession} ба дарааллын хязгаар & 35 & 5.6, 5.7\tabularnewline
+6 & {[}Pi{]}{[}ЗК{]} & Бусад эвдрэлүүд & 30 & 5.8\tabularnewline
+7 & {[}ЗК{]}{[}Pi{]} & Дүгнэлт ба Git & 15 & ---\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
 \hypertarget{ux430ux43bux445ux430ux43c-1-influxdb-ux431ux44dux43bux442ux433ux44dux445-ux431ux430-ux431ux438ux447ux438ux43bux442ux438ux439ux433-ux433ux430ux440ux430ux430ux440-ux448ux430ux43bux433ux430ux445-25-ux43cux438ux43d-ux437ux43a}{%
 \subsection{Алхам 1 --- InfluxDB бэлтгэх ба бичилтийг гараар шалгах (25 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-1-influxdb-ux431ux44dux43bux442ux433ux44dux445-ux431ux430-ux431ux438ux447ux438ux43bux442ux438ux439ux433-ux433ux430ux440ux430ux430ux440-ux448ux430ux43bux433ux430ux445-25-ux43cux438ux43d-ux437ux43a}}
 
-InfluxDB 3 нь \emph{schema-on-write}: анхны бичилт өгөгдлийн сан, хүснэгтийг автоматаар үүсгэдэг. Гэхдээ санг \textbf{ил үүсгэх} нь сайн дадал (нэр, хадгалах хугацааг өөрөө шийднэ). Амжилттай бол \texttt{200}, аль хэдийн байвал \texttt{409} буцна.
+InfluxDB 3 нь \emph{schema-on-write}: анхны бичилт өгөгдлийн сан, хүснэгтийг автоматаар үүсгэдэг. Гэхдээ санг \textbf{ил үүсгэх} нь сайн дадал (нэр, хадгалах хугацааг өөрөө шийднэ).
+
+\textbf{1.1 Сан үүсгэж, жагсаах.}
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \ExtensionTok{curl}\NormalTok{ {-}s {-}w }\StringTok{\textquotesingle{}  → HTTP \%\{http\_code\}\textbackslash{}n\textquotesingle{}}\NormalTok{ {-}X POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/configure/database\textquotesingle{}} \KeywordTok{\textbackslash{}}
   \ExtensionTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}}\NormalTok{ {-}d }\StringTok{\textquotesingle{}\{"db":"cnc302"\}\textquotesingle{}}
 \ExtensionTok{curl}\NormalTok{ {-}s }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/configure/database?format=json\textquotesingle{}} \KeywordTok{|} \ExtensionTok{jq}
-\CommentTok{\# Нэг мөр гараар бичиж, буцааж уншина}
-\ExtensionTok{curl}\NormalTok{ {-}s {-}X POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/write\_lp?db=cnc302\&precision=millisecond\textquotesingle{}} \KeywordTok{\textbackslash{}}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{→\ HTTP\ 200} (шинээр үүссэн) эсвэл \texttt{409} (Лаб 1-д аль хэдийн үүссэн) --- \textbf{хоёулаа зүгээр}. Жагсаалтад \texttt{cnc302}.
+
+\textbf{1.2 Нэг мөр гараар бичиж, буцааж унших.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{curl}\NormalTok{ {-}s {-}w }\StringTok{\textquotesingle{}  → HTTP \%\{http\_code\}\textbackslash{}n\textquotesingle{}}\NormalTok{ {-}X POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/write\_lp?db=cnc302\&precision=millisecond\textquotesingle{}} \KeywordTok{\textbackslash{}}
   \ExtensionTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: text/plain\textquotesingle{}} \KeywordTok{\textbackslash{}}
   \ExtensionTok{{-}{-}data{-}binary} \StringTok{"telemetry,site=test,device=test0 temperature=24.5 }\VariableTok{$(}\FunctionTok{date}\NormalTok{ +\%s\%3N}\VariableTok{)}\StringTok{"}
-
 \ExtensionTok{curl}\NormalTok{ {-}s {-}X POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/query\_sql\textquotesingle{}} \KeywordTok{\textbackslash{}}
   \ExtensionTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \KeywordTok{\textbackslash{}}
   \ExtensionTok{{-}d} \StringTok{\textquotesingle{}\{"db":"cnc302","q":"SELECT * FROM telemetry LIMIT 5","format":"json"\}\textquotesingle{}} \KeywordTok{|} \ExtensionTok{jq}
-\CommentTok{\# Ижил асуулга GET{-}ээр (URL{-}кодчилсон), мөр бүр тусдаа JSON (jsonl):}
 \ExtensionTok{curl}\NormalTok{ {-}s }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/query\_sql?db=cnc302\&format=jsonl\&q=SELECT+*+FROM+telemetry+LIMIT+5\textquotesingle{}}
 \end{Highlighting}
 \end{Shaded}
+
+✓ Бичилт \texttt{→\ HTTP\ 204}; хоёр асуулга хоёулаа \texttt{"device":"test0"}, \texttt{"temperature":\allowbreak{}24.\allowbreak{}5} агуулсан мөр буцаана (сүүлийнх нь мөр бүр тусдаа JSON --- \texttt{jsonl}).
 
 \begin{itemize}
 \tightlist
 \item
   \texttt{precision} утга нь v3 API-д \textbf{бүтэн үгээр}: \texttt{auto} (анхдагч) \textbar{} \texttt{nanosecond} \textbar{} \texttt{microsecond} \textbar{} \texttt{millisecond} \textbar{} \texttt{second}. \texttt{ms}, \texttt{s} гэх товчлол нь зөвхөн v1 (\texttt{/write}) ба v2 (\texttt{/api/v2/write}) нийцлийн API-д хүчинтэй.
 \item
-  Амжилттай бичилт \texttt{204\ No\ Content} буцаана. Line protocol буруу эсвэл баганын төрөл зөрчигдвөл \texttt{400} ба алдааны JSON (анхдагч \texttt{accept\_\allowbreak{}partial=\allowbreak{}true} үед зөв мөрүүд нь бичигдэнэ).
+  Line protocol буруу эсвэл баганын төрөл зөрчигдвөл \texttt{400} ба алдааны JSON (анхдагч \texttt{accept\_\allowbreak{}partial=\allowbreak{}true} үед зөв мөрүүд нь бичигдэнэ).
 \item
   \texttt{query\_sql}-ийн \texttt{format}: \texttt{json} (анхдагч), \texttt{jsonl}, \texttt{csv}, \texttt{pretty}, \texttt{parquet}.
 \item
@@ -239,7 +395,7 @@ InfluxDB 3 нь \emph{schema-on-write}: анхны бичилт өгөгдлий
 Албан ёсны баримт: \href{https://docs.influxdata.com/influxdb3/core/write-data/http-api/v3-write-lp/}{InfluxDB 3 Core --- v3 write\_\allowbreak{}lp API}, \href{https://docs.influxdata.com/influxdb3/core/query-data/execute-queries/influxdb-v3-api/}{v3 query API}
 \end{quote}
 
-\textbf{Бичилтийн саатлыг хэмжинэ} (5 удаа давтаж, \texttt{\%\{time\_total\}}-ыг тэмдэглэ):
+\textbf{1.3 Бичилтийн саатлыг хэмжих} (5 удаа, \texttt{\%\{time\_total\}} секундээр):
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -249,6 +405,8 @@ InfluxDB 3 нь \emph{schema-on-write}: анхны бичилт өгөгдлий
   \ExtensionTok{{-}{-}data{-}binary} \StringTok{"telemetry,site=test,device=test0 temperature=2}\VariableTok{$i}\StringTok{.0 }\VariableTok{$(}\FunctionTok{date}\NormalTok{ +\%s\%3N}\VariableTok{)}\StringTok{"}\KeywordTok{;} \KeywordTok{done}
 \end{Highlighting}
 \end{Shaded}
+
+✓ 5 мөр, жишээ \texttt{0.004215} (= 4.2 мс).
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-5.1-ux431ux438ux447ux438ux445-ux434ux430ux432ux445ux430ux440ux433ux44bux43d-ux441ux443ux443ux440ux44c}{%
 \subsubsection{Хүснэгт 5.1 --- Бичих давхаргын суурь}\label{ux445ux4afux441ux43dux44dux433ux442-5.1-ux431ux438ux447ux438ux445-ux434ux430ux432ux445ux430ux440ux433ux44bux43d-ux441ux443ux443ux440ux44c}}
@@ -269,14 +427,8 @@ InfluxDB 3 нь \emph{schema-on-write}: анхны бичилт өгөгдлий
 InfluxDB 2.7 нөөц хувилбар дээр ажиллаж байгаа бол \texttt{docs/\allowbreak{}troubleshooting.\allowbreak{}md} §6-г уншаад цаашид \texttt{verify}-д \texttt{-\/-influx2} тугийг нэмнэ.
 \end{quote}
 
-\hypertarget{ux430ux43bux445ux430ux43c-2-node-red-ux448ux443ux433ux430ux43c-ux431ux430-grafana-ux441ux430ux43cux431ux430ux440-45-ux43cux438ux43d-ux437ux43a}{%
-\subsection{Алхам 2 --- Node-RED шугам ба Grafana самбар (45 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-2-node-red-ux448ux443ux433ux430ux43c-ux431ux430-grafana-ux441ux430ux43cux431ux430ux440-45-ux43cux438ux43d-ux437ux43a}}
-
-\textbf{2.1 Импортлох.} Node-RED (\texttt{:1880}) → ☰ → \textbf{Import} (эсвэл \texttt{Ctrl-I}) → \texttt{lab05/\allowbreak{}flows/\allowbreak{}nodered-pipeline.\allowbreak{}json}-ийн агуулгыг наах эсвэл файлыг сонгох → \textbf{new flow} → \textbf{Import} → \textbf{Deploy}.
-
-\begin{quote}
-Албан ёсны баримт: \href{https://nodered.org/docs/user-guide/editor/workspace/import-export}{Node-RED --- Importing and Exporting Flows}
-\end{quote}
+\hypertarget{ux430ux43bux445ux430ux43c-2-node-red-ux448ux443ux433ux430ux43c-ux431ux430-grafana-ux441ux430ux43cux431ux430ux440-45-ux43cux438ux43d-ux437ux43api}{%
+\subsection{Алхам 2 --- Node-RED шугам ба Grafana самбар (45 мин) {[}ЗК{]}{[}Pi{]}}\label{ux430ux43bux445ux430ux43c-2-node-red-ux448ux443ux433ux430ux43c-ux431ux430-grafana-ux441ux430ux43cux431ux430ux440-45-ux43cux438ux43d-ux437ux43api}}
 
 \begin{figure}
 \centering
@@ -293,17 +445,100 @@ mqtt in ─▶ задлах + шалгах ─┬─(1)─▶ line protocol (tel
 
 \texttt{data\_\allowbreak{}integrity.\allowbreak{}py}-ийн мессеж (\texttt{run\_id}, \texttt{seq} талбартай) 2-р салаагаар \texttt{integrity} хүснэгтэд бичигдэнэ. Node-RED хүлээн авсан цаг \texttt{rx\_ms} нь MTTR-ыг тооцоход хэрэглэгдэнэ.
 
-\textbf{2.2 Хоёр зангилааг шалга.} \texttt{mqtt-broker} нь \texttt{emqx:1883} (compose сүлжээн доторх нэр, \texttt{localhost} \textbf{биш}), MQTT v5, \texttt{cleansession} унтраалттай, \texttt{sessionExpiry} 3600 с --- Node-RED дахин асахад EMQX хүлээлгэсэн мессежийг өгнө. \texttt{http\ request} нь \texttt{POST\ http:\allowbreak{}/\allowbreak{}/\allowbreak{}influxdb:\allowbreak{}8181/\allowbreak{}api/\allowbreak{}v3/\allowbreak{}write\_\allowbreak{}lp?\allowbreak{}db=\allowbreak{}cnc302\&\allowbreak{}precision=\allowbreak{}millisecond}. Түүний \textbf{"Only send non-2xx responses to Catch node"} сонголт \textbf{унтраалттай} байх ёстой: асаалттай бол InfluxDB унтарсан үеийн холболтын алдаа (\texttt{ECONNREFUSED}) гаралт руу гарахгүй, dead-letter хэзээ ч бичигдэхгүй. Захиалж буй сэдэв: \texttt{cnc302/\allowbreak{}+/\allowbreak{}+/\allowbreak{}+/\allowbreak{}+/\allowbreak{}telemetry}. Dead-letter файл \texttt{/\allowbreak{}data/\allowbreak{}deadletter.\allowbreak{}jsonl} --- \texttt{nodered/node-red} дүрсийн хэрэглэгчийн хавтас \texttt{/data} бөгөөд \texttt{nodered-data} volume-д хадгалагдана.
+\textbf{2.1 Урсгалыг Windows-ийн clipboard руу хуулах.} \texttt{clip.exe} нь WSL-ээс Windows-ийн clipboard руу бичнэ:
 
-\textbf{2.3 Өгөгдөл урсгана.} {[}Pi{]} Pi дээр агентаа ажиллуулаад (\texttt{cd\ \textasciitilde{}/cnc302/edge\ \&\&\ make\ agent}), {[}ЗК{]} дээр симулятороор нэмэлт ачаалал өгнө. Node-RED-ийн debug самбарт 10 секунд тутам \texttt{write\_ok} өсөх ёстой:
+\textbf{{[}ЗК · Ubuntu-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \ExtensionTok{python3}\NormalTok{ tools/sim\_device.py {-}{-}target cloud {-}{-}host localhost {-}{-}devices 10 {-}{-}interval 1}
+\FunctionTok{cat}\NormalTok{ lab05/flows/nodered{-}pipeline.json }\KeywordTok{|} \ExtensionTok{clip.exe}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{2.4 Задлах зангилааны гурван үүрэг} (кодыг нээж уншина):
+\textbf{2.2 Импортлох.} Windows-ийн хөтчөөр http://localhost:1880 →
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Баруун дээд \textbf{☰} → \textbf{Import} (эсвэл \texttt{Ctrl\ +\ I}).
+\item
+  Том текст талбарт \texttt{Ctrl\ +\ V} (2.1-д хуулсан JSON).
+\item
+  Доод талд \textbf{new flow} сонго → \textbf{Import}.
+\item
+  Шинэ таб гарч ирнэ. Баруун дээд улаан \textbf{Deploy} товч.
+\end{enumerate}
+
+✓ \texttt{Successfully\ deployed}. MQTT зангилааны доор ногоон \textbf{connected} гэсэн тэмдэг.
+
+✗ \textbf{connected} биш, улаан \textbf{disconnected} → 2.3-ын \texttt{mqtt-broker} тохиргоо.
+
+\begin{quote}
+Албан ёсны баримт: \href{https://nodered.org/docs/user-guide/editor/workspace/import-export}{Node-RED --- Importing and Exporting Flows}
+\end{quote}
+
+\textbf{2.3 Хоёр зангилааг шалгах} (давхар товшиж нээнэ, \textbf{Done}-оор хаана):
+
+\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+\toprule
+\begin{minipage}[b]{0.47\columnwidth}\raggedright
+Зангилаа\strut
+\end{minipage} & \begin{minipage}[b]{0.47\columnwidth}\raggedright
+Байх ёстой утга\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{mqtt\ in} → брокер (харандаа дүрс)\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+Server \texttt{emqx}, Port \texttt{1883} (compose сүлжээн доторх нэр, \texttt{localhost} \textbf{биш}), Protocol \textbf{MQTT V5}, \textbf{Use clean start} унтраалттай, Session Expiry \texttt{3600}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{mqtt\ in} → Topic\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{cnc302/\allowbreak{}+/\allowbreak{}+/\allowbreak{}+/\allowbreak{}+/\allowbreak{}telemetry}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{http\ request}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{POST}, URL \texttt{http:\allowbreak{}/\allowbreak{}/\allowbreak{}influxdb:\allowbreak{}8181/\allowbreak{}api/\allowbreak{}v3/\allowbreak{}write\_\allowbreak{}lp?\allowbreak{}db=\allowbreak{}cnc302\&\allowbreak{}precision=\allowbreak{}millisecond}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\texttt{http\ request} → \textbf{Only send non-2xx responses to Catch node}\strut
+\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\textbf{унтраалттай} --- асаалттай бол InfluxDB унтарсан үеийн \texttt{ECONNREFUSED} гаралт руу гарахгүй, dead-letter хэзээ ч бичигдэхгүй\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+Dead-letter файл \texttt{/\allowbreak{}data/\allowbreak{}deadletter.\allowbreak{}jsonl} --- \texttt{nodered/node-red} дүрсийн хэрэглэгчийн хавтас \texttt{/data} бөгөөд \texttt{nodered-data} volume-д хадгалагдана. Ямар нэг утга өөрчилсөн бол дахин \textbf{Deploy}.
+
+\textbf{2.4 Өгөгдөл урсгах.} Pi дээр агент:
+
+\textbf{{[}Pi-2{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ agent}
+\end{Highlighting}
+\end{Shaded}
+
+Компьютер дээр симулятор:
+
+\textbf{{[}ЗК · Ubuntu-2{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ tools/sim\_device.py {-}{-}target cloud {-}{-}host localhost {-}{-}devices 10 {-}{-}interval 1}
+\end{Highlighting}
+\end{Shaded}
+
+Node-RED-ийн баруун талын \textbf{debug} самбарыг (хорхойн дүрстэй таб) нээ.
+
+✓ 10 секунд тутам \texttt{write\_ok} тоолуур өснө. 2 минутын дараа \texttt{write\_ok}, \texttt{write\_errors}-ийг Хүснэгт 5.2-т бич.
+
+\textbf{2.5 Задлах зангилааны гурван үүрэг} (\texttt{задлах\ +\ шалгах} function зангилааг давхар товшиж кодыг унш):
 
 \begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
@@ -342,54 +577,92 @@ InfluxDB-ийн tag (хэмжээс)\strut
 
 Line protocol-д tag утгын \textbf{таслал, тэнцүүгийн тэмдэг, зай}-г \texttt{\textbackslash{}}-ээр escape хийдэг (\texttt{esc()} функц); цаг нь миллисекунд тул URL-д \texttt{precision=\allowbreak{}millisecond}. Ижил хүснэгт + tag set + цагтай хоёр мөр нэг цэг болж нийлдэг тул QoS 1-ийн давхар хүргэлт санд давхар мөр үүсгэхгүй.
 
-\textbf{2.5 Чанарын шүүлт ба dead-letter-ыг туршина:}
+\textbf{2.6 Чанарын шүүлт ба dead-letter-ыг туршина.} Хүрээнээс гарсан утга --- санд \textbf{ОРОХГҮЙ} байх ёстой:
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [ЗК] хүрээнээс гарсан утга — санд ОРОХГҮЙ байх ёстой}
 \ExtensionTok{mosquitto\_pub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}cnc302/shutis/mhts/lab/dev9999/telemetry\textquotesingle{}} \KeywordTok{\textbackslash{}}
   \ExtensionTok{{-}m} \StringTok{\textquotesingle{}\{"ts":\textquotesingle{}"}\VariableTok{$(}\FunctionTok{date}\NormalTok{ +\%s\%3N}\VariableTok{)}\StringTok{"\textquotesingle{},"temperature":9999,"humidity":50,"vibration\_rms":0.3\}\textquotesingle{}}
+\FunctionTok{sleep}\NormalTok{ 2}
 \ExtensionTok{curl}\NormalTok{ {-}s {-}X POST }\StringTok{\textquotesingle{}http://localhost:8181/api/v3/query\_sql\textquotesingle{}}\NormalTok{ {-}H }\StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}} \KeywordTok{\textbackslash{}}
   \ExtensionTok{{-}d} \StringTok{\textquotesingle{}\{"db":"cnc302","q":"SELECT count(*) c FROM telemetry WHERE device=\textquotesingle{}"\textquotesingle{}"\textquotesingle{}dev9999\textquotesingle{}"\textquotesingle{}"\textquotesingle{}","format":"json"\}\textquotesingle{}}
-\ExtensionTok{docker}\NormalTok{ exec cnc302{-}nodered wc {-}l /data/deadletter.jsonl   \# dead{-}letter файлын урт}
-\ExtensionTok{docker}\NormalTok{ exec cnc302{-}nodered tail {-}1 /data/deadletter.jsonl  \# }\DataTypeTok{\{"stage":"parse","reason":"range:temperature",…\}}
+\BuiltInTok{echo}
+\ExtensionTok{docker}\NormalTok{ exec cnc302{-}nodered wc {-}l /data/deadletter.jsonl}
+\ExtensionTok{docker}\NormalTok{ exec cnc302{-}nodered tail {-}1 /data/deadletter.jsonl}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{2.6 Grafana самбар} (\texttt{:3000}, InfluxDB эх сурвалж аль хэдийн бүртгэгдсэн: query language \textbf{SQL}, database \texttt{cnc302}). SQL горимд Grafana нь InfluxDB 3 руу Flight SQL (gRPC)-ээр холбогддог тул TLS-гүй үед эх сурвалжийн \textbf{Insecure Connection} асаалттай байх ёстой. Гурван панель үүсгэж хадгална --- Алхам 4-д өгсөх урсгал тасрахад энэ график дээр \textbf{цоорхой} үүсэх ёстой (эсвэл үүсэхгүй; аль нь болохыг та хэмжинэ):
+✓ \texttt{{[}\{"c":0\}{]}}; dead-letter-ийн сүүлийн мөр \texttt{\{"stage":\allowbreak{}"parse","reason":\allowbreak{}"range:\allowbreak{}temperature",\ldots{}\}}.
 
-\begingroup\scriptsize\begin{longtable}[]{@{}ll@{}}
+✗ \texttt{No\ such\ file} (deadletter.jsonl) → dead-letter хараахан бичигдээгүй: 2.3-ын шалгалтыг дахин хий.
+
+\textbf{2.7 Grafana самбар.} InfluxDB эх сурвалж аль хэдийн бүртгэгдсэн (query language \textbf{SQL}, database \texttt{cnc302}). SQL горимд Grafana нь InfluxDB 3 руу Flight SQL (gRPC)-ээр холбогддог тул TLS-гүй үед эх сурвалжийн \textbf{Insecure Connection} асаалттай байх ёстой.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  http://localhost:3000 → \textbf{☰ → Connections → Data sources → InfluxDB3} → \textbf{Insecure Connection} асаалттай эсэхийг шалга → \textbf{Save \& test} → ✓ ногоон.
+\item
+  \textbf{☰ → Dashboards → New → New dashboard → + Add visualization → InfluxDB3}.
+\item
+  Query засварлагчийг \textbf{SQL / Code} горимд шилжүүлж, доорх query-г буулга, баруун талаас Visualization төрлийг сонго, \textbf{Title} өг → \textbf{Back to dashboard}. Гурван панелийн хувьд давт:
+\end{enumerate}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
-\begin{minipage}[b]{0.47\columnwidth}\raggedright
-Панель\strut
-\end{minipage} & \begin{minipage}[b]{0.47\columnwidth}\raggedright
-Асуулга\strut
+\begin{minipage}[b]{0.30\columnwidth}\raggedright
+Title\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Төрөл\strut
+\end{minipage} & \begin{minipage}[b]{0.30\columnwidth}\raggedright
+Query\strut
 \end{minipage}\tabularnewline
 \midrule
 \endhead
-\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
 Температурын цуваа\strut
-\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Time series\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
 \texttt{SELECT\ time,\ temperature,\ device\ FROM\ telemetry\ WHERE\ \$\_\allowbreak{}\_\allowbreak{}timeFilter(time)\ ORDER\ BY\ time}\strut
 \end{minipage}\tabularnewline
-\begin{minipage}[t]{0.47\columnwidth}\raggedright
-Идэвхтэй төхөөрөмж (Stat)\strut
-\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Идэвхтэй төхөөрөмж\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Stat\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
 \texttt{SELECT\ count(DISTINCT\ device)\ AS\ devices\ FROM\ telemetry\ WHERE\ \$\_\allowbreak{}\_\allowbreak{}timeFilter(time)}\strut
 \end{minipage}\tabularnewline
-\begin{minipage}[t]{0.47\columnwidth}\raggedright
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
 Бичилтийн хурд\strut
-\end{minipage} & \begin{minipage}[t]{0.47\columnwidth}\raggedright
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Time series\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
 \texttt{SELECT\ \$\_\allowbreak{}\_\allowbreak{}dateBin(time)\ AS\ time,\ count(*)\ AS\ points\ FROM\ telemetry\ WHERE\ \$\_\allowbreak{}\_\allowbreak{}timeFilter(time)\ GROUP\ BY\ 1\ ORDER\ BY\ 1}\strut
 \end{minipage}\tabularnewline
 \bottomrule
 \end{longtable}\endgroup
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  \textbf{Save dashboard} → \texttt{Лаб\ 5\ —\ Шугам}. Хугацааны мужийг \textbf{Last 15 minutes}, баруун дээд refresh-ийг \textbf{10s} болго.
+\end{enumerate}
+
+✓ Гурван панелд өгөгдөл. Алхам 4-д өгсөх урсгал тасрахад энэ график дээр \textbf{цоорхой} үүсэх ёстой (эсвэл үүсэхгүй; аль нь болохыг та хэмжинэ).
 
 \texttt{\$\_\allowbreak{}\_\allowbreak{}timeFilter(time)} нь самбарын цагийн хүрээг, \texttt{\$\_\allowbreak{}\_\allowbreak{}dateBin(time)} нь \texttt{date\_bin()}-ийг Grafana-гийн \texttt{\$\_\allowbreak{}\_\allowbreak{}interval}-аар орлуулна. \texttt{GROUP\ BY\ time} (түүхий цагаар бүлэглэх) нь цэг бүрийг тусдаа бүлэг болгодог тул хурдыг харуулахгүй.
 
 \begin{quote}
 Албан ёсны баримт: \href{https://grafana.com/docs/grafana/latest/datasources/influxdb/query-editor/}{Grafana --- InfluxDB query editor (SQL macros)}, \href{https://grafana.com/docs/grafana/latest/datasources/influxdb/configure/}{Configure the InfluxDB data source}
 \end{quote}
+
+\textbf{2.8 Симулятор ба агентыг зогсоо} --- Алхам 3-аас эхлэх хэмжилтэд саад болохгүй: \textbf{{[}ЗК · Ubuntu-2{]}} ба \textbf{{[}Pi-2{]}}-д \texttt{Ctrl\ +\ C}.
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-5.2-ux448ux443ux433ux430ux43cux44bux43d-ux447ux430ux43dux430ux440ux44bux43d-ux445ux44fux43dux430ux43bux442}{%
 \subsubsection{Хүснэгт 5.2 --- Шугамын чанарын хяналт}\label{ux445ux4afux441ux43dux44dux433ux442-5.2-ux448ux443ux433ux430ux43cux44bux43d-ux447ux430ux43dux430ux440ux44bux43d-ux445ux44fux43dux430ux43bux442}}
@@ -407,31 +680,51 @@ Grafana дээр өгөгдөл харагдав уу &\tabularnewline
 \bottomrule
 \end{longtable}\endgroup
 
-\hypertarget{ux430ux43bux445ux430ux43c-3-ux441ux443ux443ux440ux44c-ux431ux4afux440ux44dux43d-ux431ux4afux442ux44dux43d-ux431ux430ux439ux434ux430ux43b-ux433ux4afux4afux440ux44dux44dux440-30-ux43cux438ux43d-piux437ux43a}{%
-\subsection{Алхам 3 --- Суурь бүрэн бүтэн байдал: гүүрээр (30 мин) {[}Pi{]}{[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-3-ux441ux443ux443ux440ux44c-ux431ux4afux440ux44dux43d-ux431ux4afux442ux44dux43d-ux431ux430ux439ux434ux430ux43b-ux433ux4afux4afux440ux44dux44dux440-30-ux43cux438ux43d-piux437ux43a}}
+\hypertarget{ux430ux43bux445ux430ux43c-3-ux441ux443ux443ux440ux44c-ux431ux4afux440ux44dux43d-ux431ux4afux442ux44dux43d-ux431ux430ux439ux434ux430ux43b-ux433ux4afux4afux440ux44dux44dux440-30-ux43cux438ux43d-pi}{%
+\subsection{Алхам 3 --- Суурь бүрэн бүтэн байдал: гүүрээр (30 мин) {[}Pi{]}}\label{ux430ux43bux445ux430ux43c-3-ux441ux443ux443ux440ux44c-ux431ux4afux440ux44dux43d-ux431ux4afux442ux44dux43d-ux431ux430ux439ux434ux430ux43b-ux433ux4afux4afux440ux44dux44dux440-30-ux43cux438ux43d-pi}}
 
 Эвдрэлгүй үед \textbf{алдагдал 0\%} байхыг эхлээд батал. Суурь дээр аль хэдийн алдагдаж байвал цааш явах утгагүй.
 
+\textbf{3.1 Гүүрийн төлөвийг бичиж эхлэх --- ЭНЭ ЦОНХЫГ ЭЦЭС ХҮРТЭЛ БҮҮ ХАА.}
+
+\textbf{{[}Pi-1{]}}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [Pi] терминал 1 — гүүрний төлөвийг бичиж эхэлнэ (ЭНЭ ЦОНХЫГ ЭЦЭС ХҮРТЭЛ БҮҮ ХАА)}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \FunctionTok{mkdir}\NormalTok{ {-}p lab05/out}
 \ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}F }\StringTok{\textquotesingle{}\{"ts":\%U,"state":\%p\}\textquotesingle{}} \KeywordTok{\textbackslash{}}
-  \ExtensionTok{{-}t} \StringTok{"cnc302/}\VariableTok{$SITE}\StringTok{/}\VariableTok{$AREA}\StringTok{/}\VariableTok{$LINE}\StringTok{/}\VariableTok{$DEVICE\_ID}\StringTok{/bridge/state"} \OperatorTok{\textgreater{}}\NormalTok{ lab05/out/bridge.jsonl}
+  \ExtensionTok{{-}t} \StringTok{"cnc302/}\VariableTok{$SITE}\StringTok{/}\VariableTok{$AREA}\StringTok{/}\VariableTok{$LINE}\StringTok{/}\VariableTok{$DEVICE\_ID}\StringTok{/bridge/state"} \KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab05/out/bridge.jsonl}
+\end{Highlighting}
+\end{Shaded}
 
-\CommentTok{\# [Pi] терминал 2 — ирмэгийн брокер руу нийтэлнэ, гүүр үүл рүү дамжуулна}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py publish {-}{-}via edge {-}{-}host localhost }\KeywordTok{\textbackslash{}}
+✓ Нэн даруй \texttt{\{"ts":\allowbreak{}1791\ldots{},"state":\allowbreak{}1\}} гэсэн мөр (retained) гарна. Цонх \textbf{нээлттэй хүлээж} байна.
+
+✗ Юу ч гарахгүй → §2.2-ын блок энэ цонхонд буулгагдаагүй (\texttt{echo\ \$DEVICE\_\allowbreak{}ID} хоосон).
+
+\textbf{3.2 Ирмэгийн брокер руу 3 минут нийтлэх} (10 мсж/с × 180 с = 1800 мессеж):
+
+\textbf{{[}Pi-2{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{$PY} \ExtensionTok{lab05/data\_integrity.py}\NormalTok{ publish {-}{-}via edge {-}{-}host localhost }\KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}rate}\NormalTok{ 10 {-}{-}seconds 180 {-}{-}qos 1 {-}{-}run{-}id base {-}{-}outdir lab05/out}
-\CommentTok{\# дараа нь шалгана — InfluxDB нь ҮҮЛ дээр байгааг санаарай}
-\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py verify {-}{-}influx }\StringTok{"http://}\VariableTok{$CLOUD\_HOST}\StringTok{:8181"} \KeywordTok{\textbackslash{}}
+\end{Highlighting}
+\end{Shaded}
+
+✓ 3 минутын дараа \texttt{илгээсэн:\ 1800} хэлбэрийн дүгнэлт.
+
+\textbf{3.3 Шалгах.} InfluxDB нь \textbf{ҮҮЛ} дээр байгааг санаарай:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{$PY} \ExtensionTok{lab05/data\_integrity.py}\NormalTok{ verify {-}{-}influx }\StringTok{"http://}\VariableTok{$CLOUD\_HOST}\StringTok{:8181"} \KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}run{-}id}\NormalTok{ base {-}{-}outdir lab05/out}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{quote}
-\textbf{Цагийн тохирол.} MTTR-ыг Pi-гийн цаг (тасалдлын цаг) ба зөөврийн компьютерийн цаг (\texttt{rx\_ms}) хоёрыг харьцуулж тооцдог. Хоёр хост дээр \texttt{timedatectl} → \texttt{System\ clock\ synchronized:\allowbreak{}\ yes} байх ёстой.
-\end{quote}
+✓ «Алдагдал 0.0\%», \texttt{lab05/\allowbreak{}out/\allowbreak{}base-result.\allowbreak{}json} үүснэ.
+
+✗ \texttt{Connection\ refused} / timeout (8181) → компьютерийн галт хана (SETUP А.6) эсвэл InfluxDB асаагүй. ✗ Санд 0 мөр → Node-RED-ийн \texttt{integrity} салаа (Алхам 2.3), гүүр (\texttt{make\ link}).
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-5.3-ux441ux443ux443ux440ux44c-ux44dux432ux434ux440ux44dux43bux433ux4afux439}{%
 \subsubsection{Хүснэгт 5.3 --- Суурь (эвдрэлгүй)}\label{ux445ux4afux441ux43dux44dux433ux442-5.3-ux441ux443ux443ux440ux44c-ux44dux432ux434ux440ux44dux43bux433ux4afux439}}
@@ -449,71 +742,122 @@ Grafana дээр өгөгдөл харагдав уу &\tabularnewline
 \bottomrule
 \end{longtable}\endgroup
 
-\hypertarget{ux430ux43bux445ux430ux43c-4-ux4e9ux433ux441ux4e9ux445-ux443ux440ux441ux433ux430ux43b-uplink-ux442ux430ux441ux440ux430ux445-rpo-ux431ux430-mttr-60-ux43cux438ux43d-piux437ux43a}{%
-\subsection{Алхам 4 --- ӨГСӨХ УРСГАЛ (UPLINK) ТАСРАХ: RPO ба MTTR (60 мин) {[}Pi{]}{[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-4-ux4e9ux433ux441ux4e9ux445-ux443ux440ux441ux433ux430ux43b-uplink-ux442ux430ux441ux440ux430ux445-rpo-ux431ux430-mttr-60-ux43cux438ux43d-piux437ux43a}}
+\hypertarget{ux430ux43bux445ux430ux43c-4-ux4e9ux433ux441ux4e9ux445-ux443ux440ux441ux433ux430ux43b-uplink-ux442ux430ux441ux440ux430ux445-rpo-ux431ux430-mttr-60-ux43cux438ux43d-pi}{%
+\subsection{Алхам 4 --- ӨГСӨХ УРСГАЛ (UPLINK) ТАСРАХ: RPO ба MTTR (60 мин) {[}Pi{]}}\label{ux430ux43bux445ux430ux43c-4-ux4e9ux433ux441ux4e9ux445-ux443ux440ux441ux433ux430ux43b-uplink-ux442ux430ux441ux440ux430ux445-rpo-ux431ux430-mttr-60-ux43cux438ux43d-pi}}
 
-\textbf{Энэ бол лабораторийн гол хэсэг.} \texttt{uplink-down} нь Pi → үүл чиглэлийн 1883 портыг л хаана (iptables \texttt{OUTPUT\ \ldots{}\ -j\ DROP}, iptables байхгүй бол nft \texttt{inet\ cnc302} хүснэгт): ирмэгийн mosquitto ажилласаар, төхөөрөмжүүд Pi руу нийтэлсээр байна. Энэ нь "бүх зүйл унасан" биш, яг \textbf{өгсөх урсгал тасарсан} туршилт.
+\textbf{Энэ бол лабораторийн гол хэсэг.} \texttt{uplink-down} нь Pi → үүл чиглэлийн 1883 портыг л хаана (iptables \texttt{OUTPUT\ \ldots{}\ -j\ DROP}, iptables байхгүй бол nft \texttt{inet\ cnc302} хүснэгт): ирмэгийн mosquitto ажилласаар, төхөөрөмжүүд Pi руу нийтэлсээр байна. Энэ нь «бүх зүйл унасан» биш, яг \textbf{өгсөх урсгал тасарсан} туршилт.
 
-\textbf{4.1 QoS 1, 60 секундын тасалдал.} Гурван терминал зэрэг:
+\textbf{Туршилт бүрийн хэв маяг (4.1, 4.4, 4.5, 5.x, 6.x-д ижил):}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{{[}Pi-3{]}} \texttt{sudo\ -v} --- sudo нууц үгийг урьдчилан оруулна (15 мин хадгалагдана; эс бөгөөс \texttt{sleep}-ийн дараа нууц үг асууж, тасалдал хоцорно).
+\item
+  \textbf{{[}Pi-2{]}} \texttt{publish} эхлүүлнэ.
+\item
+  \textbf{{[}Pi-3{]}} \texttt{sleep\ N\ \&\allowbreak{}\&\allowbreak{}\ bash\ lab05/\allowbreak{}failure\_\allowbreak{}inject.\allowbreak{}sh\ \ldots{}} --- эвдрэл.
+\item
+  Хоёулаа дуусахыг хүлээнэ, \textbf{30 сек} нэмж хүлээнэ (дараалал урсаж дуусна).
+\item
+  \textbf{{[}Pi-2{]}} \texttt{verify}.
+\end{enumerate}
+
+\textbf{4.1 QoS 1, 60 секундын тасалдал} (нийт ≈ 5.5 мин):
+
+\textbf{{[}Pi-3{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [Pi] терминал 1 — bridge.jsonl бичсээр байна (Алхам 3{-}аас үргэлжилнэ)}
-\CommentTok{\# [Pi] терминал 2 — 5 минут нийтэлнэ}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py publish {-}{-}via edge {-}{-}host localhost }\KeywordTok{\textbackslash{}}
+\FunctionTok{sudo}\NormalTok{ {-}v}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{{[}Pi-2{]}} --- 5 минут нийтэлнэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{$PY} \ExtensionTok{lab05/data\_integrity.py}\NormalTok{ publish {-}{-}via edge {-}{-}host localhost }\KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}rate}\NormalTok{ 10 {-}{-}seconds 300 {-}{-}qos 1 {-}{-}run{-}id uplink60 {-}{-}outdir lab05/out}
-\CommentTok{\# [Pi] терминал 3 — 60 секундын дараа өгсөх урсгалыг 60 секунд таслана}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{{[}Pi-3{]}} --- \textbf{шууд дараа нь}; 60 секундын дараа өгсөх урсгалыг 60 секунд таслана:
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{sleep}\NormalTok{ 60 }\KeywordTok{\&\&} \FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh uplink{-}down 60}
 \end{Highlighting}
 \end{Shaded}
 
-Энэ үед юу болдгийг Зураг 5.2-оос дахин хар. \texttt{failure\_\allowbreak{}inject.\allowbreak{}sh} тасалдлын эхлэл/төгсгөлийг \texttt{lab05/\allowbreak{}out/\allowbreak{}uplink-events.\allowbreak{}jsonl}-д бичнэ.
+✓ \texttt{▼\ \ldots{}} (тасалсан) ба 60 сек дараа \texttt{▲\ Өгсөх\ урсгал\ сэргэлээ.\allowbreak{}} \texttt{failure\_\allowbreak{}inject.\allowbreak{}sh} тасалдлын эхлэл/төгсгөлийг \texttt{lab05/\allowbreak{}out/\allowbreak{}uplink-events.\allowbreak{}jsonl}-д бичнэ.
 
-\textbf{4.2 Өгсөх урсгал унах үед {[}Pi{]} дээр дараалал өсөж байгааг хар:}
+Энэ үед юу болдгийг Зураг 5.2-оос дахин хар.
+
+\textbf{4.2 Тасалдлын ҮЕД дараалал өсөж байгааг харах.} Тасарсан 60 секундын дотор --- \textbf{{[}Pi-3{]}}-ийн \texttt{sleep} дуусахыг хүлээх хооронд \textbf{шинэ} PowerShell таб → \texttt{ssh\ pi} нээж:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# хадгалагдсан мессежийн тоо (retained + тогтвортой клиентийн дараалал);}
-\CommentTok{\# sys\_interval (анхдагч 10 с) тутам шинэчлэгдэнэ. Хуучин нэр нь $SYS/broker/messages/stored}
 \ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}$SYS/broker/store/messages/count\textquotesingle{}}\NormalTok{ {-}C 1}
-\ExtensionTok{docker}\NormalTok{ stats {-}{-}no{-}stream cnc302{-}mosquitto        \# RAM өсөж байна уу}
+\ExtensionTok{docker}\NormalTok{ stats {-}{-}no{-}stream cnc302{-}mosquitto}
 \end{Highlighting}
 \end{Shaded}
 
-Гүүр тасралтыг хэзээ илрүүлснийг \texttt{bridge.jsonl}-ээс хар --- \texttt{uplink-down}-оос хэдэн секундын дараа \texttt{"state":0} гарав (эсвэл огт гарсангүй)? Энэ зөрүүг Хүснэгт 5.5-д бич.
+(10 сек тутам шинэчлэгддэг; хоёр гурван удаа давт.) Хадгалагдсан мессежийн тоо ба mosquitto-гийн RAM өсч байна уу? Хуучин хувилбарт сэдэв нь \texttt{\$SYS/\allowbreak{}broker/\allowbreak{}messages/\allowbreak{}stored}.
+
+Гүүр тасралтыг хэзээ илрүүлснийг \textbf{{[}Pi-1{]}}-ийн \texttt{bridge.jsonl}-ээс хар --- \texttt{uplink-down}-оос хэдэн секундын дараа \texttt{"state":0} гарав (эсвэл огт гарсангүй)? Энэ зөрүүг Хүснэгт 5.5-д бич.
 
 \begin{quote}
 \textbf{Урхинд бүү ор.} Өгсөх урсгал сэргэсний дараа шинэ \texttt{mosquitto\_sub} асаавал дахин илгээгдсэн мессеж \textbf{харагдахгүй} --- тэсрэлт аль хэдийн өнгөрсөн байна. Дахин илгээлтийн нотолгоо нь зөвхөн (а) InfluxDB дэх мөрүүд, (б) Алхам 3-аас хойш тасралтгүй ажиллаж байгаа \texttt{bridge.jsonl} хоёр.
 \end{quote}
 
-\textbf{4.3 Шалгах --- алдагдлыг гүүрний төлөвөөр ХУВААНА:}
+\textbf{4.3 Шалгах --- алдагдлыг гүүрний төлөвөөр ХУВААНА.} \texttt{publish} дуусмагц, 30 сек хүлээгээд:
+
+\textbf{{[}Pi-2{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [Pi] publish дуусмагц (сэргэхийг 30 сек хүлээгээд)}
-\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py verify {-}{-}influx }\StringTok{"http://}\VariableTok{$CLOUD\_HOST}\StringTok{:8181"} \KeywordTok{\textbackslash{}}
+\FunctionTok{sleep}\NormalTok{ 30}
+\VariableTok{$PY} \ExtensionTok{lab05/data\_integrity.py}\NormalTok{ verify {-}{-}influx }\StringTok{"http://}\VariableTok{$CLOUD\_HOST}\StringTok{:8181"} \KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}run{-}id}\NormalTok{ uplink60 {-}{-}outdir lab05/out {-}{-}bridge{-}log lab05/out/bridge.jsonl }\KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}cut{-}log}\NormalTok{ lab05/out/uplink{-}events.jsonl}
 \end{Highlighting}
 \end{Shaded}
 
-Гаралт нь алдагдлыг хоёр янзаар хуваана: (а) \textbf{гүүрийн мэдээлсэн} төлөвөөр (\texttt{-\/-bridge-log}), (б) \textbf{бодит} тасалдлаар (\texttt{-\/-cut-log}), мөн MTTR-ыг автоматаар тооцно. Хоёр хуваалтын "тасарсан (с)" ялгаа нь гүүрийн илрүүлэх хугацаа юм.
+✓ Гаралт нь алдагдлыг хоёр янзаар хуваана: (а) \textbf{гүүрийн мэдээлсэн} төлөвөөр (\texttt{-\/-bridge-log}), (б) \textbf{бодит} тасалдлаар (\texttt{-\/-cut-log}), мөн MTTR-ыг (\texttt{mttr\_s}) автоматаар тооцно. Хоёр хуваалтын «тасарсан (с)» ялгаа нь гүүрийн илрүүлэх хугацаа юм.
 
-\textbf{4.4 QoS 0-оор давт} (шинэ \texttt{-\/-run-id}, ижил хэв маяг):
+\textbf{4.4 QoS 0-оор давт} --- 4.1--4.3-ыг яг ижил дарааллаар, зөвхөн \texttt{-\/\allowbreak{}-qos\ 0\ -\/\allowbreak{}-run-id\ uplink60q0}:
+
+\textbf{{[}Pi-2{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py publish {-}{-}via edge {-}{-}host localhost }\KeywordTok{\textbackslash{}}
+\VariableTok{$PY} \ExtensionTok{lab05/data\_integrity.py}\NormalTok{ publish {-}{-}via edge {-}{-}host localhost }\KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}rate}\NormalTok{ 10 {-}{-}seconds 300 {-}{-}qos 0 {-}{-}run{-}id uplink60q0 {-}{-}outdir lab05/out}
-\CommentTok{\# 60 сек дараа: bash lab05/failure\_inject.sh uplink{-}down 60 ; дараа нь:}
-\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py verify {-}{-}influx }\StringTok{"http://}\VariableTok{$CLOUD\_HOST}\StringTok{:8181"} \KeywordTok{\textbackslash{}}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{{[}Pi-3{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sudo}\NormalTok{ {-}v}\KeywordTok{;} \FunctionTok{sleep}\NormalTok{ 60 }\KeywordTok{\&\&} \FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh uplink{-}down 60}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{{[}Pi-2{]}} (дууссаны дараа)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sleep}\NormalTok{ 30}
+\VariableTok{$PY} \ExtensionTok{lab05/data\_integrity.py}\NormalTok{ verify {-}{-}influx }\StringTok{"http://}\VariableTok{$CLOUD\_HOST}\StringTok{:8181"} \KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}run{-}id}\NormalTok{ uplink60q0 {-}{-}outdir lab05/out {-}{-}bridge{-}log lab05/out/bridge.jsonl }\KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}cut{-}log}\NormalTok{ lab05/out/uplink{-}events.jsonl}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{4.5 Тасалдлыг уртасга:} ижил туршилтыг \texttt{uplink-down\ 180} (3 минут) -аар давт (\texttt{-\/-seconds\ 420}, \texttt{-\/\allowbreak{}-run-id\ uplink180}).
+\textbf{4.5 Тасалдлыг уртасга} --- 3 минут (нийт ≈ 7.5 мин): \textbf{{[}Pi-2{]}} \texttt{\ldots{}\ -\/\allowbreak{}-qos\ 1\ -\/\allowbreak{}-seconds\ 420\ -\/\allowbreak{}-run-id\ uplink180\ \ldots{}}, \textbf{{[}Pi-3{]}} \texttt{sudo\ -v;\ sleep\ 60\ \&\allowbreak{}\&\allowbreak{}\ bash\ lab05/\allowbreak{}failure\_\allowbreak{}inject.\allowbreak{}sh\ uplink-down\ 180}, дараа нь \texttt{verify\ -\/\allowbreak{}-run-id\ uplink180\ \ldots{}} (бусад тугууд 4.3-тай ижил).
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-5.4-ux4e9ux433ux441ux4e9ux445-ux443ux440ux441ux433ux430ux43b-ux442ux430ux441ux440ux430ux445-rpo-ux431ux430-mttr}{%
 \subsubsection{Хүснэгт 5.4 --- Өгсөх урсгал тасрах: RPO ба MTTR}\label{ux445ux4afux441ux43dux44dux433ux442-5.4-ux4e9ux433ux441ux4e9ux445-ux443ux440ux441ux433ux430ux43b-ux442ux430ux441ux440ux430ux445-rpo-ux431ux430-mttr}}
@@ -604,11 +948,11 @@ QoS\strut
 \begin{itemize}
 \tightlist
 \item
-  \textbf{RPO} = хамгийн урт тасалдлын хугацаа (\texttt{verify}-ийн "Хамгийн урт тасалдал ... секунд"). Алдагдал 0 бол RPO = 0.
+  \textbf{RPO} = хамгийн урт тасалдлын хугацаа (\texttt{verify}-ийн «Хамгийн урт тасалдал ... секунд»). Алдагдал 0 бол RPO = 0.
 \item
   \textbf{MTTR} = өгсөх урсгал сэргэснээс (\texttt{uplink-events.\allowbreak{}jsonl}-ийн \texttt{state=1}) тасалдлын үеэр илгээсэн сүүлийн мессеж санд хүрэх (\texttt{integrity.rx\_ms}) хүртэлх хугацаа --- \texttt{verify\ -\/\allowbreak{}-cut-log} хэвлэнэ (\texttt{mttr\_s}).
 \item
-  \textbf{Гүүр дахин холбогдох хугацаа} = \texttt{bridge.jsonl}-ийн \texttt{state=1} − \texttt{uplink-events.\allowbreak{}jsonl}-ийн \texttt{state=1}.
+  \textbf{Гүүр дахин холбогдох хугацаа} = \texttt{bridge.jsonl}-ийн \texttt{state=1} − \texttt{uplink-events.\allowbreak{}jsonl}-ийн \texttt{state=1} (хоёулаа мс; \textbf{{[}Pi-3{]}} \texttt{tail\ -4\ lab05/\allowbreak{}out/\allowbreak{}uplink-events.\allowbreak{}jsonl\ lab05/\allowbreak{}out/\allowbreak{}bridge.\allowbreak{}jsonl}).
 \end{itemize}
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-5.5-ux431ux43eux434ux438ux442-ux442ux430ux441ux430ux43bux434ux430ux43b-ux431ux430-ux433ux4afux4afux440ux438ux439ux43d-ux43cux44dux434ux44dux44dux43bux441ux44dux43d-ux442ux4e9ux43bux4e9ux432ux4e9ux4e9ux440-ux445ux443ux432ux430ux430ux441ux430ux43d-ux430ux43bux434ux430ux433ux434ux430ux43b---cut-log---bridge-log}{%
@@ -674,31 +1018,59 @@ QoS\strut
 \end{longtable}\endgroup
 
 \begin{quote}
-\textbf{Хүлээгдэх үр дүн:} \texttt{cleansession\ false} + \texttt{local\_\allowbreak{}cleansession\ false} + \texttt{queue\_\allowbreak{}qos0\_\allowbreak{}messages\ true} үед \textbf{QoS 1}-ийн алдагдал 0\% байх ёстой --- PUBACK аваагүй мессеж session-д үлдэж, дахин холбогдоход илгээгдэнэ. \textbf{QoS 0}-д гүүр тасралтыг илрүүлэхээс өмнө TCP руу бичигдсэн мессеж алдагдаж болно (§3, 2-р зүйл) --- алдагдсан хэсэг тасалдлын \textbf{эхэнд} байвал яг энэ шалтгаан. 60 секундын тасалдалд гүүр "0" мэдээлээгүй байж болохыг анхаар (keepalive 60 с).
+\textbf{Хүлээгдэх үр дүн:} \texttt{cleansession\ false} + \texttt{local\_\allowbreak{}cleansession\ false} + \texttt{queue\_\allowbreak{}qos0\_\allowbreak{}messages\ true} үед \textbf{QoS 1}-ийн алдагдал 0\% байх ёстой --- PUBACK аваагүй мессеж session-д үлдэж, дахин холбогдоход илгээгдэнэ. \textbf{QoS 0}-д гүүр тасралтыг илрүүлэхээс өмнө TCP руу бичигдсэн мессеж алдагдаж болно (§3, 2-р зүйл) --- алдагдсан хэсэг тасалдлын \textbf{эхэнд} байвал яг энэ шалтгаан. 60 секундын тасалдалд гүүр «0» мэдээлээгүй байж болохыг анхаар (keepalive 60 с).
 \end{quote}
 
 \hypertarget{ux430ux43bux445ux430ux43c-5-cleansession-ux431ux430-ux434ux430ux440ux430ux430ux43bux43bux44bux43d-ux445ux44fux437ux433ux430ux430ux440-35-ux43cux438ux43d-pi}{%
 \subsection{\texorpdfstring{Алхам 5 --- \texttt{cleansession} ба дарааллын хязгаар (35 мин) {[}Pi{]}}{Алхам 5 --- cleansession ба дарааллын хязгаар (35 мин) {[}Pi{]}}}\label{ux430ux43bux445ux430ux43c-5-cleansession-ux431ux430-ux434ux430ux440ux430ux430ux43bux43bux44bux43d-ux445ux44fux437ux433ux430ux430ux440-35-ux43cux438ux43d-pi}}
 
-\textbf{5.1 \texttt{cleansession} ба \texttt{local\_\allowbreak{}cleansession}-ийг салгаж турш.} \texttt{bridge.conf}-д \texttt{local\_\allowbreak{}cleansession\ false} \textbf{ил} бичигдсэн тул зөвхөн \texttt{cleansession}-ийг \texttt{true} болгох нь гүүрний \textbf{локал} дарааллыг хөндөхгүй --- энэ хоёрын үүргийг ялгах нь энэ алхмын зорилго. Гүүрний тохиргоог \textbf{шууд} засаад Алхам 4.1-ийг хоёр удаа давтана:
+\textbf{5.1 \texttt{cleansession} ба \texttt{local\_\allowbreak{}cleansession}-ийг салгаж турш.} \texttt{bridge.conf}-д \texttt{local\_\allowbreak{}cleansession\ false} \textbf{ил} бичигдсэн тул зөвхөн \texttt{cleansession}-ийг \texttt{true} болгох нь гүүрний \textbf{локал} дарааллыг хөндөхгүй --- энэ хоёрын үүргийг ялгах нь энэ алхмын зорилго.
+
+\begin{quote}
+⚠ \texttt{make\ restart} нь эхлээд \texttt{make\ bridge}-ийг ажиллуулж \texttt{bridge.conf}-ыг \textbf{загвараас дахин үүсгэдэг} --- гар засвар устана. Тиймээс энд \texttt{docker\ compose\ restart\ mosquitto}. Дуусаад 5.4-т \texttt{make\ bridge}-ээр анхны төлөвт буцаана.
+\end{quote}
+
+\textbf{(а) Зөвхөн алсын тал цэвэр.} \texttt{sed} нь файлд засвар хийнэ (nano-гаар гараар засаж болно):
+
+\textbf{{[}Pi-3{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge}
-\CommentTok{\# (а) зөвхөн алсын тал цэвэр:  cleansession true,  local\_cleansession false  → {-}{-}run{-}id uplink60clean}
-\CommentTok{\# (б) хоёр тал цэвэр:          cleansession true,  local\_cleansession true   → {-}{-}run{-}id uplink60cleanboth}
-\FunctionTok{nano}\NormalTok{ mosquitto/conf.d/bridge.conf}
-\ExtensionTok{docker}\NormalTok{ compose restart mosquitto      \# ⚠ }\KeywordTok{\textasciigrave{}}\FunctionTok{make}\NormalTok{ restart}\KeywordTok{\textasciigrave{}}\NormalTok{ БИШ!}
-\ExtensionTok{docker}\NormalTok{ compose logs {-}{-}tail=20 mosquitto }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}i bridge}
+\FunctionTok{sed}\NormalTok{ {-}i }\StringTok{\textquotesingle{}s/\^{}cleansession .*/cleansession true/; s/\^{}local\_cleansession .*/local\_cleansession false/\textquotesingle{}}\NormalTok{ mosquitto/conf.d/bridge.conf}
+\FunctionTok{grep}\NormalTok{ {-}E }\StringTok{\textquotesingle{}\^{}(cleansession|local\_cleansession)\textquotesingle{}}\NormalTok{ mosquitto/conf.d/bridge.conf}
+\ExtensionTok{docker}\NormalTok{ compose restart mosquitto}
+\FunctionTok{sleep}\NormalTok{ 5}\KeywordTok{;} \ExtensionTok{docker}\NormalTok{ compose logs {-}{-}tail=20 mosquitto }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}i bridge}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
 \end{Highlighting}
 \end{Shaded}
 
+✓ \texttt{cleansession\ true} / \texttt{local\_\allowbreak{}cleansession\ false}; логт \texttt{Connecting\ bridge\ cloud}.
+
+Дараа нь Алхам 4.1--4.3-ыг \texttt{-\/\allowbreak{}-run-id\ uplink60clean}-ээр давт.
+
+\textbf{(б) Хоёр тал цэвэр.}
+
+\textbf{{[}Pi-3{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge}
+\FunctionTok{sed}\NormalTok{ {-}i }\StringTok{\textquotesingle{}s/\^{}cleansession .*/cleansession true/; s/\^{}local\_cleansession .*/local\_cleansession true/\textquotesingle{}}\NormalTok{ mosquitto/conf.d/bridge.conf}
+\FunctionTok{grep}\NormalTok{ {-}E }\StringTok{\textquotesingle{}\^{}(cleansession|local\_cleansession)\textquotesingle{}}\NormalTok{ mosquitto/conf.d/bridge.conf}
+\ExtensionTok{docker}\NormalTok{ compose restart mosquitto}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\end{Highlighting}
+\end{Shaded}
+
+Алхам 4.1--4.3-ыг \texttt{-\/\allowbreak{}-run-id\ uplink60cleanboth}-оор давт.
+
 \begin{quote}
-Бидний урьдчилсан туршилтаар (mosquitto 2.0, QoS 1, 30 с тасалдал) (а) алдагдалгүй, (б) тасалдлын үеийн мессеж бараг бүгд алдагдсан. Өөрсдийн тоогоор батал.
+⚠ \texttt{docker\ compose\ restart\ mosquitto} хийхэд \textbf{{[}Pi-1{]}}-ийн \texttt{mosquitto\_sub} тасарч болно. Тасарсан бол 3.1-ийн командыг \texttt{tee} биш \textbf{\texttt{tee\ -a}}-аар (файлыг дарж бичихгүйн тулд) дахин асаа.
 \end{quote}
 
 \begin{quote}
-⚠ \texttt{make\ restart} нь эхлээд \texttt{make\ bridge}-ийг ажиллуулж \texttt{bridge.conf}-ыг \textbf{загвараас дахин үүсгэдэг} --- гар засвар устана. Тиймээс энд \texttt{docker\ compose\ restart\ mosquitto}. Дуусаад \texttt{make\ bridge}-ээр анхны төлөвт буцаана.
+Бидний урьдчилсан туршилтаар (mosquitto 2.0, QoS 1, 30 с тасалдал) (а) алдагдалгүй, (б) тасалдлын үеийн мессеж бараг бүгд алдагдсан. Өөрсдийн тоогоор батал.
 \end{quote}
 
 \textbf{5.2 Дарааллын RAM-ын арифметик.} \texttt{mosquitto.conf} дахь \texttt{max\_\allowbreak{}queued\_\allowbreak{}messages\ 100000} юу гэсэн үг вэ --- тоол:
@@ -710,27 +1082,73 @@ Pi-гийн боломжтой RAM (Лаб 4, Хүснэгт 4.1) = ______ MiB
 → Таны хурдаар (______ мсж/с) дараалал дүүрэхэд ______ секунд шаардагдана
 \end{verbatim}
 
-\textbf{5.3 Дарааллын халилтыг үзэх.} Хязгаарыг зориудаар багасгаж, халихыг ажигла. \texttt{max\_\allowbreak{}queued\_\allowbreak{}messages} нь "дамжуулж байгаа (in-flight) мессежээс \textbf{гадна}" хадгалах QoS 1/2 мессежийн тоо (клиент тус бүрд):
+\textbf{5.3 Дарааллын халилтыг үзэх.} Эхлээд гүүрийг \textbf{анхны} тохиргоонд буцааж, дараа нь дарааллын хязгаарыг зориудаар 500 болгоно. \texttt{max\_\allowbreak{}queued\_\allowbreak{}messages} нь «дамжуулж байгаа (in-flight) мессежээс \textbf{гадна}» хадгалах QoS 1/2 мессежийн тоо (клиент тус бүрд):
+
+\textbf{{[}Pi-3{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge}
+\FunctionTok{make}\NormalTok{ bridge}
 \FunctionTok{sed}\NormalTok{ {-}i }\StringTok{\textquotesingle{}s/\^{}max\_queued\_messages .*/max\_queued\_messages 500/\textquotesingle{}}\NormalTok{ mosquitto/mosquitto.conf}
+\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}max\_queued\_messages\textquotesingle{}}\NormalTok{ mosquitto/mosquitto.conf}
 \ExtensionTok{docker}\NormalTok{ compose restart mosquitto}
-\CommentTok{\# [Pi] өөр терминалд: 120 сек тасалж, 10 мсж/с илгээнэ → 1200 мессеж \textgreater{} 500 дараалал}
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py publish {-}{-}via edge {-}{-}host localhost }\KeywordTok{\textbackslash{}}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{max\_\allowbreak{}queued\_\allowbreak{}messages\ 500}.
+
+Одоо 120 сек таслаад 10 мсж/с илгээнэ → 1200 мессеж \textgreater{} 500 дараалал:
+
+\textbf{{[}Pi-2{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{$PY} \ExtensionTok{lab05/data\_integrity.py}\NormalTok{ publish {-}{-}via edge {-}{-}host localhost }\KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}rate}\NormalTok{ 10 {-}{-}seconds 240 {-}{-}qos 1 {-}{-}run{-}id qfull {-}{-}outdir lab05/out}
-\CommentTok{\# 30 сек дараа: bash lab05/failure\_inject.sh uplink{-}down 120 ; дараа нь:}
-\ExtensionTok{python3}\NormalTok{ lab05/data\_integrity.py verify {-}{-}influx }\StringTok{"http://}\VariableTok{$CLOUD\_HOST}\StringTok{:8181"} \KeywordTok{\textbackslash{}}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{{[}Pi-3{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sudo}\NormalTok{ {-}v}\KeywordTok{;} \FunctionTok{sleep}\NormalTok{ 30 }\KeywordTok{\&\&} \FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh uplink{-}down 120}
+\ExtensionTok{docker}\NormalTok{ compose {-}f \textasciitilde{}/cnc302/edge/docker{-}compose.yml logs mosquitto }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}i }\StringTok{"dropped"} \KeywordTok{|} \FunctionTok{tail}\NormalTok{ {-}5}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{{[}Pi-2{]}} (дууссаны дараа)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sleep}\NormalTok{ 30}
+\VariableTok{$PY} \ExtensionTok{lab05/data\_integrity.py}\NormalTok{ verify {-}{-}influx }\StringTok{"http://}\VariableTok{$CLOUD\_HOST}\StringTok{:8181"} \KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}run{-}id}\NormalTok{ qfull {-}{-}outdir lab05/out {-}{-}bridge{-}log lab05/out/bridge.jsonl }\KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}cut{-}log}\NormalTok{ lab05/out/uplink{-}events.jsonl}
-\ExtensionTok{docker}\NormalTok{ compose {-}f \textasciitilde{}/cnc302/edge/docker{-}compose.yml logs mosquitto }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}i }\StringTok{"dropped"}
-\CommentTok{\# Дуусаад БУЦААЖ 100000 болгоод дахин асаана}
 \end{Highlighting}
 \end{Shaded}
 
 Алдагдсан \texttt{seq}-ийн хүрээ тасалдлын \textbf{эхэнд} үү, \textbf{төгсгөлд} үү гэдгийг \texttt{verify}-ийн тасралтын жагсаалтаас ол.
+
+\textbf{5.4 БУЦААЖ анхны тохиргоонд --- ЗААВАЛ.}
+
+\textbf{{[}Pi-3{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge}
+\FunctionTok{sed}\NormalTok{ {-}i }\StringTok{\textquotesingle{}s/\^{}max\_queued\_messages .*/max\_queued\_messages 100000/\textquotesingle{}}\NormalTok{ mosquitto/mosquitto.conf}
+\FunctionTok{make}\NormalTok{ bridge}
+\ExtensionTok{docker}\NormalTok{ compose restart mosquitto}
+\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}max\_queued\_messages\textquotesingle{}}\NormalTok{ mosquitto/mosquitto.conf}
+\FunctionTok{grep}\NormalTok{ {-}E }\StringTok{\textquotesingle{}\^{}(cleansession|local\_cleansession)\textquotesingle{}}\NormalTok{ mosquitto/conf.d/bridge.conf}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{100000}, \texttt{cleansession\ false}, \texttt{local\_\allowbreak{}cleansession\ false}. \texttt{git\ diff\ edge/\allowbreak{}mosquitto/\allowbreak{}mosquitto.\allowbreak{}conf} хоосон.
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-5.6-cleansession-ux431ux430-ux434ux430ux440ux430ux430ux43bux43bux44bux43d-ux445ux44fux437ux433ux430ux430ux440ux44bux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442}{%
 \subsubsection{\texorpdfstring{Хүснэгт 5.6 --- \texttt{cleansession} ба дарааллын хязгаарын харьцуулалт}{Хүснэгт 5.6 --- cleansession ба дарааллын хязгаарын харьцуулалт}}\label{ux445ux4afux441ux43dux44dux433ux442-5.6-cleansession-ux431ux430-ux434ux430ux440ux430ux430ux43bux43bux44bux43d-ux445ux44fux437ux433ux430ux430ux440ux44bux43d-ux445ux430ux440ux44cux446ux443ux443ux43bux430ux43bux442}}
@@ -813,40 +1231,115 @@ Pi-гийн боломжтой RAM (Лаб 4, Хүснэгт 4.1) = ______ MiB
 \bottomrule
 \end{longtable}\endgroup
 
-\textbf{5.4 microSD-гийн бичих саатал.} mosquitto-гийн persistence ба InfluxDB хоёулаа диск рүү бичдэг. Pi-гийн картыг хэмж (4 KiB × 2000 синхрон бичилт):
+\textbf{5.5 microSD-гийн бичих саатал.} mosquitto-гийн persistence ба InfluxDB хоёулаа диск рүү бичдэг. Pi-гийн картыг хэмж (4 KiB × 2000 синхрон бичилт):
+
+\textbf{{[}Pi-3{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{dd}\NormalTok{ if=/dev/zero of=\textasciitilde{}/cnc302/sdtest bs=4k count=2000 oflag=dsync }\OperatorTok{2\textgreater{}\&1} \KeywordTok{|} \FunctionTok{tail}\NormalTok{ {-}1}
-\FunctionTok{rm}\NormalTok{ \textasciitilde{}/cnc302/sdtest }\KeywordTok{\&\&} \FunctionTok{vmstat}\NormalTok{ 1 5      \# }\KeywordTok{\textasciigrave{}}\ExtensionTok{wa}\KeywordTok{\textasciigrave{}}\NormalTok{ = I/O хүлээлт}
+\FunctionTok{rm}\NormalTok{ \textasciitilde{}/cnc302/sdtest }\KeywordTok{\&\&} \FunctionTok{vmstat}\NormalTok{ 1 5}
 \end{Highlighting}
 \end{Shaded}
+
+✓ Эхний команд \texttt{8192000\ bytes\ \ldots{}\ copied,\ N\ s,\ X\ kB/\allowbreak{}s}; \texttt{vmstat}-ын \texttt{wa} багана = I/O хүлээлт.
 
 Гарсан тоог \texttt{autosave\_\allowbreak{}interval\ 60}-той холбож тайлбарла: mosquitto яагаад бичилт бүрийг шууд диск рүү буулгадаггүй вэ, энэ нь тасалдал үед юу алдах эрсдэлтэй вэ? Хариултаа Алхам 6-гийн \texttt{broker} (хэвийн зогсоолт → \texttt{mosquitto.db} бичигдэнэ) ба \texttt{broker-kill} (SIGKILL → бичигдэхгүй) хоёрын үр дүнгээр батал.
 
 \hypertarget{ux430ux43bux445ux430ux43c-6-ux431ux443ux441ux430ux434-ux44dux432ux434ux440ux44dux43bux4afux4afux434-30-ux43cux438ux43d-piux437ux43a}{%
 \subsection{Алхам 6 --- Бусад эвдрэлүүд (30 мин) {[}Pi{]}{[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-6-ux431ux443ux441ux430ux434-ux44dux432ux434ux440ux44dux43bux4afux4afux434-30-ux43cux438ux43d-piux437ux43a}}
 
-Тус бүрд \texttt{publish} ажиллаж байх зуур эвдрэлийг үүсгэнэ (60 секундын дараа), дараа нь \texttt{verify}.
+Тус бүрд Алхам 4-ийн \textbf{хэв маягийг} дагана: \textbf{{[}Pi-2{]}} \texttt{publish} (\texttt{-\/-seconds\ 180}, шинэ \texttt{-\/-run-id}) → \textbf{{[}Pi-3{]}} 60 сек дараа эвдрэл → дууссаны дараа 30 сек хүлээгээд \texttt{verify\ -\/\allowbreak{}-run-id\ \ldots{}\ -\/\allowbreak{}-bridge-log\ lab05/\allowbreak{}out/\allowbreak{}bridge.\allowbreak{}jsonl}. \texttt{run-id}-г доорх хүснэгтийн дагуу нэрлэ.
+
+\begingroup\scriptsize\begin{longtable}[]{@{}llll@{}}
+\toprule
+\begin{minipage}[b]{0.22\columnwidth}\raggedright
+run-id\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Хаана\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Эвдрэлийн команд (60 сек дараа)\strut
+\end{minipage} & \begin{minipage}[b]{0.22\columnwidth}\raggedright
+Юу хийдэг вэ\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{broker30}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{{[}Pi-3{]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{bash\ lab05/\allowbreak{}failure\_\allowbreak{}inject.\allowbreak{}sh\ broker\ 30}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+ирмэгийн mosquitto өөрөө унана --- гүүр биш, \textbf{БРОКЕР} (хэвийн SIGTERM → \texttt{mosquitto.db} хадгалагдана)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{kill20}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{{[}Pi-3{]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{bash\ lab05/\allowbreak{}failure\_\allowbreak{}inject.\allowbreak{}sh\ uplink-down\ 120\ \&\allowbreak{}} → 40 сек дараа \texttt{bash\ lab05/\allowbreak{}failure\_\allowbreak{}inject.\allowbreak{}sh\ broker-kill\ 20}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+цахилгаан тасрахыг дуурайна: өгсөх урсгал тасарсан \textbf{ҮЕД} mosquitto-г SIGKILL-ээр унагана\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{influx30}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{{[}ЗК · Ubuntu-1{]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{bash\ lab05/\allowbreak{}failure\_\allowbreak{}inject.\allowbreak{}sh\ influx\ 30}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{ҮҮЛ} дээр: InfluxDB унана. Брокер, гүүр ажилласаар байна!\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{cpu45}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{{[}Pi-3{]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{bash\ lab05/\allowbreak{}failure\_\allowbreak{}inject.\allowbreak{}sh\ cpu\ 45}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+CPU ханалт (дулааны төсөв ч мөн шалгагдана)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{disk60}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{{[}Pi-3{]}}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\texttt{bash\ lab05/\allowbreak{}failure\_\allowbreak{}inject.\allowbreak{}sh\ disk\ 60}\strut
+\end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
+\textbf{АЮУЛГҮЙ} дискний туршилт --- \texttt{/dev/shm} (RAM) дээрх 64 MiB loop файл, бодит microSD хөндөгдөхгүй\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{broker}, \texttt{broker-kill} үед \textbf{{[}Pi-1{]}}-ийн \texttt{mosquitto\_sub} тасарна --- дууссаны дараа 3.1-ийн командыг \textbf{\texttt{tee\ -a}}-аар дахин асаа.
+\item
+  \texttt{influx30}-ийн дараа dead-letter ажилласан эсэхийг шалга: \textbf{{[}ЗК · Ubuntu-1{]}} \texttt{docker\ exec\ cnc302-nodered\ wc\ -l\ /\allowbreak{}data/\allowbreak{}deadletter.\allowbreak{}jsonl} (өмнөхөөс өссөн үү?).
+\end{itemize}
+
+\textbf{Эцэст нь БҮГДИЙГ сэргээнэ} --- хоёр хост дээр:
+
+\textbf{{[}Pi-3{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [Pi] ирмэгийн брокер өөрөө унана — гүүр биш, БРОКЕР (хэвийн SIGTERM → mosquitto.db хадгалагдана)}
-\FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh broker 30}
-\CommentTok{\# [Pi] цахилгаан тасрахыг дуурайна: өгсөх урсгал тасарсан ҮЕД mosquitto{-}г SIGKILL{-}ээр унагана}
-\CommentTok{\#    (терминал 3: uplink{-}down 120 ажиллаж байх үед 40 сек дараа)}
-\FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh broker{-}kill 20}
-\CommentTok{\# [ЗК] ҮҮЛ дээр: InfluxDB унана. Брокер, гүүр ажилласаар байна!}
-\FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh influx 30}
-\ExtensionTok{docker}\NormalTok{ exec cnc302{-}nodered wc {-}l /data/deadletter.jsonl    \# dead{-}letter ажиллав уу}
-\CommentTok{\# [Pi] CPU ханалт (дулааны төсөв ч мөн шалгагдана)}
-\FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh cpu 45}
-\CommentTok{\# [Pi] АЮУЛГҮЙ дискний туршилт — /dev/shm (RAM) дээрх 64 MiB loop файл, бодит microSD хөндөгдөхгүй}
-\FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh disk 60}
-\CommentTok{\# Эцэст нь БҮГДИЙГ сэргээнэ}
 \FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh restore}
 \end{Highlighting}
 \end{Shaded}
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh restore}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ health }\KeywordTok{\&\&} \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\end{Highlighting}
+\end{Shaded}
+
+✓ Pi: \texttt{cnc302-mosquitto\ \ldots{}\ Up}; компьютер: \texttt{make\ health} дөрвөн мөр \texttt{200}.
 
 \begin{quote}
 \texttt{influx} горим нь хамгийн заль мэхтэй тохиолдол: \textbf{төхөөрөмж юу ч анзаарахгүй}, брокер хүлээж авсаар байна, гүүр ажиллаж байна --- гэвч өгөгдөл хаана ч хадгалагдахгүй. Ийм эвдрэлийг зөвхөн Node-RED-ийн \texttt{write\_errors} тоолуур ба dead-letter файлаас л илрүүлнэ. Grafana дээр график тасарна --- гэхдээ хэн нэг нь харж байвал л.
@@ -1114,23 +1607,61 @@ MTTR (с)\strut
 \bottomrule
 \end{longtable}\endgroup
 
-\hypertarget{ux430ux43bux445ux430ux43c-7-ux434ux4afux433ux43dux44dux43bux442-ux431ux430-commit-15-ux43cux438ux43d-piux437ux43a}{%
-\subsection{Алхам 7 --- Дүгнэлт ба commit (15 мин) {[}Pi{]}{[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-7-ux434ux4afux433ux43dux44dux43bux442-ux431ux430-commit-15-ux43cux438ux43d-piux437ux43a}}
+\hypertarget{ux430ux43bux445ux430ux43c-7-ux434ux4afux433ux43dux44dux43bux442-ux431ux430-git-15-ux43cux438ux43d-ux437ux43api}{%
+\subsection{Алхам 7 --- Дүгнэлт ба Git (15 мин) {[}ЗК{]}{[}Pi{]}}\label{ux430ux43bux445ux430ux43c-7-ux434ux4afux433ux43dux44dux43bux442-ux431ux430-git-15-ux43cux438ux43d-ux437ux43api}}
 
 Багийн төслийн \textbf{найдвартай байдлын паспорт}-ыг бич: ямар RPO, ямар MTTR-ыг зорилт болгох вэ, түүнд хүрэхийн тулд ямар тохиргоо шаардлагатай вэ (\texttt{max\_\allowbreak{}queued\_\allowbreak{}messages}, \texttt{cleansession}, QoS, диск).
 
+\textbf{7.1 Pi бүрэн хэвийн байгааг батлах.} \textbf{{[}Pi-1{]}}-д \texttt{Ctrl\ +\ C} (гүүрийн бичлэгийг зогсооно), дараа нь:
+
+\textbf{{[}Pi-3{]}}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh restore     \# бүх зүйл хэвийн эсэхийг батал}
-\KeywordTok{(}\BuiltInTok{cd}\NormalTok{ edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ bridge }\KeywordTok{\&\&} \ExtensionTok{docker}\NormalTok{ compose restart mosquitto}\KeywordTok{)}\NormalTok{   \# анхны тохиргоо}
-\FunctionTok{git}\NormalTok{ add lab05/}
-\CommentTok{\# lab05/out/ нь .gitignore{-}д — зөвхөн үр дүнгийн JSON{-}г албадан нэмнэ (лог, jsonl{-}ыг БИШ)}
-\FunctionTok{git}\NormalTok{ add {-}f lab05/out/*{-}result.json}
+\FunctionTok{bash}\NormalTok{ lab05/failure\_inject.sh restore}
+\FunctionTok{git}\NormalTok{ status {-}{-}short edge/}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{edge/} дотор өөрчлөгдсөн файл \textbf{алга} (5.4-т буцаасан).
+
+\textbf{7.2 Үр дүнг компьютер руу хуулах.} \texttt{verify}-ийн үр дүн Pi дээр бичигдсэн:
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\FunctionTok{scp}\NormalTok{ {-}i \textasciitilde{}/.ssh/cnc302 }\StringTok{\textquotesingle{}cnc302@\textless{}PI\_IP\textgreater{}:cnc302/lab05/out/*{-}result.json\textquotesingle{}} \KeywordTok{\textbackslash{}}
+    \StringTok{\textquotesingle{}cnc302@\textless{}PI\_IP\textgreater{}:cnc302/lab05/out/*.jsonl\textquotesingle{}} \StringTok{\textquotesingle{}cnc302@\textless{}PI\_IP\textgreater{}:cnc302/lab05/out/failure{-}log.txt\textquotesingle{}} \ExtensionTok{lab05/out/}
+\FunctionTok{ls}\NormalTok{ lab05/out/*{-}result.json}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{base-result.json}, \texttt{uplink60-result.\allowbreak{}json}, \ldots{} бүгд.
+
+\textbf{7.3 Тайлан, нэмэх, шалгах.} \texttt{lab05/out/} нь \texttt{.gitignore}-д --- зөвхөн үр дүнгийн JSON-г \textbf{зориуд} нэмнэ (том \texttt{-sent.jsonl}-уудыг БИШ):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cp}\NormalTok{ docs/report{-}template.md lab05/report.md}
+\ExtensionTok{code}\NormalTok{ lab05/report.md}
+\FunctionTok{git}\NormalTok{ add lab05/report.md}
+\FunctionTok{git}\NormalTok{ add {-}f lab05/out/*{-}result.json lab05/out/failure{-}log.txt}
 \FunctionTok{git}\NormalTok{ status {-}{-}short}
+\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}E }\StringTok{\textquotesingle{}\textbackslash{}.env$|bridge\textbackslash{}.conf$|\textbackslash{}.key$|\textbackslash{}.crt$|devices\textbackslash{}.csv\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+✓ Сүүлийн команд \textbf{юу ч хэвлэхгүй}.
+
+\textbf{7.4 Commit ба push.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{git}\NormalTok{ commit {-}m }\StringTok{"Лаб 5: өгөгдлийн шугам, өгсөх урсгал тасрах, RPO/MTTR"}
-\FunctionTok{git}\NormalTok{ tag lab05{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push {-}{-}tags}
-\CommentTok{\# Нууц файл ороогүйг ЗААВАЛ шалга}
-\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}E }\StringTok{\textquotesingle{}\textbackslash{}.env$|bridge\textbackslash{}.conf$|\textbackslash{}.key$|\textbackslash{}.crt$|devices\textbackslash{}.csv\textquotesingle{}}\NormalTok{   \# хоосон байх ЁСТОЙ}
+\FunctionTok{git}\NormalTok{ tag lab05{-}done}
+\FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push {-}{-}tags}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1211,7 +1742,7 @@ MTTR (с)\strut
 \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
 \texttt{mosquitto\_sub} тэсрэлтийн ДАРАА асаасан\strut
 \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
-InfluxDB-ээс шалга (§1-ийн урхи)\strut
+InfluxDB-ээс шалга (Алхам 4.2-ын урхи)\strut
 \end{minipage}\tabularnewline
 \begin{minipage}[t]{0.30\columnwidth}\raggedright
 mosquitto огт эхлэхгүй\strut
@@ -1239,14 +1770,14 @@ InfluxDB унтарсан ч dead-letter хоосон\strut
 \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
 \texttt{http\ request}-ийн "Only send non-2xx responses to Catch node" асаалттай\strut
 \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
-сонголтыг унтраа (§2.2)\strut
+сонголтыг унтраа (Алхам 2.3)\strut
 \end{minipage}\tabularnewline
 \begin{minipage}[t]{0.30\columnwidth}\raggedright
 \texttt{bridge.jsonl}-д \texttt{0} гарсангүй\strut
 \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
 тасалдал \texttt{keepalive\_\allowbreak{}interval}-аас богино\strut
 \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
-\texttt{-\/-cut-log}-оор шалга (§3)\strut
+\texttt{-\/-cut-log}-оор шалга (Алхам 4.3)\strut
 \end{minipage}\tabularnewline
 \begin{minipage}[t]{0.30\columnwidth}\raggedright
 \texttt{verify} 0 мөр олно\strut
@@ -1296,6 +1827,48 @@ sudo эрхгүй эсвэл loop модуль алга\strut
 урсгалын хуучин хувилбар импортлогдсон (integrity салаагүй)\strut
 \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
 \texttt{lab05/\allowbreak{}flows/\allowbreak{}nodered-pipeline.\allowbreak{}json}-ийг дахин импортло\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{No\ module\ named\ \textquotesingle{}requests\textquotesingle{}} / \texttt{\textquotesingle{}paho\textquotesingle{}} (Pi)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+ирмэгийн venv-д алга / \texttt{python3} гэж бичсэн\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+§2.3, \texttt{\$PY}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{verify}: \texttt{Connection\ refused} (8181)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+компьютерийн галт хана эсвэл InfluxDB унтарсан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+SETUP А.6; {[}ЗК{]} \texttt{make\ health}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Эвдрэл \texttt{sleep}-ийн дараа нууц үг асууж хоцров\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+sudo нууц үг кэшлэгдээгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+эвдрэлийн өмнө \texttt{sudo\ -v} (Алхам 4)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Node-RED Import-д \texttt{Ctrl+V} юу ч буулгахгүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{clip.exe} ажиллаагүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{\textbackslash{}\allowbreak{}\textbackslash{}\allowbreak{}wsl\$\textbackslash{}\allowbreak{}Ubuntu\textbackslash{}\allowbreak{}home\textbackslash{}\allowbreak{}\textless{}нэр\textgreater{}\textbackslash{}\allowbreak{}cnc302\textbackslash{}\allowbreak{}lab05\textbackslash{}\allowbreak{}flows\textbackslash{}\allowbreak{}} хавтаснаас файлыг \textbf{select a file to import}-оор сонго\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{bridge.jsonl} дахин асаахад хуучин бичлэг устав\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{tee} (\texttt{-a}-гүй) файлыг дарж бичсэн\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{tee\ -a} (Алхам 5.1, 6)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Лабын дараа гүүр/дараалал хачин\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+5.x-ийн тохиргоо буцаагдаагүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Алхам 5.4\strut
 \end{minipage}\tabularnewline
 \bottomrule
 \end{longtable}\endgroup

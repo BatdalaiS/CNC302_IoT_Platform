@@ -107,7 +107,7 @@ Windows\strut
 \end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
 Start → \texttt{Terminal} (Windows 10-д \texttt{PowerShell})\strut
 \end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
-\texttt{PS\ C:\textbackslash{}Users\textbackslash{}bat\textgreater{}}\strut
+\texttt{PS\ C:\allowbreak{}\textbackslash{}\allowbreak{}Users\textbackslash{}\allowbreak{}bat\textgreater{}}\strut
 \end{minipage}\tabularnewline
 \begin{minipage}[t]{0.22\columnwidth}\raggedright
 \textbf{{[}ЗК · PowerShell (Admin){]}}\strut
@@ -116,7 +116,7 @@ Windows, администраторын эрхтэй\strut
 \end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
 Start → \texttt{Terminal} → \textbf{баруун товч} → \textbf{Run as administrator} → \textbf{Yes}\strut
 \end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
-\texttt{PS\ C:\textbackslash{}WINDOWS\textbackslash{}system32\textgreater{}}\strut
+\texttt{PS\ C:\allowbreak{}\textbackslash{}\allowbreak{}WINDOWS\textbackslash{}\allowbreak{}system32\textgreater{}}\strut
 \end{minipage}\tabularnewline
 \begin{minipage}[t]{0.22\columnwidth}\raggedright
 \textbf{{[}ЗК · Ubuntu{]}}\strut
@@ -691,7 +691,7 @@ Docker Desktop-ийн баримтаар Linux VM-д анхдагчаар \textb
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Windows + WSL 2 backend (бидний сонголт):} Docker Desktop-ийн \textbf{Resources} хэсэгт Memory гулсуур \textbf{байхгүй} --- санах ойг WSL 2-ын VM-д \texttt{\%UserProfile\%\textbackslash{}.wslconfig} файлаар өгнө (доорх алхмууд).
+  \textbf{Windows + WSL 2 backend (бидний сонголт):} Docker Desktop-ийн \textbf{Resources} хэсэгт Memory гулсуур \textbf{байхгүй} --- санах ойг WSL 2-ын VM-д \texttt{\%UserProfile\%\textbackslash{}\allowbreak{}.\allowbreak{}wslconfig} файлаар өгнө (доорх алхмууд).
 \item
   \textbf{macOS, Linux, Windows Hyper-V backend:} \textbf{Settings → Resources → Advanced → Memory limit → 6 GB} (16 GB-тай бол 8 GB) → \emph{Apply \& restart}.
 \end{itemize}
@@ -728,7 +728,7 @@ Docker Desktop-ийн баримтаар Linux VM-д анхдагчаар \textb
 \end{longtable}\endgroup
 
 \begin{quote}
-⚠ Файлын нэр яг \texttt{.wslconfig} байх ёстой --- \textbf{\texttt{.wslconfig.txt} БИШ}. Шалгах: \texttt{Get-ChildItem\ \$env:USERPROFILE\textbackslash{}.wslconfig} → алдаагүй гарвал зөв.
+⚠ Файлын нэр яг \texttt{.wslconfig} байх ёстой --- \textbf{\texttt{.wslconfig.txt} БИШ}. Шалгах: \texttt{Get-ChildItem\ \$env:\allowbreak{}USERPROFILE\textbackslash{}\allowbreak{}.\allowbreak{}wslconfig} → алдаагүй гарвал зөв.
 \end{quote}
 
 \textbf{Алхам 3 --- WSL-ийг дахин эхлүүлэх.}
@@ -806,7 +806,7 @@ Docker Desktop-ийн баримтаар Linux VM-д анхдагчаар \textb
 ✓ \textbf{Шалгах:} \texttt{lab01\ \ldots{}\ lab08\ \ stack\ \ edge\ \ tools\ \ docs\ \ README.\allowbreak{}md\ \ SETUP.\allowbreak{}md} харагдана.
 
 \begin{quote}
-☞ Сангаа VS Code-оор нээх: \texttt{cd\ \textasciitilde{}/cnc302\ \&\&\ code\ .} --- VS Code нээгдэж, зүүн доод буланд \textbf{WSL: Ubuntu} гэж харагдана. Windows-ийн File Explorer-оос: хаягийн мөрөнд \texttt{\textbackslash{}\textbackslash{}wsl\$\textbackslash{}Ubuntu\textbackslash{}home\textbackslash{}\textless{}ubuntu-нэр\textgreater{}\textbackslash{}cnc302}.
+☞ Сангаа VS Code-оор нээх: \texttt{cd\ \textasciitilde{}/cnc302\ \&\&\ code\ .} --- VS Code нээгдэж, зүүн доод буланд \textbf{WSL: Ubuntu} гэж харагдана. Windows-ийн File Explorer-оос: хаягийн мөрөнд \texttt{\textbackslash{}\allowbreak{}\textbackslash{}\allowbreak{}wsl\$\textbackslash{}\allowbreak{}Ubuntu\textbackslash{}\allowbreak{}home\textbackslash{}\allowbreak{}\textless{}ubuntu-нэр\textgreater{}\textbackslash{}\allowbreak{}cnc302}.
 \end{quote}
 
 \textbf{Алхам 3 --- Python-ийн virtual environment.}
@@ -1024,7 +1024,7 @@ Pi руу \textbf{нууц үггүй, түлхүүрээр} нэвтэрнэ. �
 
 \texttt{Enter\ passphrase} гэж асуувал хоосон орхиж \textbf{Enter}, дахин \textbf{Enter}.
 
-✓ \texttt{Your\ identification\ has\ been\ saved\ in\ C:\textbackslash{}Users\textbackslash{}\ldots{}\textbackslash{}.ssh\textbackslash{}cnc302} гэж гарна. Хоёр файл үүснэ:
+✓ \texttt{Your\ identification\ has\ been\ saved\ in\ C:\allowbreak{}\textbackslash{}\allowbreak{}Users\textbackslash{}\allowbreak{}\ldots{}\textbackslash{}\allowbreak{}.\allowbreak{}ssh\textbackslash{}\allowbreak{}cnc302} гэж гарна. Хоёр файл үүснэ:
 
 \begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
 \toprule
@@ -1066,7 +1066,7 @@ Pi руу \textbf{нууц үггүй, түлхүүрээр} нэвтэрнэ. �
 
 Одооноос \texttt{ssh\ pi} гэж бичихэд \texttt{ssh\ -i\ \textasciitilde{}/.ssh/cnc302\ cnc302@pi-team\textless{}NN\textgreater{}.local}-тай ижил ажиллана. VS Code ч энэ файлыг уншина (В.3).
 
-✓ \textbf{Шалгах:} \texttt{Get-Content\ "\$env:USERPROFILE\textbackslash{}.ssh\textbackslash{}config"} → \texttt{HostName\ pi-team07.\allowbreak{}local} гэх мэт \textbf{өөрийн дугаартай} мөр харагдана (\texttt{\textless{}NN\textgreater{}} үлдсэн бол файлыг \texttt{notepad\ "\$env:USERPROFILE\textbackslash{}.ssh\textbackslash{}config"}-оор засна).
+✓ \textbf{Шалгах:} \texttt{Get-Content\ "\$env:\allowbreak{}USERPROFILE\textbackslash{}\allowbreak{}.\allowbreak{}ssh\textbackslash{}\allowbreak{}config"} → \texttt{HostName\ pi-team07.\allowbreak{}local} гэх мэт \textbf{өөрийн дугаартай} мөр харагдана (\texttt{\textless{}NN\textgreater{}} үлдсэн бол файлыг \texttt{notepad\ "\$env:\allowbreak{}USERPROFILE\textbackslash{}\allowbreak{}.\allowbreak{}ssh\textbackslash{}\allowbreak{}config"}-оор засна).
 
 \hypertarget{ux430.8-vm-ux43bux430ux431-8-ux44bux43d-k3s-server-vm-ux43bux430ux431-8-ux430ux430ux441-ux4e9ux43cux43dux4e9-ux445ux438ux439ux43dux44d}{%
 \subsection{А.8 {[}VM{]} Лаб 8-ын K3s server VM (Лаб 8-аас өмнө хийнэ)}\label{ux430.8-vm-ux43bux430ux431-8-ux44bux43d-k3s-server-vm-ux43bux430ux431-8-ux430ux430ux441-ux4e9ux43cux43dux4e9-ux445ux438ux439ux43dux44d}}
@@ -1345,7 +1345,7 @@ Pi 3B-ийн албан ёсны үзүүлэлт: BCM2837, 4 × Cortex-A53 (Arm
 \end{Highlighting}
 \end{Shaded}
 
-(\texttt{.local} ажиллахгүй бол: \texttt{ssh\ -i\ "\$env:USERPROFILE\textbackslash{}.ssh\textbackslash{}cnc302"\ cnc302@\textless{}PI\_IP\textgreater{}}.)
+(\texttt{.local} ажиллахгүй бол: \texttt{ssh\ -i\ "\$env:\allowbreak{}USERPROFILE\textbackslash{}\allowbreak{}.\allowbreak{}ssh\textbackslash{}\allowbreak{}cnc302"\ cnc302@\textless{}PI\_\allowbreak{}IP\textgreater{}}.)
 
 Анх удаа:
 
@@ -2231,7 +2231,7 @@ Imager-ийн customisation хэрэгжээгүй, Wi-Fi SSID/нууц үг б�
 \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
 Imager-т өөр түлхүүр буулгасан, эсвэл \texttt{ssh} буруу түлхүүр ашиглаж байна\strut
 \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
-\texttt{ssh\ -i\ "\$env:USERPROFILE\textbackslash{}.ssh\textbackslash{}cnc302"\ cnc302@\textless{}PI\_IP\textgreater{}}; хэрэглэгчийн нэр \texttt{cnc302} эсэх (\texttt{pi@} биш); болохгүй бол картаа А.7-ийн \texttt{.pub}-аар \textbf{дахин бич}\strut
+\texttt{ssh\ -i\ "\$env:\allowbreak{}USERPROFILE\textbackslash{}\allowbreak{}.\allowbreak{}ssh\textbackslash{}\allowbreak{}cnc302"\ cnc302@\textless{}PI\_\allowbreak{}IP\textgreater{}}; хэрэглэгчийн нэр \texttt{cnc302} эсэх (\texttt{pi@} биш); болохгүй бол картаа А.7-ийн \texttt{.pub}-аар \textbf{дахин бич}\strut
 \end{minipage}\tabularnewline
 \begin{minipage}[t]{0.30\columnwidth}\raggedright
 \texttt{WARNING:\allowbreak{}\ REMOTE\ HOST\ IDENTIFICATION\ HAS\ CHANGED!}\strut
@@ -2376,7 +2376,7 @@ Memory limit: Mac, Linux, Windows Hyper-V; анхдагч нь хостын 50\%
 \end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
 \href{https://learn.microsoft.com/en-us/windows/wsl/wsl-config}{WSL --- Advanced settings configuration (.\allowbreak{}wslconfig)}\strut
 \end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
-\texttt{\%UserProfile\%\textbackslash{}.wslconfig}, \texttt{{[}wsl2{]}\ memory=\allowbreak{}}, анхдагч 50\%, \texttt{wsl\ -\/\allowbreak{}-shutdown}\strut
+\texttt{\%UserProfile\%\textbackslash{}\allowbreak{}.\allowbreak{}wslconfig}, \texttt{{[}wsl2{]}\ memory=\allowbreak{}}, анхдагч 50\%, \texttt{wsl\ -\/\allowbreak{}-shutdown}\strut
 \end{minipage} & \begin{minipage}[t]{0.22\columnwidth}\raggedright
 2026-09\strut
 \end{minipage}\tabularnewline

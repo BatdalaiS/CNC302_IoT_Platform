@@ -29,29 +29,89 @@
 
 ---
 
-## 2. Урьдчилсан нөхцөл
+## 2. Урьдчилсан нөхцөл ба бэлтгэл (20 мин)
 
 - Лаб 1–3 дууссан. **Лаб 1-ийн Хүснэгт 1.5 (ирмэгийн ачааллын хариу үйлдэл) ба Лаб 3-ын Хүснэгт 3.6 (ачааллын хэмжээний нөлөө) гар дор байх ёстой** — өнөөдөр тэдгээрээс таамаг гаргана.
-- 💻 Файлын дескрипторын хязгаар өргөжсөн, дүрс татагдсан:
+- Лаб 2-ын authenticator унтраалттай (`authn false`).
 
+> 💡 **Алхмуудыг дарааллаар нь хий.** Алхам бүрийн төгсгөлд ✅ **Шалгах** хэсэг бий. Үр дүн нь таарахгүй бол **цааш бүү яв** — ❌ мөр эсвэл §8-аас шалтгааныг ол.
+
+### 2.1 Терминалууд
+
+Энэ лабд **таван** терминал хэрэгтэй — Алхам 3-т гурван Pi цонх зэрэг ажиллана:
+
+| Цонх | Хаана | Хэрхэн нээх |
+|---|---|---|
+| **[🥧 Pi-1]** | Raspberry Pi | PowerShell таб → `ssh pi` |
+| **[🥧 Pi-2]** | Raspberry Pi | шинэ PowerShell таб → `ssh pi` |
+| **[🥧 Pi-3]** | Raspberry Pi | шинэ PowerShell таб → `ssh pi` |
+| **[💻 Ubuntu-1]** | Зөөврийн компьютер (WSL) | Terminal-ын `˅` → **Ubuntu** |
+| **[💻 Ubuntu-2]** | Зөөврийн компьютер (WSL) | дахин `˅` → **Ubuntu** |
+
+`<PI_IP>` — **[🥧 Pi-1]** `hostname -I`. `<LAPTOP_IP>` — **[💻 PowerShell]** `ipconfig`.
+
+### 2.2 Орчноо бэлтгэх — **цонх нээх бүрт** ажиллуулна
+
+**[💻 Ubuntu-1]** ба **[💻 Ubuntu-2]**
 ```bash
-ulimit -n                     # 1024 бол хангалтгүй (binary-ээр ажиллуулах үед)
-ulimit -n 65535               # Linux/macOS; Windows дээр WSL2 дотор
-docker pull emqx/emqtt-bench:0.6.3   # amd64 ба arm64 дүрс бий
+cd ~/cnc302 && source .venv/bin/activate
+set -a && source ~/cnc302/stack/.env && set +a
+mkdir -p measurements
 ```
 
-> Албан ёсны баримт: [emqtt-bench README](https://github.com/emqx/emqtt-bench) — `conn` / `sub` / `pub` дэд команд; `-c` клиентийн тоо, `-i` холбогдох завсар (мс), `-I` нийтлэх завсар (мс), `-s` ачааллын хэмжээ, `-q` QoS, `-t` сэдэв (`%i` = клиентийн дэс дугаар); анхдагчаар MQTT 5.0 (`-V 5`). Docker-гүй бол [releases](https://github.com/emqx/emqtt-bench/releases) хуудаснаас OS-д тохирох багцыг татаж, `bin/`-ийг `PATH`-д нэмнэ; `loadtest.sh` Docker демон олдохгүй бол `emqtt_bench`-ийг өөрөө ашиглана. Docker-оор ажиллуулахад хостын `ulimit -n` контейнерт шилждэггүй тул скрипт `--ulimit nofile=65535:65535` өгдөг.
+`stack/.env`-ийг ачаалснаар `EMQX_API_KEY`, `EMQX_API_SECRET`, `EMQX_DASHBOARD_PASSWORD` бэлэн болно. EMQX 5-ын REST API самбарын нэр/нууц үгээр Basic auth **хүлээн авдаггүй** тул `collect_metrics.py` эхлээд API түлхүүрийг (Лаб 2), байхгүй бол `/api/v5/login`-ийг ашиглана.
 
-- 🥧 Pi бэлэн: `cd ~/cnc302/edge && make check && make mem` → бүгд OK, throttle `0x0`
-- 💻 EMQX-ийн нууц үг терминалд бэлэн:
-
+**[🥧 Pi-1]**, **[🥧 Pi-2]**, **[🥧 Pi-3]**
 ```bash
-# EMQX 5-ын REST API самбарын нэр/нууц үгээр Basic auth ХҮЛЭЭН АВАХГҮЙ.
-# collect_metrics.py эхлээд API түлхүүрийг (Лаб 2), байхгүй бол /api/v5/login-ийг ашиглана.
-set -a && source ~/cnc302/stack/.env && set +a   # EMQX_API_KEY, EMQX_API_SECRET, EMQX_DASHBOARD_PASSWORD
+cd ~/cnc302
+PY=~/cnc302/edge/.venv/bin/python
+set -a && source ~/cnc302/edge/.env && set +a
+mkdir -p measurements
 ```
 
-- 🥧 Pi дээр терминал бүрд: `set -a && source ~/cnc302/edge/.env && set +a`
+### 2.3 Нэг удаагийн бэлтгэл
+
+**(а) Pi дээр `requests` сан.** `lab04/collect_metrics.py` нь `requests`-ийг ашигладаг, харин ирмэгийн venv-д зөвхөн `paho-mqtt` бий:
+
+**[🥧 Pi-1]**
+```bash
+git pull
+$PY -m pip install "requests>=2.31,<3"
+$PY -c "import requests, paho.mqtt; print('OK')"
+```
+
+✅ `OK`.
+
+**(б) Компьютер дээр emqtt-bench дүрс.** Ачаалал үүсгэгч `emqtt-bench`-ийг Docker-оор ажиллуулна:
+
+**[💻 Ubuntu-1]**
+```bash
+git pull
+docker pull emqx/emqtt-bench:0.6.3
+docker run --rm emqx/emqtt-bench:0.6.3 pub --help | head -3
+```
+
+✅ `Usage: emqtt_bench pub …`. Дүрс amd64 ба arm64-д бий.
+
+> Албан ёсны баримт: [emqtt-bench README](https://github.com/emqx/emqtt-bench) — `conn` / `sub` / `pub` дэд команд; `-c` клиентийн тоо, `-i` холбогдох завсар (мс), `-I` нийтлэх завсар (мс), `-s` ачааллын хэмжээ, `-q` QoS, `-t` сэдэв (`%i` = клиентийн дэс дугаар); анхдагчаар MQTT 5.0 (`-V 5`). Docker-оор ажиллуулахад хостын `ulimit -n` контейнерт шилждэггүй тул `loadtest.sh` `--ulimit nofile=65535:65535` өгдөг — Ubuntu дээр `ulimit`-ыг өөрчлөх шаардлагагүй.
+
+### 2.4 Урьдчилсан шалгалт
+
+**[💻 Ubuntu-1]**
+```bash
+cd ~/cnc302/stack && make up && make health
+cd ~/cnc302
+```
+
+✅ Дөрвөн мөр `200`.
+
+**[🥧 Pi-1]**
+```bash
+cd ~/cnc302/edge && make check && make up && make mem
+cd ~/cnc302
+```
+
+✅ Бүгд `OK`, `throttled=0x0`.
 
 ---
 
@@ -116,19 +176,45 @@ Bitrate (Mbit/с) = N_холболт × R_мсж/с × B_утас × 8 / 1 000 0
 
 ![Зураг 4.1 — Ачааллын туршилтын бүтэц: emqtt-bench (зөөврийн компьютер) → ирмэгийн Mosquitto (Pi 3B) ба үүлний EMQX, хэмжүүр цуглуулалт](../docs/img/fig-loadtest.svg)
 
+| Алхам | Хаана | Юу хийх | Мин | Хүснэгт |
+|---|---|---|---|---|
+| 1 | 🥧💻 | Суурь төлөв | 20 | 4.1 |
+| 2 | 💻 | Таамаг (хэмжихээс өмнө) | 25 | 4.2 |
+| 3 | 💻🥧 | Ирмэгийн ачааллын тест | 60 | 4.3, 4.4 |
+| 4 | 💻 | Үүлний ачааллын тест | 45 | 4.5 |
+| 5 | 💻 | EMQX rule engine | 30 | 4.6 |
+| 6 | 💻 | Ханалтын шинжилгээ | 30 | 4.7, 4.8 |
+| 7 | 💻 | Багтаамжийн томьёо | 15 | — |
+| 8 | 💻 | Үзүүлэн ба Git | 15 | — |
+
+> ⚠️ **Ачаалал ҮРГЭЛЖ өөр хостоос ирнэ.** `loadtest.sh` нь **зөвхөн компьютер дээр** ажиллана — Pi дээр ажиллуулбал Pi өөрийгөө ачаална.
+
+---
+
 ### Алхам 1 — Суурь төлөв, хоёр хост дээр (20 мин) 🥧💻
 
 Ачаалал өгөхийн өмнөх төлөв. Дараагийн бүх тоо үүнтэй харьцуулагдана.
 
+**1.1 Pi.** Ирмэгийн агент ажиллаж байвал зогсоо (`Ctrl + C`):
+
+**[🥧 Pi-1]**
 ```bash
-# 🥧 Pi дээр
-pkill -f vscode-server                       # 150–250 MiB чөлөөлнө
-cd ~/cnc302 && ./tools/measure_stack.sh --role edge
+pkill -f vscode-server
+bash tools/measure_stack.sh --role edge | tee measurements/l4-01-edge.txt
 mosquitto_sub -h localhost -t '$SYS/broker/clients/connected' -C 1
-mosquitto_sub -h localhost -t '$SYS/broker/store/messages/count' -C 1   # (хуучин нэр: messages/stored)
+mosquitto_sub -h localhost -t '$SYS/broker/store/messages/count' -C 1
 docker stats --no-stream --format '{{.Name}} {{.MemUsage}} {{.MemPerc}}' cnc302-mosquitto
-# 💻 компьютер дээр
-cd ~/cnc302 && ./tools/measure_stack.sh --role cloud
+```
+
+✅ `$SYS/broker/clients/connected` нь 1–2 (гүүр ба таны `mosquitto_sub`); `cnc302-mosquitto … / 128MiB …%`.
+
+❌ `$SYS/broker/store/messages/count` юу ч хэвлэхгүй гацвал `Ctrl + C` — хуучин хувилбарт нэр нь `$SYS/broker/messages/stored`.
+
+**1.2 Компьютер.**
+
+**[💻 Ubuntu-1]**
+```bash
+bash tools/measure_stack.sh --role cloud | tee measurements/l4-01-cloud.txt
 ```
 
 #### Хүснэгт 4.1 — Суурь төлөв
@@ -148,7 +234,7 @@ cd ~/cnc302 && ./tools/measure_stack.sh --role cloud
 
 Багаараа цаасан дээр тооцоолж, **дараа нь битгий засаарай**. Буруу таамаг бол сонирхолтой үр дүн; засварласан таамаг бол оноогүй.
 
-**2.1 Өгсөх урсгалын (uplink) таазыг тооцоол** (200 байт ачаалал, 1 мсж/с нэг холболтод, §3-ын томьёо):
+**2.1 Өгсөх урсгалын (uplink) таазыг тооцоол** (200 байт ачаалал, 1 мсж/с нэг холболтод, §3-ын томьёо). `loadtest.sh`-ийн анхдагч сэдэв нь `cnc302/bench/%i/telemetry`:
 
 ```
 Сэдвийн урт L (өөрийн TOPIC)            = ______ Б
@@ -185,46 +271,78 @@ MQTT PUBLISH = 7 + L + 200               = ______ Б
 | microSD (persistence) | | |
 | **Бидний таамаг: ХАМГИЙН ТҮРҮҮНД ханах нөөц** | | |
 
+✅ Хүснэгт 4.2-ыг **гэрэл зургаар** авч хадгал (эсвэл `git commit`) — дараа нь засаагүйгээ нотлох баримт.
+
 ---
 
 ### Алхам 3 — Ирмэгийн ачааллын тест (60 мин) 💻🥧
 
 **3.1 Дасгал ажиллуулалт** — бүх зүйл холбогдож байгааг батлах:
 
+**[💻 Ubuntu-1]**
 ```bash
-# 💻 компьютер дээрээс Pi рүү (ачаалал ҮРГЭЛЖ өөр хостоос ирнэ)
-cd ~/cnc302 && bash lab04/loadtest.sh --target edge pub <PI-IP> 10 1
+bash lab04/loadtest.sh --target edge pub <PI_IP> 10 1
 ```
 
-30 секунд ажиллуулаад Ctrl+C. 🥧 Pi дээр холболт харагдах ёстой:
+✅ `→ [edge] 10 нийтлэгч × 1 мсж/с = 10 мсж/с зорилтот` гарч, emqtt-bench `connected: 10` хэлбэрийн мөр хэвлэнэ.
 
+Ажиллаж байх **зуур** Pi дээр шалга:
+
+**[🥧 Pi-1]**
 ```bash
-mosquitto_sub -h localhost -t '$SYS/broker/clients/connected' -C 1   # ≈ 10
+sleep 15; mosquitto_sub -h localhost -t '$SYS/broker/clients/connected' -C 1
 ```
 
-**3.2 Бүтэн шат дараалсан тест.** Гурван терминалыг **зэрэг** ажиллуулна:
+✅ ≈ `11`–`12` (10 + гүүр + таны клиент). Дараа нь **[💻 Ubuntu-1]**-д `Ctrl + C`.
 
+❌ emqtt-bench `econnrefused` / `timeout` → `<PI_IP>` буруу эсвэл Pi-гийн mosquitto асаагүй (`cd ~/cnc302/edge && make up`).
+
+**3.2 Бүтэн шат дараалсан тест.** Шатууд **10 25 50 100 200 350 500** холболт, шат бүр 120 сек + 20 сек амралт ≈ **17 минут**. Дөрвөн цонхыг **дарааллаар** асаана:
+
+**[🥧 Pi-1]** — систем хэмжилт (1100 сек):
 ```bash
-# 🥧 терминал 1 — систем хэмжилт
-cd ~/cnc302 && ./tools/measure_stack.sh --role edge --watch 900 5
-
-# 🥧 терминал 2 — үзүүлэлт цуглуулагч (CSV-д `target=edge`; mosquitto-г $SYS-ээр уншина)
-cd ~/cnc302 && python3 lab04/collect_metrics.py --target edge --label ramp --seconds 900
-
-# 🥧 терминал 3 — swap-ын хяналт. si/so > 0 бол ХЯЗГААР ОЛДЛОО
-vmstat 1
-
-# 💻 ачаалал үүсгэгч — шатууд: 10 25 50 100 200 350 500
-bash lab04/loadtest.sh --target edge ramp <PI-IP>
+bash tools/measure_stack.sh --role edge --watch 1100 5 | tee measurements/l4-03-edge-watch.txt
 ```
 
-> ⚠ **`vmstat 1`-ийн `si`/`so` багана тэгээс өссөн мөчид зогсоо.** Тэр бол хязгаар. Цааш шахах нь Pi-г царцааж, microSD-г элээнэ. Энэ нь алдаа биш — **энэ бол таны хэмжилт**.
+**[🥧 Pi-2]** — үзүүлэлт цуглуулагч (CSV-д `target=edge`; mosquitto-г `$SYS`-ээр уншина):
+```bash
+$PY lab04/collect_metrics.py --target edge --label ramp --seconds 1100
+```
 
-> **Санамж:** `--target edge` үед CSV-ийн `broker_connections` ба `broker_msg_in_rate` нь ирмэгийн mosquitto-гийн `$SYS/broker/clients/connected` ба `$SYS/broker/publish/messages/received`-ээс ирнэ (mosquitto `sys_interval` тутам, анхдагч 10 с шинэчилнэ). Цуглуулагч өөрөө нэг холболт эзэлдэг — холболтын тоо шатнаас 1–2-оор их байна. `emqx_*` баганууд edge дээр хоосон (эсвэл `--emqx` өгвөл **үүлнийх**). Хэмжилтийн хэрэгсэл юуг хэмжиж байгааг үргэлж мэдэж бай.
+**[🥧 Pi-3]** — swap-ын хяналт. `si`/`so` > 0 бол **ХЯЗГААР ОЛДЛОО**:
+```bash
+vmstat 5 | tee measurements/l4-03-vmstat.txt
+```
+
+✅ Гурван цонх бүгд мөр хэвлэж эхэлсэн. Одоо л ачааллыг асаа:
+
+**[💻 Ubuntu-1]**
+```bash
+bash lab04/loadtest.sh --target edge ramp <PI_IP>
+```
+
+Скрипт `collect_metrics.py ажиллаж эхэлсэн үү? [enter]` гэж асуухад `Enter` дар.
+
+✅ Шат бүрд `──────── ШАТ: N төхөөрөмж …` ба `──────── N дууслаа (брокер амьд) …`.
+
+> ⚠ **[🥧 Pi-3]-ын `si`/`so` багана тэгээс өссөн мөчид [💻 Ubuntu-1]-д `Ctrl + C` дарж ачааллыг зогсоо.** Тэр бол хязгаар. Цааш шахах нь Pi-г царцааж, microSD-г элээнэ. Энэ нь алдаа биш — **энэ бол таны хэмжилт**. Аль шатанд зогсоосноо тэмдэглэ.
+
+Ачаалал дууссаны (эсвэл зогсоосны) дараа Pi-1, Pi-2, Pi-3-т `Ctrl + C`.
+
+✅ **[🥧 Pi-2]**-ийн төгсгөлд `measurements/loadtest-edge-ramp-YYYYmmdd-HHMMSS.csv` бичигдсэн гэж гарна.
+
+> **Санамж:** `--target edge` үед CSV-ийн `broker_connections` ба `broker_msg_in_rate` нь ирмэгийн mosquitto-гийн `$SYS/broker/clients/connected` ба `$SYS/broker/publish/messages/received`-ээс ирнэ (mosquitto `sys_interval` тутам, анхдагч 10 с шинэчилнэ). Цуглуулагч өөрөө нэг холболт эзэлдэг — холболтын тоо шатнаас 1–2-оор их байна. `emqx_*` баганууд edge дээр хоосон. Хэмжилтийн хэрэгсэл юуг хэмжиж байгааг үргэлж мэдэж бай.
 >
 > Албан ёсны баримт: [mosquitto(8) — \$SYS topics](https://mosquitto.org/man/mosquitto-8.html).
 
-Шат бүрд `emqtt-bench`-ийн гаралт (илгээсэн хурд) ба Pi-гийн үзүүлэлтийг бичнэ:
+**3.3 Хүснэгт 4.3-ыг бөглө.** CSV-г шат бүрээр нь харах:
+
+**[🥧 Pi-1]**
+```bash
+column -s, -t < $(ls -t measurements/loadtest-edge-ramp-*.csv | head -1) | less -S
+```
+
+(`q`-ээр гарна; сум баруун/зүүн.) «Бодит илгээсэн»-ийг **[💻 Ubuntu-1]**-ийн emqtt-bench гаралтаас, `si/so`-г `measurements/l4-03-vmstat.txt`-ээс ав.
 
 #### Хүснэгт 4.3 — Ирмэг (Pi 3B, mosquitto): шатууд ⭐
 
@@ -240,22 +358,36 @@ bash lab04/loadtest.sh --target edge ramp <PI-IP>
 
 **Хэзээ зогсоох вэ:** сул RAM < 150 MiB, `si/so` > 0, `throttled` ≠ `0x0`, mosquitto контейнер дахин асав (`docker inspect -f '{{.State.OOMKilled}} {{.RestartCount}}' cnc302-mosquitto`), брокер шинэ холболт авахаа больсон (скрипт өөрөө илрүүлж зогсоно), эсвэл хүлээн авалт илгээсний 95%-иас доош.
 
-**3.3 Өгсөх урсгалыг (uplink) зориудаар ачаалах.** Дээрх шатууд өгсөх урсгалыг **хөндөөгүй** (яагаад? — §3-ын урхи). Одоо сэдвийг гүүрээр дамжих угтвартай болгож, ачааллыг том болгоно:
+**3.4 Өгсөх урсгалыг (uplink) зориудаар ачаалах.** Дээрх шатууд өгсөх урсгалыг **хөндөөгүй** (яагаад? — §3-ын урхи: анхдагч сэдэв `cnc302/bench/…` гүүрийн `cnc302/shutis/#` дүрэмд багтахгүй). Одоо сэдвийг гүүрээр дамжих угтвартай болгож, ачааллыг том болгоно. 200 холболт × 5 мсж/с × 2000 Б: зөвхөн ачаалал 16 Mbit/с, утсан дээр ≈ 17.8 Mbit/с.
 
+**[💻 Ubuntu-1]**
 ```bash
-# 💻 компьютер дээрээс (SITE/AREA/LINE-ийг edge/.env-ээс хуул).
-# 200 холболт × 5 мсж/с × 2000 Б: зөвхөн ачаалал 16 Mbit/с, утсан дээр ≈ 17.8 Mbit/с
-TOPIC="cnc302/$SITE/$AREA/$LINE/bench-%i/telemetry" PAYLOAD_SIZE=2000 \
-  bash lab04/loadtest.sh --target edge pub <PI-IP> 200 5
+TOPIC='cnc302/shutis/mhts/lab/bench-%i/telemetry' PAYLOAD_SIZE=2000 \
+  bash lab04/loadtest.sh --target edge pub <PI_IP> 200 5
 ```
 
-🥧 зэрэг ажиглана (`collect_metrics.py`-ийн `tx Mbit` багана, `docker stats`-ийн NET I/O өсөлт):
+(`SITE` нь `shutis`-ээс өөр бол сэдвийг өөрийн `edge/.env`-ийн утгаар соль.)
 
+60 секундын дараа, ачаалал ажиллаж байх **зуур**:
+
+**[🥧 Pi-1]**
 ```bash
 docker stats --no-stream --format 'table {{.Name}}\t{{.NetIO}}\t{{.MemUsage}}\t{{.CPUPerc}}'
+sleep 10
+docker stats --no-stream --format 'table {{.Name}}\t{{.NetIO}}\t{{.MemUsage}}\t{{.CPUPerc}}'
+free -m
 ```
 
-Ачааллыг 5 → 10 мсж/с болгож давт (≈ 35.7 Mbit/с утсан дээр). Дараа нь онолын таазад ойртуулъя: 500 × 10 × 2000 ≈ 89 Mbit/с. Өгсөх урсгал тэр хэмжээнд хүрэв үү, эсвэл түүнээс өмнө RAM (контейнер/хост) эсвэл CPU ханав уу?
+**Хэмжсэн Mbit/с** = (хоёр дахь NET I/O-ийн «гарсан» − эхнийх) × 8 / 10 сек. Мөн компьютер дээр гүүрээр ирж байгааг шалга:
+
+**[💻 Ubuntu-2]**
+```bash
+mosquitto_sub -h localhost -t 'cnc302/shutis/mhts/lab/bench-1/telemetry' -C 3 | wc -c
+```
+
+✅ 0-ээс их тоо = гүүрээр үүлэнд **хүрсэн**.
+
+**[💻 Ubuntu-1]**-д `Ctrl + C`, дараа нь `… pub <PI_IP> 200 10`, тэгээд `… pub <PI_IP> 500 10`-оор давт (≈ 35.7 ба ≈ 89 Mbit/с). Өгсөх урсгал тэр хэмжээнд хүрэв үү, эсвэл түүнээс өмнө RAM (контейнер/хост) эсвэл CPU ханав уу? Сул RAM 150 MiB-ээс доош унавал **зогсоо**.
 
 #### Хүснэгт 4.4 — Өгсөх урсгалын (uplink) ачаалал (сэдэв гүүрээр дамжина)
 
@@ -270,15 +402,29 @@ docker stats --no-stream --format 'table {{.Name}}\t{{.NetIO}}\t{{.MemUsage}}\t{
 
 ### Алхам 4 — Үүлний ачааллын тест (45 мин) 💻
 
-Ижил аргачлал, өөр зорилт. Шатууд **50 100 250 500 1000 2000**.
+Ижил аргачлал, өөр зорилт. Шатууд **50 100 250 500 1000 2000**, ≈ 14 минут.
 
+**4.1 Цуглуулагч** (CSV-д `target=cloud`):
+
+**[💻 Ubuntu-2]**
 ```bash
-# 💻 терминал 1 — цуглуулагч (CSV-д `target=cloud`)
-cd ~/cnc302 && python3 lab04/collect_metrics.py --target cloud --label ramp --seconds 900
-
-# 💻 терминал 2 — ачаалал
-bash lab04/loadtest.sh --target cloud ramp localhost
+python lab04/collect_metrics.py --target cloud --label ramp --seconds 900
 ```
+
+✅ 5 сек тутам мөр хэвлэнэ; `emqx_connections` багана тоо агуулна. ❌ `401` → API түлхүүр (§2.2, Лаб 2 Алхам 0).
+
+**4.2 Ачаалал.** Хаягт `localhost` **биш**, `<LAPTOP_IP>`-ийг өг — emqtt-bench Docker Desktop-ийн дотоод VM-д ажилладаг тул тэндээс `localhost` нь Windows-ийн EMQX биш:
+
+**[💻 Ubuntu-1]**
+```bash
+bash lab04/loadtest.sh --target cloud ramp <LAPTOP_IP>
+```
+
+`[enter]` асуухад `Enter`.
+
+✅ Шат бүрд `… дууслаа (брокер амьд)`. Дууссаны дараа **[💻 Ubuntu-2]** CSV бичигдэнэ (эсвэл `Ctrl + C`).
+
+❌ `✗ <LAPTOP_IP>:1883 хариу өгөхгүй` → IP өөрчлөгдсөн (`ipconfig`) эсвэл галт хана (SETUP А.6).
 
 > Ачаалал үүсгэгч ба брокер нэг машин дээр байвал **компьютер өөрөө хязгаарлагч** болж мэднэ. Хоёр дахь машинаас (эсвэл багийн нөгөө гишүүний компьютерээс) ачаалж чадвал илүү зөв. Аль нөхцөлд хэмжсэнээ үзүүлэнд заавал хэл.
 
@@ -297,7 +443,11 @@ bash lab04/loadtest.sh --target cloud ramp localhost
 
 ### Алхам 5 — EMQX rule engine: мессежийг брокер дээр чиглүүлэх (30 мин) 💻
 
-**5.1** EMQX самбар (`:18083`) → **Integration → Rules → Create** (5.8-ын цэсний нэр; хувилбараас хамаарч «Data Integration» гэж бичигдэж болно). Чичиргээний хэт өндөр утгыг шүүх дүрэм:
+**5.1 Дүрэм үүсгэх.** Windows-ийн хөтчөөр http://localhost:18083 →
+
+1. Зүүн цэс **Integration → Rules** (хувилбараас хамаарч «Data Integration») → **+ Create**.
+2. **Name** (хувилбараас хамаарч **Rule ID**): `vibration_alert`.
+3. **SQL Editor**-т байгаа текстийг устгаж, доорхийг буулга:
 
 ```sql
 SELECT
@@ -312,28 +462,50 @@ WHERE
   payload.vibration_rms > 1.5
 ```
 
-Үйлдэл (Action): **Republish** → Topic `cnc302/alerts/vibration`, QoS 1, Payload `${.}` (SELECT-ийн бүх талбарыг JSON болгоно). JSON ачааллын талбарт `payload.<нэр>`-ээр шууд хандана.
+4. Баруун талд **+ Add Action** → Type of Action: **Republish** → Topic `cnc302/alerts/vibration`, QoS `1`, Payload `${.}` (SELECT-ийн бүх талбарыг JSON болгоно) → **Add**.
+5. Доод талд **Save** (эсвэл **Create**).
+
+✅ Rules жагсаалтад `vibration_alert` **Enabled**.
 
 > EMQX 5.8.6 дээр шууд туршсан: энэ дүрэм `sim_device.py --anomaly-rate 0.5` урсгал дээр `{"vibration":3.37,"ts":…,"temperature":32.1,"source":"dev0002","device_id":"dev0002"}` хэлбэрийн дохиолол гаргав. `cnc302/alerts/…` нь 6 хэсэгтэй UNS схемд багтахгүй (Лаб 3, `uns_tree.py --strict`) — багийн схемд хаана байрлуулахаа шийд.
 
-**5.2 Туршина:**
+**5.2 Туршина.** Эхлээд дохиоллыг сонс:
 
+**[💻 Ubuntu-2]**
 ```bash
-# 💻 терминал 1 — дохиоллыг сонсоно; терминал 2 — гажилтай өгөгдөл илгээнэ
 mosquitto_sub -h localhost -t 'cnc302/alerts/#' -v
-python3 tools/sim_device.py --target cloud --host localhost --devices 5 --interval 1 --anomaly-rate 0.2
 ```
 
-**5.3 Ачаалалтай үед дүрэм ажиллаж байна уу?** Алхам 4-ийн 500 холболтын шатыг дахин ажиллуулж, дүрмийн статистик ба EMQX-ийн CPU-г дүрэмгүй үетэй харьцуул. Самбарын дүрмийн хуудас эсвэл REST API-аас уншина:
+Дараа нь гажилтай өгөгдөл илгээ:
+
+**[💻 Ubuntu-1]**
+```bash
+python tools/sim_device.py --target cloud --host localhost --devices 5 --interval 1 --anomaly-rate 0.2
+```
+
+✅ (5.3-ын эхэнд `RULE=` хоосон бол 5.1-ийн нэрийг шалга.) **[💻 Ubuntu-2]**-д хэдэн секунд тутам `cnc302/alerts/vibration {"vibration":…}` гарна. 30 секундын дараа хоёуланд `Ctrl + C`.
+
+**5.3 Ачаалалтай үед дүрэм ажиллаж байна уу?** Дүрмийн ID-г олж, тоолуурыг унш:
+
+**[💻 Ubuntu-1]**
+```bash
+RULE=$(curl -s -u "$EMQX_API_KEY:$EMQX_API_SECRET" http://localhost:18083/api/v5/rules \
+  | jq -r '.data[] | select(.name=="vibration_alert" or .id=="vibration_alert") | .id')
+echo "RULE=$RULE"
+curl -s -u "$EMQX_API_KEY:$EMQX_API_SECRET" \
+  http://localhost:18083/api/v5/rules/$RULE/metrics | jq '.metrics'
+```
+
+Одоо Алхам 4-ийн **500 холболтын** шатыг дүрэмтэй үед дахин ажиллуул (2 мин), тоолуур ба EMQX-ийн CPU-г (`docker stats --no-stream cnc302-emqx`) дүрэмгүй үетэй (Хүснэгт 4.5) харьцуул:
 
 ```bash
-curl -s -u "$EMQX_API_KEY:$EMQX_API_SECRET" \
-  http://localhost:18083/api/v5/rules/<дүрмийн-id>/metrics | python3 -m json.tool
+TOPIC='cnc302/shutis/mhts/lab/bench-%i/telemetry' timeout 120 \
+  bash lab04/loadtest.sh --target cloud pub <LAPTOP_IP> 500 1
 ```
 
 Гол тоолуурууд: `matched` (FROM-д таарсан), `passed` (WHERE үнэн), `failed.no_result` (WHERE худал — **алдаа биш**, шүүгдсэн мессеж), `failed.exception` (жинхэнэ алдаа), `actions.success` / `actions.failed`, `matched.rate`. Анхаар: `failed` нь `failed.no_result`-ийг агуулдаг тул «Failed» өндөр байх нь шүүлтүүр ажиллаж байгааг л илэрхийлж болно.
 
-**5.4 Цонхны нэгтгэл.** EMQX-ийн rule SQL доорх бичлэгийг хүлээн авах эсэхийг **шалгаж, самбарын буцаасан мессежийг үгчлэн бич** — хүлээн авахгүй бол энэ нь Лаб 5-д Node-RED хэрэгтэй болох шалтгаан:
+**5.4 Цонхны нэгтгэл.** 5.1-ийн адил **шинэ** дүрэм үүсгэх гэж оролдож, доорх SQL-ийг буулгаад **Save** дар. EMQX хүлээн авах эсэхийг шалгаж, самбарын буцаасан мессежийг **үгчлэн** тайландаа бич — хүлээн авахгүй бол энэ нь Лаб 5-д Node-RED хэрэгтэй болох шалтгаан:
 
 ```sql
 SELECT avg(payload.temperature) as avg_temp
@@ -355,19 +527,29 @@ GROUP BY device_id, INTERVAL 60s
 
 ### Алхам 6 — Хоёр муруй, нэг тэнхлэг: ханалтын шинжилгээ (30 мин) 💻
 
+**6.1 Pi-гийн CSV-г компьютер руу хуулах.** (Лаб 1 Алхам 8.1-д SSH түлхүүрээ `~/.ssh/cnc302`-д хуулсан.)
+
+**[💻 Ubuntu-1]**
 ```bash
-# 💻 хоёр хостын CSV-г нэг дор өгнө (Pi-гийнхийг эхлээд хуулж ав)
-cd ~/cnc302
-scp pi@<PI-IP>:~/cnc302/measurements/loadtest-edge-ramp-*.csv measurements/
-python3 lab04/plot_scaling.py measurements/loadtest-edge-*.csv \
-        measurements/loadtest-cloud-*.csv --out lab04/scaling.png
+scp -i ~/.ssh/cnc302 'cnc302@<PI_IP>:cnc302/measurements/loadtest-edge-ramp-*.csv' \
+    'cnc302@<PI_IP>:cnc302/measurements/l4-*.txt' measurements/
+ls measurements/
 ```
 
-matplotlib байхгүй бол ASCII график гарна (edge = ●, cloud = ○) — үзүүлэнд ч хангалттай.
+✅ `loadtest-edge-ramp-…csv` ба `loadtest-cloud-ramp-…csv` хоёулаа байна.
+
+**6.2 График.**
+
+```bash
+python lab04/plot_scaling.py measurements/loadtest-edge-*.csv \
+       measurements/loadtest-cloud-*.csv --out lab04/scaling.png
+```
+
+matplotlib байхгүй бол ASCII график гарна (edge = ●, cloud = ○) — үзүүлэнд ч хангалттай. PNG хэрэгтэй бол: `pip install "matplotlib>=3.8,<4"` → дахин ажиллуул.
 
 #### Хүснэгт 4.7 — Аль нөөц түрүүлж ханав ⭐⭐
 
-Багана бүрд **тоо ба эх сурвалж** бич. "RAM ханасан" гэсэн ганц үг оноо авахгүй.
+Багана бүрд **тоо ба эх сурвалж** бич. «RAM ханасан» гэсэн ганц үг оноо авахгүй.
 
 | Нөөц | Ирмэг: ханасан уу, ямар тоогоор | Үүл: ханасан уу, ямар тоогоор | Нотолгоо (хүснэгт/багана) |
 |---|---|---|---|
@@ -378,6 +560,8 @@ matplotlib байхгүй бол ASCII график гарна (edge = ●, clou
 | microSD (I/O хүлээлт `wa`) | | | |
 | Холболтын тоо / файлын дескриптор | | | |
 | **ХАМГИЙН ТҮРҮҮНД ханасан нь** | | | |
+
+`wa` (I/O хүлээлт) нь `measurements/l4-03-vmstat.txt`-ийн `wa` багана.
 
 #### Хүснэгт 4.8 — Таамаг ба бодит
 
@@ -428,16 +612,25 @@ C_edge (70%) = ______ мсж/с      C_cloud (70%) = ______ мсж/с
 
 **Заавал үзүүлэх:** ханалтын график, хязгаарын цэг, таамаг–бодит зөрүү, ханасан нөөцийн **нотолгоо**.
 
+**8.1 Нэмэх ба шалгах.** `measurements/` нь `.gitignore`-д — тайланд хэрэгтэй CSV-г **зориуд** `-f`-ээр нэмнэ:
+
+**[💻 Ubuntu-1]**
 ```bash
-cd ~/cnc302
-git add lab04/
-# measurements/ нь .gitignore-д — тайланд хэрэгтэй CSV-г зориудаар албадан нэмнэ
-git add -f measurements/loadtest-edge-ramp-*.csv measurements/loadtest-cloud-ramp-*.csv
+cp docs/report-template.md lab04/report.md     # үзүүлэнгийн тэмдэглэлээ энд
+git add lab04/report.md
+[ -f lab04/scaling.png ] && git add lab04/scaling.png
+git add -f measurements/loadtest-edge-ramp-*.csv measurements/loadtest-cloud-ramp-*.csv measurements/l4-*.txt
 git status --short
+git ls-files | grep -E '\.env$|bridge\.conf$|\.key$|\.crt$|devices\.csv'
+```
+
+✅ Сүүлийн команд **юу ч хэвлэхгүй**.
+
+**8.2 Commit ба push.**
+```bash
 git commit -m "Лаб 4: ирмэг ба үүлний багтаамжийн хязгаар"
-git tag lab04-done && git push && git push --tags
-# Нууц файл ороогүйг ЗААВАЛ шалга
-git ls-files | grep -E '\.env$|bridge\.conf$|\.key$|\.crt$|devices\.csv'   # хоосон байх ЁСТОЙ
+git tag lab04-done
+git push && git push --tags
 ```
 
 ---
@@ -494,8 +687,8 @@ git ls-files | grep -E '\.env$|bridge\.conf$|\.key$|\.crt$|devices\.csv'   # х�
 |---|---|---|
 | emqtt-bench 1024 холболт дээр зогсоно | `ulimit -n` бага | binary: `ulimit -n 65535`; Docker: скрипт `--ulimit nofile=65535:65535` өгдөг |
 | `failed to connect to the docker API` | Docker CLI бий, демон ажиллахгүй | Docker-ийг асаа, эсвэл `USE_DOCKER=0` + releases-ийн `emqtt_bench` |
-| Ачаалал өгсөн ч Pi дээр юу ч өөрчлөгдөхгүй | ачаалал үүлний EMQX рүү явж байна | `--target edge` ба `<PI-IP>`-ээ шалга |
-| Өгсөх урсгал (tx) огт ачаалагдахгүй | сэдэв `cnc302/<SITE>/` угтваргүй | Алхам 3.3-ын `TOPIC=` |
+| Ачаалал өгсөн ч Pi дээр юу ч өөрчлөгдөхгүй | ачаалал үүлний EMQX рүү явж байна | `--target edge` ба `<PI_IP>`-ээ шалга |
+| Өгсөх урсгал (tx) огт ачаалагдахгүй | сэдэв `cnc302/<SITE>/` угтваргүй | Алхам 3.4-ийн `TOPIC=` |
 | `collect_metrics.py` EMQX API алдаа `401` | EMQX 5-д самбарын нэр/нууц үгээр Basic auth хийхгүй; түлхүүр эсвэл нууц үг буруу | `EMQX_API_KEY`/`EMQX_API_SECRET` (stack/.env) эсвэл зөв `EMQX_DASHBOARD_PASSWORD`; эсвэл `--no-emqx` |
 | edge CSV-д `broker_connections` хоосон | mosquitto \$SYS-д холбогдсонгүй, эсвэл 10 с хүлээгээгүй | `--mqtt-host`/`--mqtt-port`; `mosquitto_sub -t '$SYS/#' -C 5 -v` |
 | mosquitto гэнэт дахин асав, холболтууд тасрав | контейнерийн 128 MiB хязгаар → OOM | `docker inspect -f '{{.State.OOMKilled}}' cnc302-mosquitto` → Хүснэгт 4.7-д **нотолгоо** болгон бич |
@@ -503,6 +696,12 @@ git ls-files | grep -E '\.env$|bridge\.conf$|\.key$|\.crt$|devices\.csv'   # х�
 | CPU 400% харагдана | 4 цөмийн нийлбэр | 100% = нэг цөм, 400% = бүрэн ханалт |
 | `throttled` ≠ `0x0` | халалт эсвэл сул тэжээл | хөргөлт, 5 V/2.5 A тэжээл; хэмжилтийг **дахин** хий |
 | Компьютер өөрөө эхэлж ханана | ачаалал үүсгэгч нэг машин дээр | өөр машинаас ачаал, эсвэл `-c` багасгаж хурдыг нэмэгдүүл |
+| `collect_metrics.py` (Pi): `No module named 'requests'` | ирмэгийн venv-д `requests` алга | §2.3 (а) |
+| `collect_metrics.py` (Pi): `No module named 'paho'` | `python3` гэж бичсэн | `$PY` (§2.2) |
+| `measure_stack.sh`: `Permission denied` | `./tools/…` гэж ажиллуулсан | `bash tools/measure_stack.sh …` |
+| Үүлний тест: `localhost:1883 хариу өгөхгүй` | emqtt-bench Docker Desktop-ийн VM-д ажилладаг | `<LAPTOP_IP>` өг (Алхам 4.2) |
+| Шатны тест дуусахаас өмнө Pi-гийн цонхнууд зогсов | `--watch` / `--seconds` хугацаа богино | 1100 сек (Алхам 3.2) |
+| `scp`: `Permission denied (publickey)` | хэрэглэгч `pi@` гэж бичсэн | `cnc302@<PI_IP>` |
 
 ---
 

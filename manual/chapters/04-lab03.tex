@@ -56,35 +56,125 @@ QoS × зам (loopback / LAN / bridge): p50, p95, \textbf{p99}\strut
 \textbf{p99 бол гол тоо, дундаж биш.} Pi 3B-гийн албан ёсны үзүүлэлт нь «100 Mb/s Ethernet, 4 × USB 2.0»; CPU нь 4 цөмт Cortex-A53. Ийм хязгаартай төхөөрөмж дээр p50 сайхан харагдаж байхад p99 хэд дахин том гарч болно. Хэрэглэгчийн мэдэрдэг, SLA-д бичигддэг тоо нь p99. Ethernet нь USB-тэй зурвас хуваадаг эсэх нь \textbf{таамаг} --- үүнийг Алхам 4.4-т өөрсдөө шалгана.
 \end{quote}
 
-\hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}{%
-\section{2. Урьдчилсан нөхцөл}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b}}
+\hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b-ux431ux430-ux431ux44dux43bux442ux433ux44dux43b-15-ux43cux438ux43d}{%
+\section{2. Урьдчилсан нөхцөл ба бэлтгэл (15 мин)}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux43dux4e9ux445ux446ux4e9ux43b-ux431ux430-ux431ux44dux43bux442ux433ux44dux43b-15-ux43cux438ux43d}}
 
 \begin{itemize}
 \tightlist
 \item
-  Лаб 1, 2 дууссан, \texttt{lab02-done} тэмдэглэгээ тавигдсан
+  Лаб 1, 2 дууссан, \texttt{lab02-done} tag тавигдсан. \textbf{Лаб 2-ын Алхам 7.6-д EMQX-ийн authenticator-ыг унтраасан} (\texttt{authn\ false}) байх ёстой --- эс бөгөөс энэ лабын бүх клиент \texttt{not\ authorised} авна.
 \item
-  Бие даалт VI: MQTT 5.0 стандартын §3.3 (PUBLISH), §4.3 (QoS-ийн урсгал), §4.7 (Topic Names ба Topic Filters) уншсан
-\item
-  \texttt{mosquitto\_pub} / \texttt{mosquitto\_sub} хоёр хост дээр суусан
+  Бие даалт VI: MQTT 5.0 стандартын §3.3 (PUBLISH), §4.3 (QoS-ийн урсгал), §4.7 (Topic Names ба Topic Filters) уншсан.
 \end{itemize}
+
+\begin{quote}
+☞ \textbf{Алхмуудыг дарааллаар нь хий.} Алхам бүрийн төгсгөлд ✓ \textbf{Шалгах} хэсэг бий. Үр дүн нь таарахгүй бол \textbf{цааш бүү яв} --- ✗ мөр эсвэл §8-аас шалтгааныг ол.
+\end{quote}
+
+\hypertarget{ux442ux435ux440ux43cux438ux43dux430ux43bux443ux443ux434}{%
+\subsection{2.1 Терминалууд}\label{ux442ux435ux440ux43cux438ux43dux430ux43bux443ux443ux434}}
+
+\begingroup\scriptsize\begin{longtable}[]{@{}lll@{}}
+\toprule
+Цонх & Хаана & Хэрхэн нээх\tabularnewline
+\midrule
+\endhead
+\textbf{{[}Pi-1{]}} & Raspberry Pi & PowerShell таб → \texttt{ssh\ pi}\tabularnewline
+\textbf{{[}Pi-2{]}} & Raspberry Pi & шинэ PowerShell таб → \texttt{ssh\ pi}\tabularnewline
+\textbf{{[}ЗК · Ubuntu-1{]}} & Зөөврийн компьютер (WSL) & Terminal-ын \texttt{▼} → \textbf{Ubuntu}\tabularnewline
+\textbf{{[}ЗК · Ubuntu-2{]}} & Зөөврийн компьютер (WSL) & дахин \texttt{▼} → \textbf{Ubuntu}\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
+\texttt{\textless{}PI\_\allowbreak{}IP\textgreater{}} --- \textbf{{[}Pi-1{]}} \texttt{hostname\ -I}-ийн эхний хаяг. \texttt{\textless{}LAPTOP\_\allowbreak{}IP\textgreater{}} --- \textbf{{[}ЗК · PowerShell{]}} \texttt{ipconfig}.
+
+\hypertarget{ux43eux440ux447ux43dux43eux43e-ux431ux44dux43bux442ux433ux44dux445-ux446ux43eux43dux445-ux43dux44dux44dux445-ux431ux4afux440ux442-ux430ux436ux438ux43bux43bux443ux443ux43bux43dux430}{%
+\subsection{\texorpdfstring{2.2 Орчноо бэлтгэх --- \textbf{цонх нээх бүрт} ажиллуулна}{2.2 Орчноо бэлтгэх --- цонх нээх бүрт ажиллуулна}}\label{ux43eux440ux447ux43dux43eux43e-ux431ux44dux43bux442ux433ux44dux445-ux446ux43eux43dux445-ux43dux44dux44dux445-ux431ux4afux440ux442-ux430ux436ux438ux43bux43bux443ux443ux43bux43dux430}}
+
+\textbf{{[}ЗК · Ubuntu-1{]}} ба \textbf{{[}ЗК · Ubuntu-2{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [ЗК] үүлний давхарга}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ up }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ health     \# бүх мөр 200}
-\FunctionTok{make}\NormalTok{ ip                                          \# CLOUD\_HOST{-}ыг тэмдэглэ}
-\CommentTok{\# [Pi] ирмэгийн давхарга}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ check                   \# бүгд OK}
-\FunctionTok{make}\NormalTok{ up }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ link                             \# bridge/state → 1}
-\FunctionTok{make}\NormalTok{ mem                                         \# throttle 0x0 байх ЁСТОЙ}
-\CommentTok{\# [Pi] Pi{-}гийн терминал БҮРД хувьсагчаа ачаална (доорх коммандууд үүнийг хэрэглэнэ)}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \BuiltInTok{source}\NormalTok{ .venv/bin/activate}
+\BuiltInTok{export} \VariableTok{EMQX\_API\_KEY=$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}EMQX\_API\_KEY=\textquotesingle{}}\NormalTok{ stack/.env }\KeywordTok{|} \FunctionTok{cut}\NormalTok{ {-}d= {-}f2}\VariableTok{)}
+\BuiltInTok{export} \VariableTok{EMQX\_API\_SECRET=$(}\FunctionTok{grep} \StringTok{\textquotesingle{}\^{}EMQX\_API\_SECRET=\textquotesingle{}}\NormalTok{ stack/.env }\KeywordTok{|} \FunctionTok{cut}\NormalTok{ {-}d= {-}f2}\VariableTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{{[}Pi-1{]}} ба \textbf{{[}Pi-2{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\VariableTok{PY=}\NormalTok{\textasciitilde{}/cnc302/edge/.venv/bin/python}
 \KeywordTok{set} \ExtensionTok{{-}a} \KeywordTok{\&\&} \BuiltInTok{source}\NormalTok{ \textasciitilde{}/cnc302/edge/.env }\KeywordTok{\&\&} \KeywordTok{set} \ExtensionTok{+a}
 \BuiltInTok{echo} \StringTok{"}\VariableTok{$CLOUD\_HOST}\StringTok{ / }\VariableTok{$SITE}\StringTok{/}\VariableTok{$AREA}\StringTok{/}\VariableTok{$LINE}\StringTok{/}\VariableTok{$DEVICE\_ID}\StringTok{"}
 \end{Highlighting}
 \end{Shaded}
 
-\texttt{bridge/state} нь \texttt{1} биш бол \texttt{docs/\allowbreak{}troubleshooting.\allowbreak{}md} §1 рүү. Throttle \texttt{0x0} биш бол хөргөөд дахин эхэл --- өнөөдрийн бүх саатлын тоо тэр үед хүчингүй.
+✓ Pi дээр \texttt{192.\allowbreak{}168.\allowbreak{}1.\allowbreak{}100\ /\allowbreak{}\ shutis/\allowbreak{}mhts/\allowbreak{}lab/\allowbreak{}pi3b-team07} (өөрийн утгаар).
+
+\begin{quote}
+⚠ Pi дээр Python скриптийг \textbf{\texttt{python3}-аар биш, \texttt{\$PY}-аар} ажиллуулна: \texttt{paho-mqtt} зөвхөн ирмэгийн venv-д суусан. Компьютер дээр venv идэвхтэй үед \texttt{python} гэж бичнэ.
+\end{quote}
+
+\hypertarget{ux431ux430ux433ux438ux439ux43d-ux445ux430ux43cux433ux438ux439ux43d-ux441ux4afux4afux43bux438ux439ux43d-ux43aux43eux434ux44bux433-ux442ux430ux442ux430ux445}{%
+\subsection{2.3 Багийн хамгийн сүүлийн кодыг татах}\label{ux431ux430ux433ux438ux439ux43d-ux445ux430ux43cux433ux438ux439ux43d-ux441ux4afux4afux43bux438ux439ux43d-ux43aux43eux434ux44bux433-ux442ux430ux442ux430ux445}}
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ pull }\KeywordTok{\&\&} \ExtensionTok{pip}\NormalTok{ install {-}r tools/requirements.txt}
+\FunctionTok{mkdir}\NormalTok{ {-}p lab03/out}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{{[}Pi-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ pull}
+\FunctionTok{mkdir}\NormalTok{ {-}p lab03/out}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux448ux430ux43bux433ux430ux43bux442}{%
+\subsection{2.4 Урьдчилсан шалгалт}\label{ux443ux440ux44cux434ux447ux438ux43bux441ux430ux43d-ux448ux430ux43bux433ux430ux43bux442}}
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/stack }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ up }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ health}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\end{Highlighting}
+\end{Shaded}
+
+✓ Дөрвөн мөр \texttt{200}.
+
+\textbf{{[}Pi-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ check }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ up }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ mem}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{make\ check} бүгд \texttt{OK}; \texttt{make\ mem}-ийн \texttt{throttle\ :\allowbreak{}\ throttled=\allowbreak{}0x0}.
+
+\textbf{{[}Pi-2{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ link}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{\ldots{}/\allowbreak{}bridge/\allowbreak{}state\ 1} → \texttt{Ctrl\ +\ C}.
+
+✗ \texttt{bridge/state\ 0} → \texttt{docs/\allowbreak{}troubleshooting.\allowbreak{}md} §1. ✗ Throttle \texttt{0x0} биш → Pi-г хөргөж, тэжээлээ шалгаад дахин эхэл --- өнөөдрийн бүх саатлын тоо тэр үед хүчингүй.
 
 \hypertarget{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}{%
 \section{3. Онолын сануулга}\label{ux43eux43dux43eux43bux44bux43d-ux441ux430ux43dux443ux443ux43bux433ux430}}
@@ -191,19 +281,61 @@ cnc302/<site>/<area>/<line>/<device>/<channel>
 \hypertarget{ux430ux43bux445ux43cux443ux443ux434}{%
 \section{4. Алхмууд}\label{ux430ux43bux445ux43cux443ux443ux434}}
 
+\begingroup\scriptsize\begin{longtable}[]{@{}lllll@{}}
+\toprule
+Алхам & Хаана & Юу хийх & Мин & Хүснэгт\tabularnewline
+\midrule
+\endhead
+1 & {[}Pi{]}{[}ЗК{]} & Суурь төлөв, хоёр брокерын баталгаа & 15 & 3.1\tabularnewline
+2 & {[}ЗК{]}{[}Pi{]} & MQTT 5.0-ийн зургаан боломж, хоёр брокер дээр & 45 & 3.2, 3.3\tabularnewline
+3 & {[}Pi{]} & QoS × зам матриц & 55 & 3.4\tabularnewline
+4 & {[}Pi{]} & Тэсрэлт ба тогтвортой урсгал & 30 & 3.5, 3.6\tabularnewline
+5 & {[}Pi{]}{[}ЗК{]} & Unified Namespace & 35 & 3.7\tabularnewline
+6 & {[}ЗК{]}{[}Pi{]} & Sparkplug B & 30 & 3.8\tabularnewline
+7 & {[}ЗК{]} & Багийн шийдвэр & 20 & 3.9\tabularnewline
+8 & {[}ЗК{]}{[}Pi{]} & Гаралт цуглуулж, Git & 15 & ---\tabularnewline
+\bottomrule
+\end{longtable}\endgroup
+
 \hypertarget{ux430ux43bux445ux430ux43c-1-ux441ux443ux443ux440ux44c-ux442ux4e9ux43bux4e9ux432-ux431ux430-ux445ux43eux451ux440-ux431ux440ux43eux43aux435ux440ux44bux43d-ux431ux430ux442ux430ux43bux433ux430ux430-15-ux43cux438ux43d-piux437ux43a}{%
 \subsection{Алхам 1 --- Суурь төлөв ба хоёр брокерын баталгаа (15 мин) {[}Pi{]}{[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-1-ux441ux443ux443ux440ux44c-ux442ux4e9ux43bux4e9ux432-ux431ux430-ux445ux43eux451ux440-ux431ux440ux43eux43aux435ux440ux44bux43d-ux431ux430ux442ux430ux43bux433ux430ux430-15-ux43cux438ux43d-piux437ux43a}}
 
+\textbf{1.1 Pi-гийн төлөв.}
+
+\textbf{{[}Pi-1{]}}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [Pi] Pi дээр — юу ажиллаж байна, хэдий чинээ RAM үлдсэн}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302 }\KeywordTok{\&\&} \ExtensionTok{./tools/measure\_stack.sh}\NormalTok{ {-}{-}role edge}
-\CommentTok{\# [ЗК] үүл дээр — гүүрээр юу ирж байгааг харна (энэ цонхыг НЭЭЛТТЭЙ орхи)}
+\ExtensionTok{pkill}\NormalTok{ {-}f vscode{-}server}
+\VariableTok{OUTDIR=}\NormalTok{lab03/out }\FunctionTok{bash}\NormalTok{ tools/measure\_stack.sh {-}{-}role edge }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/01{-}edge.txt}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{Throttle\ :\ 0x0}, \texttt{Санах\ ой\ :\allowbreak{}\ \ldots{}\ MiB\ боломжтой}.
+
+\textbf{1.2 Үүл дээр гүүрээр юу ирж байгааг сонсох} --- энэ цонхыг Алхам 1-ийн турш \textbf{нээлттэй} орхи:
+
+\textbf{{[}ЗК · Ubuntu-2{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}cnc302/\#\textquotesingle{}}\NormalTok{ {-}v}
 \end{Highlighting}
 \end{Shaded}
 
-{[}Pi{]} өөр терминалд агентыг асаа: \texttt{cd\ \textasciitilde{}/cnc302/edge\ \&\&\ make\ agent}. Компьютер дээрх цонхонд \texttt{telemetry}, \texttt{health}, \texttt{status} урсаж эхлэх ёстой.
+\textbf{1.3 Ирмэгийн агентыг асаах.}
+
+\textbf{{[}Pi-2{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ agent}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \textbf{{[}ЗК · Ubuntu-2{]}}-д \texttt{\ldots{}/\allowbreak{}telemetry}, \texttt{\ldots{}/health}, \texttt{\ldots{}/status} урсаж эхэлнэ. Хүснэгт 3.1-ийн «Үүл дээр харагдаж буй сувгууд» мөрийг эндээс бөглө (сэдвийн \textbf{сүүлийн} хэсэг).
+
+Хүснэгтийг бөглөсний дараа \textbf{{[}ЗК · Ubuntu-2{]}} ба \textbf{{[}Pi-2{]}}-д \texttt{Ctrl\ +\ C}.
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-3.1-ux44dux445ux43bux44dux43bux438ux439ux43d-ux442ux4e9ux43bux4e9ux432}{%
 \subsubsection{Хүснэгт 3.1 --- Эхлэлийн төлөв}\label{ux445ux4afux441ux43dux44dux433ux442-3.1-ux44dux445ux43bux44dux43bux438ux439ux43d-ux442ux4e9ux43bux4e9ux432}}
@@ -225,25 +357,47 @@ Pi температур (°C) / \texttt{get\_throttled} & / & \textbf{0x0} ба�
 \hypertarget{ux430ux43bux445ux430ux43c-2-mqtt-5.0-ux438ux439ux43d-ux437ux443ux440ux433ux430ux430ux43d-ux431ux43eux43bux43eux43cux436-ux445ux43eux451ux440-ux431ux440ux43eux43aux435ux440-ux434ux44dux44dux440-45-ux43cux438ux43d-ux437ux43api}{%
 \subsection{Алхам 2 --- MQTT 5.0-ийн зургаан боломж, хоёр брокер дээр (45 мин) {[}ЗК{]}{[}Pi{]}}\label{ux430ux43bux445ux430ux43c-2-mqtt-5.0-ux438ux439ux43d-ux437ux443ux440ux433ux430ux430ux43d-ux431ux43eux43bux43eux43cux436-ux445ux43eux451ux440-ux431ux440ux43eux43aux435ux440-ux434ux44dux44dux440-45-ux43cux438ux43d-ux437ux43api}}
 
-Эхлээд {[}ЗК{]} үүлний EMQX дээр дараалан ажиллуулж, гаралтыг \texttt{lab03/out/}-д хадгална:
+\textbf{2.1 Үүлний EMQX дээр.} Мөр бүрийг \textbf{тус тусад нь} ажиллуулж, дуусахыг хүлээ (\texttt{expiry}, \texttt{session} тус бүр \textasciitilde15--25 сек):
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\ExtensionTok{python3}\NormalTok{ lab03/mqtt5\_features.py {-}{-}host localhost {-}{-}expiry 10 expiry    }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}expiry{-}emqx.txt}
-\ExtensionTok{python3}\NormalTok{ lab03/mqtt5\_features.py {-}{-}host localhost {-}{-}count 1000 alias    }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}alias{-}emqx.txt}
-\ExtensionTok{python3}\NormalTok{ lab03/mqtt5\_features.py {-}{-}host localhost reqresp               }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}reqresp{-}emqx.txt}
-\ExtensionTok{python3}\NormalTok{ lab03/mqtt5\_features.py {-}{-}host localhost {-}{-}subs 3 {-}{-}count 300 shared }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}shared{-}emqx.txt}
-\ExtensionTok{python3}\NormalTok{ lab03/mqtt5\_features.py {-}{-}host localhost {-}{-}expiry 10 session   }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}session{-}emqx.txt}
-\ExtensionTok{python3}\NormalTok{ lab03/mqtt5\_features.py {-}{-}host localhost reason                }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}reason{-}emqx.txt}
+\ExtensionTok{python}\NormalTok{ lab03/mqtt5\_features.py {-}{-}host localhost {-}{-}expiry 10 expiry         }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}expiry{-}emqx.txt}
+\ExtensionTok{python}\NormalTok{ lab03/mqtt5\_features.py {-}{-}host localhost {-}{-}count 1000 alias         }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}alias{-}emqx.txt}
+\ExtensionTok{python}\NormalTok{ lab03/mqtt5\_features.py {-}{-}host localhost reqresp                    }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}reqresp{-}emqx.txt}
+\ExtensionTok{python}\NormalTok{ lab03/mqtt5\_features.py {-}{-}host localhost {-}{-}subs 3 {-}{-}count 300 shared }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}shared{-}emqx.txt}
+\ExtensionTok{python}\NormalTok{ lab03/mqtt5\_features.py {-}{-}host localhost {-}{-}expiry 10 session        }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}session{-}emqx.txt}
+\ExtensionTok{python}\NormalTok{ lab03/mqtt5\_features.py {-}{-}host localhost reason                     }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}reason{-}emqx.txt}
+\FunctionTok{ls}\NormalTok{ lab03/out/f{-}*{-}emqx.txt }\KeywordTok{|} \FunctionTok{wc}\NormalTok{ {-}l}
 \end{Highlighting}
 \end{Shaded}
+
+✓ Сүүлийн мөр \texttt{6}. Файл бүрийн агуулга хоосон биш (\texttt{cat\ lab03/\allowbreak{}out/\allowbreak{}f-alias-emqx.\allowbreak{}txt}).
 
 \begin{quote}
 Албан ёсны баримт: \href{https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html}{MQTT 5.0} --- Message Expiry §3.3.2.3.3, Topic Alias §3.3.2.3.4, Response Topic / Correlation Data §3.3.2.3.5--6 ба §4.10, Shared Subscriptions §4.8.2, Session Expiry §3.1.2.11.2, Reason Code §2.4.
 \end{quote}
 
-Дараа нь \textbf{зургааг бүгдийг {[}Pi{]} Pi дээр яг ижил коммандаар давтана} (\texttt{-\/\allowbreak{}-host\ localhost} → ирмэгийн mosquitto 2.0; файлын нэрийг \texttt{-mosq} болгоно). Юуг ажиглах вэ:
+\textbf{2.2 Ирмэгийн mosquitto дээр --- яг ижил зургаан туршилт.} \texttt{-\/\allowbreak{}-host\ localhost} нь Pi дээр Pi-гийн \textbf{өөрийн} mosquitto 2.0-ийг заана:
+
+\textbf{{[}Pi-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{$PY} \ExtensionTok{lab03/mqtt5\_features.py}\NormalTok{ {-}{-}host localhost {-}{-}expiry 10 expiry         }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}expiry{-}mosq.txt}
+\VariableTok{$PY} \ExtensionTok{lab03/mqtt5\_features.py}\NormalTok{ {-}{-}host localhost {-}{-}count 1000 alias         }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}alias{-}mosq.txt}
+\VariableTok{$PY} \ExtensionTok{lab03/mqtt5\_features.py}\NormalTok{ {-}{-}host localhost reqresp                    }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}reqresp{-}mosq.txt}
+\VariableTok{$PY} \ExtensionTok{lab03/mqtt5\_features.py}\NormalTok{ {-}{-}host localhost {-}{-}subs 3 {-}{-}count 300 shared }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}shared{-}mosq.txt}
+\VariableTok{$PY} \ExtensionTok{lab03/mqtt5\_features.py}\NormalTok{ {-}{-}host localhost {-}{-}expiry 10 session        }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}session{-}mosq.txt}
+\VariableTok{$PY} \ExtensionTok{lab03/mqtt5\_features.py}\NormalTok{ {-}{-}host localhost reason                     }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/f{-}reason{-}mosq.txt}
+\FunctionTok{ls}\NormalTok{ lab03/out/f{-}*{-}mosq.txt }\KeywordTok{|} \FunctionTok{wc}\NormalTok{ {-}l}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{6}.
+
+\textbf{2.3 Юуг ажиглах вэ} --- хоёр брокерын гаралтыг хажуу тийш нь тавьж харьцуул:
 
 \begin{itemize}
 \tightlist
@@ -360,22 +514,47 @@ Reason Code\strut
 \bottomrule
 \end{longtable}\endgroup
 
-\textbf{Alias-ийн хэмнэлтийг бодитоор хэмжих.} Яг ижил 1000 мессежийг эхлээд alias-гүй (\texttt{-\/-no-alias}), дараа нь alias-тай илгээж, брокерын \textbf{хүлээн авсан байтын} тоолуурын зөрүүг харьцуулна. Тоолуур бүр хэдэн секундын хоцролттой шинэчлэгддэг тул ажиллуулалт бүрийн өмнө, дараа \textasciitilde15 секунд хүлээ.
+\textbf{2.4 Alias-ийн хэмнэлтийг mosquitto дээр бодитоор хэмжих.} Яг ижил 1000 мессежийг эхлээд alias-гүй, дараа нь alias-тай илгээж, брокерын \textbf{хүлээн авсан байтын} тоолуурын зөрүүг харьцуулна. mosquitto-гийн \texttt{\$SYS} тоолуур 10 секунд тутам шинэчлэгддэг тул мөр бүрийн \textbf{хооронд 15 секунд} хүлээ (\texttt{sleep\ 15} бичигдсэн). Блокийг \textbf{бүтнээр нь} буулга:
+
+\textbf{{[}Pi-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [Pi] mosquitto: хүлээн авсан бүх байт (sys\_interval тутам, анхдагч 10 с шинэчлэгдэнэ)}
-\ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}$SYS/broker/bytes/received\textquotesingle{}}\NormalTok{ {-}C 1        \# A}
-\ExtensionTok{python3}\NormalTok{ lab03/mqtt5\_features.py {-}{-}host localhost {-}{-}count 1000 alias {-}{-}no{-}alias}
-\ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}$SYS/broker/bytes/received\textquotesingle{}}\NormalTok{ {-}C 1        \# B}
-\ExtensionTok{python3}\NormalTok{ lab03/mqtt5\_features.py {-}{-}host localhost {-}{-}count 1000 alias}
-\ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}$SYS/broker/bytes/received\textquotesingle{}}\NormalTok{ {-}C 1        \# C}
-
-\CommentTok{\# [ЗК] EMQX: REST API{-}ийн bytes.received (API түлхүүр stack/.env{-}д)}
-\ExtensionTok{curl}\NormalTok{ {-}s {-}u }\StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"} \KeywordTok{\textbackslash{}}
-  \StringTok{\textquotesingle{}http://localhost:18083/api/v5/metrics?aggregate=true\textquotesingle{}} \KeywordTok{|} \ExtensionTok{python3}\NormalTok{ {-}m json.tool }\KeywordTok{|} \FunctionTok{grep} \StringTok{\textquotesingle{}"bytes.received"\textquotesingle{}}
+\FunctionTok{rd()} \KeywordTok{\{} \ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}$SYS/broker/bytes/received\textquotesingle{}}\NormalTok{ {-}C 1}\KeywordTok{;} \KeywordTok{\}}
+\FunctionTok{sleep}\NormalTok{ 15}\KeywordTok{;} \VariableTok{A=$(}\ExtensionTok{rd}\VariableTok{)}\NormalTok{; }\BuiltInTok{echo} \StringTok{"A=}\VariableTok{$A}\StringTok{"}
+\VariableTok{$PY} \ExtensionTok{lab03/mqtt5\_features.py}\NormalTok{ {-}{-}host localhost {-}{-}count 1000 alias {-}{-}no{-}alias }\OperatorTok{\textgreater{}}\NormalTok{ /dev/null}
+\FunctionTok{sleep}\NormalTok{ 15}\KeywordTok{;} \VariableTok{B=$(}\ExtensionTok{rd}\VariableTok{)}\NormalTok{; }\BuiltInTok{echo} \StringTok{"B=}\VariableTok{$B}\StringTok{"}
+\VariableTok{$PY} \ExtensionTok{lab03/mqtt5\_features.py}\NormalTok{ {-}{-}host localhost {-}{-}count 1000 alias }\OperatorTok{\textgreater{}}\NormalTok{ /dev/null}
+\FunctionTok{sleep}\NormalTok{ 15}\KeywordTok{;} \VariableTok{C=$(}\ExtensionTok{rd}\VariableTok{)}\NormalTok{; }\BuiltInTok{echo} \StringTok{"C=}\VariableTok{$C}\StringTok{"}
+\BuiltInTok{echo} \StringTok{"alias{-}гүй: }\VariableTok{$((}\NormalTok{B{-}A}\VariableTok{))}\StringTok{ Б   alias{-}тай: }\VariableTok{$((}\NormalTok{C{-}B}\VariableTok{))}\StringTok{ Б"} \KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/alias{-}bytes{-}mosq.txt}
 \end{Highlighting}
 \end{Shaded}
+
+✓ Сүүлийн мөр хоёр эерэг тоо хэвлэнэ, alias-тай нь \textbf{бага}.
+
+\begin{quote}
+⚠ Энэ хугацаанд ирмэгийн агентыг \textbf{бүү} ажиллуул --- түүний мессеж тоолуурт нэмэгдэж хэмжилтийг гажуудуулна.
+\end{quote}
+
+\textbf{2.5 EMQX-ийн тоолуур (харьцуулалт).} EMQX-ийн REST API-ийн \texttt{bytes.received}:
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{emqx\_rx()} \KeywordTok{\{} \ExtensionTok{curl}\NormalTok{ {-}s {-}u }\StringTok{"}\VariableTok{$EMQX\_API\_KEY}\StringTok{:}\VariableTok{$EMQX\_API\_SECRET}\StringTok{"} \KeywordTok{\textbackslash{}}
+  \StringTok{\textquotesingle{}http://localhost:18083/api/v5/metrics?aggregate=true\textquotesingle{}} \KeywordTok{\textbackslash{}}
+  \KeywordTok{|} \ExtensionTok{jq} \StringTok{\textquotesingle{}if type=="array" then .[0]["bytes.received"] else .["bytes.received"] end\textquotesingle{}}\KeywordTok{;} \KeywordTok{\}}
+\FunctionTok{sleep}\NormalTok{ 5}\KeywordTok{;} \VariableTok{A=$(}\ExtensionTok{emqx\_rx}\VariableTok{)}
+\ExtensionTok{python}\NormalTok{ lab03/mqtt5\_features.py {-}{-}host localhost {-}{-}count 1000 alias {-}{-}no{-}alias }\OperatorTok{\textgreater{}}\NormalTok{ /dev/null}
+\FunctionTok{sleep}\NormalTok{ 5}\KeywordTok{;} \VariableTok{B=$(}\ExtensionTok{emqx\_rx}\VariableTok{)}
+\ExtensionTok{python}\NormalTok{ lab03/mqtt5\_features.py {-}{-}host localhost {-}{-}count 1000 alias }\OperatorTok{\textgreater{}}\NormalTok{ /dev/null}
+\FunctionTok{sleep}\NormalTok{ 5}\KeywordTok{;} \VariableTok{C=$(}\ExtensionTok{emqx\_rx}\VariableTok{)}
+\BuiltInTok{echo} \StringTok{"alias{-}гүй: }\VariableTok{$((}\NormalTok{B{-}A}\VariableTok{))}\StringTok{ Б   alias{-}тай: }\VariableTok{$((}\NormalTok{C{-}B}\VariableTok{))}\StringTok{ Б"} \KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/alias{-}bytes{-}emqx.txt}
+\end{Highlighting}
+\end{Shaded}
+
+✗ \texttt{null} → API түлхүүр хоосон (§2.2; Лаб 2-ын Алхам 0). Энэ үед гүүрээр Pi-гийн агентын мессеж ирж байвал тоолуурт нэмэгдэнэ --- агентыг зогсоосон эсэхээ шалга.
 
 \begin{quote}
 Албан ёсны баримт: \href{https://mosquitto.org/man/mosquitto-8.html}{mosquitto(8) --- \$SYS topics}: \texttt{\$SYS/\allowbreak{}broker/\allowbreak{}bytes/\allowbreak{}received} = брокер асснаас хойш хүлээн авсан нийт байт.
@@ -443,6 +622,8 @@ C − B =\strut
 \bottomrule
 \end{longtable}\endgroup
 
+«Сэдвийн урт» ба «онолын утга»-ыг 2.1/2.2-ын \texttt{alias} гаралтаас ав.
+
 \begin{quote}
 Скриптийн онолын тооцоо MQTT пакетын түвшинд (fixed header, Remaining Length, сэдэв, Packet Identifier, property) хийгдсэн. Тоолуурын зөрүү түүнтэй хэр таарав? Зөрүүг CONNECT/DISCONNECT, PINGREQ зэрэг нэмэлт пакетаар тайлбарла. TCP/IP толгой аль ч тоолуурт ордоггүй --- яагаад?
 \end{quote}
@@ -450,7 +631,7 @@ C − B =\strut
 \hypertarget{ux430ux43bux445ux430ux43c-3-qos-ux437ux430ux43c-ux43cux430ux442ux440ux438ux446-55-ux43cux438ux43d-pi}{%
 \subsection{Алхам 3 --- QoS × зам матриц (55 мин) {[}Pi{]}}\label{ux430ux43bux445ux430ux43c-3-qos-ux437ux430ux43c-ux43cux430ux442ux440ux438ux446-55-ux43cux438ux43d-pi}}
 
-\textbf{Энэ бол лабораторийн гол хэмжилт:} гурван зам × гурван QoS = 9 мөр, бүгд \textbf{Pi дээрээс} --- бид ирмэгийн төхөөрөмжийн туршлагыг хэмжиж байна.
+\textbf{Энэ бол лабораторийн гол хэмжилт:} гурван зам × гурван QoS = 9 мөр, бүгд \textbf{Pi дээрээс} --- бид ирмэгийн төхөөрөмжийн туршлагыг хэмжиж байна. Нэг хэмжилт = 3 QoS × 500 мессеж × 0.01 сек ≈ \textbf{20--30 сек}.
 
 \begin{figure}
 \centering
@@ -458,24 +639,52 @@ C − B =\strut
 \caption{Зураг 3.3 --- Хэмжилтийн гурван зам: loopback, LAN, гүүр}
 \end{figure}
 
+\textbf{3.1 Бэлтгэл.} Ирмэгийн агент ба бусад ачааллыг зогсоо (\textbf{{[}Pi-2{]}}-д агент ажиллаж байвал \texttt{Ctrl\ +\ C}), throttle-ийг шалга:
+
+\textbf{{[}Pi-1{]}}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [Pi] бүгдийг Pi дээр, дараалан}
-\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\CommentTok{\# А. loopback — сүлжээ огт оролцохгүй}
-\ExtensionTok{python3}\NormalTok{ tools/qos\_latency.py {-}{-}path loopback {-}{-}host localhost {-}{-}port 1883 }\KeywordTok{\textbackslash{}}
+\ExtensionTok{vcgencmd}\NormalTok{ get\_throttled}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{throttled=0x0}.
+
+\textbf{3.2 А. loopback} --- сүлжээ огт оролцохгүй:
+
+\textbf{{[}Pi-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{$PY} \ExtensionTok{tools/qos\_latency.py}\NormalTok{ {-}{-}path loopback {-}{-}host localhost {-}{-}port 1883 }\KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}sweep}\NormalTok{ {-}{-}count 500 {-}{-}payload 200 {-}{-}interval 0.01 {-}{-}csv lab03/out/qos{-}loopback.csv}
-\CommentTok{\# Б. lan — Pi → 100 Mb/s өгсөх урсгал (uplink) → үүлний EMQX → буцаж Pi}
-\ExtensionTok{python3}\NormalTok{ tools/qos\_latency.py {-}{-}path lan {-}{-}host }\StringTok{"}\VariableTok{$CLOUD\_HOST}\StringTok{"}\NormalTok{ {-}{-}port 1883 }\KeywordTok{\textbackslash{}}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{3.3 Б. lan} --- Pi → 100 Mb/s өгсөх урсгал (uplink) → үүлний EMQX → буцаж Pi:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{$PY} \ExtensionTok{tools/qos\_latency.py}\NormalTok{ {-}{-}path lan {-}{-}host }\StringTok{"}\VariableTok{$CLOUD\_HOST}\StringTok{"}\NormalTok{ {-}{-}port 1883 }\KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}sweep}\NormalTok{ {-}{-}count 500 {-}{-}payload 200 {-}{-}interval 0.01 {-}{-}csv lab03/out/qos{-}lan.csv}
-\CommentTok{\# В. bridge — нийтлэгч Pi{-}гийн mosquitto руу, захиалагч үүлний EMQX{-}ээс.}
-\CommentTok{\#    Сэдэв нь гүүрийн \textasciigrave{}topic cnc302/\textless{}SITE\textgreater{}/\# out 1\textasciigrave{} дүрэмд ЗААВАЛ багтана.}
-\ExtensionTok{python3}\NormalTok{ tools/qos\_latency.py {-}{-}path bridge {-}{-}host localhost {-}{-}port 1883 }\KeywordTok{\textbackslash{}}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{3.4 В. bridge} --- нийтлэгч Pi-гийн mosquitto руу, захиалагч үүлний EMQX-ээс. Сэдэв нь гүүрийн \texttt{topic\ cnc302/\allowbreak{}\textless{}SITE\textgreater{}/\allowbreak{}\#\ out\ 1} дүрэмд \textbf{заавал} багтана:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{$PY} \ExtensionTok{tools/qos\_latency.py}\NormalTok{ {-}{-}path bridge {-}{-}host localhost {-}{-}port 1883 }\KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}sub{-}host} \StringTok{"}\VariableTok{$CLOUD\_HOST}\StringTok{"}\NormalTok{ {-}{-}sub{-}port 1883 }\KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}topic} \StringTok{"cnc302/}\VariableTok{$SITE}\StringTok{/}\VariableTok{$AREA}\StringTok{/}\VariableTok{$LINE}\StringTok{/}\VariableTok{$DEVICE\_ID}\StringTok{/bench"} \KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}sweep}\NormalTok{ {-}{-}count 500 {-}{-}payload 200 {-}{-}interval 0.01 {-}{-}csv lab03/out/qos{-}bridge.csv}
 \end{Highlighting}
 \end{Shaded}
+
+✓ \textbf{Шалгах (3.2--3.4 бүрт):} QoS 0, 1, 2 гэсэн \textbf{гурван мөртэй} хүснэгт хэвлэгдэнэ; QoS 1, 2-ын «Илгээв» = «Ирсэн» = 500 (QoS 0-д бага зэрэг алдагдал байж болно --- тэр ч \textbf{хэмжилт}).
+
+✗ \texttt{bridge}-ийн бүх мөрөнд Ирсэн = 0 → \texttt{-\/-topic} нь \texttt{cnc302/\$SITE/}-ээр эхлээгүй, эсвэл \texttt{\$SITE} хоосон (§2.2-ын блокийг энэ цонхонд буулгаагүй). ✗ QoS 2-т \texttt{АНХААР:\allowbreak{}\ \ldots{}\ бүх\ мессеж\ ирсэнгүй} → \texttt{-\/-timeout\ 60} нэмж дахин.
 
 \begin{quote}
 \textbf{Юуг хэмжиж байгаагаа мэд.} В мөр нь нийтлэгчээс ирмэгийн брокер, гүүр, үүлний брокероор дамжин захиалагчид хүрэх \textbf{бүтэн замыг} хэмжинэ; «Ирсэн» багана нь EMQX-ээс уншсан тоо тул мессеж үүлэнд хүрсний нотолгоо. Анхаар: гүүр нь \textbf{өөрийн} QoS-оор (\texttt{out\ 1} → QoS 1) дамжуулдаг тул В мөрийн «QoS 2» нь зөвхөн нийтлэгч → mosquitto үсрэлтэд хамаарна --- тайландаа тайлбарла. Сэдэв гүүрийн дүрэмд багтахгүй бол (жишээ нь \texttt{-\/\allowbreak{}-topic\ cnc302/\allowbreak{}bench/\allowbreak{}latency}) алдалт 100\% гарна --- туршаад үз. Мессеж InfluxDB-д бичигдсэн эсэхийг Лаб 5-д шалгана.
@@ -681,7 +890,7 @@ bridge\strut
 \bottomrule
 \end{longtable}\endgroup
 
-Матрицаас гурван харьцааг тооцож бич:
+\textbf{3.5 Харьцаа тооцох.} Матрицаас гурван харьцааг тооцож бич:
 
 \begin{verbatim}
 p99(lan, QoS1) / p99(loopback, QoS1)   = ______   ← сүлжээний үнэ
@@ -699,22 +908,41 @@ p99 / p50              (lan, QoS1)     = ______   ← СҮҮЛИЙН ӨРГӨН
 
 Ижил зам (\texttt{lan}), зөвхөн илгээх хэмнэл ба ачаалал өөрчлөгдөнө. \texttt{-\/-shared\ 3} нь MQTT 5.0-ийн Shared Subscription (\texttt{\$share/\allowbreak{}\textless{}group\textgreater{}/\allowbreak{}\textless{}filter\textgreater{}}, §4.8.2): мессеж бүр бүлгийн \textbf{нэг л} захиалагчид очно.
 
+\textbf{4.1 Тэсрэлт} --- 500 мессежийг завсаргүй шиднэ:
+
+\textbf{{[}Pi-1{]}}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [Pi] тэсрэлт: 500 мессежийг завсаргүй шиднэ}
-\ExtensionTok{python3}\NormalTok{ tools/qos\_latency.py {-}{-}path lan {-}{-}host }\StringTok{"}\VariableTok{$CLOUD\_HOST}\StringTok{"} \KeywordTok{\textbackslash{}}
+\VariableTok{$PY} \ExtensionTok{tools/qos\_latency.py}\NormalTok{ {-}{-}path lan {-}{-}host }\StringTok{"}\VariableTok{$CLOUD\_HOST}\StringTok{"} \KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}sweep}\NormalTok{ {-}{-}count 500 {-}{-}payload 200 {-}{-}interval 0 {-}{-}csv lab03/out/qos{-}burst.csv}
-\CommentTok{\# [Pi] том ачаалал: 2000 байт, тогтвортой}
-\ExtensionTok{python3}\NormalTok{ tools/qos\_latency.py {-}{-}path lan {-}{-}host }\StringTok{"}\VariableTok{$CLOUD\_HOST}\StringTok{"} \KeywordTok{\textbackslash{}}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{4.2 Том ачаалал} --- 2000 байт, тогтвортой:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{$PY} \ExtensionTok{tools/qos\_latency.py}\NormalTok{ {-}{-}path lan {-}{-}host }\StringTok{"}\VariableTok{$CLOUD\_HOST}\StringTok{"} \KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}qos}\NormalTok{ 1 {-}{-}count 500 {-}{-}payload 2000 {-}{-}interval 0.01 {-}{-}csv lab03/out/qos{-}2000b.csv}
-\CommentTok{\# [Pi] хуваалцсан захиалга: 3 хэрэглэгч}
-\ExtensionTok{python3}\NormalTok{ tools/qos\_latency.py {-}{-}path lan {-}{-}host }\StringTok{"}\VariableTok{$CLOUD\_HOST}\StringTok{"} \KeywordTok{\textbackslash{}}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{4.3 Хуваалцсан захиалга} --- 3 хэрэглэгч:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{$PY} \ExtensionTok{tools/qos\_latency.py}\NormalTok{ {-}{-}path lan {-}{-}host }\StringTok{"}\VariableTok{$CLOUD\_HOST}\StringTok{"} \KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}qos}\NormalTok{ 1 {-}{-}count 500 {-}{-}interval 0.01 {-}{-}shared 3 {-}{-}csv lab03/out/qos{-}shared3.csv}
 \end{Highlighting}
 \end{Shaded}
 
+✓ Гурвуулаа хүснэгт хэвлэнэ; 4.3-ын \texttt{Sub} багана \texttt{3}.
+
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-3.5-ux442ux44dux441ux440ux44dux43bux442-ux431ux430-ux442ux43eux433ux442ux432ux43eux440ux442ux43eux439-ux443ux440ux441ux433ux430ux43b-ux437ux430ux43c-lan}{%
 \subsubsection{Хүснэгт 3.5 --- Тэсрэлт ба тогтвортой урсгал (зам = lan)}\label{ux445ux4afux441ux43dux44dux433ux442-3.5-ux442ux44dux441ux440ux44dux43bux442-ux431ux430-ux442ux43eux433ux442ux432ux43eux440ux442ux43eux439-ux443ux440ux441ux433ux430ux43b-ux437ux430ux43c-lan}}
+
+«steady» мөрүүдийг Хүснэгт 3.4-ийн \texttt{lan} мөрүүдээс ав.
 
 \begingroup\scriptsize\begin{longtable}[]{@{}llllll@{}}
 \toprule
@@ -750,15 +978,52 @@ burst / steady p50-ийн харьцаа (QoS 1): ule{1.5cm}{0.4pt} дахин. 
 2000 байт нь 200 байтаас 10 дахин том. p99 нь 10 дахин өссөн үү? Үгүй бол хязгаарлагч нь зурвас биш, \textbf{нэг мессеж бүрийн тогтмол зардал} (round-trip, брокерын боловсруулалт) байна гэсэн үг. 100 Mb/s дээр 2000 байтын мессеж утсан дээр \textasciitilde0.18 мс л эзэлнэ (Лаб 4, §3-ын арифметик). Энэ тоо Лаб 4-ийн өгсөх урсгалын (uplink) тооцоонд шууд хэрэглэгдэнэ.
 \end{quote}
 
-\textbf{4.4 (сонголттой, 10 мин) Таамаг шалгах: Ethernet ба USB зурвас хуваадаг уу?} Pi-д USB флаш диск залгаж, түүн рүү том файл бичиж байх зуур \texttt{lan} QoS 1 хэмжилтийг давтана. p99 мэдэгдэхүйц өсвөл таамаг дэмжигдэнэ; өсөөгүй бол няцаагдана --- аль ч үр дүн тайланд хүчинтэй.
+\textbf{4.4 (сонголттой, 10 мин) Таамаг шалгах: Ethernet ба USB зурвас хуваадаг уу?} USB флаш диск хэрэгтэй. Raspberry Pi OS \textbf{Lite} USB дискийг автоматаар холбодоггүй (mount) тул гараар холбоно.
+
+\begin{quote}
+⚠ Флаш диск дээрх өгөгдөл \textbf{устахгүй} (зөвхөн \texttt{big.bin} файл нэмэгдэнэ), гэхдээ хоосон диск ашиглахыг зөвлөж байна.
+\end{quote}
+
+\textbf{{[}Pi-1{]}} --- дискийг олж, холбох:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [Pi] терминал 1 — USB диск рүү \textasciitilde{}500 MB бичнэ (/media/... замаа шалга)}
-\FunctionTok{dd}\NormalTok{ if=/dev/zero of=/media/}\VariableTok{$USER}\NormalTok{/}\OperatorTok{\textless{}}\NormalTok{USB}\OperatorTok{\textgreater{}}\NormalTok{/big.bin bs=1M count=500 oflag=direct status=progress}
-\CommentTok{\# [Pi] терминал 2 — зэрэг}
-\ExtensionTok{python3}\NormalTok{ tools/qos\_latency.py {-}{-}path lan {-}{-}host }\StringTok{"}\VariableTok{$CLOUD\_HOST}\StringTok{"} \KeywordTok{\textbackslash{}}
+\ExtensionTok{lsblk}\NormalTok{ {-}o NAME,SIZE,TYPE,MOUNTPOINT}
+\end{Highlighting}
+\end{Shaded}
+
+USB диск нь ихэвчлэн \texttt{sda}, хуваалт нь \texttt{sda1}. \textbf{Хэмжээгээр нь шалга} (\texttt{mmcblk0} бол microSD --- түүнийг БҮҮ сонго).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sudo}\NormalTok{ mkdir {-}p /mnt/usb}
+\FunctionTok{sudo}\NormalTok{ mount /dev/sda1 /mnt/usb}
+\FunctionTok{df}\NormalTok{ {-}h /mnt/usb}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{{[}Pi-2{]}} --- USB руу \textasciitilde500 MB бичнэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sudo}\NormalTok{ dd if=/dev/zero of=/mnt/usb/big.bin bs=1M count=500 oflag=direct status=progress}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{{[}Pi-1{]}} --- \texttt{dd} ажиллаж байх \textbf{зуур}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{$PY} \ExtensionTok{tools/qos\_latency.py}\NormalTok{ {-}{-}path lan {-}{-}host }\StringTok{"}\VariableTok{$CLOUD\_HOST}\StringTok{"} \KeywordTok{\textbackslash{}}
     \ExtensionTok{{-}{-}qos}\NormalTok{ 1 {-}{-}count 500 {-}{-}interval 0.01 {-}{-}csv lab03/out/qos{-}lan{-}usbload.csv}
+\end{Highlighting}
+\end{Shaded}
+
+Дууссаны дараа цэвэрлэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sudo}\NormalTok{ rm /mnt/usb/big.bin }\KeywordTok{\&\&} \FunctionTok{sudo}\NormalTok{ umount /mnt/usb}
 \end{Highlighting}
 \end{Shaded}
 
@@ -772,46 +1037,98 @@ USB руу бичиж байхад & & & таамаг дэмжигдэв / ня�
 \bottomrule
 \end{longtable}\endgroup
 
+p99 мэдэгдэхүйц өсвөл таамаг дэмжигдэнэ; өсөөгүй бол няцаагдана --- аль ч үр дүн тайланд хүчинтэй.
+
 \hypertarget{ux430ux43bux445ux430ux43c-5-unified-namespace-ux43cux43eux434-ux437ux4e9ux440ux447ux438ux43b-ux441ux445ux435ux43c-35-ux43cux438ux43d-piux437ux43a}{%
 \subsection{Алхам 5 --- Unified Namespace: мод, зөрчил, схем (35 мин) {[}Pi{]}{[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-5-unified-namespace-ux43cux43eux434-ux437ux4e9ux440ux447ux438ux43b-ux441ux445ux435ux43c-35-ux43cux438ux43d-piux437ux43a}}
 
-\textbf{5.1 Одоогийн модыг харах.} Флотыг ирмэгийн брокер руу чиглүүлж, зэрэг сонсоно:
+\textbf{5.1 Одоогийн модыг харах.} Компьютерээс виртуал флотыг \textbf{Pi-гийн брокер} руу чиглүүлнэ:
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [ЗК] терминал 1 — виртуал флот Pi{-}гийн брокер руу}
-\ExtensionTok{python3}\NormalTok{ tools/sim\_device.py {-}{-}target edge {-}{-}host }\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{ {-}{-}devices 8 {-}{-}interval 1 {-}{-}lines 3}
-\CommentTok{\# [Pi] терминал 2 — модыг барьж авна}
-\ExtensionTok{python3}\NormalTok{ lab03/uns\_tree.py {-}{-}host localhost {-}{-}seconds 30 }\KeywordTok{\textbackslash{}}
-    \ExtensionTok{{-}{-}filter} \StringTok{\textquotesingle{}cnc302/\#\textquotesingle{}}\NormalTok{ {-}{-}json lab03/out/uns{-}before.json}
+\ExtensionTok{python}\NormalTok{ tools/sim\_device.py {-}{-}target edge {-}{-}host }\OperatorTok{\textless{}}\NormalTok{PI\_IP}\OperatorTok{\textgreater{}}\NormalTok{ {-}{-}devices 8 {-}{-}interval 1 {-}{-}lines 3}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{5.2 Зөрчил үүсгэж, шалгагч барьж авахыг харах.} Шалгагч ажиллаж байх зуур {[}ЗК{]} дээрээс дараахийг илгээж, гурвуулангийн зөрчлийн тайланг тайландаа хуулна:
+Флот ажиллаж байх \textbf{зуур} Pi дээр модыг 30 сек барьж авна:
+
+\textbf{{[}Pi-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{mosquitto\_pub}\NormalTok{ {-}h }\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{ {-}t }\StringTok{\textquotesingle{}cnc302/UB/Campus/Line 1/DEV{-}1/temp\textquotesingle{}}\NormalTok{ {-}m }\StringTok{\textquotesingle{}\{"t":24\}\textquotesingle{}}
-\ExtensionTok{mosquitto\_pub}\NormalTok{ {-}h }\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{ {-}t }\StringTok{\textquotesingle{}sensors/room12/temperature\textquotesingle{}}\NormalTok{ {-}m }\StringTok{\textquotesingle{}24\textquotesingle{}}
-\ExtensionTok{mosquitto\_pub}\NormalTok{ {-}h }\OperatorTok{\textless{}}\NormalTok{PI{-}IP}\OperatorTok{\textgreater{}}\NormalTok{ {-}t }\StringTok{\textquotesingle{}cnc302/ub/campus/line01/dev1/telemetry/raw\textquotesingle{}}\NormalTok{ {-}m }\StringTok{\textquotesingle{}\{\}\textquotesingle{}}
+\VariableTok{$PY} \ExtensionTok{lab03/uns\_tree.py}\NormalTok{ {-}{-}host localhost {-}{-}seconds 30 }\KeywordTok{\textbackslash{}}
+    \ExtensionTok{{-}{-}filter} \StringTok{\textquotesingle{}cnc302/\#\textquotesingle{}}\NormalTok{ {-}{-}json lab03/out/uns{-}before.json }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/uns{-}before.txt}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{5.3 Хатуу горим ба гарах код.} \texttt{-\/-strict} нь CI-д ашиглагдана:
+✓ \texttt{cnc302\ →\ shutis\ →\ mhts\ →\ line\ldots{}} хэлбэрийн мод хэвлэгдэж, \texttt{lab03/\allowbreak{}out/\allowbreak{}uns-before.\allowbreak{}json} үүснэ.
+
+\textbf{5.2 Зөрчил үүсгэж, шалгагч барьж авахыг харах.} \textbf{{[}Pi-1{]}}-д шалгагчийг дахин 60 сек ажиллуул:
+
+\textbf{{[}Pi-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [Pi] Pi дээр, агент ажиллаж байх зуур}
-\ExtensionTok{python3}\NormalTok{ lab03/uns\_tree.py {-}{-}host localhost {-}{-}seconds 20 {-}{-}strict {-}{-}prefix cnc302}
-\BuiltInTok{echo} \StringTok{"гарах код: }\VariableTok{$?}\StringTok{"}\NormalTok{      \# 0 = цэвэр, 1 = зөрчилтэй}
+\VariableTok{$PY} \ExtensionTok{lab03/uns\_tree.py}\NormalTok{ {-}{-}host localhost {-}{-}seconds 60 {-}{-}filter }\StringTok{\textquotesingle{}\#\textquotesingle{}} \KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/uns{-}violations.txt}
 \end{Highlighting}
 \end{Shaded}
+
+Ажиллаж байх \textbf{зуур} компьютерээс гурван «буруу» сэдэв илгээ:
+
+\textbf{{[}ЗК · Ubuntu-2{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{mosquitto\_pub}\NormalTok{ {-}h }\OperatorTok{\textless{}}\NormalTok{PI\_IP}\OperatorTok{\textgreater{}}\NormalTok{ {-}t }\StringTok{\textquotesingle{}cnc302/UB/Campus/Line 1/DEV{-}1/temp\textquotesingle{}}\NormalTok{ {-}m }\StringTok{\textquotesingle{}\{"t":24\}\textquotesingle{}}
+\ExtensionTok{mosquitto\_pub}\NormalTok{ {-}h }\OperatorTok{\textless{}}\NormalTok{PI\_IP}\OperatorTok{\textgreater{}}\NormalTok{ {-}t }\StringTok{\textquotesingle{}sensors/room12/temperature\textquotesingle{}}\NormalTok{ {-}m }\StringTok{\textquotesingle{}24\textquotesingle{}}
+\ExtensionTok{mosquitto\_pub}\NormalTok{ {-}h }\OperatorTok{\textless{}}\NormalTok{PI\_IP}\OperatorTok{\textgreater{}}\NormalTok{ {-}t }\StringTok{\textquotesingle{}cnc302/ub/campus/line01/dev1/telemetry/raw\textquotesingle{}}\NormalTok{ {-}m }\StringTok{\textquotesingle{}\{\}\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+✓ 60 секундын дараа \textbf{{[}Pi-1{]}}-ийн тайланд гурван сэдэв бүгд \textbf{зөрчил} гэж гарна. Тайланг хуулж тайландаа оруул.
+
+Одоо флотыг зогсоо: \textbf{{[}ЗК · Ubuntu-1{]}} \texttt{Ctrl\ +\ C}.
+
+\textbf{5.3 Хатуу горим ба гарах код.} \texttt{-\/-strict} нь CI-д ашиглагдана. Ирмэгийн агентыг асаа:
+
+\textbf{{[}Pi-2{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302/edge }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ agent}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{{[}Pi-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{$PY} \ExtensionTok{lab03/uns\_tree.py}\NormalTok{ {-}{-}host localhost {-}{-}seconds 20 {-}{-}strict {-}{-}prefix cnc302}
+\BuiltInTok{echo} \StringTok{"гарах код: }\VariableTok{$?}\StringTok{"}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{гарах\ код:\ 0} = цэвэр, \texttt{1} = зөрчилтэй. Агентын ердийн урсгал цэвэр гарах ёстой.
 
 \begin{quote}
-\textbf{Хүлээгдэх үр дүн:} \texttt{uns\_tree.py}-ийн зөвшөөрөгдсөн суваг нь \texttt{telemetry}, \texttt{status}, \texttt{health}, \texttt{anomaly}, \texttt{cmd}, \texttt{config}, \texttt{event}, \texttt{attributes}, мөн нийлмэл \texttt{bridge/\ldots{}} ба \texttt{ota/\ldots{}} (7--8 хэсэгтэй). Тиймээс агентын ердийн урсгал цэвэр гарах ёстой, харин Алхам 5.2-ын гурван сэдэв, Алхам 3В-гийн \texttt{\ldots{}/bench} суваг \textbf{зөрчил} болно. Энэ бол \textbf{шийдвэр гаргах цэг}: \texttt{bench}-ийг жагсаалтад нэмэх үү, эсвэл хэмжилтийн урсгалыг UNS-ээс гадуур тусад нь байлгах уу? Тайландаа сонголтоо үндэслэлтэй бич. Жагсаалт нь стандарт биш, \textbf{курсын тохиролцоо} гэдгийг санаарай.
+\textbf{Хүлээгдэх үр дүн:} \texttt{uns\_tree.py}-ийн зөвшөөрөгдсөн суваг нь \texttt{telemetry}, \texttt{status}, \texttt{health}, \texttt{anomaly}, \texttt{cmd}, \texttt{config}, \texttt{event}, \texttt{attributes}, мөн нийлмэл \texttt{bridge/\ldots{}} ба \texttt{ota/\ldots{}} (7--8 хэсэгтэй). Тиймээс агентын ердийн урсгал цэвэр гарах ёстой, харин Алхам 5.2-ын гурван сэдэв, Алхам 3.4-ийн \texttt{\ldots{}/bench} суваг \textbf{зөрчил} болно. Энэ бол \textbf{шийдвэр гаргах цэг}: \texttt{bench}-ийг жагсаалтад нэмэх үү, эсвэл хэмжилтийн урсгалыг UNS-ээс гадуур тусад нь байлгах уу? Тайландаа сонголтоо үндэслэлтэй бич. Жагсаалт нь стандарт биш, \textbf{курсын тохиролцоо} гэдгийг санаарай.
 \end{quote}
 
-\textbf{5.4 Багийн UNS схем.} \texttt{lab03/\allowbreak{}uns-schema.\allowbreak{}md} файлд бичнэ. Дор хаяж \textbf{10 бодит сэдвийн жишээ} оруулна:
+Агентыг зогсоо: \textbf{{[}Pi-2{]}} \texttt{Ctrl\ +\ C}.
+
+\textbf{5.4 Багийн UNS схем.} Компьютер дээр файл үүсгэ:
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{code}\NormalTok{ lab03/uns{-}schema.md}
+\end{Highlighting}
+\end{Shaded}
+
+Дор хаяж \textbf{10 бодит сэдвийн жишээ} оруулж, дараах асуултад хариул:
 
 \begin{itemize}
 \tightlist
@@ -822,7 +1139,7 @@ USB руу бичиж байхад & & & таамаг дэмжигдэв / ня�
 \item
   Аль сэдэв \textbf{retained} байх вэ, яагаад? (Санамж: \texttt{status} бол LWT-тэй retained.)
 \item
-  Тушаал хаашаа очиж, хариу хаанаас ирэх вэ? Гүүрний \texttt{in} дүрэмтэй нийцэж байна уу?
+  Тушаал хаашаа очиж, хариу хаанаас ирэх вэ? Гүүрний \texttt{in} дүрэмтэй нийцэж байна уу? (\texttt{cat\ \textasciitilde{}/cnc302/edge/mosquitto/conf.d/bridge.conf.template})
 \item
   10 жилийн дараа шинэ талбай нэмэхэд схем эвдрэх үү?
 \end{itemize}
@@ -846,8 +1163,8 @@ ota/* & хоёр тал & & & &\tabularnewline
 \bottomrule
 \end{longtable}\endgroup
 
-\hypertarget{ux430ux43bux445ux430ux43c-6-sparkplug-b-30-ux43cux438ux43d-ux437ux43a}{%
-\subsection{Алхам 6 --- Sparkplug B (30 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-6-sparkplug-b-30-ux43cux438ux43d-ux437ux43a}}
+\hypertarget{ux430ux43bux445ux430ux43c-6-sparkplug-b-30-ux43cux438ux43d-ux437ux43api}{%
+\subsection{Алхам 6 --- Sparkplug B (30 мин) {[}ЗК{]}{[}Pi{]}}\label{ux430ux43bux445ux430ux43c-6-sparkplug-b-30-ux43cux438ux43d-ux437ux43api}}
 
 ⚠ \textbf{\texttt{sparkplug\_\allowbreak{}lite.\allowbreak{}py} нь жинхэнэ Sparkplug B БИШ --- сургалтын хялбаршуулалт.} \href{https://sparkplug.eclipse.org/specification/version/3.0/documents/sparkplug-specification-3.0.0.pdf}{Sparkplug 3.0.0}-ийн дагуу хийсэн нь: сэдвийн бүтэц \texttt{spBv1.\allowbreak{}0/\allowbreak{}\textless{}group\_\allowbreak{}id\textgreater{}/\allowbreak{}\textless{}message\_\allowbreak{}type\textgreater{}/\allowbreak{}\textless{}edge\_\allowbreak{}node\_\allowbreak{}id\textgreater{}{[}/\allowbreak{}\textless{}device\_\allowbreak{}id\textgreater{}{]}}; NBIRTH-ийн \texttt{seq} = 0, мессеж бүрт +1, 255-ын дараа 0; NDEATH нь MQTT Will (QoS 1, retain=false), \texttt{seq}-гүй, \texttt{bdSeq} нь NBIRTH-ийнхтэй ижил; BIRTH-д нэр + alias, DATA-д \textbf{зөвхөн} alias.
 
@@ -868,55 +1185,89 @@ ota/* & хоёр тал & & & &\tabularnewline
   Primary Host-ийн \texttt{spBv1.\allowbreak{}0/\allowbreak{}STATE/\allowbreak{}\textless{}host\_\allowbreak{}id\textgreater{}}-ийг хүлээдэггүй.
 \end{enumerate}
 
-\textbf{6.1 Хоёр терминалд зэрэг ({[}ЗК{]} үүлний EMQX дээр):}
+\textbf{6.1 Ажиглагч ба зангилаа (үүлний EMQX дээр).} Эхлээд ажиглагчийг асаа --- 90 сек сонсоно:
+
+\textbf{{[}ЗК · Ubuntu-2{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# терминал 1 — ажиглагч; терминал 2 — ирмэгийн зангилаа}
-\ExtensionTok{python3}\NormalTok{ lab03/sparkplug\_lite.py monitor {-}{-}host localhost {-}{-}seconds 90}
-\ExtensionTok{python3}\NormalTok{ lab03/sparkplug\_lite.py node {-}{-}host localhost {-}{-}devices 3 {-}{-}seconds 60 {-}{-}interval 1}
+\ExtensionTok{python}\NormalTok{ lab03/sparkplug\_lite.py monitor {-}{-}host localhost {-}{-}seconds 90 }\KeywordTok{|} \FunctionTok{tee}\NormalTok{ lab03/out/sp{-}monitor{-}1.txt}
 \end{Highlighting}
 \end{Shaded}
 
-\texttt{NBIRTH\ →\ DBIRTH\ →\ DDATA\ \ldots{}\ →\ NDEATH} дарааллыг ажигла. DDATA дотор метрикийн \textbf{нэр байхгүй, зөвхөн alias} байна --- ажиглагч нь BIRTH-ээс сурсан хүснэгтээрээ нэрийг сэргээнэ.
+5 секундын дараа зангилааг асаа:
 
-\textbf{6.2 Дарааллын тасалдал ба report-by-exception} (ажиглагч ажиллаж байх зуур):
+\textbf{{[}ЗК · Ubuntu-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{python3}\NormalTok{ lab03/sparkplug\_lite.py node {-}{-}host localhost {-}{-}devices 2 {-}{-}seconds 30 {-}{-}drop{-}seq 5}
-\ExtensionTok{python3}\NormalTok{ lab03/sparkplug\_lite.py node {-}{-}host localhost {-}{-}devices 3 {-}{-}seconds 30 {-}{-}deadband 0}
-\ExtensionTok{python3}\NormalTok{ lab03/sparkplug\_lite.py node {-}{-}host localhost {-}{-}devices 3 {-}{-}seconds 30 {-}{-}deadband 0.5}
+\ExtensionTok{python}\NormalTok{ lab03/sparkplug\_lite.py node {-}{-}host localhost {-}{-}devices 3 {-}{-}seconds 60 {-}{-}interval 1}
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{6.3 Гэнэтийн салалт (Last Will) --- хоёр өөр тохиолдол.} Ажиглагч ажиллаж байх зуур:
+✓ Ажиглагч дээр \texttt{NBIRTH\ →\ DBIRTH\ ×3\ →\ DDATA\ \ldots{}\ →\ NDEATH} дараалал. DDATA дотор метрикийн \textbf{нэр байхгүй, зөвхөн alias} байна --- ажиглагч нь BIRTH-ээс сурсан хүснэгтээрээ нэрийг сэргээнэ.
+
+\textbf{6.2 Дарааллын тасалдал ба report-by-exception.} \textbf{{[}ЗК · Ubuntu-2{]}}-д ажиглагчийг дахин асаа (\texttt{-\/-seconds\ 150}, \texttt{tee\ lab03/\allowbreak{}out/\allowbreak{}sp-monitor-2.\allowbreak{}txt}), дараа нь \textbf{{[}ЗК · Ubuntu-1{]}}-д нэг нэгээр нь (өмнөх нь дуусахыг хүлээ):
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# (а) Процесс үхэв: үйлдлийн систем TCP холболтыг ХААНА → брокер шууд мэднэ}
-\ExtensionTok{python3}\NormalTok{ lab03/sparkplug\_lite.py node {-}{-}host localhost {-}{-}devices 2 {-}{-}seconds 300 }\KeywordTok{\&}
-\FunctionTok{sleep}\NormalTok{ 15}\KeywordTok{;} \FunctionTok{date}\NormalTok{ +\%T}\KeywordTok{;} \BuiltInTok{kill}\NormalTok{ {-}9 \%1          \# NDEATH бараг ТЭР ДАРУЙ гарна}
-
-\CommentTok{\# (б) Процесс "хөлдөв": холболт нээлттэй, гэхдээ пакет илгээхгүй (кабель тасрахтай адил)}
-\ExtensionTok{python3}\NormalTok{ lab03/sparkplug\_lite.py node {-}{-}host localhost {-}{-}devices 2 {-}{-}seconds 300 }\KeywordTok{\&}
-\FunctionTok{sleep}\NormalTok{ 15}\KeywordTok{;} \FunctionTok{date}\NormalTok{ +\%T}\KeywordTok{;} \BuiltInTok{kill}\NormalTok{ {-}STOP \%1       \# NDEATH \textasciitilde{}45 секундын дараа}
-\CommentTok{\# … NDEATH{-}ийг харсны дараа:  kill {-}9 \%1}
+\ExtensionTok{python}\NormalTok{ lab03/sparkplug\_lite.py node {-}{-}host localhost {-}{-}devices 2 {-}{-}seconds 30 {-}{-}drop{-}seq 5}
+\ExtensionTok{python}\NormalTok{ lab03/sparkplug\_lite.py node {-}{-}host localhost {-}{-}devices 3 {-}{-}seconds 30 {-}{-}deadband 0}
+\ExtensionTok{python}\NormalTok{ lab03/sparkplug\_lite.py node {-}{-}host localhost {-}{-}devices 3 {-}{-}seconds 30 {-}{-}deadband 0.5}
 \end{Highlighting}
 \end{Shaded}
+
+✓ \texttt{-\/-drop-seq\ 5}-ийн үед ажиглагч \textbf{дарааллын тасалдал} илрүүлнэ. Deadband 0 ба 0.5-ын DDATA-гийн тоог ажиглагчийн гаралтаас тоол (\texttt{grep\ -c\ DDATA} --- хоёр ажиллуулалтыг тусад нь хадгалахыг хүсвэл ажиглагчийг тус бүрт дахин асаа).
+
+\textbf{6.3 Гэнэтийн салалт (Last Will) --- хоёр өөр тохиолдол.} \textbf{{[}ЗК · Ubuntu-2{]}}-д ажиглагчийг \texttt{-\/-seconds\ 300}-аар асаа. Дараа нь \textbf{{[}ЗК · Ubuntu-1{]}}-д:
+
+\textbf{(а) Процесс үхэв:} үйлдлийн систем TCP холболтыг ХААНА → брокер шууд мэднэ.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab03/sparkplug\_lite.py node {-}{-}host localhost {-}{-}devices 2 {-}{-}seconds 300 }\KeywordTok{\&}
+\FunctionTok{sleep}\NormalTok{ 15}\KeywordTok{;} \FunctionTok{date}\NormalTok{ +\%T}\KeywordTok{;} \BuiltInTok{kill}\NormalTok{ {-}9 \%1}
+\end{Highlighting}
+\end{Shaded}
+
+✓ NDEATH \textbf{бараг тэр даруй} гарна. Хэвлэгдсэн цаг ба ажиглагчийн NDEATH-ийн цагийг харьцуул.
+
+\textbf{(б) Процесс «хөлдөв»:} холболт нээлттэй, гэхдээ пакет илгээхгүй (кабель тасрахтай адил).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ lab03/sparkplug\_lite.py node {-}{-}host localhost {-}{-}devices 2 {-}{-}seconds 300 }\KeywordTok{\&}
+\FunctionTok{sleep}\NormalTok{ 15}\KeywordTok{;} \FunctionTok{date}\NormalTok{ +\%T}\KeywordTok{;} \BuiltInTok{kill}\NormalTok{ {-}STOP \%1}
+\end{Highlighting}
+\end{Shaded}
+
+✓ NDEATH \textbf{\textasciitilde45 секундын} дараа гарна. Харсны дараа процессыг устга: \texttt{kill\ -9\ \%1}.
 
 \begin{quote}
 \textbf{Яагаад ялгаатай вэ?} MQTT 5.0 §3.1.2.5-ын дагуу Will нь «клиент DISCONNECT илгээлгүй сүлжээний холболтыг хаасан» үед ч, «keepalive хугацаанд харилцаагүй» үед ч нийтлэгдэнэ. \texttt{kill\ -9} үед цөм сокетыг хааж брокер тэр дороо мэднэ (локал туршилтад \textasciitilde2 мс). \texttt{kill\ -STOP} эсвэл кабель тасрахад брокер юу ч хүлээж авахгүй тул keepalive-ын \textbf{1.5 дахин} хугацааг хүлээнэ (§3.1.2.10): keepalive 30 с → \textasciitilde45 с. Энэ нь «төхөөрөмж унасныг хэдэн секундын дараа мэдэх вэ» гэсэн бодит асуултын хариу. Ctrl+C-ээр зогсоовол зангилаа DISCONNECT-ийг reason code \textbf{0x04 (Disconnect with Will Message)}-тэй илгээж, брокер NDEATH-ийг шууд нийтэлнэ --- Sparkplug 3.0 MQTT 5.0 клиентэд үүнийг шаарддаг.
 \end{quote}
 
-\textbf{6.4 Угтварын сургамж.} Sparkplug сэдэв нь \texttt{spBv1.0/\ldots{}} угтвартай --- \texttt{cnc302/\allowbreak{}\textless{}SITE\textgreater{}/\allowbreak{}\#} \textbf{биш}. Тиймээс Pi дээр ажиллуулсан зангилааны мессежийг гүүр үүл рүү дамжуулахгүй (гүүрийн \texttt{topic\ cnc302/\allowbreak{}\textless{}SITE\textgreater{}/\allowbreak{}\#\ out\ 1} дүрэм). Батал:
+\textbf{6.4 Угтварын сургамж.} Sparkplug сэдэв нь \texttt{spBv1.0/\ldots{}} угтвартай --- \texttt{cnc302/\allowbreak{}\textless{}SITE\textgreater{}/\allowbreak{}\#} \textbf{биш}. Тиймээс Pi дээр ажиллуулсан зангилааны мессежийг гүүр үүл рүү дамжуулахгүй (гүүрийн \texttt{topic\ cnc302/\allowbreak{}\textless{}SITE\textgreater{}/\allowbreak{}\#\ out\ 1} дүрэм). Батал --- эхлээд үүл дээр сонс:
+
+\textbf{{[}ЗК · Ubuntu-2{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# [Pi] Pi дээр зангилаа ажиллуулж байхад, [ЗК] үүл дээр:}
-\ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}spBv1.0/\#\textquotesingle{}}\NormalTok{ {-}v {-}W 15    \# хоосон байхыг хүлээнэ}
+\ExtensionTok{mosquitto\_sub}\NormalTok{ {-}h localhost {-}t }\StringTok{\textquotesingle{}spBv1.0/\#\textquotesingle{}}\NormalTok{ {-}v {-}W 20}
 \end{Highlighting}
 \end{Shaded}
+
+Тэр \textbf{20 секундын дотор} Pi дээр зангилаа ажиллуул:
+
+\textbf{{[}Pi-1{]}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{$PY} \ExtensionTok{lab03/sparkplug\_lite.py}\NormalTok{ node {-}{-}host localhost {-}{-}devices 2 {-}{-}seconds 15}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \textbf{{[}ЗК · Ubuntu-2{]}} юу ч хэвлэхгүй, 20 сек дараа \texttt{Timed\ out} гэж гарна --- гүүр \texttt{spBv1.0/\#}-ийг дамжуулаагүй.
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-3.8-sparkplug-b-ux433ux438ux439ux43d-ux430ux436ux438ux433ux43bux430ux43bux442}{%
 \subsubsection{Хүснэгт 3.8 --- Sparkplug B-гийн ажиглалт}\label{ux445ux4afux441ux43dux44dux433ux442-3.8-sparkplug-b-ux433ux438ux439ux43d-ux430ux436ux438ux433ux43bux430ux43bux442}}
@@ -940,7 +1291,7 @@ Deadband-ийн хэмнэлт \% &\tabularnewline
 \hypertarget{ux430ux43bux445ux430ux43c-7-ux431ux430ux433ux438ux439ux43d-ux448ux438ux439ux434ux432ux44dux440-20-ux43cux438ux43d-ux437ux43a}{%
 \subsection{Алхам 7 --- Багийн шийдвэр (20 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-7-ux431ux430ux433ux438ux439ux43d-ux448ux438ux439ux434ux432ux44dux440-20-ux43cux438ux43d-ux437ux43a}}
 
-Энэ бол лабораторийн гол үр дүн: цаашид ямар тохиргоо хэрэглэхээ \textbf{тоон үндэслэлтэйгээр} шийднэ. Багана бүрд Хүснэгт 3.4--3.6-гийн \textbf{тодорхой тоо} иш татна ("хурдан учраас" гэсэн хариулт оноо авахгүй).
+Энэ бол лабораторийн гол үр дүн: цаашид ямар тохиргоо хэрэглэхээ \textbf{тоон үндэслэлтэйгээр} шийднэ. Багана бүрд Хүснэгт 3.4--3.6-гийн \textbf{тодорхой тоо} иш татна («хурдан учраас» гэсэн хариулт оноо авахгүй).
 
 \hypertarget{ux445ux4afux441ux43dux44dux433ux442-3.9-ux431ux430ux433ux438ux439ux43d-ux43fux440ux43eux442ux43eux43aux43eux43bux44bux43d-ux448ux438ux439ux434ux432ux44dux440}{%
 \subsubsection{Хүснэгт 3.9 --- Багийн протоколын шийдвэр}\label{ux445ux4afux441ux43dux44dux433ux442-3.9-ux431ux430ux433ux438ux439ux43d-ux43fux440ux43eux442ux43eux43aux43eux43bux44bux43d-ux448ux438ux439ux434ux432ux44dux440}}
@@ -961,20 +1312,53 @@ Sparkplug B хэрэглэх үү & &\tabularnewline
 \bottomrule
 \end{longtable}\endgroup
 
-\hypertarget{ux430ux43bux445ux430ux43c-8-git-commit-10-ux43cux438ux43d-ux437ux43a}{%
-\subsection{Алхам 8 --- Git commit (10 мин) {[}ЗК{]}}\label{ux430ux43bux445ux430ux43c-8-git-commit-10-ux43cux438ux43d-ux437ux43a}}
+\hypertarget{ux430ux43bux445ux430ux43c-8-ux433ux430ux440ux430ux43bux442-ux446ux443ux433ux43bux443ux443ux43bux436-git-commit-15-ux43cux438ux43d-ux437ux43api}{%
+\subsection{Алхам 8 --- Гаралт цуглуулж, Git commit (15 мин) {[}ЗК{]}{[}Pi{]}}\label{ux430ux43bux445ux430ux43c-8-ux433ux430ux440ux430ux43bux442-ux446ux443ux433ux43bux443ux443ux43bux436-git-commit-15-ux43cux438ux43d-ux437ux43api}}
+
+\textbf{8.1 Pi дээрх гаралтыг компьютер руу хуулах.} (Лаб 1 Алхам 8.1-д SSH түлхүүрээ \texttt{\textasciitilde{}/.ssh/cnc302}-д хуулсан.)
+
+\textbf{{[}ЗК · Ubuntu-1{]}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \BuiltInTok{cd}\NormalTok{ \textasciitilde{}/cnc302}
-\FunctionTok{git}\NormalTok{ add lab03/}
-\CommentTok{\# Хэмжилтийн нотолгоо: lab03/out/ нь .gitignore{-}д тул зориудаар албадан нэмнэ}
-\FunctionTok{git}\NormalTok{ add {-}f lab03/out/qos{-}*.csv lab03/out/f{-}*.txt lab03/out/uns{-}before.json}
+\FunctionTok{scp}\NormalTok{ {-}i \textasciitilde{}/.ssh/cnc302 }\StringTok{\textquotesingle{}cnc302@\textless{}PI\_IP\textgreater{}:cnc302/lab03/out/*\textquotesingle{}}\NormalTok{ lab03/out/}
+\FunctionTok{ls}\NormalTok{ lab03/out/}
+\end{Highlighting}
+\end{Shaded}
+
+✓ \texttt{qos-*.csv} (Pi), \texttt{f-*-emqx.txt} ба \texttt{f-*-mosq.txt}, \texttt{uns-before.json}, \texttt{alias-bytes-*.\allowbreak{}txt} нэг хавтаст.
+
+\textbf{8.2 Тайлан.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cp}\NormalTok{ docs/report{-}template.md lab03/report.md}
+\ExtensionTok{code}\NormalTok{ lab03/report.md}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{8.3 Нэмэх ба шалгах.} \texttt{lab03/out/} нь \texttt{.gitignore}-д тул хэмжилтийн нотолгоог \textbf{зориуд} \texttt{-f}-ээр нэмнэ:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ add lab03/report.md lab03/uns{-}schema.md}
+\FunctionTok{git}\NormalTok{ add {-}f lab03/out/qos{-}*.csv lab03/out/f{-}*.txt lab03/out/uns{-}*.json lab03/out/uns{-}*.txt }\KeywordTok{\textbackslash{}}
+           \ExtensionTok{lab03/out/alias{-}bytes{-}*.txt}\NormalTok{ lab03/out/sp{-}*.txt}
 \FunctionTok{git}\NormalTok{ status {-}{-}short}
+\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}E }\StringTok{\textquotesingle{}\textbackslash{}.env$|bridge\textbackslash{}.conf$|\textbackslash{}.key$|\textbackslash{}.crt$|devices\textbackslash{}.csv\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+✓ Сүүлийн команд \textbf{юу ч хэвлэхгүй}.
+
+\textbf{8.4 Commit ба push.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{git}\NormalTok{ commit {-}m }\StringTok{"Лаб 3: QoS × зам матриц, UNS схем, Sparkplug"}
-\FunctionTok{git}\NormalTok{ tag lab03{-}done }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push {-}{-}tags}
-\CommentTok{\# Нууц файл ороогүйг ЗААВАЛ шалга}
-\FunctionTok{git}\NormalTok{ ls{-}files }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ {-}E }\StringTok{\textquotesingle{}\textbackslash{}.env$|bridge\textbackslash{}.conf$|\textbackslash{}.key$|\textbackslash{}.crt$|devices\textbackslash{}.csv\textquotesingle{}}\NormalTok{   \# хоосон байх ЁСТОЙ}
+\FunctionTok{git}\NormalTok{ tag lab03{-}done}
+\FunctionTok{git}\NormalTok{ push }\KeywordTok{\&\&} \FunctionTok{git}\NormalTok{ push {-}{-}tags}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1206,6 +1590,48 @@ Sparkplug NDEATH \texttt{kill\ -9}-ийн дараа ч гарахгүй\strut
 ажиглагч өөр брокерт/группт холбогдсон\strut
 \end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
 \texttt{-\/-host}, \texttt{-\/-group} ижил эсэхийг шалга\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{ModuleNotFoundError:\ No\ module\ named\ \textquotesingle{}paho\textquotesingle{}} (Pi)\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{python3} гэж бичсэн\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{\$PY} (§2.2)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{\$SITE}, \texttt{\$CLOUD\_HOST} хоосон\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+энэ Pi цонхонд \texttt{.env} ачаалаагүй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+§2.2-ын блок\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+Бүх клиент \texttt{not\ authorised}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Лаб 2-ын authenticator идэвхтэй хэвээр\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Лаб 2 Алхам 7.6 --- \texttt{authn\ false}\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{alias-bytes} зөрүү сөрөг / хэт их\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+тоолуур шинэчлэгдээгүй, эсвэл агент зэрэг ажилласан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{sleep\ 15}-ийг бүү алгас; агентыг зогсоо\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{mount:\allowbreak{}\ /\allowbreak{}dev/\allowbreak{}sda1\ \ldots{}\ does\ not\ exist}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+USB диск өөр нэртэй\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{lsblk}-ээр шалга (\texttt{sdb1} г.м.)\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright
+\texttt{scp}: \texttt{UNPROTECTED\ PRIVATE\ KEY\ FILE}\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+түлхүүрийг \texttt{/mnt/c/...}-ээс шууд ашигласан\strut
+\end{minipage} & \begin{minipage}[t]{0.30\columnwidth}\raggedright
+Лаб 1 Алхам 8.1\strut
 \end{minipage}\tabularnewline
 \bottomrule
 \end{longtable}\endgroup

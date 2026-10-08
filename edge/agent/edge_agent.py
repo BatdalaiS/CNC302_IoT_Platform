@@ -19,7 +19,7 @@ CNC302 — ИРМЭГИЙН АГЕНТ (Raspberry Pi 3B).
     python3 edge_agent.py                    # .env-ийн утгаар
     python3 edge_agent.py --dry-run          # брокергүй, зөвхөн хэвлэнэ
     python3 edge_agent.py --once             # нэг удаа
-    python3 edge_agent.py --detector ../lab06/models/anomaly_int8.tflite
+    python3 edge_agent.py --detector ../lab06/models/model_int8.tflite
     python3 edge_agent.py --filter           # зөвхөн аномалийг үүл рүү
 """
 from __future__ import annotations
